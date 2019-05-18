@@ -22,4 +22,8 @@
     <Folder Include="Models\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Texnomic.DNS\DNS\Texnomic.DNS.csproj" />
+  </ItemGroup>
+
 </Project>
