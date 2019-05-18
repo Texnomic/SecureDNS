@@ -10,10 +10,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Texnomic.DNS.Data;
-using Texnomic.DNS.Resolvers;
+using Texnomic.SecureDNS.Data;
+using Texnomic.SecureDNS.Resolvers;
 
-namespace Texnomic.DNS
+namespace Texnomic.SecureDNS
 {
     public class Startup
     {
@@ -29,7 +29,7 @@ namespace Texnomic.DNS
             Services.AddDnsServer();
             Services.AddHangfire();
             Services.AddDnsServer();
-            Services.AddSingleton<WeatherForecastService>();
+            Services.AddSingleton<MonitorService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

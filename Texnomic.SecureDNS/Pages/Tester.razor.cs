@@ -7,14 +7,14 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace Texnomic.DNS.Pages
+namespace Texnomic.SecureDNS.Pages
 {
     public class TesterBase : ComponentBase
     {
         [Inject]
         protected DnsServer DnsServer { get; set; }
 
-        protected string Input = "google.com";
+        protected string Input { get; set; } = "facebook.com";
 
         protected string Output;
 

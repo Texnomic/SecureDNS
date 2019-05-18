@@ -2,7 +2,7 @@
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 
-namespace Texnomic.DNS.Resolvers
+namespace Texnomic.SecureDNS.Resolvers
 {
 
     /// <summary>

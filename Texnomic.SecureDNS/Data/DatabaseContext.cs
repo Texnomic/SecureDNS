@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Texnomic.DNS.Data
+namespace Texnomic.SecureDNS.Data
 {
     public class DatabaseContext : DbContext
     {

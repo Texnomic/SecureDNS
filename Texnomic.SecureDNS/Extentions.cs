@@ -9,10 +9,10 @@ using Microsoft.Extensions.Hosting;
 using System;
 using System.Net;
 using System.Threading.Tasks;
-using Texnomic.DNS.Data;
-using Texnomic.DNS.Resolvers;
+using Texnomic.SecureDNS.Data;
+using Texnomic.SecureDNS.Resolvers;
 
-namespace Texnomic.DNS
+namespace Texnomic.SecureDNS
 {
     public static class Extentions
     {
