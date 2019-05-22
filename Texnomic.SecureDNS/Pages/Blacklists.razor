@@ -1,0 +1,18 @@
+@page "/Blacklists"
+@inherits BlacklistsBase
+@using Texnomic.SecureDNS.Models
+@using Telerik.Blazor.Components.Grid
+
+<h1>Blacklists</h1>
+
+<button class="btn btn-primary" onclick="@Initalize">Initalize</button>
+
+<p>@Output</p>
+
+<TelerikGrid Data="@DatabaseContext.Blacklists.AsEnumerable()" Pageable=true PageSize=20 Sortable="true" Filterable=true>
+    <TelerikGridColumns>
+        <TelerikGridColumn Field="@nameof(Blacklist.ID)"></TelerikGridColumn>
+        <TelerikGridColumn Field="@nameof(Blacklist.Domain)"></TelerikGridColumn>
+        <TelerikGridColumn Field="@nameof(Blacklist.Timestamp)"></TelerikGridColumn>
+    </TelerikGridColumns>
+</TelerikGrid>

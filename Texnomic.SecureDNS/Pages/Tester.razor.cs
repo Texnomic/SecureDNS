@@ -1,5 +1,5 @@
-﻿using DNS.Client;
-using DNS.Server;
+﻿using Texnomic.DNS.Client;
+using Texnomic.DNS.Server;
 using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
@@ -29,7 +29,7 @@ namespace Texnomic.SecureDNS.Pages
             Output = string.Join(", ", IPs);
 
             // Get the domain name belonging to the IP (google.com)
-            var Domain = await Client.Reverse("173.194.69.100");
+            //var Domain = await Client.Reverse("173.194.69.100");
         }
     }
 }

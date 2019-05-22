@@ -1,4 +1,4 @@
-﻿using DNS.Server;
+﻿using Texnomic.DNS.Server;
 using Hangfire;
 using Hangfire.SQLite;
 using Microsoft.AspNetCore.Hosting;
@@ -10,7 +10,7 @@ using System;
 using System.Net;
 using System.Threading.Tasks;
 using Texnomic.SecureDNS.Data;
-using Texnomic.SecureDNS.Resolvers;
+using Texnomic.DNS.Protocol.RequestResolvers;
 
 namespace Texnomic.SecureDNS
 {
@@ -28,32 +28,6 @@ namespace Texnomic.SecureDNS
                                         .Build();
 
                 Services.AddSingleton(Configurations);
-
-                return Services;
-            }
-        }
-
-
-        public static IServiceCollection AddSqlite(this IServiceCollection Services)
-        {
-            using (var Provider = Services.BuildServiceProvider())
-            {
-                var Configurations = Provider.GetRequiredService<IConfigurationRoot>();
-
-                Services.AddEntityFrameworkSqlite();
-
-                Services.AddDbContext<DatabaseContext>(Options => Options.UseSqlite(Configurations.GetConnectionString("DefaultConnection")));
-
-                //var Env = Provider.GetRequiredService<IWebHostEnvironment>();
-
-                //if (Env.IsDevelopment())
-                //{
-                //    var DatabaseContext = Provider.GetRequiredService<DatabaseContext>();
-
-                //    DatabaseContext.Database.EnsureDeleted();
-
-                //    DatabaseContext.Database.EnsureCreated();
-                //}
 
                 return Services;
             }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using DNS.Server;
+using Texnomic.DNS.Server;
 using Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Texnomic.SecureDNS.Data;
-using Texnomic.SecureDNS.Resolvers;
+using Texnomic.SecureDNS.Services;
 
 namespace Texnomic.SecureDNS
 {
@@ -25,20 +25,27 @@ namespace Texnomic.SecureDNS
             Services.AddServerSideBlazor();
             Services.AddTelerikBlazor();
             Services.AddJsonConfigurations();
-            Services.AddSqlite();
+            Services.AddEntityFrameworkSqlite();
+            Services.AddHttpClient();
+            Services.AddSingleton<DatabaseContext>();
             Services.AddDnsServer();
             Services.AddHangfire();
-            Services.AddDnsServer();
             Services.AddSingleton<MonitorService>();
+            Services.AddSingleton<BlacklistsService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder App, IWebHostEnvironment Env, IBackgroundJobClient BackgroundJobs, DnsServer DnsServer)
+        public void Configure(IApplicationBuilder App, IWebHostEnvironment Env, IBackgroundJobClient BackgroundJobs, DnsServer DnsServer, DatabaseContext DatabaseContext)
         {
             if (Env.IsDevelopment())
             {
                 App.UseDeveloperExceptionPage();
+                //DatabaseContext.Database.EnsureDeleted();
             }
+
+            DatabaseContext.Database.EnsureCreated();
+
+            DnsServer.Listen();
 
             App.UseHangfireDashboard();
 
@@ -53,8 +60,6 @@ namespace Texnomic.SecureDNS
                 Endpoints.MapBlazorHub();
                 Endpoints.MapFallbackToPage("/_Host");
             });
-
-            DnsServer.Listen();
 
             //BackgroundJobs.Enqueue(() => Extentions.StartServer());
         }

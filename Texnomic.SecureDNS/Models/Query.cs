@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using DNS.Protocol;
-using DNS.Protocol.ResourceRecords;
+using Texnomic.DNS.Protocol;
+using Texnomic.DNS.Protocol.ResourceRecords;
 
 namespace Texnomic.SecureDNS.Models
 {
@@ -18,7 +18,7 @@ namespace Texnomic.SecureDNS.Models
         public string Port => IPEndPoint.Port.ToString();
         public string Domain => Request.Questions[0].Name.ToString();
         public string Resolve => Response.AnswerRecords
-                                         .Where(Record => Record.Type == RecordType.A)
+                                         .Where(Record => Record.Type == RecordType.A || Record.Type == RecordType.PTR)
                                          .Cast<IPAddressResourceRecord>()
                                          .Select(Record => Record.IPAddress)
                                          .ToList()[0]

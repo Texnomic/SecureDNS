@@ -1,5 +1,5 @@
-using DNS.Protocol;
-using DNS.Server;
+using Texnomic.DNS.Protocol;
+using Texnomic.DNS.Server;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,7 +8,7 @@ using System.Net;
 using System.Collections.Generic;
 using Texnomic.SecureDNS.Models;
 
-namespace Texnomic.SecureDNS.Data
+namespace Texnomic.SecureDNS.Services
 {
     public class MonitorService
     {
@@ -33,6 +33,7 @@ namespace Texnomic.SecureDNS.Data
                 Request = Args.Request,
                 Response = Args.Response
             });
+
             DataReceived?.Invoke(this, Args);
         }
     }

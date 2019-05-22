@@ -1,12 +1,6 @@
-﻿using DNS.Client;
-using DNS.Server;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Timers;
-using Texnomic.SecureDNS.Data;
+using Texnomic.SecureDNS.Services;
 
 namespace Texnomic.SecureDNS.Pages
 {
@@ -19,11 +13,6 @@ namespace Texnomic.SecureDNS.Pages
         {
             MonitorService.DataReceived += MonitorService_DataReceived;
             base.OnInit();
-        }
-
-        private void Timer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            Invoke(StateHasChanged);
         }
 
         private void MonitorService_DataReceived(object sender, EventArgs e)

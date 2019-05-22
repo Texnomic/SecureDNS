@@ -6,10 +6,8 @@ namespace Texnomic.SecureDNS
 {
     public class Program
     {
-        public static Task Server;
         public static void Main(string[] args)
         {
-            //Server = Extentions.StartServer();
             CreateHostBuilder(args).Build().Run();
         }
 
