@@ -1,0 +1,8 @@
+@page "/Network"
+@inherits NetworkBase
+
+
+<h1>Network</h1>
+
+<button class="btn btn-primary" onclick="@(async () => await NetworkService.SetDNS())">Set DNS</button>
+<button class="btn btn-primary" onclick="@(async () => await NetworkService.ResetDNS())">Reset DNS</button>

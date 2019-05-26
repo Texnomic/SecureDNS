@@ -11,6 +11,9 @@ using System.Net;
 using System.Threading.Tasks;
 using Texnomic.SecureDNS.Data;
 using Texnomic.DNS.Protocol.RequestResolvers;
+using Texnomic.SecureDNS.Resolvers;
+using System.Reflection;
+using System.Collections.Generic;
 
 namespace Texnomic.SecureDNS
 {
@@ -69,6 +72,27 @@ namespace Texnomic.SecureDNS
 
                 return Services;
             }
+        }
+
+        public static IServiceCollection AddServices(this IServiceCollection Services)
+        {
+            var Asm = Assembly.GetExecutingAssembly();
+
+            var Namespaces = new SortedSet<string>()
+            {
+                "Texnomic.SecureDNS.Services",
+                "Texnomic.SecureDNS.Data",
+            };
+
+            foreach (Type Type in Asm.GetTypes())
+            {
+                if (Namespaces.Contains(Type.Namespace))
+                {
+                    Services.AddSingleton(Type);
+                }
+            }
+
+            return Services;
         }
 
         [DisableConcurrentExecution(60)]

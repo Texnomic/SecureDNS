@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
-    <LangVersion>7.3</LangVersion>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -10,16 +10,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FlexLabs.EntityFrameworkCore.Upsert" Version="2.1.0" />
-    <PackageReference Include="Hangfire" Version="1.7.2" />
+    <PackageReference Include="AsyncEnumerator" Version="2.2.2" />
+    <PackageReference Include="FlexLabs.EntityFrameworkCore.Upsert" Version="2.1.2" />
+    <PackageReference Include="Hangfire" Version="1.7.3" />
     <PackageReference Include="Hangfire.SQLite" Version="1.4.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.2.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Design" Version="1.1.6" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0" />
     <PackageReference Include="morelinq" Version="3.1.1" />
-    <PackageReference Include="System.Management.Automation" Version="6.2.0" />
+    <PackageReference Include="System.Management.Automation" Version="6.2.1" />
     <PackageReference Include="Telerik.UI.for.Blazor.Trial" Version="1.1.0" />
-    <PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="2.2.8" />
+    <PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="2.3.1" />
   </ItemGroup>
 
   <ItemGroup>

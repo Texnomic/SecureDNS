@@ -1,0 +1,173 @@
+﻿using System;
+using System.Net.Security;
+using System.Net.Sockets;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Texnomic.DNS.Protocol;
+using Texnomic.DNS.Protocol.RequestResolvers;
+using Texnomic.SecureDNS.Data;
+using Texnomic.SecureDNS.Models;
+using System.Collections.Async;
+using System.Security.Cryptography.X509Certificates;
+using Microsoft.EntityFrameworkCore;
+
+namespace Texnomic.SecureDNS.Resolvers
+{
+    public class DnsOverTls : IRequestResolver, IDisposable
+    {
+        private readonly DatabaseContext DatabaseContext;
+
+        private TcpClient TcpClient;
+        private SslStream SslStream;
+
+        public List<Host> Hosts;
+        public List<Cache> Cache;
+        public List<Resolver> Resolvers;
+
+
+        public DnsOverTls(DatabaseContext DatabaseContext)
+        {
+            this.DatabaseContext = DatabaseContext;
+            InitializeAsync().Wait();
+            PreloadAsync().Wait();
+        }
+
+        private async Task InitializeAsync()
+        {
+            foreach (var Resolver in Resolvers)
+            {
+                try
+                {
+                    TcpClient = new TcpClient(Resolver.IPEndPoint);
+
+                    await TcpClient.ConnectAsync(Resolver.IPEndPoint.Address, Resolver.IPEndPoint.Port);
+
+                    SslStream = new SslStream(TcpClient.GetStream(), false, new RemoteCertificateValidationCallback(ValidateServerCertificate));
+
+                    await SslStream.AuthenticateAsClientAsync(Resolver.IPEndPoint.Address.ToString());
+                }
+                catch (Exception Error)
+                {
+                    throw Error;
+                }
+            }
+        }
+
+        private async Task PreloadAsync()
+        {
+            Resolvers = await DatabaseContext.Resolvers.ToListAsync();
+            Hosts = await DatabaseContext.Hosts.ToListAsync();
+            Cache = await DatabaseContext.Cache.ToListAsync();
+        }
+
+        private async Task WriteAsync(IRequest Request)
+        {
+            while (true)
+            {
+                try
+                {
+                    var Buffer = Request.ToArray();
+
+                    var Length = BitConverter.GetBytes((ushort)Buffer.Length);
+
+                    if (BitConverter.IsLittleEndian)
+                    {
+                        Array.Reverse(Length);
+                    }
+
+                    await SslStream.WriteAsync(Length);
+                    await SslStream.WriteAsync(Buffer);
+                    await SslStream.FlushAsync();
+
+                    break;
+                }
+                catch (Exception Error)
+                {
+                    throw Error;
+                }
+            }
+        }
+
+        private async Task<Response> ReadAsync()
+        {
+            while (true)
+            {
+                try
+                {
+                    var Buffer = new byte[2];
+
+                    var Read = await SslStream.ReadAsync(Buffer);
+
+                    if (Read == 0) throw new Exception("Read Zero Bytes from SslStream.");
+
+                    if (BitConverter.IsLittleEndian)
+                    {
+                        Array.Reverse(Buffer);
+                    }
+
+                    var Length = BitConverter.ToUInt16(Buffer);
+
+                    Buffer = new byte[Length];
+
+                    Read = await SslStream.ReadAsync(Buffer);
+
+                    if (Read == 0) throw new Exception("Read Zero Bytes from SslStream.");
+
+                    return Response.FromArray(Buffer);
+                }
+                catch (Exception Error)
+                {
+                    throw Error;
+                }
+            }
+        }
+
+        public async Task<IResponse> Resolve(IRequest Request)
+        {
+            try
+            {
+                var Host = Hosts.SingleOrDefault(Host => Host.Domain == Request.Questions.First().Name);
+
+                if (Host != null) throw new NotImplementedException();
+
+                var Cached = Cache.SingleOrDefault(Cache => Cache.Domain == Request.Questions.First().Name);
+
+                if (Cached != null) return Cached.Response;
+
+                var IsBlacklisted = await DatabaseContext.Blacklists.AnyAsync(Record => Record.Domain == Request.Questions.First().Name);
+
+                if (IsBlacklisted) throw new NotImplementedException();
+
+                if (!TcpClient.Connected || !SslStream.CanRead || !SslStream.CanWrite) await InitializeAsync();
+
+                await WriteAsync(Request);
+
+                var Response = await ReadAsync();
+
+                await DatabaseContext.Cache
+                                     .Upsert(new Cache() { Domain = Response.Domain, Response = Response })
+                                     .On(Record => Record.Domain)
+                                     .RunAsync();
+
+                return Response;
+            }
+            catch (Exception Error)
+            {
+                throw Error;
+            }
+        }
+
+        public bool ValidateServerCertificate(object Sender, X509Certificate Certificate, X509Chain Chain, SslPolicyErrors SslPolicyErrors)
+        {
+            return SslPolicyErrors == SslPolicyErrors.None && Resolvers.Any(Resolver => Resolver.Hash.ToString() == Certificate.GetPublicKeyString());
+        }
+
+        public void Dispose()
+        {
+            DatabaseContext.Dispose();
+            SslStream.Dispose();
+            TcpClient.Dispose();
+        }
+    }
+}

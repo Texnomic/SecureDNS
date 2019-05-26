@@ -27,11 +27,9 @@ namespace Texnomic.SecureDNS
             Services.AddJsonConfigurations();
             Services.AddEntityFrameworkSqlite();
             Services.AddHttpClient();
-            Services.AddSingleton<DatabaseContext>();
+            Services.AddServices();
             Services.AddDnsServer();
             Services.AddHangfire();
-            Services.AddSingleton<MonitorService>();
-            Services.AddSingleton<BlacklistsService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

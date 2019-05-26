@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Security.Policy;
 using System.Threading.Tasks;
 using Texnomic.DNS.Protocol;
 using Texnomic.SecureDNS.Models;
@@ -48,16 +49,16 @@ namespace Texnomic.SecureDNS.Data
                         .HasConversion(Value => Value.ToString(), Value => DateTime.Parse(Value));
 
             ModelBuilder.Entity<Resolver>()
-                        .HasIndex(Resolver => Resolver.IPAddress)
+                        .HasIndex(Resolver => Resolver.IPEndPoint)
                         .IsUnique();
 
             ModelBuilder.Entity<Resolver>()
-                        .Property(Resolver => Resolver.IPAddress)
-                        .HasConversion(Value => Value.ToString(), Value => IPAddress.Parse(Value));
+                        .Property(Resolver => Resolver.IPEndPoint)
+                        .HasConversion(Value => Value.ToString(), Value => IPEndPoint.Parse(Value));
 
             ModelBuilder.Entity<Resolver>()
                         .Property(Resolver => Resolver.Hash)
-                        .HasConversion(Value => Value.Raw, Value => new SHA256(Value));
+                        .HasConversion(Value => Value.Raw, Value => new Hexadecimal(Value));
 
             ModelBuilder.Entity<Host>()
                         .HasIndex(Host => Host.Domain)
@@ -82,6 +83,23 @@ namespace Texnomic.SecureDNS.Data
             ModelBuilder.Entity<Blacklist>()
                         .Property(Blacklist => Blacklist.Timestamp)
                         .HasConversion(Value => Value.ToString(), Value => DateTime.Parse(Value));
+
+            ModelBuilder.Entity<Host>()
+                        .HasData(new Host()
+                        {
+                            ID = 1,
+                            Domain = Domain.FromString("www.secure.dns"),
+                            IPAddress = IPAddress.Parse("127.0.0.1")
+                        });
+
+            ModelBuilder.Entity<Resolver>()
+                        .HasData(new Resolver()
+                        {
+                            ID = 1,
+                            Name = "CloudFlare TLS",
+                            IPEndPoint = IPEndPoint.Parse("1.1.1.1:853"),
+                            Hash = Hexadecimal.Parse("")
+                        });
         }
     }
 }

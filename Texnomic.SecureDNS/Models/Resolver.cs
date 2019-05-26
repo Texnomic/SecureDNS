@@ -10,7 +10,7 @@ namespace Texnomic.SecureDNS.Models
     {
         public int ID { get; set; }
         public string Name { get; set; }
-        public IPAddress IPAddress { get; set; }
-        public SHA256 Hash { get; set; }
+        public IPEndPoint IPEndPoint { get; set; }
+        public Hexadecimal Hash { get; set; }
     }
 }
