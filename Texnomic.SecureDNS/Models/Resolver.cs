@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
+﻿using System.Net;
+using Texnomic.DNS.Protocol;
 
 namespace Texnomic.SecureDNS.Models
 {
@@ -10,6 +7,7 @@ namespace Texnomic.SecureDNS.Models
     {
         public int ID { get; set; }
         public string Name { get; set; }
+        public Domain Domain { get; set; }
         public IPEndPoint IPEndPoint { get; set; }
         public Hexadecimal Hash { get; set; }
     }
