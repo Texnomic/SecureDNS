@@ -24,7 +24,7 @@ namespace Texnomic.SecureDNS.Services
     //+------------------------------------------------------------------------------+
     //| Windows 10         |  Win32NT        |        10         |          0        |
     //+------------------------------------------------------------------------------+
-    
+
 
     public class NetworkService
     {
@@ -39,7 +39,7 @@ namespace Texnomic.SecureDNS.Services
 
         public async Task ResetDNS()
         {
-            
+
 
             using (var Shell = PowerShell.Create())
             {
