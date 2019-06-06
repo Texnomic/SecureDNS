@@ -1,9 +1,7 @@
-﻿using Texnomic.DNS.Client;
-using Texnomic.DNS.Server;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using System.Threading.Tasks;
-using Texnomic.SecureDNS.Services;
 using Texnomic.SecureDNS.Data;
+using Texnomic.SecureDNS.Services;
 
 namespace Texnomic.SecureDNS.Pages
 {

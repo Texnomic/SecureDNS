@@ -1,17 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
 using Texnomic.DNS.Server;
 using Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Texnomic.SecureDNS.Data;
-using Texnomic.SecureDNS.Services;
+using Texnomic.SecureDNS.Hangfire;
+using System;
 
 namespace Texnomic.SecureDNS
 {
@@ -33,17 +28,22 @@ namespace Texnomic.SecureDNS
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder App, IWebHostEnvironment Env, IBackgroundJobClient BackgroundJobs, DnsServer DnsServer, DatabaseContext DatabaseContext)
+        public void Configure(IApplicationBuilder App, IWebHostEnvironment Env, IServiceProvider ServiceProvider, DatabaseContext DatabaseContext)
         {
             if (Env.IsDevelopment())
             {
+                DatabaseContext.Database.EnsureDeleted();
+                DatabaseContext.Database.EnsureCreated();
                 App.UseDeveloperExceptionPage();
-                //DatabaseContext.Database.EnsureDeleted();
+            }
+            else
+            {
+                DatabaseContext.Database.EnsureCreated();
             }
 
-            DatabaseContext.Database.EnsureCreated();
-
-            DnsServer.Listen();
+            //Configure Hangfire to Use Our JobActivator with ASP.NET IoC Containers
+            //http://docs.hangfire.io/en/latest/background-methods/using-ioc-containers.html
+            GlobalConfiguration.Configuration.UseActivator(new HangfireJobActivator(ServiceProvider));
 
             App.UseHangfireDashboard();
 
@@ -58,8 +58,6 @@ namespace Texnomic.SecureDNS
                 Endpoints.MapBlazorHub();
                 Endpoints.MapFallbackToPage("/_Host");
             });
-
-            //BackgroundJobs.Enqueue(() => Extentions.StartServer());
         }
 
     }
