@@ -1,5 +1,5 @@
 ﻿using System.Net;
-using Texnomic.DNS.Protocol;
+using Texnomic.DNS.Models;
 
 namespace Texnomic.SecureDNS.Models
 {
@@ -8,7 +8,12 @@ namespace Texnomic.SecureDNS.Models
         public int ID { get; set; }
         public string Name { get; set; }
         public Domain Domain { get; set; }
-        public IPEndPoint IPEndPoint { get; set; }
+        public IPAddress IPAddress { get; set; }
         public Hexadecimal Hash { get; set; }
+        public bool UDP { get; set; }
+        public bool TCP { get; set; }
+        public bool TLS { get; set; }
+        public bool HTTPS { get; set; }
+        public bool CRYPT { get; set; }
     }
 }

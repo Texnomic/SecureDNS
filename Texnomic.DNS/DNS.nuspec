@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>DNS</id>
+    <version>1.0.0</version>
+    <title>DNS</title>
+    <authors>Texnomic</authors>
+    <owners>Texnomic</owners>
+    <projectUrl>https://github.com/Texnomic/dns</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>DNS Protocol C# Library with Client and Server Implementation.</description>
+    <copyright>Copyright 2019</copyright>
+    <tags>dns protocol client server</tags>
+  </metadata>
+</package>

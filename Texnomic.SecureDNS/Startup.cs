@@ -1,4 +1,4 @@
-using Texnomic.DNS.Server;
+using System;
 using Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -6,7 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Texnomic.SecureDNS.Data;
 using Texnomic.SecureDNS.Hangfire;
-using System;
 
 namespace Texnomic.SecureDNS
 {

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Texnomic.DNS.Protocol;
+using Texnomic.DNS.Models;
 using Texnomic.SecureDNS.Data;
 using Texnomic.SecureDNS.Models;
 

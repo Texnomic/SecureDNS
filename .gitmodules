@@ -1,3 +1,0 @@
-[submodule "dns"]
-	path = Texnomic.DNS
-	url = https://github.com/Texnomic/DNS.git

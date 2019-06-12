@@ -1,7 +1,6 @@
-﻿using NetworkSettingsAdapter;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Management.Automation;
+using System.Linq;
 using System.Net.NetworkInformation;
 using System.Threading.Tasks;
 using Texnomic.SecureDNS.Models;
@@ -33,35 +32,27 @@ namespace Texnomic.SecureDNS.Services
     {
         private readonly string[] Loopback = { "127.0.0.1", "127.0.0.1" };
 
-        public NetworkConnectionManager Manager;
-        public List<Adapter> Adapters;
+        public List<Adapter> Adapters => GetAdapters();
 
-        public AdaptersService()
+        private List<Adapter> GetAdapters()
         {
-            Manager = new NetworkConnectionManager();
-            Adapters = new List<Adapter>();
-
-            foreach (var NetworkInterface in NetworkInterface.GetAllNetworkInterfaces())
-            {
-                Adapters.Add(new Adapter
-                {
-                    ID = NetworkInterface.Id,
-                    Name = NetworkInterface.Name,
-                    Description = NetworkInterface.Description,
-                    Mac = NetworkInterface.GetPhysicalAddress().ToString(),
-                    DNS = string.Join(", ", NetworkInterface.GetIPProperties().DnsAddresses)
-                });
-            }
+            return NetworkInterface.GetAllNetworkInterfaces()
+                                    .Select(NIC => new Adapter
+                                    {
+                                        ID = NIC.Id,
+                                        Name = NIC.Name,
+                                        Description = NIC.Description,
+                                        Mac = NIC.GetPhysicalAddress().ToString(),
+                                        DNS = string.Join(", ", NIC.GetIPProperties().DnsAddresses)
+                                    })
+                                    .ToList();
         }
 
         public async Task SetDNSAsync(Adapter Adapter)
         {
             try
             {
-                Manager.SetDns(Loopback, Adapter.ID);
-
-                using var Shell = PowerShell.Create();
-                await Shell.AddScript("Get-NetAdapter -Physical | ForEach-Object { Set-DnsClientServerAddress $_.Name -ServerAddresses (\"127.0.0.1\") }").InvokeAsync();
+                //await Shell.AddScript("Get-NetAdapter -Physical | ForEach-Object { Set-DnsClientServerAddress $_.Name -ServerAddresses (\"127.0.0.1\") }").InvokeAsync();
             }
             catch (Exception Error)
             {
@@ -73,12 +64,7 @@ namespace Texnomic.SecureDNS.Services
         {
             try
             {
-                var DNS = Adapter.DNS.Split(", ", StringSplitOptions.RemoveEmptyEntries);
-
-                Manager.SetDns(DNS, Adapter.ID);
-
-                using var Shell = PowerShell.Create();
-                await Shell.AddScript("Get-NetAdapter -Physical | ForEach-Object { Set-DnsClientServerAddress $_.Name -ResetServerAddresses }").InvokeAsync();
+                //await Shell.AddScript("Get-NetAdapter -Physical | ForEach-Object { Set-DnsClientServerAddress $_.Name -ResetServerAddresses }").InvokeAsync();
             }
             catch (Exception Error)
             {

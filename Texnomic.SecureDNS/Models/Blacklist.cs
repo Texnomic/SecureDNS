@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Texnomic.DNS.Protocol;
+using Texnomic.DNS.Models;
 
 namespace Texnomic.SecureDNS.Models
 {

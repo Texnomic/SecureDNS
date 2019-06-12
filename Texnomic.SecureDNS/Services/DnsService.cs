@@ -1,5 +1,6 @@
 ﻿using Hangfire;
-using Texnomic.DNS.Server;
+using Texnomic.DNS;
+using Texnomic.SecureDNS.Resolvers;
 
 namespace Texnomic.SecureDNS.Services
 {
@@ -16,7 +17,7 @@ namespace Texnomic.SecureDNS.Services
 
         public void Start()
         {
-            JobID = JobClient.Enqueue<DnsServer>(Server => Server.Listen());
+            JobID = JobClient.Enqueue<DnsServer<DnsOverTls>>(Server => Server.StartAsync());
         }
 
         public void Stop()

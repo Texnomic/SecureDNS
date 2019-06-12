@@ -1,12 +1,13 @@
-﻿using Texnomic.DNS.Server;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Net;
-using Texnomic.DNS.Protocol.RequestResolvers;
 using System.Reflection;
 using System.Collections.Generic;
+using Texnomic.SecureDNS.Resolvers;
+using Texnomic.DNS;
+using Texnomic.DNS.Resolvers;
 
 namespace Texnomic.SecureDNS
 {
@@ -31,11 +32,9 @@ namespace Texnomic.SecureDNS
 
         public static IServiceCollection AddDnsServer(this IServiceCollection Services)
         {
-            var Resolver = new TlsRequestResolver(new IPEndPoint(IPAddress.Parse("1.1.1.1"), 853));
+            Services.AddSingleton<DnsOverTls>();
 
-            Services.AddSingleton<IRequestResolver>(Resolver);
-
-            Services.AddSingleton<DnsServer>();
+            Services.AddSingleton<DnsServer<DnsOverTls>>();
 
             return Services;
         }

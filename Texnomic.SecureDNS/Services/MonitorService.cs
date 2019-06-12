@@ -1,35 +1,31 @@
-using Texnomic.DNS.Protocol;
-using Texnomic.DNS.Server;
 using System;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Collections.ObjectModel;
-using System.Net;
-using System.Collections.Generic;
+using Texnomic.DNS;
 using Texnomic.SecureDNS.Models;
+using Texnomic.SecureDNS.Resolvers;
 
 namespace Texnomic.SecureDNS.Services
 {
     public class MonitorService
     {
-        private readonly DnsServer Server;
+        private readonly DnsServer<DnsOverTls> Server;
 
         public ObservableCollection<Query> Queries;
 
         public event EventHandler<EventArgs> DataReceived;
 
-        public MonitorService(DnsServer Server)
+        public MonitorService(DnsServer<DnsOverTls> Server)
         {
             this.Server = Server;
             Queries = new ObservableCollection<Query>();
-            Server.Responded += Server_Responded;
+            Server.Resolved += Server_Resolved;
         }
 
-        private void Server_Responded(object Sender, DnsServer.RespondedEventArgs Args)
+        private void Server_Resolved(object sender, DnsServer<DnsOverTls>.ResolvedEventArgs Args)
         {
             Queries.Add(new Query
             {
-                IPEndPoint = Args.Remote,
+                IPEndPoint = Args.EndPoint,
                 Request = Args.Request,
                 Response = Args.Response
             });

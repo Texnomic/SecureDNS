@@ -2,7 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
-    <LangVersion>preview</LangVersion>
+    <LangVersion>8.0</LangVersion>
+    <PublishSingleFile>true</PublishSingleFile>
+    <RuntimeIdentifier>win10-x64</RuntimeIdentifier>
+    <RuntimeIdentifiers>win10-x64;win81-x64;win7-x64;</RuntimeIdentifiers>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,15 +22,13 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.2.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Design" Version="1.1.6" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0" />
-    <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.0.0-preview.1" />
     <PackageReference Include="morelinq" Version="3.1.1" />
-    <PackageReference Include="Plexteq.Win32Managed.NetworkSettingsAdapter" Version="1.0.0" />
     <PackageReference Include="Telerik.UI.for.Blazor.Trial" Version="1.1.0" />
     <PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="2.4.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Texnomic.DNS\DNS\Texnomic.DNS.csproj" />
+    <ProjectReference Include="..\Texnomic.DNS\Texnomic.DNS.csproj" />
   </ItemGroup>
 
 </Project>

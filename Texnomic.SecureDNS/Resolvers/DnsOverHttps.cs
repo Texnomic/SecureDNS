@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Texnomic.DNS.Protocol;
-using Texnomic.DNS.Protocol.RequestResolvers;
+using Texnomic.DNS.Models;
+using Texnomic.DNS.Resolvers;
 using Texnomic.SecureDNS.Data;
 
 namespace Texnomic.SecureDNS.Resolvers
 {
-    public class DnsOverHttps : IRequestResolver
+    public class DnsOverHttps : IResolver
     {
         private readonly DatabaseContext DatabaseContext;
 
@@ -17,7 +15,7 @@ namespace Texnomic.SecureDNS.Resolvers
             this.DatabaseContext = DatabaseContext;
         }
 
-        public Task<IResponse> Resolve(IRequest Request)
+        public Task<Message> ResolveAsync(Message Request)
         {
             throw new NotImplementedException();
         }

@@ -4,17 +4,18 @@ using System.Net.Sockets;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Texnomic.DNS.Protocol;
-using Texnomic.DNS.Protocol.RequestResolvers;
 using Texnomic.SecureDNS.Data;
 using Texnomic.SecureDNS.Models;
 using System.Collections.Async;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.EntityFrameworkCore;
+using Texnomic.DNS.Resolvers;
+using Texnomic.DNS.Models;
+using System.Net;
 
 namespace Texnomic.SecureDNS.Resolvers
 {
-    public class DnsOverTls : IRequestResolver, IDisposable
+    public class DnsOverTls : IResolver, IDisposable
     {
         private readonly DatabaseContext DatabaseContext;
 
@@ -25,6 +26,10 @@ namespace Texnomic.SecureDNS.Resolvers
         public List<Cache> Cache;
         public List<Resolver> Resolvers;
 
+        //Generic Workaround, Needs Fixing
+        public DnsOverTls()
+        {
+        }
 
         public DnsOverTls(DatabaseContext DatabaseContext)
         {
@@ -39,13 +44,13 @@ namespace Texnomic.SecureDNS.Resolvers
             {
                 try
                 {
-                    TcpClient = new TcpClient(Resolver.IPEndPoint);
+                    TcpClient = new TcpClient();
 
-                    await TcpClient.ConnectAsync(Resolver.IPEndPoint.Address, Resolver.IPEndPoint.Port);
+                    await TcpClient.ConnectAsync(Resolver.IPAddress, 853);
 
                     SslStream = new SslStream(TcpClient.GetStream(), false, new RemoteCertificateValidationCallback(ValidateServerCertificate));
 
-                    await SslStream.AuthenticateAsClientAsync(Resolver.IPEndPoint.Address.ToString());
+                    await SslStream.AuthenticateAsClientAsync(Resolver.IPAddress.ToString());
                 }
                 catch (Exception Error)
                 {
@@ -61,7 +66,7 @@ namespace Texnomic.SecureDNS.Resolvers
             Cache = await DatabaseContext.Cache.ToListAsync();
         }
 
-        private async Task WriteAsync(IRequest Request)
+        private async Task WriteAsync(Message Request)
         {
             while (true)
             {
@@ -89,7 +94,7 @@ namespace Texnomic.SecureDNS.Resolvers
             }
         }
 
-        private async Task<Response> ReadAsync()
+        private async Task<Message> ReadAsync()
         {
             while (true)
             {
@@ -114,7 +119,7 @@ namespace Texnomic.SecureDNS.Resolvers
 
                     if (Read == 0) throw new Exception("Read Zero Bytes from SslStream.");
 
-                    return Response.FromArray(Buffer);
+                    return Message.FromArray(Buffer);
                 }
                 catch (Exception Error)
                 {
@@ -123,19 +128,21 @@ namespace Texnomic.SecureDNS.Resolvers
             }
         }
 
-        public async Task<IResponse> Resolve(IRequest Request)
+        public async Task<Message> ResolveAsync(Message Request)
         {
             try
             {
-                var Host = Hosts.SingleOrDefault(Host => Host.Domain == Request.Questions.First().Name);
+                var Domain = Request.Questions.First().Domain;
+
+                var Host = Hosts.SingleOrDefault(Host => Host.Domain == Domain);
 
                 if (Host != null) throw new NotImplementedException();
 
-                var Cached = Cache.SingleOrDefault(Cache => Cache.Domain == Request.Questions.First().Name);
+                var Cached = Cache.SingleOrDefault(Cache => Cache.Domain == Domain);
 
                 if (Cached != null) return Cached.Response;
 
-                var IsBlacklisted = await DatabaseContext.Blacklists.AnyAsync(Record => Record.Domain == Request.Questions.First().Name);
+                var IsBlacklisted = await DatabaseContext.Blacklists.AnyAsync(Record => Record.Domain == Domain);
 
                 if (IsBlacklisted) throw new NotImplementedException();
 
@@ -146,7 +153,7 @@ namespace Texnomic.SecureDNS.Resolvers
                 var Response = await ReadAsync();
 
                 await DatabaseContext.Cache
-                                     .Upsert(new Cache() { Domain = Response.Domain, Response = Response })
+                                     .Upsert(new Cache() { Domain = Domain, Response = Response })
                                      .On(Record => Record.Domain)
                                      .RunAsync();
 

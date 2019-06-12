@@ -20,7 +20,7 @@ namespace Texnomic.SecureDNS.Hangfire
 
                 Services.AddHangfire(Configuration => Configuration.UseSQLiteStorage(Connection, new SQLiteStorageOptions
                 {
-                    InvisibilityTimeout = TimeSpan.FromDays(1),
+                    //InvisibilityTimeout = TimeSpan.FromDays(1),
                     JobExpirationCheckInterval = TimeSpan.FromDays(1),
                 }));
 
