@@ -1,4 +1,6 @@
 using System;
+using ElectronNET.API;
+using ElectronNET.API.Entities;
 using Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -57,7 +59,22 @@ namespace Texnomic.SecureDNS
                 Endpoints.MapBlazorHub();
                 Endpoints.MapFallbackToPage("/_Host");
             });
+
+            Electronize();
         }
 
+        public async void Electronize()
+        {
+            var Options = new BrowserWindowOptions
+            {
+                DarkTheme = true,
+                AutoHideMenuBar = true,
+                //Show = false
+            };
+
+            var Window = await Electron.WindowManager.CreateWindowAsync(Options);
+
+            //Window.OnReadyToShow += () => Window.Show();
+        }
     }
 }

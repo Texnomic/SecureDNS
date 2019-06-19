@@ -1,34 +1,35 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
-
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <LangVersion>8.0</LangVersion>
+    <OutputType>Exe</OutputType>
+    <!--<PublishTrimmed>true</PublishTrimmed>-->
     <PublishSingleFile>true</PublishSingleFile>
-    <RuntimeIdentifier>win10-x64</RuntimeIdentifier>
-    <RuntimeIdentifiers>win10-x64;win81-x64;win7-x64;</RuntimeIdentifiers>
+    <!--<PublishReadyToRun>true</PublishReadyToRun>-->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
   </PropertyGroup>
-
   <ItemGroup>
-    <None Remove="SecureDNS.sqlite-journal" />
-    <None Remove="SecureDNS.sqlite" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="AsyncEnumerator" Version="2.2.2" />
+    <PackageReference Include="AsyncEnumerator" Version="3.0.2-beta" />
+    <PackageReference Include="ElectronNET.API" Version="5.22.12" />
     <PackageReference Include="FlexLabs.EntityFrameworkCore.Upsert" Version="2.1.2" />
     <PackageReference Include="Hangfire" Version="1.7.3" />
     <PackageReference Include="Hangfire.SQLite" Version="1.4.2" />
-    <PackageReference Include="Microsoft.CodeAnalysis" Version="3.1.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.2.4" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Design" Version="1.1.6" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis" Version="3.2.0-beta1-final" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.0.0-preview6.19304.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Design" Version="2.0.0-preview1-final" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.0.0-preview6.19304.6" />
     <PackageReference Include="morelinq" Version="3.1.1" />
     <PackageReference Include="Telerik.UI.for.Blazor.Trial" Version="1.1.0" />
-    <PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="2.4.0" />
+    <PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="2.5.3" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Texnomic.DNS\Texnomic.DNS.csproj" />
+    <ProjectReference Include="..\Texnomic.ORMi\Texnomic.ORMi.csproj" />
+    <ProjectReference Include="..\Texnomic.WMI\Texnomic.WMI.csproj" />
   </ItemGroup>
-
+  <ItemGroup>
+    <Content Update="Electron.Manifest.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 </Project>

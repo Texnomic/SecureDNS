@@ -17,6 +17,7 @@ namespace Texnomic.SecureDNS.Pages
 
         protected async Task ResolveAsync()
         {
+            await Task.Delay(1000);
             throw new NotImplementedException();
         }
     }
