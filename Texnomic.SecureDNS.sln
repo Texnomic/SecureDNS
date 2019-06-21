@@ -19,7 +19,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.WMI", "Texnomic.WM
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.ORMi", "Texnomic.ORMi\Texnomic.ORMi.csproj", "{84F5B8E0-7D9E-4A1F-9689-23184140D08B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Texnomic.SecureDNS.Tests", "Texnomic.SecureDNS.Tests\Texnomic.SecureDNS.Tests.csproj", "{827EC308-B997-40BB-8D38-3B0C6959570D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.SecureDNS.Tests", "Texnomic.SecureDNS.Tests\Texnomic.SecureDNS.Tests.csproj", "{827EC308-B997-40BB-8D38-3B0C6959570D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Texnomic.DNS.Tests", "Texnomic.DNS.Tests\Texnomic.DNS.Tests.csproj", "{F45A4331-4CC4-4977-B3AB-B534F7A15F0C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,6 +49,10 @@ Global
 		{827EC308-B997-40BB-8D38-3B0C6959570D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{827EC308-B997-40BB-8D38-3B0C6959570D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{827EC308-B997-40BB-8D38-3B0C6959570D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F45A4331-4CC4-4977-B3AB-B534F7A15F0C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F45A4331-4CC4-4977-B3AB-B534F7A15F0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F45A4331-4CC4-4977-B3AB-B534F7A15F0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F45A4331-4CC4-4977-B3AB-B534F7A15F0C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

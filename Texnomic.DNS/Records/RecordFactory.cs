@@ -7,14 +7,14 @@ namespace Texnomic.DNS.Records
 {
     public class RecordFactory : ISubtypeFactory
     {
-        static readonly SortedDictionary<RecordType, Type> TypesDictionary = new SortedDictionary<RecordType, Type>
+        static readonly Dictionary<RecordType, Type> TypesDictionary = new Dictionary<RecordType, Type>
         {
             { RecordType.A, typeof(A) },
             { RecordType.CNAME, typeof(CName) }
         };
 
 
-        static readonly SortedDictionary<Type, RecordType> KeysDictionary = new SortedDictionary<Type, RecordType>
+        static readonly Dictionary<Type, RecordType> KeysDictionary = new Dictionary<Type, RecordType>
         {
             { typeof(A), RecordType.A },
             { typeof(CName), RecordType.CNAME }
@@ -24,10 +24,7 @@ namespace Texnomic.DNS.Records
         {
             Key = KeysDictionary.GetValueOrDefault(ValueType);
 
-            if (Key == default)
-            {
-                throw new NotImplementedException();
-            }
+            if (Key == default) throw new NotImplementedException();
 
             return true;
         }
@@ -36,10 +33,7 @@ namespace Texnomic.DNS.Records
         {
             Type = TypesDictionary.GetValueOrDefault((RecordType)Key);
 
-            if (Type == default)
-            {
-                throw new NotImplementedException();
-            }
+            if (Type == default) throw new NotImplementedException();
 
             return true;
         }

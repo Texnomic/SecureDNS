@@ -69,12 +69,9 @@ namespace Texnomic.SecureDNS
             {
                 DarkTheme = true,
                 AutoHideMenuBar = true,
-                //Show = false
             };
 
-            var Window = await Electron.WindowManager.CreateWindowAsync(Options);
-
-            //Window.OnReadyToShow += () => Window.Show();
+            await Electron.WindowManager.CreateWindowAsync(Options);
         }
     }
 }

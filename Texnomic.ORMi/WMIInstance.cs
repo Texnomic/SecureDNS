@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using Texnomic.ORMi.Attributes;
@@ -16,19 +17,13 @@ namespace Texnomic.ORMi
         [WmiIgnore]
         internal CimInstance Instance { get; set; }
 
-        protected TResult Execute<TResult>([CallerMemberName] string Name = default, Dictionary<string, object> Parameters = default)
+        protected TResult Execute<TValue, TResult>([CallerMemberName] string Name = default, Dictionary<string, TValue> Parameters = default)
         {
             using var ParametersCollection = new CimMethodParametersCollection();
 
-            if (Parameters != default)
-            {
-                foreach (var Parameter in Parameters)
-                {
-                    var CimParameter = CimMethodParameter.Create(Parameter.Key, Parameter.Value, CimFlags.Parameter);
-
-                    ParametersCollection.Add(CimParameter);
-                }
-            }
+            Parameters?.ToList()
+                       .ConvertAll(Parameter => CimMethodParameter.Create(Parameter.Key, Parameter.Value, CimFlags.Parameter))
+                       .ForEach(Parameter => ParametersCollection.Add(Parameter));
 
             //Instance.CimClass.CimClassMethods[Name].Parameters;
 
