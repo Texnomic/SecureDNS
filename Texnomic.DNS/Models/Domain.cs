@@ -1,11 +1,14 @@
 ﻿using BinarySerialization;
+using Nerdbank.Streams;
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection.Emit;
 using System.Text;
+using System.Text.Json.Serialization;
 using Texnomic.DNS.Enums;
 
 namespace Texnomic.DNS.Models
@@ -13,38 +16,38 @@ namespace Texnomic.DNS.Models
     public class Domain : IBinarySerializable
     {
         [Ignore]
-        public Label[] Labels { get; set; }
+        public Label[] Labels { get; private set; }
 
-        public override string ToString()
+        public Domain(string Domain)
         {
-            return string.Join('.', Labels.Select(Label => Label.Text));
-        }
+            var DomainLables = Domain.Split('.');
 
-        public static Domain FromString(string DomainText)
-        {
-            var DomainLables = DomainText.Split('.');
-
-            var Domain = new Domain
-            {
-                Labels = new Label[DomainLables.Length]
-            };
+            Labels = new Label[DomainLables.Length];
 
             for (int i = 0; i < DomainLables.Length; i++)
             {
-                Domain.Labels[i] = new Label
+                Labels[i] = new Label
                 {
                     Type = LabelType.Normal,
                     Count = (ushort)DomainLables[i].Length,
                     Text = DomainLables[i]
                 };
             }
+        }
 
-            return Domain;
+        public override string ToString()
+        {
+            return string.Join('.', Labels.Select(Label => Label.Text));
+        }
+
+        public static Domain FromString(string Domain)
+        {
+            return new Domain(Domain);
         }
 
         public void Serialize(Stream Stream, Endianness Endianness, BinarySerializationContext Context)
         {
-            if(Context.ParentContext.Value is Answer)
+            if (Context.ParentContext.Value is Answer)
             {
                 Stream.WriteByte(0b11000000);
                 Stream.WriteByte(0b00001100);
@@ -59,7 +62,7 @@ namespace Texnomic.DNS.Models
         {
             var Data = Stream.ReadByte();
 
-            var Flag = (Data &~ 0b00111111) >> 6;
+            var Flag = (Data & ~0b00111111) >> 6;
 
             var Type = (LabelType)(Flag);
 
@@ -77,9 +80,9 @@ namespace Texnomic.DNS.Models
                     {
                         var Byte = Stream.ReadByte();
 
-                        var Pointer = (Byte &~ 0b11000000) + Stream.ReadByte();
+                        var Pointer = (Byte & ~0b11000000) + Stream.ReadByte();
 
-                        if (Pointer != 12) throw new NotImplementedException();
+                        if (Pointer != 12) throw new NotImplementedException($"Compressed Label with OffSet Pointer {Pointer}.");
 
                         var Message = Context.ParentContext.ParentContext.ParentValue as Message;
 
@@ -142,6 +145,11 @@ namespace Texnomic.DNS.Models
             }
 
             Stream.WriteByte(0);
+        }
+
+        public string ToJson()
+        {
+            return JsonSerializer.ToString(this);
         }
     }
 }

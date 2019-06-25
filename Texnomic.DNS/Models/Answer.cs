@@ -1,5 +1,7 @@
 ﻿using BinarySerialization;
+using Nerdbank.Streams;
 using System;
+using System.Buffers;
 using System.Net;
 using Texnomic.DNS.Converters;
 using Texnomic.DNS.Enums;
@@ -26,6 +28,16 @@ namespace Texnomic.DNS.Models
         [FieldLength(nameof(Length))]
         [SubtypeFactory(nameof(Type), typeof(RecordFactory))]
         public IRecord Record { get; set; }
+
+        public new static Answer FromArray(byte[] Data)
+        {
+            return Serializer.Deserialize<Answer>(Data);
+        }
+
+        public new static Answer FromArray(ReadOnlySequence<byte> Data)
+        {
+            return Serializer.Deserialize<Answer>(Data.AsStream());
+        }
     }
 
 }
