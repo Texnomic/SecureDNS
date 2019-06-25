@@ -5,6 +5,7 @@ namespace Texnomic.DNS.Resolvers
 {
     public interface IResolver
     {
+        Task<byte[]> ResolveAsync(byte[] Request);
         Task<Message> ResolveAsync(Message Request);
     }
 }

@@ -5,15 +5,15 @@ namespace Texnomic.DNS.Models
 {
     public class Question
     {
-        [FieldOrder(16)]
+        [FieldOrder(0)]
         public Domain Domain { get; set; }
 
-        [FieldOrder(22)]
+        [FieldOrder(1)]
         [FieldBitLength(16)]
         [FieldEndianness(Endianness.Big)]
         public RecordType Type { get; set; }
 
-        [FieldOrder(23)]
+        [FieldOrder(2)]
         [FieldBitLength(16)]
         [FieldEndianness(Endianness.Big)]
         public RecordClass Class { get; set; }

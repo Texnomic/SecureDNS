@@ -1,6 +1,6 @@
 ﻿namespace Texnomic.DNS.Enums
 {
-    public enum LabelType
+    public enum LabelType : byte
     {
         Normal = 0,
         Extended = 1,

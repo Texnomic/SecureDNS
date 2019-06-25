@@ -12,7 +12,7 @@ namespace Texnomic.WMI.Network
         public uint Index { get; set; }
 
         [WmiProperty("Description")]
-        public string Name { get; set; }
+        public string Device { get; set; }
 
         [WmiProperty("IPAddress")]
         public string[] IPAddress { get; set; }
@@ -21,7 +21,7 @@ namespace Texnomic.WMI.Network
         public string[] IPSubnet { get; set; }
 
         [WmiProperty("MACAddress")]
-        public string MAC { get; set; }
+        public string Mac { get; set; }
 
         [WmiProperty("DNSServerSearchOrder")]
         public string[] DNS { get; set; }

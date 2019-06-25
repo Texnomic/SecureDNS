@@ -5,7 +5,7 @@ namespace Texnomic.DNS.Records
 {
     public class CName : IRecord
     {
-        [FieldOrder(28)]
+        [FieldOrder(0)]
         [SerializeUntil((byte)0)]
         public Label[] Labels { get; set; }
     }

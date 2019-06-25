@@ -1,33 +1,27 @@
 ﻿using BinarySerialization;
 using System;
+using System.IO;
 
 namespace Texnomic.DNS.Converters
 {
-    public class TimeSpanConverter : FieldValueAttributeBase
+    public class TimeSpanConverter : IValueConverter, IBinarySerializable
     {
-        public TimeSpanConverter(string Field) : base(Field) { }
-
-        public object Convert(object Value, object Parameter, BinarySerializationContext Context)
+        public object Convert(object value, object parameter, BinarySerializationContext context)
         {
-            return TimeSpan.FromSeconds((uint)Value);
+            return new TimeSpan(0, 0, (int)value);
         }
 
         public object ConvertBack(object value, object parameter, BinarySerializationContext context)
         {
-            return (int)((TimeSpan)value).TotalSeconds;
+            return (uint)((TimeSpan)value).TotalSeconds;
         }
 
-        protected override object GetFinalValue(object state)
+        public void Deserialize(Stream stream, Endianness endianness, BinarySerializationContext serializationContext)
         {
             throw new NotImplementedException();
         }
 
-        protected override object GetInitialState(BinarySerializationContext context)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override object GetUpdatedState(object state, byte[] buffer, int offset, int count)
+        public void Serialize(Stream stream, Endianness endianness, BinarySerializationContext serializationContext)
         {
             throw new NotImplementedException();
         }

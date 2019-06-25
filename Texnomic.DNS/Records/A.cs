@@ -5,7 +5,7 @@ namespace Texnomic.DNS.Records
 {
     public class A : IRecord
     {
-        [FieldOrder(28)]
+        [FieldOrder(0)]
         [FieldBitLength(32)]
         [FieldEndianness(Endianness.Little)]
         public uint Data { get; set; }

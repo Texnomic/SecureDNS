@@ -33,7 +33,7 @@ namespace Texnomic.DNS.Records
         {
             Type = TypesDictionary.GetValueOrDefault((RecordType)Key);
 
-            if (Type == default) throw new NotImplementedException();
+            //if (Type == default) throw new NotImplementedException();
 
             return true;
         }

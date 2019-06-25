@@ -7,7 +7,7 @@ namespace Texnomic.WMI.Network
     public class NetAdapter : WmiInstance
     {
         [WmiProperty("InterfaceGuid")]
-        public string ID { get; set; }
+        public string Guid { get; set; }
 
         public string Name { get; set; }
 
