@@ -18,6 +18,14 @@ namespace Texnomic.DNS.Models
         [Ignore]
         public Label[] Labels { get; private set; }
 
+        /// <summary>
+        /// Empty Constructor for Serialization
+        /// </summary>
+        public Domain()
+        {
+            Labels = new Label[0];
+        }
+
         public Domain(string Domain)
         {
             var DomainLables = Domain.Split('.');

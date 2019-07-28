@@ -63,5 +63,12 @@ namespace Texnomic.ORMi
 
             return string.Join(", ", SearchProperties);
         }
+
+        protected void SetProperty<T>([CallerMemberName] string Name = default, T Value = default)
+        {
+            Instance.CimInstanceProperties[Name].Value = Value;
+            Instance = Session.ModifyInstance(Instance);
+            GetType().GetProperty(Name).SetValue(this, Value);
+        }
     }
 }
