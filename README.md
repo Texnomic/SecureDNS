@@ -10,6 +10,22 @@ The Project will be offically launched within my Talk for [Cairo Security Camp](
 
 >This talk will cover the DNS protocol since its inception in 1986 and taking a deep-dive into the inherit lack of security at its core design and how all modern operating systems using insecure standards, Then we will explain alternative secure implementation like DNS Over TLS and DNS Over HTTP/S. Then we will shift-gears to developing an all-new modern DNS Server Reference-Implementation with a myriad of possibilities for retaking control like Black/Sink-holing, Threat Hunting/Intelligence and way more! Finally, we will launch a GitHub-based Open-Source Project containing DNS Server Reference-Implementation for the First-Time & Exclusively in Cairo Security Camp!
 
+# Technology Stack
+0. (C# 8.0)[https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-8]
+1. (.NET Core 3.0)[https://dotnet.microsoft.com/download/dotnet-core/3.0]
+2. (ASP.NET Core 3.0)[https://dotnet.microsoft.com/download/dotnet-core/3.0]
+3. (Blazor aka Razor Components)[https://dotnet.microsoft.com/apps/aspnet/web-apps/client]
+4. (Entity Framework Core 3.0)[https://docs.microsoft.com/en-us/ef/core/]
+
+# Dependencies
+1. (HangFire)[https://www.hangfire.io/]
+2. (MoreLINQ)[https://github.com/morelinq/MoreLINQ]
+3. (Electron.NET)[https://github.com/ElectronNET/Electron.NET]
+4. (FlexLabs.Upsert)[https://github.com/artiomchi/FlexLabs.Upsert]
+5. (Telerik UI for Blazor)[https://www.telerik.com/blazor-ui]
+6. (Entity Framework Extensions)[https://entityframework-extensions.net/]
+7. (Hangfire Extension Plugins)[https://github.com/wanlitao/HangfireExtension]
+
 # Supported By:
-1. JetBrains 
 ![JetBrains](https://raw.githubusercontent.com/Texnomic/SecureDNS/master/GitHub/JetBrains.png "JetBrains")
+![Telerik](https://raw.githubusercontent.com/Texnomic/SecureDNS/master/GitHub/Telerik.png "Telerik")
