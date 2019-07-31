@@ -7,3 +7,7 @@ The SecureDNS Server is implemented using Clean-Architecture patterns and with m
 
 # Important Note:
 The Project will be offically launched on [Cairo Security Camp](https://cairosecuritycamp.com/sessions/diy-secure-dns-server/) September 21st.
+
+# Supported By:
+1. JetBrains 
+![JetBrains](https://raw.githubusercontent.com/Texnomic/SecureDNS/GitHub/JetBrains.png "JetBrains")
