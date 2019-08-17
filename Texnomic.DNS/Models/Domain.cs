@@ -1,12 +1,8 @@
 ﻿using BinarySerialization;
-using Nerdbank.Streams;
 using System;
-using System.Buffers;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Reflection.Emit;
 using System.Text;
 using System.Text.Json.Serialization;
 using Texnomic.DNS.Enums;
@@ -15,32 +11,34 @@ namespace Texnomic.DNS.Models
 {
     public class Domain : IBinarySerializable
     {
+        private const byte CompressedLabel = 0b11000000;
+        private const byte LabelPointer = 0b00001100;
+        private const byte LabelMask = 0b00111111;
+        private const byte LengthMash = 0b11000000;
+        private const byte PointerMask = 0b11000000;
+        private const byte NullOctet = 0b00000000;
+
         [Ignore]
-        public Label[] Labels { get; private set; }
+        public List<Label> Labels { get; private set; } 
 
         /// <summary>
         /// Empty Constructor for Serialization
         /// </summary>
         public Domain()
         {
-            Labels = new Label[0];
+            Labels = new List<Label>();
         }
 
         public Domain(string Domain)
         {
-            var DomainLables = Domain.Split('.');
-
-            Labels = new Label[DomainLables.Length];
-
-            for (int i = 0; i < DomainLables.Length; i++)
-            {
-                Labels[i] = new Label
-                {
-                    Type = LabelType.Normal,
-                    Count = (ushort)DomainLables[i].Length,
-                    Text = DomainLables[i]
-                };
-            }
+            Labels = Domain.Split('.')
+                           .Select(Label => new Label
+                           {
+                               Type = LabelType.Normal,
+                               Count = (ushort)Label.Length,
+                               Text = Label
+                           })
+                           .ToList();
         }
 
         public override string ToString()
@@ -57,46 +55,29 @@ namespace Texnomic.DNS.Models
         {
             if (Context.ParentContext.Value is Answer)
             {
-                Stream.WriteByte(0b11000000);
-                Stream.WriteByte(0b00001100);
+                SerializeCompressedLabels(Stream);
             }
             else
             {
-                SerializeLabels(Stream);
+                SerializeNormalLabels(Stream, Context);
             }
         }
 
         public void Deserialize(Stream Stream, Endianness Endianness, BinarySerializationContext Context)
         {
-            var Data = Stream.ReadByte();
-
-            var Flag = (Data & ~0b00111111) >> 6;
-
-            var Type = (LabelType)(Flag);
+            var Type = ReadLabelType(Stream);
 
             switch (Type)
             {
                 case LabelType.Normal:
                     {
-                        Stream.Position = 0;
-
-                        DeserializeLabels(Stream);
+                        DeserializeNormalLabels(Stream);
 
                         break;
                     }
                 case LabelType.Compressed:
                     {
-                        var Byte = Stream.ReadByte();
-
-                        var Pointer = (Byte & ~0b11000000) + Stream.ReadByte();
-
-                        if (Pointer != 12) throw new NotImplementedException($"Compressed Label with OffSet Pointer {Pointer}.");
-
-                        var Message = Context.ParentContext.ParentContext.ParentValue as Message;
-
-                        Labels = Message.Questions.First().Domain.Labels;
-
-                        Stream.Position -= 1; //Workaround Serializer Bug
+                        DeserializeCompressedLabels(Stream, Context);
 
                         break;
                     }
@@ -106,19 +87,19 @@ namespace Texnomic.DNS.Models
             }
         }
 
-        private void DeserializeLabels(Stream Stream)
+        private void DeserializeNormalLabels(Stream Stream)
         {
-            var Byte = Stream.ReadByte();
+            Stream.Position = 0;
 
-            var Labels = new List<Label>();
+            var Byte = Stream.ReadByte();
 
             while (Byte != 0)
             {
-                var Size = Byte & ~0b11000000;
+                var Length = Byte &~ LengthMash;
 
-                var Buffer = new byte[Size];
+                var Buffer = new byte[Length];
 
-                Stream.Read(Buffer, 0, Size);
+                Stream.Read(Buffer, 0, Length);
 
                 var Text = Encoding.ASCII.GetString(Buffer);
 
@@ -133,13 +114,27 @@ namespace Texnomic.DNS.Models
 
                 Byte = Stream.ReadByte();
             }
+        }
+        private void DeserializeCompressedLabels(Stream Stream, BinarySerializationContext Context)
+        {
+            Stream.Position = 0;
 
-            this.Labels = Labels.ToArray();
+            var Byte = Stream.ReadByte();
+
+            var Pointer = (Byte & ~PointerMask) + Stream.ReadByte();
+
+            if (Pointer != 12) throw new NotImplementedException($"Compressed Label with OffSet Pointer {Pointer}.");
+
+            var Message = Context.ParentContext.ParentContext.ParentValue as Message;
+
+            Labels = Message.Questions.First().Domain.Labels;
         }
 
-        private void SerializeLabels(Stream Stream)
+        private void SerializeNormalLabels(Stream Stream, BinarySerializationContext Context)
         {
-            foreach (var Label in Labels)
+            var Domain = Context.Value as Domain;
+
+            foreach (var Label in Domain.Labels)
             {
                 var Flag = (ushort)Label.Type << 6;
 
@@ -152,7 +147,21 @@ namespace Texnomic.DNS.Models
                 Stream.Write(Bytes, 0, Bytes.Length);
             }
 
-            Stream.WriteByte(0);
+            Stream.WriteByte(NullOctet);
+        }
+        private void SerializeCompressedLabels(Stream Stream)
+        {
+            Stream.WriteByte(CompressedLabel);
+            Stream.WriteByte(LabelPointer);
+        }
+
+        private LabelType ReadLabelType(Stream Stream)
+        {
+            var Byte = Stream.ReadByte();
+
+            var Flag = (Byte & ~LabelMask) >> 6;
+
+            return (LabelType)Flag;
         }
 
         public string ToJson()

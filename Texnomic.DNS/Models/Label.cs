@@ -1,6 +1,4 @@
-﻿using BinarySerialization;
-using System.Text;
-using Texnomic.DNS.Enums;
+﻿using Texnomic.DNS.Enums;
 
 namespace Texnomic.DNS.Models
 {

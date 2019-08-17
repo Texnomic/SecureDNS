@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Texnomic.ORMi;
+﻿using Texnomic.ORMi;
 using Texnomic.ORMi.Attributes;
 
 namespace Texnomic.WMI.Network

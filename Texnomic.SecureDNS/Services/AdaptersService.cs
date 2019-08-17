@@ -53,7 +53,7 @@ namespace Texnomic.SecureDNS.Services
             try
             {
                 await Task.Delay(1000);
-                //await Shell.AddScript("Get-NetAdapter -Physical | ForEach-Object { Set-DnsClientServerAddress $_.Name -ServerAddresses (\"127.0.0.1\") }").InvokeAsync();
+                //
             }
             catch (Exception Error)
             {
@@ -66,7 +66,7 @@ namespace Texnomic.SecureDNS.Services
             try
             {
                 await Task.Delay(1000);
-                //await Shell.AddScript("Get-NetAdapter -Physical | ForEach-Object { Set-DnsClientServerAddress $_.Name -ResetServerAddresses }").InvokeAsync();
+                //
             }
             catch (Exception Error)
             {

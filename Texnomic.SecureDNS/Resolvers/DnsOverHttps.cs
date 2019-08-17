@@ -19,5 +19,10 @@ namespace Texnomic.SecureDNS.Resolvers
         {
             throw new NotImplementedException();
         }
+
+        public Task<byte[]> ResolveAsync(byte[] Request)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

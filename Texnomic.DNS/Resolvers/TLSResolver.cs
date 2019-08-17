@@ -2,7 +2,6 @@
 using System;
 using System.Buffers;
 using System.IO.Pipelines;
-using System.Linq;
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
@@ -12,7 +11,7 @@ using Texnomic.DNS.Models;
 
 namespace Texnomic.DNS.Resolvers
 {
-    public class TLS : IResolver, IDisposable
+    public class TLSResolver : IResolver, IDisposable
     {
         private readonly string PublicKey;
         private readonly IPAddress IPAddress;
@@ -22,7 +21,7 @@ namespace Texnomic.DNS.Resolvers
         private PipeReader PipeReader;
         private PipeWriter PipeWriter;
 
-        public TLS(IPAddress IPAddress, string PublicKey)
+        public TLSResolver(IPAddress IPAddress, string PublicKey)
         {
             this.IPAddress = IPAddress;
             this.PublicKey = PublicKey;

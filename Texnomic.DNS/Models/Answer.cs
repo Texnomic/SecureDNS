@@ -2,9 +2,6 @@
 using Nerdbank.Streams;
 using System;
 using System.Buffers;
-using System.Net;
-using Texnomic.DNS.Converters;
-using Texnomic.DNS.Enums;
 using Texnomic.DNS.Records;
 
 namespace Texnomic.DNS.Models

@@ -2,12 +2,10 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
-using System.Net;
 using System.Reflection;
 using System.Collections.Generic;
 using Texnomic.SecureDNS.Resolvers;
 using Texnomic.DNS;
-using Texnomic.DNS.Resolvers;
 
 namespace Texnomic.SecureDNS
 {

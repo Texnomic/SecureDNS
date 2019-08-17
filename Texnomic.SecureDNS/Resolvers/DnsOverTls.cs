@@ -6,12 +6,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Texnomic.SecureDNS.Data;
 using Texnomic.SecureDNS.Models;
-using System.Collections.Async;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.EntityFrameworkCore;
 using Texnomic.DNS.Resolvers;
 using Texnomic.DNS.Models;
-using System.Net;
 
 namespace Texnomic.SecureDNS.Resolvers
 {
@@ -175,6 +173,11 @@ namespace Texnomic.SecureDNS.Resolvers
             DatabaseContext.Dispose();
             SslStream.Dispose();
             TcpClient.Dispose();
+        }
+
+        public Task<byte[]> ResolveAsync(byte[] Request)
+        {
+            throw new NotImplementedException();
         }
     }
 }

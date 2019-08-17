@@ -63,7 +63,7 @@ namespace Texnomic.DNS.Tests
 
             var Bytes = Msg.ToArray();
 
-            Assert.AreEqual(Convert.ToBase64String(Bytes), Convert.ToBase64String(ResponseBytes));
+            Assert.AreEqual(Convert.ToBase64String(ResponseBytes), Convert.ToBase64String(Bytes));
         }
     }
 }

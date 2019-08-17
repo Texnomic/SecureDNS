@@ -21,7 +21,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.ORMi", "Texnomic.O
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.SecureDNS.Tests", "Texnomic.SecureDNS.Tests\Texnomic.SecureDNS.Tests.csproj", "{827EC308-B997-40BB-8D38-3B0C6959570D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Texnomic.DNS.Tests", "Texnomic.DNS.Tests\Texnomic.DNS.Tests.csproj", "{F45A4331-4CC4-4977-B3AB-B534F7A15F0C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.DNS.Tests", "Texnomic.DNS.Tests\Texnomic.DNS.Tests.csproj", "{F45A4331-4CC4-4977-B3AB-B534F7A15F0C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.SecureDNS.Automation", "Texnomic.SecureDNS.Automation\Texnomic.SecureDNS.Automation.csproj", "{01A6E760-91EB-481F-8243-9C2D3DFFDFA8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Texnomic.SecureDNS.Automation.Tests", "Texnomic.SecureDNS.Automation.Tests\Texnomic.SecureDNS.Automation.Tests.csproj", "{EFB5C48D-C4C6-479D-92BD-1F19029F5CC1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,6 +57,14 @@ Global
 		{F45A4331-4CC4-4977-B3AB-B534F7A15F0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F45A4331-4CC4-4977-B3AB-B534F7A15F0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F45A4331-4CC4-4977-B3AB-B534F7A15F0C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{01A6E760-91EB-481F-8243-9C2D3DFFDFA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01A6E760-91EB-481F-8243-9C2D3DFFDFA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01A6E760-91EB-481F-8243-9C2D3DFFDFA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01A6E760-91EB-481F-8243-9C2D3DFFDFA8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EFB5C48D-C4C6-479D-92BD-1F19029F5CC1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EFB5C48D-C4C6-479D-92BD-1F19029F5CC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EFB5C48D-C4C6-479D-92BD-1F19029F5CC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EFB5C48D-C4C6-479D-92BD-1F19029F5CC1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
