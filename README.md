@@ -1,4 +1,4 @@
-![SecureDNS](http://github.com/Texnomic/SecureDNS/blob/master/GitHub/Logo.png?raw=true "SecureDNS")
+![SecureDNS](https://raw.githubusercontent.com/Texnomic/SecureDNS/master/GitHub/Logo.png?token=AAMSPST36THE2YKM2FZXOTC5LBVSS "SecureDNS")
 
 Building a Secure, Modern & Cross-Platform DNS Server Using C# 8.0 & .NET Core 3.0.
 
@@ -32,4 +32,4 @@ The Project will be offically launched within my Talk for [Cairo Security Camp](
 
 
 # Supported By
-![JetBrains](http://github.com/Texnomic/SecureDNS/blob/master/GitHub/JetBrains.png?raw=true "JetBrains")
+![JetBrains](https://raw.githubusercontent.com/Texnomic/SecureDNS/master/GitHub/JetBrains.png?token=AAMSPSXJTF7ZGMXVJ5WEBWK5LBVTO "JetBrains")
