@@ -9,15 +9,15 @@ namespace Texnomic.SecureDNS.Pages
         [Inject]
         public MonitorService MonitorService { get; set; }
 
-        protected override void OnInit()
+        protected override void OnInitialized()
         {
             MonitorService.DataReceived += MonitorService_DataReceived;
-            base.OnInit();
+            base.OnInitialized();
         }
 
-        private void MonitorService_DataReceived(object sender, EventArgs e)
+        private void MonitorService_DataReceived(object Sender, EventArgs Args)
         {
-            Invoke(StateHasChanged);
+            InvokeAsync(StateHasChanged).ConfigureAwait(false);
         }
     }
 }

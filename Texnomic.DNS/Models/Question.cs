@@ -2,6 +2,7 @@
 using Nerdbank.Streams;
 using System.Buffers;
 using System.IO;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Texnomic.DNS.Enums;
 
@@ -44,12 +45,12 @@ namespace Texnomic.DNS.Models
 
         public string ToJson()
         {
-            return JsonSerializer.ToString(this);
+            return JsonSerializer.Serialize(this);
         }
 
         public static Message FromJson(string Json)
         {
-            return JsonSerializer.Parse<Message>(Json);
+            return JsonSerializer.Deserialize<Message>(Json);
         }
 
         public override string ToString()

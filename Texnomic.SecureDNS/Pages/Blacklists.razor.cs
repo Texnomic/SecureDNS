@@ -15,11 +15,11 @@ namespace Texnomic.SecureDNS.Pages
 
         protected string Output;
 
-        protected async Task Initalize()
+        protected async Task InitializeAsync()
         {
-            await BlacklistsService.Initalize();
+            await BlacklistsService.InitializeAsync();
 
-            Output = "Blacklists Initalized Sucessfully.";
+            Output = "Blacklists Initialized Successfully.";
         }
     }
 }

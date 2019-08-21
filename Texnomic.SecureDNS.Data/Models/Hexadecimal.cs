@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace Texnomic.SecureDNS.Models
+namespace Texnomic.SecureDNS.Data.Models
 {
     public class Hexadecimal
     {

@@ -10,9 +10,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="BinarySerializer" Version="8.3.0" />
-    <PackageReference Include="Nerdbank.Streams" Version="2.2.26" />
-    <PackageReference Include="System.Text.Json" Version="4.6.0-preview6.19303.8" />
+    <PackageReference Include="BinarySerializer" Version="8.4.3" />
+    <PackageReference Include="Nerdbank.Streams" Version="2.3.26" />
+    <PackageReference Include="System.Text.Json" Version="4.6.0-preview8.19405.3" />
   </ItemGroup>
 
 </Project>

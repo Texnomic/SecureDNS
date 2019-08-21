@@ -1,33 +1,62 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.IO;
 using System.Net;
 using System.Reflection;
+using Texnomic.SecureDNS.Data.Identity;
 using Texnomic.DNS.Models;
-using Texnomic.SecureDNS.Models;
+using Texnomic.SecureDNS.Data.Models;
 
 namespace Texnomic.SecureDNS.Data
 {
-    public class DatabaseContext : DbContext
+    public class DatabaseContext : IdentityDbContext<User, Role, Guid, UserClaim, UserRole, UserLogin, RoleClaim, UserToken>
     {
         public DbSet<Cache> Cache { get; set; }
         public DbSet<Resolver> Resolvers { get; set; }
         public DbSet<Host> Hosts { get; set; }
         public DbSet<Blacklist> Blacklists { get; set; }
 
-        public DatabaseContext() : base()
-        {
+        public DatabaseContext() { }
 
-        }
+        public DatabaseContext(DbContextOptions<DatabaseContext> Options) : base(Options) { }
+
 
         protected override void OnConfiguring(DbContextOptionsBuilder OptionsBuilder)
         {
-            var Directiory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            OptionsBuilder.UseSqlite($"Data Source={Directiory}\\SecureDNS.sqlite;");
+            if (OptionsBuilder.IsConfigured) return;
+
+            var Directory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            OptionsBuilder.UseSqlite($"Data Source={Directory}\\SecureDNS.sqlite;");
         }
 
         protected override void OnModelCreating(ModelBuilder ModelBuilder)
         {
+            base.OnModelCreating(ModelBuilder);
+
+            ModelBuilder.Entity<Role>().ToTable("Roles");
+            ModelBuilder.Entity<Role>().Property(Property => Property.Id).HasColumnName("RoleID");
+
+            ModelBuilder.Entity<RoleClaim>().ToTable("RoleClaims");
+            ModelBuilder.Entity<RoleClaim>().Property(Property => Property.Id).HasColumnName("RoleClaimID");
+
+            ModelBuilder.Entity<User>().ToTable("Users");
+            ModelBuilder.Entity<User>().Property(Property => Property.Id).HasColumnName("UserID");
+
+            ModelBuilder.Entity<UserRole>().ToTable("UserRoles");
+            ModelBuilder.Entity<UserRole>().Property(Property => Property.RoleId).HasColumnName("RoleID");
+            ModelBuilder.Entity<UserRole>().Property(Property => Property.UserId).HasColumnName("UserID");
+
+            ModelBuilder.Entity<UserLogin>().ToTable("UserLogins");
+            ModelBuilder.Entity<UserLogin>().Property(Property => Property.UserId).HasColumnName("UserID");
+
+            ModelBuilder.Entity<UserClaim>().ToTable("UserClaims");
+            ModelBuilder.Entity<UserClaim>().Property(Property => Property.Id).HasColumnName("UserClaimID");
+            ModelBuilder.Entity<UserClaim>().Property(Property => Property.UserId).HasColumnName("UserID");
+
+            ModelBuilder.Entity<UserToken>().ToTable("UserTokens");
+            ModelBuilder.Entity<UserToken>().Property(Property => Property.UserId).HasColumnName("UserID");
+
             ModelBuilder.Entity<Cache>()
                         .HasIndex(Cache => Cache.Domain)
                         .IsUnique();

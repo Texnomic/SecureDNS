@@ -25,6 +25,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.SecureDNS.Automati
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.SecureDNS.Automation.Tests", "Texnomic.SecureDNS.Automation.Tests\Texnomic.SecureDNS.Automation.Tests.csproj", "{EFB5C48D-C4C6-479D-92BD-1F19029F5CC1}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.SecureDNS.Data", "Texnomic.SecureDNS.Data\Texnomic.SecureDNS.Data.csproj", "{10DECCB9-F189-416F-ABCE-29A53E273EBD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,10 @@ Global
 		{EFB5C48D-C4C6-479D-92BD-1F19029F5CC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EFB5C48D-C4C6-479D-92BD-1F19029F5CC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EFB5C48D-C4C6-479D-92BD-1F19029F5CC1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10DECCB9-F189-416F-ABCE-29A53E273EBD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10DECCB9-F189-416F-ABCE-29A53E273EBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10DECCB9-F189-416F-ABCE-29A53E273EBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10DECCB9-F189-416F-ABCE-29A53E273EBD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

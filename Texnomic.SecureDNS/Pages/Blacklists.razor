@@ -1,14 +1,13 @@
 @page "/Blacklists"
 @inherits BlacklistsBase
-@using Texnomic.SecureDNS.Models
 
 <h1>Blacklists</h1>
 
-<button class="btn btn-primary" onclick="@Initalize">Initalize</button>
+<button class="btn btn-primary" @onclick="@InitializeAsync">Initialize</button>
 
 <p>@Output</p>
 
-<TelerikGrid Data="@DatabaseContext.Blacklists.AsEnumerable()" Pageable=true PageSize=20 Sortable="true" Filterable=true>
+<TelerikGrid Data="@DatabaseContext.Blacklists.AsEnumerable()" Pageable="true" PageSize="20" Sortable="true" Filterable="true">
     <TelerikGridColumns>
         <TelerikGridColumn Field="@nameof(Blacklist.ID)"></TelerikGridColumn>
         <TelerikGridColumn Field="@nameof(Blacklist.Domain)"></TelerikGridColumn>

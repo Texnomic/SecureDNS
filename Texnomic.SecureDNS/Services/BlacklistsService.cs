@@ -6,7 +6,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Texnomic.DNS.Models;
 using Texnomic.SecureDNS.Data;
-using Texnomic.SecureDNS.Models;
+using Texnomic.SecureDNS.Data.Models;
 
 namespace Texnomic.SecureDNS.Services
 {
@@ -21,72 +21,72 @@ namespace Texnomic.SecureDNS.Services
             this.HttpClientFactory = HttpClientFactory;
         }
 
-        public async Task Initalize()
+        public async Task InitializeAsync()
         {
-            await FilterLists_EasyPrivacy();
-            await FilterLists_EasyList();
-            await FilterLists_280Blocker();
-            await FilterLists_1Hosts();
-            await RansomwareTracker();
-            await MalwareDomains();
-            await MalwareDomainList();
-            await YoYo();
+            await FilterLists_EasyPrivacyAsync();
+            await FilterLists_EasyListAsync();
+            await FilterLists_280BlockerAsync();
+            await FilterLists_1HostsAsync();
+            await RansomwareTrackerAsync();
+            await MalwareDomainsAsync();
+            await MalwareDomainListAsync();
+            await YoYoAsync();
         }
 
-        private async Task FilterLists_EasyPrivacy()
+        private async Task FilterLists_EasyPrivacyAsync()
         {
-            var File = await Download("https://v.firebog.net/hosts/Easyprivacy.txt");
+            var File = await DownloadAsync("https://v.firebog.net/hosts/Easyprivacy.txt");
 
             Save(File);
         }
 
-        private async Task FilterLists_EasyList()
+        private async Task FilterLists_EasyListAsync()
         {
-            var File = await Download("https://raw.githubusercontent.com/austinheap/sophos-xg-block-lists/master/easylist.txt");
+            var File = await DownloadAsync("https://raw.githubusercontent.com/austinheap/sophos-xg-block-lists/master/easylist.txt");
 
             Save(File);
         }
 
-        private async Task FilterLists_280Blocker()
+        private async Task FilterLists_280BlockerAsync()
         {
-            var File = await Download("https://280blocker.net/files/280blocker_domain.txt");
+            var File = await DownloadAsync("https://280blocker.net/files/280blocker_domain.txt");
 
             Save(File);
         }
 
-        private async Task FilterLists_1Hosts()
+        private async Task FilterLists_1HostsAsync()
         {
-            var File = await Download("https://1hos.cf/complete/list.txt");
+            var File = await DownloadAsync("https://1hos.cf/complete/list.txt");
 
             Save(File);
         }
 
-        private async Task RansomwareTracker()
+        private async Task RansomwareTrackerAsync()
         {
-            var File = await Download("https://ransomwaretracker.abuse.ch/downloads/RW_DOMBL.txt");
+            var File = await DownloadAsync("https://ransomwaretracker.abuse.ch/downloads/RW_DOMBL.txt");
 
             Save(File);
         }
 
-        private async Task MalwareDomains()
+        private async Task MalwareDomainsAsync()
         {
-            var File = await Download("http://mirror1.malwaredomains.com/files/justdomains");
+            var File = await DownloadAsync("http://mirror1.malwaredomains.com/files/justdomains");
 
             Save(File);
         }
 
-        private async Task MalwareDomainList()
+        private async Task MalwareDomainListAsync()
         {
-            var File = await Download("http://www.malwaredomainlist.com/hostslist/hosts.txt");
+            var File = await DownloadAsync("http://www.malwaredomainlist.com/hostslist/hosts.txt");
 
             File = File.Select(Line => Line.Replace("127.0.0.1", "").Trim());
 
             Save(File);
         }
 
-        private async Task YoYo()
+        private async Task YoYoAsync()
         {
-            var File = await Download("https://pgl.yoyo.org/as/serverlist.php?showintro=0;hostformat=hosts");
+            var File = await DownloadAsync("https://pgl.yoyo.org/as/serverlist.php?showintro=0;hostformat=hosts");
 
             File = File.Select(Line => Line.Replace("127.0.0.1", "").Trim());
 
@@ -97,7 +97,7 @@ namespace Texnomic.SecureDNS.Services
         {
             Upsert(Convert(File));
         }
-        private List<Blacklist> Convert(IEnumerable<string> File)
+        private static IEnumerable<Blacklist> Convert(IEnumerable<string> File)
         {
             return File.ToList()
                        .ConvertAll(Line => new Blacklist() { Domain = Domain.FromString(Line) });
@@ -110,7 +110,7 @@ namespace Texnomic.SecureDNS.Services
                                                  .On(Record => Record.Domain)
                                                  .Run());
         }
-        private async Task<IEnumerable<string>> Download(string URL)
+        private async Task<IEnumerable<string>> DownloadAsync(string URL)
         {
             using (var Client = HttpClientFactory.CreateClient())
             {
@@ -119,7 +119,7 @@ namespace Texnomic.SecureDNS.Services
                 return Parse(Data);
             }
         }
-        private IEnumerable<string> Parse(string Data)
+        private static IEnumerable<string> Parse(string Data)
         {
             return Data.Split("\n")
                        .Select(Line => Line.Trim())

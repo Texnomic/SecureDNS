@@ -1,7 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using Texnomic.DNS;
-using Texnomic.SecureDNS.Models;
+using Texnomic.SecureDNS.Data.Models;
 using Texnomic.SecureDNS.Resolvers;
 
 namespace Texnomic.SecureDNS.Services

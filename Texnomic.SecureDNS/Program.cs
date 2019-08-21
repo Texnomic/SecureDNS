@@ -12,11 +12,11 @@ namespace Texnomic.SecureDNS
                                    .Run();
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args)
+        public static IHostBuilder CreateHostBuilder(string[] Args)
         {
-            return Host.CreateDefaultBuilder(args)
+            return Host.CreateDefaultBuilder(Args)
                        .ConfigureWebHostDefaults(WebBuilder => WebBuilder
-                       .UseElectron(args)
+                       .UseElectron(Args)
                        .UseStartup<Startup>());
         }                                           
     }

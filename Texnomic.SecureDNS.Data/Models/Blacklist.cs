@@ -1,7 +1,7 @@
 ﻿using System;
 using Texnomic.DNS.Models;
 
-namespace Texnomic.SecureDNS.Models
+namespace Texnomic.SecureDNS.Data.Models
 {
     public class Blacklist
     {

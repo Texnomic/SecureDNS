@@ -1,12 +1,12 @@
 @page "/Monitor"
 @inherits MonitorBase
-@using Texnomic.SecureDNS.Models
+@using Texnomic.SecureDNS.Data.Models
 
 <h1>Server Monitor</h1>
 
 <p>This Component Demonstrates Fetching Live Data from DNS Server.</p>
 
-<TelerikGrid Data="@MonitorService.Queries" Pageable=true PageSize=20 Sortable="true" Filterable=true>
+<TelerikGrid Data="@MonitorService.Queries" Pageable="true" PageSize="20" Sortable="true" Filterable="true">
     <TelerikGridColumns>
         <TelerikGridColumn Field="@nameof(Query.IPAddress)"></TelerikGridColumn>
         <TelerikGridColumn Field="@nameof(Query.Port)"></TelerikGridColumn>

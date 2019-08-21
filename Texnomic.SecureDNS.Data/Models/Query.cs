@@ -4,7 +4,7 @@ using Texnomic.DNS.Enums;
 using Texnomic.DNS.Models;
 using Texnomic.DNS.Records;
 
-namespace Texnomic.SecureDNS.Models
+namespace Texnomic.SecureDNS.Data.Models
 {
     public class Query
     {

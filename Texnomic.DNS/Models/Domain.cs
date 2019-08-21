@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Texnomic.DNS.Enums;
 
@@ -166,7 +167,7 @@ namespace Texnomic.DNS.Models
 
         public string ToJson()
         {
-            return JsonSerializer.ToString(this);
+            return JsonSerializer.Serialize(this);
         }
     }
 }

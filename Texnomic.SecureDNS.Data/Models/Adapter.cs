@@ -1,4 +1,4 @@
-﻿namespace Texnomic.SecureDNS.Models
+﻿namespace Texnomic.SecureDNS.Data.Models
 {
     public class Adapter
     {

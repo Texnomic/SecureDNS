@@ -24,7 +24,10 @@
     <script src="https://kendo.cdn.telerik.com/blazor/1.1.0/telerik-blazor.min.js" defer></script>
 </head>
 <body>
-    <app>@(await Html.RenderComponentAsync<App>())</app>
+<app>
+    @* Remove the following line of code to disable prerendering *@
+    @(await Html.RenderStaticComponentAsync<App>())
+</app>
     <script src="_framework/blazor.server.js"></script>
 </body>
 </html>

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Texnomic.SecureDNS.Data;
-using Texnomic.SecureDNS.Models;
+using Texnomic.SecureDNS.Data.Models;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.EntityFrameworkCore;
 using Texnomic.DNS.Resolvers;
@@ -32,8 +32,8 @@ namespace Texnomic.SecureDNS.Resolvers
         public DnsOverTls(DatabaseContext DatabaseContext)
         {
             this.DatabaseContext = DatabaseContext;
-            InitializeAsync().Wait();
-            PreloadAsync().Wait();
+            InitializeAsync().RunSynchronously();
+            PreloadAsync().RunSynchronously();
         }
 
         private async Task InitializeAsync()
