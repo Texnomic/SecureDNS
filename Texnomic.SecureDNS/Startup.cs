@@ -46,8 +46,8 @@ namespace Texnomic.SecureDNS
         {
             if (Env.IsDevelopment())
             {
-                DatabaseContext.Database.EnsureDeleted();
-                DatabaseContext.Database.EnsureCreated();
+                //DatabaseContext.Database.EnsureDeleted();
+                //DatabaseContext.Database.EnsureCreated();
                 App.UseDeveloperExceptionPage();
                 App.UseDatabaseErrorPage();
             }

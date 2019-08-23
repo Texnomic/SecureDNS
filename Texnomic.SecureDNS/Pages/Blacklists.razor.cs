@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Microsoft.AspNetCore.Components;
 using System.Threading.Tasks;
 using Texnomic.SecureDNS.Data;
+using Texnomic.SecureDNS.Data.Models;
 using Texnomic.SecureDNS.Services;
 
 namespace Texnomic.SecureDNS.Pages
@@ -14,6 +17,9 @@ namespace Texnomic.SecureDNS.Pages
         protected DatabaseContext DatabaseContext { get; set; }
 
         protected string Output;
+
+        protected IEnumerable<Blacklist> Blacklists => DatabaseContext.Blacklists.Take(50).ToList();
+
 
         protected async Task InitializeAsync()
         {

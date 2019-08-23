@@ -1,0 +1,37 @@
+﻿@namespace Texnomic.Blazor.Components
+@using System.Runtime.InteropServices.ComTypes
+@using Texnomic.Blazor.Components
+@inherits DataTableBase
+
+<div class="container">
+    <table class="table table-bordered table-striped table-hover">
+        <thead>
+            <tr>
+                @foreach (var TypeProperty in TypeProperties)
+                {
+                    <th scope="col">@TypeProperty.Name</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var Record in Records)
+            {
+                var RecordProperties = Record.GetType().GetProperties();
+                <tr>
+                    @foreach (var RecordProperty in RecordProperties)
+                    {
+                        <td>@RecordProperty.GetValue(Record)</td>
+                    }
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                @foreach (var TypeProperty in TypeProperties)
+                {
+                    <th scope="col">@TypeProperty.Name</th>
+                }
+            </tr>
+        </tfoot>
+    </table>
+</div>

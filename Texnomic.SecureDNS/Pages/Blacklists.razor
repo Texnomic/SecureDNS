@@ -1,4 +1,5 @@
 @page "/Blacklists"
+@using Microsoft.EntityFrameworkCore
 @inherits BlacklistsBase
 
 <h1>Blacklists</h1>
@@ -7,10 +8,4 @@
 
 <p>@Output</p>
 
-<TelerikGrid Data="@DatabaseContext.Blacklists.AsEnumerable()" Pageable="true" PageSize="20" Sortable="true" Filterable="true">
-    <TelerikGridColumns>
-        <TelerikGridColumn Field="@nameof(Blacklist.ID)"></TelerikGridColumn>
-        <TelerikGridColumn Field="@nameof(Blacklist.Domain)"></TelerikGridColumn>
-        <TelerikGridColumn Field="@nameof(Blacklist.Timestamp)"></TelerikGridColumn>
-    </TelerikGridColumns>
-</TelerikGrid>
+<DataTable Records="@Blacklists" />
