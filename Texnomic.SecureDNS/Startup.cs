@@ -5,9 +5,11 @@ using ElectronNET.API.Entities;
 using Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json.Serialization;
 using Texnomic.SecureDNS.Data;
 using Texnomic.SecureDNS.Extensions;
 using Texnomic.SecureDNS.Hangfire;
@@ -32,7 +34,9 @@ namespace Texnomic.SecureDNS
             Services.AddDatabase();
             Services.AddIdentity();
             Services.AddTypes();
-            Services.AddRazorPages();
+            Services.AddControllers();
+            Services.AddRazorPages()
+                    .AddNewtonsoftJson(Options => Options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver());
             Services.AddServerSideBlazor();
             Services.AddJsonConfigurations();
             Services.AddHttpClient();
@@ -64,7 +68,6 @@ namespace Texnomic.SecureDNS
 
             App.UseHangfireDashboard();
             App.UseHangfireServer();
-            App.UseHttpsRedirection();
             App.UseStaticFiles();
             App.UseRouting();
             App.UseAuthentication();

@@ -18,6 +18,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.0.0-preview8.19405.7" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="3.0.0-preview8.19405.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.0.0-preview8.19405.7" />
     <PackageReference Include="Microsoft.CodeAnalysis" Version="3.3.0-beta2-final" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.0.0-preview8.19405.11" />
     <!--<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Design" Version="2.0.0-preview1-final" />-->
@@ -25,7 +26,7 @@
     <PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.0.76" />
     <PackageReference Include="morelinq" Version="3.2.0" />
     <PackageReference Include="Syncfusion.EJ2.Blazor" Version="17.2.0.46-beta" />
-    <PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="3.0.0-preview8-02" />
+    <PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="3.0.0-preview8-03" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Texnomic.Blazor.Components\Texnomic.Blazor.Components.csproj" />
