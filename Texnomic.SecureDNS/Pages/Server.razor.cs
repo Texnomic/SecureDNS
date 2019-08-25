@@ -14,14 +14,14 @@ namespace Texnomic.SecureDNS.Pages
         {
             DnsService.Start();
 
-            Output = "DNS Server Started Sucessfully.";
+            Output = "DNS Server Started Successfully.";
         }
 
         protected void Stop()
         {
             DnsService.Stop();
 
-            Output = "DNS Server Stopped Sucessfully.";
+            Output = "DNS Server Stopped Successfully.";
         }
     }
 }

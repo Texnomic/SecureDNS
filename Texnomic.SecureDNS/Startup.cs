@@ -34,7 +34,6 @@ namespace Texnomic.SecureDNS
             Services.AddTypes();
             Services.AddRazorPages();
             Services.AddServerSideBlazor();
-            Services.AddTelerikBlazor();
             Services.AddJsonConfigurations();
             Services.AddHttpClient();
             Services.AddDnsServer();

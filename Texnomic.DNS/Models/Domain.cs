@@ -20,7 +20,10 @@ namespace Texnomic.DNS.Models
         private const byte NullOctet = 0b00000000;
 
         [Ignore]
-        public List<Label> Labels { get; private set; } 
+        public List<Label> Labels { get; private set; }
+
+        [Ignore] 
+        public string Text => ToString();
 
         /// <summary>
         /// Empty Constructor for Serialization

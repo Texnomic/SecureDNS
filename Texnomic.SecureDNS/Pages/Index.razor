@@ -1,5 +1,131 @@
 ﻿@page "/"
 
-<h1>Hello, world!</h1>
+<EjsDashboardLayout Columns="8" CellSpacing="@CellSpacing" AllowResizing="true" MediaQuery="max-width:700px">
+    <DashboardLayoutPanels>
+        <DashboardLayoutPanel Id="Panel1" SizeX=3 SizeY=2>
+            <HeaderTemplate><div class='header'> Product usage ratio </div></HeaderTemplate>
+            <ContentTemplate>
+                <EjsAccumulationChart Id="piechart" Height="@Height">
+                    <AccumulationChartTooltipSettings Enable="true"></AccumulationChartTooltipSettings>
+                    <AccumulationChartLegendSettings Visible="false"></AccumulationChartLegendSettings>
+                    <AccumulationChartSeriesCollection>
+                        <AccumulationChartSeries DataSource="@PieData" XName="XValue" YName="YValue">
+                        </AccumulationChartSeries>
+                    </AccumulationChartSeriesCollection>
+                </EjsAccumulationChart>
+            </ContentTemplate>
+        </DashboardLayoutPanel>
+        <DashboardLayoutPanel Id="Panel2" SizeX=3 SizeY=2 Col=3>
+            <HeaderTemplate><div class='header'> UK trade in food groups </div></HeaderTemplate>
+            <ContentTemplate>
+                <EjsChart id="barchart" Height="@Height">
+                    <ChartPrimaryXAxis ValueType="Syncfusion.EJ2.Blazor.Charts.ValueType.Category">
+                        <ChartAxisMajorGridLines Width="0"></ChartAxisMajorGridLines>
+                    </ChartPrimaryXAxis>
+                    <ChartPrimaryYAxis LabelFormat="{value}B" EdgeLabelPlacement="EdgeLabelPlacement.Shift">
+                        <ChartAxisLineStyle Width="0"></ChartAxisLineStyle>
+                        <ChartAxisLabelStyle Color="transparent"></ChartAxisLabelStyle>
+                        <ChartAxisMajorTickLines Width="0"></ChartAxisMajorTickLines>
+                        <ChartAxisMajorGridLines Width="0"></ChartAxisMajorGridLines>
+                    </ChartPrimaryYAxis>
+                    <ChartSeriesCollection>
+                        <ChartSeries DataSource="@BarData" XName="X" YName="Y" Width=2 Type="ChartSeriesType.Bar">
+                        </ChartSeries>
+                    </ChartSeriesCollection>
+                </EjsChart>
+            </ContentTemplate>
+        </DashboardLayoutPanel>
+        <DashboardLayoutPanel Id="Panel3" SizeX=3 SizeY=2 Row=2>
+            <HeaderTemplate><div class='header'> Sales increase percentage </div></HeaderTemplate>
+            <ContentTemplate>
+                <EjsChart id="linechart" Height="@Height">
+                    <ChartSeriesCollection>
+                        <ChartSeries DataSource="@LineData" XName="XValue" YName="YValue">
+                        </ChartSeries>
+                    </ChartSeriesCollection>
+                </EjsChart>
+            </ContentTemplate>
+        </DashboardLayoutPanel>
+        <DashboardLayoutPanel Id="Panel4" SizeX=3 SizeY=2 Row=2 Col=3>
+            <HeaderTemplate><div class='header'> Mobile browsers usage </div></HeaderTemplate>
+            <ContentTemplate>
+                <EjsAccumulationChart Id="piechart1" Height="@Height">
+                    <AccumulationChartTooltipSettings Enable="true"></AccumulationChartTooltipSettings>
+                    <AccumulationChartLegendSettings Visible="false"></AccumulationChartLegendSettings>
+                    <AccumulationChartSeriesCollection>
+                        <AccumulationChartSeries DataSource="@PieData1" XName="X" YName="Y">
+                        </AccumulationChartSeries>
+                    </AccumulationChartSeriesCollection>
+                </EjsAccumulationChart>
+            </ContentTemplate>
+        </DashboardLayoutPanel>
+    </DashboardLayoutPanels>
+</EjsDashboardLayout>
 
-Welcome to your new app.
+@code {
+    public double[] CellSpacing = { 10, 10 };
+    public string Height = "200px";
+
+    public class ChartData
+    {
+        public double XValue;
+        public double YValue;
+    };
+
+    public List<ChartData> LineData = new List<ChartData>
+{
+        new ChartData { XValue = 2013, YValue = 28},
+        new ChartData { XValue = 2014, YValue = 25 },
+        new ChartData { XValue = 2015, YValue = 26 },
+        new ChartData { XValue = 2016, YValue = 27 },
+        new ChartData { XValue = 2017, YValue = 32 },
+        new ChartData { XValue = 2018, YValue = 35 }
+    };
+
+    public class PieDataVar
+    {
+        public string XValue;
+        public double YValue;
+    };
+
+    public List<PieDataVar> PieData = new List<PieDataVar>
+{
+        new PieDataVar { XValue = "Chrome", YValue = 37},
+        new PieDataVar { XValue = "UC Browser", YValue = 17 },
+        new PieDataVar { XValue = "iPhone",  YValue = 19 },
+        new PieDataVar { XValue = "Others", YValue = 4 },
+        new PieDataVar { XValue = "Opera", YValue = 11 },
+        new PieDataVar { XValue = "Android", YValue = 12 }
+    };
+
+    public class PieDataVar1
+    {
+        public string X;
+        public double Y;
+    };
+
+    public List<PieDataVar1> PieData1 = new List<PieDataVar1>
+{
+        new PieDataVar1 { X = "TypeScript", Y = 13 },
+        new PieDataVar1 { X = "React", Y = 12.5 },
+        new PieDataVar1 { X = "MVC", Y = 12 },
+        new PieDataVar1 { X = "Core", Y = 12.5 },
+        new PieDataVar1 { X = "Vue", Y = 10 },
+        new PieDataVar1 { X = "Angular", Y = 40 }
+    };
+
+    public class BarChartData
+    {
+        public string X;
+        public double Y;
+    }
+
+    public List<BarChartData> BarData = new List<BarChartData>
+{
+        new BarChartData { X= "Egg", Y= 2.2 },
+        new BarChartData { X= "Fish", Y= 2.4 },
+        new BarChartData { X= "Misc", Y= 3 },
+        new BarChartData { X= "Tea", Y= 3.1 }
+    };
+
+}

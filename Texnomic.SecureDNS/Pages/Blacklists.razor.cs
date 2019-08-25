@@ -2,6 +2,7 @@
 using System.Linq;
 using Microsoft.AspNetCore.Components;
 using System.Threading.Tasks;
+using Syncfusion.EJ2.Blazor.Grids;
 using Texnomic.SecureDNS.Data;
 using Texnomic.SecureDNS.Data.Models;
 using Texnomic.SecureDNS.Services;
@@ -18,7 +19,59 @@ namespace Texnomic.SecureDNS.Pages
 
         protected string Output;
 
-        protected IEnumerable<Blacklist> Blacklists => DatabaseContext.Blacklists.Take(50).ToList();
+        protected EjsGrid<Blacklist> DefaultGrid;
+
+
+        public void ExcelExport()
+        {
+            DefaultGrid.ExcelExport();
+        }
+
+        public void PdfExport()
+        {
+            var ExportProperties = new PdfExportProperties();
+            var Theme = new PdfTheme();
+
+            var HeaderBorder = new PdfBorder
+            {
+                Color = "#64FA50"
+            };
+
+            var HeaderThemeStyle = new PdfThemeStyle()
+            {
+                FontColor = "#64FA50",
+                FontName = "Calibri",
+                FontSize = 17,
+                Bold = true,
+                Border = HeaderBorder
+            };
+
+            Theme.Header = HeaderThemeStyle;
+
+            var RecordThemeStyle = new PdfThemeStyle()
+            {
+                FontColor = "#64FA50",
+                FontName = "Calibri",
+                FontSize = 17
+
+            };
+            Theme.Record = RecordThemeStyle;
+
+            var CaptionThemeStyle = new PdfThemeStyle()
+            {
+                FontColor = "#64FA50",
+                FontName = "Calibri",
+                FontSize = 17,
+                Bold = true
+
+            };
+
+            Theme.Caption = CaptionThemeStyle;
+
+            ExportProperties.Theme = Theme;
+
+            DefaultGrid.PdfExport(ExportProperties);
+        }
 
 
         protected async Task InitializeAsync()

@@ -22,8 +22,9 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.0.0-preview8.19405.11" />
     <!--<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Design" Version="2.0.0-preview1-final" />-->
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.0.0-preview8.19405.4" />
+    <PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.0.76" />
     <PackageReference Include="morelinq" Version="3.2.0" />
-    <PackageReference Include="Telerik.UI.for.Blazor.Trial" Version="1.1.0" />
+    <PackageReference Include="Syncfusion.EJ2.Blazor" Version="17.2.0.46-beta" />
     <PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="3.0.0-preview8-02" />
   </ItemGroup>
   <ItemGroup>
