@@ -1,33 +1,30 @@
 using System;
-using Texnomic.DNS.Models;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 using BinarySerialization;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Texnomic.DNS.Models;
 
-namespace Texnomic.DNS.Tests
+namespace Texnomic.DNS.Tests.Serialization
 {
     [TestClass]
-    public class Serialization
+    public class Binary
     {
         readonly byte[] RequestBytes;
         readonly byte[] ResponseBytes;
-        readonly BinarySerializer BinarySerializer;
 
-        public Serialization()
+        public Binary()
         {
             //{ Header ={ Id = 39298, QuestionCount = 1, AnswerRecordCount = 0, AuthorityRecordCount = 0, AdditionalRecordCount = 0, Response = False, OperationCode = Query, AuthorativeServer = False, Truncated = False, RecursionDesired = True, RecursionAvailable = False, AuthenticData = False, CheckingDisabled = False, ResponseCode = NoError}, Questions =[{ Name = facebook.com, Type = A, Class = IN}], AdditionalRecords =[]}
             RequestBytes = Convert.FromBase64String("AB6ZggEAAAEAAAAAAAAIZmFjZWJvb2sDY29tAAABAAE=");
 
             //{ Header ={ Id = 39298, QuestionCount = 1, AnswerRecordCount = 0, AuthorityRecordCount = 0, AdditionalRecordCount = 0, Response = False, OperationCode = Query, AuthorativeServer = False, Truncated = False, RecursionDesired = True, RecursionAvailable = False, AuthenticData = False, CheckingDisabled = False, ResponseCode = NoError}, Questions =[{ Name = facebook.com, Type = A, Class = IN}], AdditionalRecords =[]} => { Header ={ Id = 39298, QuestionCount = 1, AnswerRecordCount = 1, AuthorityRecordCount = 0, AdditionalRecordCount = 0, Response = True, OperationCode = Query, AuthorativeServer = False, Truncated = False, RecursionDesired = True, RecursionAvailable = True, AuthenticData = False, CheckingDisabled = False, ResponseCode = NoError}, Questions =[{ Name = facebook.com, Type = A, Class = IN}], AnswerRecords =[{ Name = facebook.com, Type = A, Class = IN, TimeToLive = 00:03:10, DataLength = 4, IPAddress = 179.60.192.36}], AuthorityRecords =[], AdditionalRecords =[]}
             ResponseBytes = Convert.FromBase64String("AC6ZgoGAAAEAAQAAAAAIZmFjZWJvb2sDY29tAAABAAHADAABAAEAAAEeAASzPMAk");
-
-            BinarySerializer = new BinarySerializer();
         }
 
         [TestMethod]
         public void FromArray()
         {
-            var Msg = BinarySerializer.Deserialize<Message>(ResponseBytes);
+            var Msg = Message.FromArray(ResponseBytes);
 
 
             Assert.AreEqual(Msg.ID, 39298);

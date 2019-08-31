@@ -11,7 +11,7 @@ using Texnomic.DNS.Models;
 
 namespace Texnomic.DNS.Resolvers
 {
-    public class TLSResolver : IResolver, IDisposable
+    public class DoT : IResolver
     {
         private readonly string PublicKey;
         private readonly IPAddress IPAddress;
@@ -21,7 +21,7 @@ namespace Texnomic.DNS.Resolvers
         private PipeReader PipeReader;
         private PipeWriter PipeWriter;
 
-        public TLSResolver(IPAddress IPAddress, string PublicKey)
+        public DoT(IPAddress IPAddress, string PublicKey)
         {
             this.IPAddress = IPAddress;
             this.PublicKey = PublicKey;

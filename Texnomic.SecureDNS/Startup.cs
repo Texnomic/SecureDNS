@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json.Serialization;
+using Texnomic.DNS.Converters;
 using Texnomic.SecureDNS.Data;
 using Texnomic.SecureDNS.Extensions;
 using Texnomic.SecureDNS.Hangfire;
@@ -35,8 +36,7 @@ namespace Texnomic.SecureDNS
             Services.AddIdentity();
             Services.AddTypes();
             Services.AddControllers();
-            Services.AddRazorPages()
-                    .AddNewtonsoftJson(Options => Options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver());
+            Services.AddRazorWithJsonSerialization();
             Services.AddServerSideBlazor();
             Services.AddJsonConfigurations();
             Services.AddHttpClient();
