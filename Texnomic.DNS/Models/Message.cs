@@ -32,29 +32,19 @@ namespace Texnomic.DNS.Models
         [JsonIgnore]
         public ushort ID { get; set; }
 
-        [FieldOrder(2)]
-        [FieldBitLength(1)]
-        [FieldEndianness(Endianness.Big)]
-        [JsonIgnore]
+        [FieldOrder(6), FieldBitLength(1), JsonIgnore]
         public MessageType MessageType { get; set; }
 
-        [FieldOrder(3)]
-        [FieldBitLength(4)]
-        [FieldEndianness(Endianness.Big)]
-        [JsonIgnore]
+        [FieldOrder(5), FieldBitLength(4), JsonIgnore]
         public OperationCode OperationCode { get; set; }
 
-        [FieldOrder(4)]
-        [FieldBitLength(1)]
-        [FieldEndianness(Endianness.Big)]
-        [JsonIgnore]
+        [FieldOrder(4), FieldBitLength(1), JsonIgnore]
         public AuthoritativeAnswer AuthoritativeAnswer { get; set; }
 
-        [FieldOrder(5), FieldBitLength(1), FieldEndianness(Endianness.Big), JsonPropertyName("TC")]
+        [FieldOrder(3), FieldBitLength(1), JsonPropertyName("TC")]
         public bool Truncated { get; set; }
 
-        //BUG When True, Entire Byte Is flipped to entire message became response
-        [FieldOrder(6), FieldBitLength(1), FieldEndianness(Endianness.Big), JsonPropertyName("RD")]
+        [FieldOrder(2), FieldBitLength(1), FieldEndianness(Endianness.Big), JsonPropertyName("RD")]
         public bool RecursionDesired { get; set; }
 
         [FieldOrder(7)]

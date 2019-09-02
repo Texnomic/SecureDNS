@@ -31,7 +31,7 @@ namespace Texnomic.DNS.Tests.Records
                 //OperationCode = OperationCode.Query,
                 //AuthoritativeAnswer = AuthoritativeAnswer.Cache,
                 //Truncated = false,
-                //RecursionDesired = true,
+                RecursionDesired = true,
                 //RecursionAvailable = false,
                 //Zero = 0,
                 //AuthenticatedData = false,
