@@ -35,7 +35,7 @@ namespace Texnomic.DNS.Resolvers
             throw new NotImplementedException();
         }
 
-        public async Task<byte[]> ResolveAsync(byte[] Query)
+        public async ValueTask<byte[]> ResolveAsync(byte[] Query)
         {
             var Message = Convert.ToBase64String(Query);
             var Request = new RestRequest($"dns-query?dns={Message}");
@@ -44,7 +44,7 @@ namespace Texnomic.DNS.Resolvers
             return Response.RawBytes;
         }
 
-        public async Task<Message> ResolveAsync(Message Query)
+        public async ValueTask<Message> ResolveAsync(Message Query)
         {
             var Request = new RestRequest($"resolve?name={Query.Questions[0].Domain}&type={Query.Questions[0].Type}");
             Request.AddHeader("Accept", "application/dns-json");

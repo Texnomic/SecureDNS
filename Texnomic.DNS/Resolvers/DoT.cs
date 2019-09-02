@@ -65,7 +65,7 @@ namespace Texnomic.DNS.Resolvers
             throw new NotImplementedException();
         }
 
-        public async Task<byte[]> ResolveAsync(byte[] Request)
+        public async ValueTask<byte[]> ResolveAsync(byte[] Request)
         {
             try
             {
@@ -87,7 +87,7 @@ namespace Texnomic.DNS.Resolvers
             }
         }
 
-        public async Task<Message> ResolveAsync(Message Request)
+        public async ValueTask<Message> ResolveAsync(Message Request)
         {
             try
             {

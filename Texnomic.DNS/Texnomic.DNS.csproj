@@ -12,6 +12,8 @@
   <ItemGroup>
     <PackageReference Include="BinarySerializer" Version="8.4.3" />
     <PackageReference Include="Nerdbank.Streams" Version="2.3.26" />
+    <PackageReference Include="Nethereum.ENS" Version="3.4.0" />
+    <PackageReference Include="Nethereum.Web3" Version="3.4.0" />
     <PackageReference Include="RestSharp" Version="106.6.10" />
     <PackageReference Include="System.Text.Json" Version="4.6.0-preview8.19405.3" />
   </ItemGroup>
