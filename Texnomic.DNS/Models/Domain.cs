@@ -4,26 +4,17 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using Texnomic.DNS.Enums;
 
 namespace Texnomic.DNS.Models
 {
     public class Domain : IBinarySerializable
     {
-        private const byte CompressedLabel = 0b11000000;
-        private const byte LabelPointer = 0b00001100;
-        private const byte LabelMask = 0b00111111;
-        private const byte LengthMash = 0b11000000;
-        private const byte PointerMask = 0b11000000;
-        private const byte NullOctet = 0b00000000;
-
         [Ignore]
         public List<Label> Labels { get; private set; }
 
-        [Ignore] 
-        public string Text => ToString();
+        [Ignore]
+        public string Name => ToString();
 
         /// <summary>
         /// Empty Constructor for Serialization
@@ -93,25 +84,27 @@ namespace Texnomic.DNS.Models
 
         private void DeserializeNormalLabels(Stream Stream)
         {
+            const byte LengthMask = 0b11000000;
+
             Stream.Position = 0;
 
             var Byte = Stream.ReadByte();
 
             while (Byte != 0)
             {
-                var Length = Byte &~ LengthMash;
+                var Length = Byte & ~LengthMask;
 
                 var Buffer = new byte[Length];
 
                 Stream.Read(Buffer, 0, Length);
 
-                var Text = Encoding.ASCII.GetString(Buffer);
+                var String = Encoding.ASCII.GetString(Buffer);
 
                 var Label = new Label
                 {
                     Type = LabelType.Normal,
-                    Text = Text,
-                    Count = (ushort)Text.Length,
+                    Text = String,
+                    Count = (ushort)String.Length,
                 };
 
                 Labels.Add(Label);
@@ -121,6 +114,8 @@ namespace Texnomic.DNS.Models
         }
         private void DeserializeCompressedLabels(Stream Stream, BinarySerializationContext Context)
         {
+            const byte PointerMask = 0b11000000;
+
             Stream.Position = 0;
 
             var Byte = Stream.ReadByte();
@@ -136,6 +131,8 @@ namespace Texnomic.DNS.Models
 
         private void SerializeNormalLabels(Stream Stream, BinarySerializationContext Context)
         {
+            const byte NullOctet = 0b00000000;
+
             var Domain = Context.Value as Domain;
 
             foreach (var Label in Domain.Labels)
@@ -155,22 +152,22 @@ namespace Texnomic.DNS.Models
         }
         private void SerializeCompressedLabels(Stream Stream)
         {
+            const byte CompressedLabel = 0b11000000;
+            const byte LabelPointer = 0b00001100;
+
             Stream.WriteByte(CompressedLabel);
             Stream.WriteByte(LabelPointer);
         }
 
         private LabelType ReadLabelType(Stream Stream)
         {
+            const byte LabelMask = 0b00111111;
+
             var Byte = Stream.ReadByte();
 
             var Flag = (Byte & ~LabelMask) >> 6;
 
             return (LabelType)Flag;
-        }
-
-        public string ToJson()
-        {
-            return JsonSerializer.Serialize(this);
         }
     }
 }

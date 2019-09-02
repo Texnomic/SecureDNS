@@ -2,7 +2,7 @@
 
 namespace Texnomic.DNS.Enums
 {
-    public enum RecursionDesired : ushort
+    public enum RecursionDesired
     {
         Iterative = 0,
         Recursive = 1

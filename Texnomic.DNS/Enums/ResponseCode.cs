@@ -1,6 +1,6 @@
 ﻿namespace Texnomic.DNS.Enums
 {
-    public enum ResponseCode
+    public enum ResponseCode : byte
     {
         /// <summary>
         /// No Error Condition.

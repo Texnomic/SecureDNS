@@ -10,7 +10,8 @@ using Texnomic.DNS.Resolvers;
 
 namespace Texnomic.DNS.Tests.Resolvers
 {
-    public class DnsOverHttps
+    [TestClass]
+    public class DoH
     {
         byte[] RequestBytes;
         IResolver Resolver;
@@ -21,7 +22,7 @@ namespace Texnomic.DNS.Tests.Resolvers
             //{ Header ={ Id = 39298, QuestionCount = 1, AnswerRecordCount = 0, AuthorityRecordCount = 0, AdditionalRecordCount = 0, Response = False, OperationCode = Query, AuthorativeServer = False, Truncated = False, RecursionDesired = True, RecursionAvailable = False, AuthenticData = False, CheckingDisabled = False, ResponseCode = NoError}, Questions =[{ Name = facebook.com, Type = A, Class = IN}], AdditionalRecords =[]}
             RequestBytes = Convert.FromBase64String("AB6ZggEAAAEAAAAAAAAIZmFjZWJvb2sDY29tAAABAAE=");
 
-            Resolver = new DoH(IPAddress.Parse("1.1.1.1"), "04C520708C204250281E7D44417C3079291C635E1D449BC5F7713A2BDED2A2A4B16C3D6AC877B8CB8F2E5053FDF418267F6137EDFFC2BEE90B5DB97EE1DF1CE274");
+            Resolver = new DNS.Resolvers.DoH(IPAddress.Parse("1.1.1.1"), "04C520708C204250281E7D44417C3079291C635E1D449BC5F7713A2BDED2A2A4B16C3D6AC877B8CB8F2E5053FDF418267F6137EDFFC2BEE90B5DB97EE1DF1CE274");
         }
 
 

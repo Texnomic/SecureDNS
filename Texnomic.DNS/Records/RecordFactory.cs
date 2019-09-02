@@ -7,16 +7,18 @@ namespace Texnomic.DNS.Records
 {
     public class RecordFactory : ISubtypeFactory
     {
-        static readonly Dictionary<RecordType, Type> TypesDictionary = new Dictionary<RecordType, Type>
+        private static readonly Dictionary<RecordType, Type> TypesDictionary = new Dictionary<RecordType, Type>
         {
             { RecordType.A, typeof(A) },
+            { RecordType.AAAA, typeof(AAAA) },
             { RecordType.CNAME, typeof(CName) }
         };
 
 
-        static readonly Dictionary<Type, RecordType> KeysDictionary = new Dictionary<Type, RecordType>
+        private static readonly Dictionary<Type, RecordType> KeysDictionary = new Dictionary<Type, RecordType>
         {
             { typeof(A), RecordType.A },
+            { typeof(AAAA), RecordType.AAAA },
             { typeof(CName), RecordType.CNAME }
         };
 

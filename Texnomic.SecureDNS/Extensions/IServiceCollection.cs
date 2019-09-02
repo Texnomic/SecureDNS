@@ -10,7 +10,6 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Serialization;
 using Texnomic.SecureDNS.Resolvers;
 using Texnomic.DNS;
-using Texnomic.DNS.Converters;
 using Texnomic.SecureDNS.Areas.Identity;
 using Texnomic.SecureDNS.Data;
 using Texnomic.SecureDNS.Data.Identity;
@@ -38,8 +37,7 @@ namespace Texnomic.SecureDNS.Extensions
         public static IServiceCollection AddRazorWithJsonSerialization(this IServiceCollection Services)
         {
             Services.AddRazorPages()
-                    .AddJsonOptions(Options => Options.JsonSerializerOptions.Converters.Add(new RecursionDesiredConverter()))
-                    .AddNewtonsoftJson(Options => Options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver());
+                      .AddNewtonsoftJson(Options => Options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver());
 
             return Services;
         }

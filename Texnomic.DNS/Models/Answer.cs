@@ -1,8 +1,5 @@
 ﻿using BinarySerialization;
-using Nerdbank.Streams;
 using System;
-using System.Buffers;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 using Texnomic.DNS.Records;
 
@@ -35,28 +32,6 @@ namespace Texnomic.DNS.Models
         [Ignore]
         [JsonPropertyName("data")]
         public string Data { get; set; }
-
-        public new static Answer FromArray(byte[] Data)
-        {
-            var Serializer = new BinarySerializer();
-            return Serializer.Deserialize<Answer>(Data);
-        }
-
-        public new static Answer FromArray(ReadOnlySequence<byte> Data)
-        {
-            var Serializer = new BinarySerializer();
-            return Serializer.Deserialize<Answer>(Data.AsStream());
-        }
-
-        public static Message FromJson(string Json)
-        {
-            return JsonSerializer.Deserialize<Message>(Json);
-        }
-
-        public override string ToString()
-        {
-            return ToJson();
-        }
     }
 
 }

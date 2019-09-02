@@ -1,18 +1,22 @@
 ﻿using Nerdbank.Streams;
 using System;
 using System.Buffers;
+using System.IO;
 using System.IO.Pipelines;
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using BinarySerialization;
 using Texnomic.DNS.Models;
+using Texnomic.DNS.Extensions;
 
 namespace Texnomic.DNS.Resolvers
 {
     public class DoT : IResolver
     {
+        private readonly BinarySerializer Serializer;
         private readonly string PublicKey;
         private readonly IPAddress IPAddress;
 
@@ -23,6 +27,7 @@ namespace Texnomic.DNS.Resolvers
 
         public DoT(IPAddress IPAddress, string PublicKey)
         {
+            Serializer = new BinarySerializer();
             this.IPAddress = IPAddress;
             this.PublicKey = PublicKey;
             Task.WaitAll(InitializeAsync());
@@ -48,6 +53,16 @@ namespace Texnomic.DNS.Resolvers
             {
                 throw Error;
             }
+        }
+
+        public byte[] Resolve(byte[] Query)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Message Resolve(Message Query)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<byte[]> ResolveAsync(byte[] Request)
@@ -78,7 +93,7 @@ namespace Texnomic.DNS.Resolvers
             {
                 if (!TcpClient.Connected || !SslStream.CanWrite) await InitializeAsync();
 
-                var Bytes = Request.ToArray();
+                var Bytes = await Serializer.SerializeAsync(Request);
 
                 await PipeWriter.WriteAsync(Bytes);
 

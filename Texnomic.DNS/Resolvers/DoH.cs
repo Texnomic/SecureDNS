@@ -25,6 +25,16 @@ namespace Texnomic.DNS.Resolvers
             Semaphore = new SemaphoreSlim(1, 1);
         }
 
+        public byte[] Resolve(byte[] Query)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Message Resolve(Message Query)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<byte[]> ResolveAsync(byte[] Query)
         {
             var Message = Convert.ToBase64String(Query);

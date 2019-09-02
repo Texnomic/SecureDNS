@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using BinarySerialization;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Texnomic.DNS.Enums;
 using Texnomic.DNS.Models;
 
-namespace Texnomic.DNS.Tests.Serialization
+namespace Texnomic.DNS.Tests.Serialization.Json
 {
     [TestClass]
-    public class Json
+    public class Request
     {
         private const string RequestJson =
             "{\"Status\": 0,\"TC\": false,\"RD\": true, \"RA\": true, \"AD\": true,\"CD\": false,\"Question\":[{\"name\": \"example.com.\", \"type\": 1}]}";
@@ -33,7 +29,7 @@ namespace Texnomic.DNS.Tests.Serialization
             {
                 ResponseCode = ResponseCode.NoError,
                 Truncated = false,
-                RecursionDesired = RecursionDesired.Recursive,
+                RecursionDesired = true,
                 RecursionAvailable = true,
                 AuthenticatedData = true,
                 CheckingDisabled = false,

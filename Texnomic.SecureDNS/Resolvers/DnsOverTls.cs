@@ -13,7 +13,7 @@ using Texnomic.DNS.Models;
 
 namespace Texnomic.SecureDNS.Resolvers
 {
-    public class DnsOverTls : IResolver, IDisposable
+    public class DnsOverTls : IResolver
     {
         private readonly DatabaseContext DatabaseContext;
 
@@ -176,6 +176,16 @@ namespace Texnomic.SecureDNS.Resolvers
         }
 
         public Task<byte[]> ResolveAsync(byte[] Request)
+        {
+            throw new NotImplementedException();
+        }
+
+        public byte[] Resolve(byte[] Query)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Message Resolve(Message Query)
         {
             throw new NotImplementedException();
         }
