@@ -9,7 +9,7 @@ namespace Texnomic.DNS.Resolvers
         byte[] Resolve(byte[] Query);
         Message Resolve(Message Query);
 
-        ValueTask<byte[]> ResolveAsync(byte[] Query);
-        ValueTask<Message> ResolveAsync(Message Query);
+        Task<byte[]> ResolveAsync(byte[] Query);
+        Task<Message> ResolveAsync(Message Query);
     }
 }

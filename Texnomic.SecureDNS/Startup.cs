@@ -39,7 +39,7 @@ namespace Texnomic.SecureDNS
             Services.AddServerSideBlazor();
             Services.AddJsonConfigurations();
             Services.AddHttpClient();
-            Services.AddDnsServer();
+            Services.AddProxyServer();
             Services.AddHangfire();
         }
 

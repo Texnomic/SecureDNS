@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Serialization;
-using Texnomic.SecureDNS.Resolvers;
 using Texnomic.DNS;
 using Texnomic.SecureDNS.Areas.Identity;
 using Texnomic.SecureDNS.Data;
@@ -42,11 +41,11 @@ namespace Texnomic.SecureDNS.Extensions
             return Services;
         }
 
-        public static IServiceCollection AddDnsServer(this IServiceCollection Services)
+        public static IServiceCollection AddProxyServer(this IServiceCollection Services)
         {
-            Services.AddScoped<DnsOverTls>();
+            //Services.AddScoped<DnsOverTls>();
 
-            Services.AddScoped<DnsServer<DnsOverTls>>();
+            //Services.AddScoped<ProxyServer<DnsOverTls>>();
 
             return Services;
         }

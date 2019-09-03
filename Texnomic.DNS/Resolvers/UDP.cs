@@ -7,12 +7,12 @@ using Texnomic.DNS.Models;
 
 namespace Texnomic.DNS.Resolvers
 {
-    public class DoU : IResolver
+    public class UDP : IResolver
     {
         private IPEndPoint IPEndPoint;
         private readonly UdpClient Client;
 
-        public DoU(IPAddress IPAddress)
+        public UDP(IPAddress IPAddress)
         {
             IPEndPoint = new IPEndPoint(IPAddress, 53);
             Client = new UdpClient
@@ -48,7 +48,7 @@ namespace Texnomic.DNS.Resolvers
             return Message.FromArray(Buffer);
         }
 
-        public async ValueTask<byte[]> ResolveAsync(byte[] Query)
+        public async Task<byte[]> ResolveAsync(byte[] Query)
         {
             await Client.SendAsync(Query, Query.Length, IPEndPoint);
 
@@ -57,7 +57,7 @@ namespace Texnomic.DNS.Resolvers
             return Result.Buffer;
         }
 
-        public async ValueTask<Message> ResolveAsync(Message Query)
+        public async Task<Message> ResolveAsync(Message Query)
         {
             var Buffer = Query.ToArray();
 

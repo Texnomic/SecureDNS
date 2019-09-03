@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Nethereum.ENS;
 using Nethereum.ENS.ENSRegistry.ContractDefinition;
 using Nethereum.Hex.HexConvertors.Extensions;
 using Texnomic.DNS.Models;
 using Nethereum.Web3;
+using Texnomic.DNS.Enums;
+using Texnomic.DNS.Extensions;
+using Texnomic.DNS.Records;
 
 namespace Texnomic.DNS.Resolvers
 {
@@ -25,7 +29,7 @@ namespace Texnomic.DNS.Resolvers
             ENSRegistryService = new ENSRegistryService(Web3, Mainnet);
         }
 
-        public async ValueTask<string> ResolveAsync(string Domain)
+        public async Task<string> ResolveAsync(string Domain)
         {
             var NameHashString = EnsUtil.GetNameHash(Domain);
 
@@ -49,49 +53,53 @@ namespace Texnomic.DNS.Resolvers
 
         public string Resolve(string Domain)
         {
-            var NameHashString = EnsUtil.GetNameHash(Domain);
-
-            var NameHashBytes = NameHashString.HexToByteArray();
-
-            var ResolverFunction = new ResolverFunction()
-            {
-                Node = NameHashBytes
-            };
-
-            //get the resolver address from ENS
-            var ResolverAddress = ENSRegistryService.ResolverQueryAsync(ResolverFunction).Result;
-
-            var ResolverService = new PublicResolverService(Web3, ResolverAddress);
-
-            //and get the address from the resolver
-            var Address = ResolverService.AddrQueryAsync(NameHashBytes).Result;
-
-            return Address;
+            return Async.RunSync(() => ResolveAsync(Domain));
         }
 
         public byte[] Resolve(byte[] Query)
         {
-            throw new NotImplementedException();
+            return Async.RunSync(() => ResolveAsync(Query));
         }
 
         public Message Resolve(Message Query)
         {
-            throw new NotImplementedException();
+            return Async.RunSync(() => ResolveAsync(Query));
         }
 
-        public async ValueTask<byte[]> ResolveAsync(byte[] Query)
+        public async Task<byte[]> ResolveAsync(byte[] Query)
         {
-            throw new NotImplementedException();
+            var Msg = Message.FromArray(Query);
+
+            Msg = await ResolveAsync(Msg);
+
+            return Msg.ToArray();
         }
 
-        public async ValueTask<Message> ResolveAsync(Message Query)
+        public async Task<Message> ResolveAsync(Message Query)
         {
-            throw new NotImplementedException();
+            var Address = await ResolveAsync(Query.Questions.First().Name);
+
+            Query.MessageType = MessageType.Response;
+            Query.Answers = new[]
+            {
+                new Answer()
+                {
+                    TTL = 60 * 60,
+                    Length = (ushort)Address.Length,
+                    Domain = Query.Questions.First().Domain,
+                    Record = new ETH()
+                    {
+                        Address = Address,
+                    },
+                }
+            };
+
+            return Query;
         }
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+
         }
 
     }

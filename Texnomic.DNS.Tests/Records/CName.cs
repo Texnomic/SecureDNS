@@ -22,7 +22,7 @@ namespace Texnomic.DNS.Tests.Records
         {
             ID = (ushort)new Random().Next();
 
-            Resolver = new DoU(IPAddress.Parse("1.1.1.1"));
+            Resolver = new UDP(IPAddress.Parse("1.1.1.1"));
 
             RequestMessage = new Message()
             {

@@ -1,55 +1,57 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using BinarySerialization;
+using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Concurrent;
+using BinarySerialization;
+using Microsoft.Extensions.Hosting;
+using PipelineNet.ChainsOfResponsibility;
+using PipelineNet.Pipelines;
 using Texnomic.DNS.Models;
-using Texnomic.DNS.Resolvers;
-using System.Collections.Generic;
 
-namespace Texnomic.DNS
+namespace Texnomic.DNS.Servers
 {
-    public class DnsServer<TResolver> : IDisposable where TResolver : IResolver, new()
+    public class ProxyServer : IHostedService, IDisposable
     {
-        readonly int Threads;
-        readonly List<Task> Workers;
-        readonly BlockingCollection<(Message, IPEndPoint)> IncomingCollection, OutcomingCollection;
+        private readonly int Threads;
+        private readonly List<Task> Workers;
+        private readonly IAsyncResponsibilityChain<Message, Message> ResponsibilityChain;
+        private readonly BlockingCollection<(Message, IPEndPoint)> IncomingCollection, OutgoingCollection;
 
         public event EventHandler<RequestedEventArgs> Requested;
         public event EventHandler<ResolvedEventArgs> Resolved;
         public event EventHandler<RespondedEventArgs> Responded;
         public event EventHandler<EventArgs> Started;
         public event EventHandler<EventArgs> Stopped;
-        public event EventHandler<ErroredEventArgs> Errored;
+        public event EventHandler<ErrorEventArgs> Error;
 
         public bool IsRunning { get; private set; }
 
-        public DnsServer()
+        private readonly UdpClient UdpClient;
+
+        public ProxyServer(IAsyncResponsibilityChain<Message, Message> ResponsibilityChain, int Threads = 0)
         {
-            Threads = Environment.ProcessorCount;
+            this.Threads = Threads == 0 ? Environment.ProcessorCount : Threads;
+
+            this.ResponsibilityChain = ResponsibilityChain;
 
             Workers = new List<Task>();
 
-            IncomingCollection = OutcomingCollection = new BlockingCollection<(Message, IPEndPoint)>();
-        }
-        public DnsServer(int Threads)
-        {
-            this.Threads = Threads;
+            UdpClient = new UdpClient(53);
 
-            Workers = new List<Task>();
-
-            IncomingCollection = OutcomingCollection = new BlockingCollection<(Message, IPEndPoint)>();
+            IncomingCollection = OutgoingCollection = new BlockingCollection<(Message, IPEndPoint)>();
         }
 
-        public async Task StartAsync()
+        public async Task StartAsync(CancellationToken CancellationToken)
         {
             if (IsRunning) return;
 
             IsRunning = true;
 
-            for (int i = 0; i < Threads; i++)
+            for (var I = 0; I < Threads; I++)
             {
                 Workers.Add(ReceiveAsync());
                 Workers.Add(ResolveAsync());
@@ -61,7 +63,7 @@ namespace Texnomic.DNS
             await Task.WhenAll(Workers);
         }
 
-        public async Task StopAsync()
+        public async Task StopAsync(CancellationToken CancellationToken)
         {
             if (!IsRunning) return;
 
@@ -78,13 +80,11 @@ namespace Texnomic.DNS
         {
             var Serializer = new BinarySerializer();
 
-            var Receiver = CreateUdpClient();
-
             while (IsRunning)
             {
                 try
                 {
-                    var Result = await Receiver.ReceiveAsync();
+                    var Result = await UdpClient.ReceiveAsync();
 
                     var Request = await Serializer.DeserializeAsync<Message>(Result.Buffer);
 
@@ -94,57 +94,55 @@ namespace Texnomic.DNS
                 }
                 catch (BindingException Error)
                 {
-                    Errored?.Invoke(this, new ErroredEventArgs(Error));
+                    this.Error?.Invoke(this, new ErrorEventArgs(Error));
                     IsRunning = false;
                     break;
                 }
                 catch (SocketException Error)
                 {
-                    Errored?.Invoke(this, new ErroredEventArgs(Error));
+                    this.Error?.Invoke(this, new ErrorEventArgs(Error));
                     IsRunning = false;
                     break;
                 }
                 catch (Exception Error)
                 {
-                    Errored?.Invoke(this, new ErroredEventArgs(Error));
+                    this.Error?.Invoke(this, new ErrorEventArgs(Error));
                     IsRunning = false;
                     break;
                 }
             }
 
-            Receiver.Dispose();
+            UdpClient.Dispose();
         }
         private async Task ResolveAsync()
         {
-            var Resolver = new TResolver();
-
             while (IsRunning)
             {
                 try
                 {
-                    (var Request, var Remote) = IncomingCollection.Take();
+                    var (Request, Remote) = IncomingCollection.Take();
 
-                    var Response = await Resolver.ResolveAsync(Request);
+                    var Response = await ResponsibilityChain.Execute(Request);
 
-                    OutcomingCollection.Add((Response, Remote));
+                    OutgoingCollection.Add((Response, Remote));
 
                     Resolved?.Invoke(this, new ResolvedEventArgs(Request, Response, Remote));
                 }
                 catch (BindingException Error)
                 {
-                    Errored?.Invoke(this, new ErroredEventArgs(Error));
+                    this.Error?.Invoke(this, new ErrorEventArgs(Error));
                     IsRunning = false;
                     break;
                 }
                 catch (SocketException Error)
                 {
-                    Errored?.Invoke(this, new ErroredEventArgs(Error));
+                    this.Error?.Invoke(this, new ErrorEventArgs(Error));
                     IsRunning = false;
                     break;
                 }
                 catch (Exception Error)
                 {
-                    Errored?.Invoke(this, new ErroredEventArgs(Error));
+                    this.Error?.Invoke(this, new ErrorEventArgs(Error));
                     IsRunning = false;
                     break;
                 }
@@ -154,13 +152,11 @@ namespace Texnomic.DNS
         {
             var Serializer = new BinarySerializer();
 
-            var Sender = CreateUdpClient();
-
             while (IsRunning)
             {
                 try
                 {
-                    (var Response, var Remote) = OutcomingCollection.Take();
+                    var (Response, Remote) = OutgoingCollection.Take();
 
                     var Stream = new MemoryStream();
 
@@ -168,49 +164,38 @@ namespace Texnomic.DNS
 
                     var Bytes = Stream.ToArray();
 
-                    await Sender.SendAsync(Bytes, Bytes.Length, Remote);
+                    await UdpClient.SendAsync(Bytes, Bytes.Length, Remote);
 
                     Responded?.Invoke(this, new RespondedEventArgs(Response, Remote));
                 }
                 catch (BindingException Error)
                 {
-                    Errored?.Invoke(this, new ErroredEventArgs(Error));
+                    this.Error?.Invoke(this, new ErrorEventArgs(Error));
                     IsRunning = false;
                     break;
                 }
                 catch (SocketException Error)
                 {
-                    Errored?.Invoke(this, new ErroredEventArgs(Error));
+                    this.Error?.Invoke(this, new ErrorEventArgs(Error));
                     IsRunning = false;
                     break;
                 }
                 catch (Exception Error)
                 {
-                    Errored?.Invoke(this, new ErroredEventArgs(Error));
+                    this.Error?.Invoke(this, new ErrorEventArgs(Error));
                     IsRunning = false;
                     break;
                 }
             }
 
-            Sender.Dispose();
-        }
-
-        private UdpClient CreateUdpClient()
-        {
-            var Receiver = new UdpClient(53)
-            {
-                ExclusiveAddressUse = false
-            };
-
-            Receiver.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-
-            return Receiver;
+            UdpClient.Dispose();
         }
 
         public void Dispose()
         {
+            UdpClient.Dispose();
             IncomingCollection.Dispose();
-            OutcomingCollection.Dispose();
+            OutgoingCollection.Dispose();
         }
 
         public class RequestedEventArgs : EventArgs
@@ -251,11 +236,11 @@ namespace Texnomic.DNS
             }
         }
 
-        public class ErroredEventArgs : EventArgs
+        public class ErrorEventArgs : EventArgs
         {
             public readonly Exception Error;
 
-            public ErroredEventArgs(Exception Error)
+            public ErrorEventArgs(Exception Error)
             {
                 this.Error = Error;
             }
