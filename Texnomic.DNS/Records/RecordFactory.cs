@@ -11,7 +11,8 @@ namespace Texnomic.DNS.Records
         {
             { RecordType.A, typeof(A) },
             { RecordType.AAAA, typeof(AAAA) },
-            { RecordType.CNAME, typeof(CName) }
+            { RecordType.CNAME, typeof(CName) },
+            { RecordType.ETH, typeof(ETH) },
         };
 
 
@@ -19,8 +20,9 @@ namespace Texnomic.DNS.Records
         {
             { typeof(A), RecordType.A },
             { typeof(AAAA), RecordType.AAAA },
-            { typeof(CName), RecordType.CNAME }
-        };
+            { typeof(CName), RecordType.CNAME },
+            { typeof(ETH), RecordType.ETH },
+    };
 
         public bool TryGetKey(Type ValueType, out object Key)
         {

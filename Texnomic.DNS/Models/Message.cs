@@ -108,11 +108,13 @@ namespace Texnomic.DNS.Models
         [JsonPropertyName("Comment")]
         public string Comment { get; set; }
 
-        //private ushort CalculateLength()
-        //{
-        //    var Serializer = new BinarySerializer();
-        //    return (ushort)Serializer.SizeOf(this);
-        //}
+        private ushort CalculateLength()
+        {
+            var QuestionsSize = Questions?.Sum(Q => 4 + Q.Domain.Labels.Sum(Label => 2 + Label.Count)) ?? 0;
+            var AnswersSize = Answers?.Sum(A => 10 + A.Domain.Labels.Sum(Label => 2 + Label.Count) + A.Length) ?? 0;
+
+            return (ushort)(12 + QuestionsSize + AnswersSize);
+        }
 
         public byte[] ToArray()
         {

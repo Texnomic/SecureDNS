@@ -1,4 +1,5 @@
-﻿using Nerdbank.Streams;
+﻿using System;
+using Nerdbank.Streams;
 using System.Buffers;
 using System.IO.Pipelines;
 using System.Net;
@@ -60,6 +61,12 @@ namespace Texnomic.DNS.Resolvers
         {
             if (!TcpClient.Connected || !SslStream.CanWrite) await InitializeAsync();
 
+            var Length = BitConverter.GetBytes((ushort)Request.Length);
+
+            Array.Reverse(Length);
+
+            await PipeWriter.WriteAsync(Length);
+
             await PipeWriter.WriteAsync(Request);
 
             PipeWriter.Complete();
@@ -68,14 +75,20 @@ namespace Texnomic.DNS.Resolvers
 
             PipeReader.Complete();
 
-            return Result.Buffer.ToArray();
+            return Result.Buffer.Slice(2).ToArray();
         }
 
         public async Task<Message> ResolveAsync(Message Request)
         {
             if (!TcpClient.Connected || !SslStream.CanWrite) await InitializeAsync();
 
-            var Bytes = await Serializer.SerializeAsync(Request);
+            var Bytes = Request.ToArray();
+
+            var Length = BitConverter.GetBytes((ushort)Bytes.Length);
+
+            Array.Reverse(Length);
+
+            await PipeWriter.WriteAsync(Length);
 
             await PipeWriter.WriteAsync(Bytes);
 
@@ -83,7 +96,7 @@ namespace Texnomic.DNS.Resolvers
 
             var Result = await PipeReader.ReadAsync();
 
-            var Response = Message.FromArray(Result.Buffer);
+            var Response = Message.FromArray(Result.Buffer.Slice(2));
 
             PipeReader.Complete();
 

@@ -298,5 +298,10 @@ namespace Texnomic.DNS.Enums
         /// DNSSEC Lookaside Validation
         /// </summary>
         DLV = 32769,
+
+        /// <summary>
+        /// Ethereum Address
+        /// </summary>
+        ETH = 300
     }
 }
