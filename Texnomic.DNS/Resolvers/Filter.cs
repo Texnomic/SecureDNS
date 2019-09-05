@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Extensions;
 using Texnomic.DNS.Models;
 
@@ -24,7 +25,7 @@ namespace Texnomic.DNS.Resolvers
             throw new NotImplementedException();
         }
 
-        public async Task<Message> ResolveAsync(Message Query)
+        public async Task<IMessage> ResolveAsync(IMessage Query)
         {
             throw new NotImplementedException();
         }
@@ -34,7 +35,7 @@ namespace Texnomic.DNS.Resolvers
             return Async.RunSync(() => ResolveAsync(Query));
         }
 
-        public Message Resolve(Message Query)
+        public IMessage Resolve(IMessage Query)
         {
             return Async.RunSync(() => ResolveAsync(Query));
         }

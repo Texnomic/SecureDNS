@@ -8,8 +8,11 @@ using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using BinarySerialization;
+using Org.BouncyCastle.Crypto.Tls;
+using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Models;
 using Texnomic.DNS.Extensions;
+using StreamExtensions = BinarySerialization.StreamExtensions;
 
 namespace Texnomic.DNS.Resolvers
 {
@@ -52,7 +55,7 @@ namespace Texnomic.DNS.Resolvers
             return Async.RunSync(() => ResolveAsync(Query));
         }
 
-        public Message Resolve(Message Query)
+        public IMessage Resolve(IMessage Query)
         {
             return Async.RunSync(() => ResolveAsync(Query));
         }
@@ -78,7 +81,7 @@ namespace Texnomic.DNS.Resolvers
             return Result.Buffer.Slice(2).ToArray();
         }
 
-        public async Task<Message> ResolveAsync(Message Request)
+        public async Task<IMessage> ResolveAsync(IMessage Request)
         {
             if (!TcpClient.Connected || !SslStream.CanWrite) await InitializeAsync();
 
@@ -103,16 +106,36 @@ namespace Texnomic.DNS.Resolvers
             return Response;
         }
 
-        public void Dispose()
-        {
-            SslStream.Dispose();
-            TcpClient.Dispose();
-        }
 
         private bool ValidateServerCertificate(object Sender, X509Certificate Certificate, X509Chain Chain, SslPolicyErrors SslPolicyErrors)
         {
             return SslPolicyErrors == SslPolicyErrors.None && Certificate.GetPublicKeyString() == PublicKey;
         }
 
+        private bool IsDisposed;
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool Disposing)
+        {
+            if (IsDisposed) return;
+
+            if (Disposing)
+            {
+                SslStream.Dispose();
+                TcpClient.Dispose();
+            }
+
+            IsDisposed = true;
+        }
+
+        ~TLS()
+        {
+            Dispose(false);
+        }
     }
 }

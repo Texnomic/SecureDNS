@@ -6,7 +6,8 @@ using Nethereum.ENS.ENSRegistry.ContractDefinition;
 using Nethereum.Hex.HexConvertors.Extensions;
 using Texnomic.DNS.Models;
 using Nethereum.Web3;
-using Texnomic.DNS.Enums;
+using Texnomic.DNS.Abstractions;
+using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Extensions;
 using Texnomic.DNS.Records;
 
@@ -61,26 +62,26 @@ namespace Texnomic.DNS.Resolvers
             return Async.RunSync(() => ResolveAsync(Query));
         }
 
-        public Message Resolve(Message Query)
+        public IMessage Resolve(IMessage Query)
         {
             return Async.RunSync(() => ResolveAsync(Query));
         }
 
         public async Task<byte[]> ResolveAsync(byte[] Query)
         {
-            var Msg = Message.FromArray(Query);
+            var Request = Message.FromArray(Query);
 
-            Msg = await ResolveAsync(Msg);
+            var Response = await ResolveAsync(Request);
 
-            return Msg.ToArray();
+            return Response.ToArray();
         }
 
-        public async Task<Message> ResolveAsync(Message Query)
+        public async Task<IMessage> ResolveAsync(IMessage Query)
         {
             var Address = await ResolveAsync(Query.Questions.First().Name);
 
             Query.MessageType = MessageType.Response;
-            Query.Answers = new[]
+            Query.Answers = new IAnswer[]
             {
                 new Answer()
                 {
@@ -97,10 +98,29 @@ namespace Texnomic.DNS.Resolvers
             return Query;
         }
 
+        private bool IsDisposed;
+
         public void Dispose()
         {
-
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
+        protected virtual void Dispose(bool Disposing)
+        {
+            if (IsDisposed) return;
+
+            if (Disposing)
+            {
+
+            }
+
+            IsDisposed = true;
+        }
+
+        ~ENS()
+        {
+            Dispose(false);
+        }
     }
 }

@@ -7,12 +7,13 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using Texnomic.DNS.Enums;
+using Texnomic.DNS.Abstractions;
+using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Extensions;
 
 namespace Texnomic.DNS.Models
 {
-    public class Message
+    public class Message : IMessage
     {
         //private ushort? Size;
 
@@ -97,12 +98,12 @@ namespace Texnomic.DNS.Models
         [FieldOrder(16)]
         [FieldCount(nameof(QuestionsCount))]
         [JsonPropertyName("Question")]
-        public Question[] Questions { get; set; }
+        public IQuestion[] Questions { get; set; }
 
         [FieldOrder(17)]
         [FieldCount(nameof(AnswersCount))]
         [JsonPropertyName("Answer")]
-        public Answer[] Answers { get; set; }
+        public IAnswer[] Answers { get; set; }
 
         [Ignore]
         [JsonPropertyName("Comment")]
@@ -139,6 +140,7 @@ namespace Texnomic.DNS.Models
             var Serializer = new BinarySerializer();
             return Serializer.Deserialize<Message>(Data.AsStream());
         }
+
 
         public string ToJson()
         {

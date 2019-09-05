@@ -10,14 +10,17 @@ namespace Texnomic.DNS.Tests.Servers
     [TestClass]
     public class Proxy
     {
-        private ProxyServer Server;
+        private SimpleServer Server;
 
         [TestInitialize]
         public void Initialize()
         {
+            //Stop-Service -DisplayName 'Docker Desktop Service'
+            //Stop-Service -DisplayName 'Internet Connection Sharing (ICS)'
+
             var ActivatorMiddlewareResolver = new ActivatorMiddlewareResolver();
             var ProxyResponsibilityChain = new ProxyResponsibilityChain(ActivatorMiddlewareResolver);
-            Server = new ProxyServer(ProxyResponsibilityChain, 1);
+            Server = new SimpleServer(ProxyResponsibilityChain);
         }
 
         [TestMethod]
@@ -25,6 +28,7 @@ namespace Texnomic.DNS.Tests.Servers
         {
             await Server.StartAsync(new CancellationToken());
         }
+
 
     }
 }

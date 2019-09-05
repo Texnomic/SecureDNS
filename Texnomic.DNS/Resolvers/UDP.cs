@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Models;
 
 namespace Texnomic.DNS.Resolvers
@@ -19,15 +19,10 @@ namespace Texnomic.DNS.Resolvers
             {
                 Client =
                 {
-                    SendTimeout = 2000, 
+                    SendTimeout = 2000,
                     ReceiveTimeout = 2000
                 }
             };
-        }
-
-        public void Dispose()
-        {
-            Client.Dispose();
         }
 
         public byte[] Resolve(byte[] Query)
@@ -37,7 +32,7 @@ namespace Texnomic.DNS.Resolvers
             return Client.Receive(ref IPEndPoint);
         }
 
-        public Message Resolve(Message Query)
+        public IMessage Resolve(IMessage Query)
         {
             var Buffer = Query.ToArray();
 
@@ -57,7 +52,7 @@ namespace Texnomic.DNS.Resolvers
             return Result.Buffer;
         }
 
-        public async Task<Message> ResolveAsync(Message Query)
+        public async Task<IMessage> ResolveAsync(IMessage Query)
         {
             var Buffer = Query.ToArray();
 
@@ -66,6 +61,31 @@ namespace Texnomic.DNS.Resolvers
             var Result = await Client.ReceiveAsync();
 
             return Message.FromArray(Result.Buffer);
+        }
+
+        private bool IsDisposed;
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool Disposing)
+        {
+            if (IsDisposed) return;
+
+            if (Disposing)
+            {
+                Client.Dispose();
+            }
+
+            IsDisposed = true;
+        }
+
+        ~UDP()
+        {
+            Dispose(false);
         }
     }
 }

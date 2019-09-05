@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Texnomic.DNS.Enums
+namespace Texnomic.DNS.Abstractions.Enums
 {
     public enum RecursionDesired
     {

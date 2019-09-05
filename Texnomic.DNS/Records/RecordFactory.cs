@@ -1,7 +1,7 @@
 ﻿using BinarySerialization;
 using System;
 using System.Collections.Generic;
-using Texnomic.DNS.Enums;
+using Texnomic.DNS.Abstractions.Enums;
 
 namespace Texnomic.DNS.Records
 {
@@ -13,6 +13,8 @@ namespace Texnomic.DNS.Records
             { RecordType.AAAA, typeof(AAAA) },
             { RecordType.CNAME, typeof(CName) },
             { RecordType.ETH, typeof(ETH) },
+            { RecordType.TXT, typeof(TXT) },
+            { RecordType.SOA, typeof(SOA) },
         };
 
 
@@ -22,7 +24,9 @@ namespace Texnomic.DNS.Records
             { typeof(AAAA), RecordType.AAAA },
             { typeof(CName), RecordType.CNAME },
             { typeof(ETH), RecordType.ETH },
-    };
+            { typeof(TXT), RecordType.TXT },
+            { typeof(SOA), RecordType.SOA },
+        };
 
         public bool TryGetKey(Type ValueType, out object Key)
         {

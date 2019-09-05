@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Texnomic.DNS.Enums;
+using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Models;
 
 namespace Texnomic.DNS.Tests.Serialization.Binary

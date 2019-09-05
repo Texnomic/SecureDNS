@@ -1,5 +1,5 @@
 ﻿using BinarySerialization;
-using Texnomic.DNS.Models;
+using Texnomic.DNS.Abstractions;
 
 namespace Texnomic.DNS.Records
 {
@@ -9,6 +9,6 @@ namespace Texnomic.DNS.Records
     public class NS : IRecord
     {
         [FieldOrder(0)]
-        public Domain Domain { get; set; }
+        public IDomain Domain { get; set; }
     }
 }

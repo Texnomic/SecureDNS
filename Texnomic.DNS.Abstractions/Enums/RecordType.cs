@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Texnomic.DNS.Enums
+namespace Texnomic.DNS.Abstractions.Enums
 {
     /// <summary>
     /// TYPE fields are used in resource records. Note that these types are a subset of QTYPEs.

@@ -1,15 +1,15 @@
 ﻿using BinarySerialization;
-using System.IO;
 using System.Text.Json.Serialization;
-using Texnomic.DNS.Enums;
+using Texnomic.DNS.Abstractions;
+using Texnomic.DNS.Abstractions.Enums;
 
 namespace Texnomic.DNS.Models
 {
-    public class Question
+    public class Question : IQuestion
     {
         [FieldOrder(0)]
         [JsonIgnore]
-        public Domain Domain { get; set; }
+        public IDomain Domain { get; set; }
 
         [Ignore]
         [JsonPropertyName("name")]

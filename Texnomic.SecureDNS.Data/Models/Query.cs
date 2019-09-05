@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using System.Net;
-using Texnomic.DNS.Enums;
+using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Models;
 using Texnomic.DNS.Records;
 

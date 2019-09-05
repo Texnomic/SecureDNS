@@ -1,4 +1,4 @@
-﻿namespace Texnomic.DNS.Records
+﻿namespace Texnomic.DNS.Abstractions
 {
     public interface IRecord
     {

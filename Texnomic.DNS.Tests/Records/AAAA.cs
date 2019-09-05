@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Texnomic.DNS.Enums;
+using Texnomic.DNS.Abstractions;
+using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Models;
 using Texnomic.DNS.Resolvers;
 
@@ -16,8 +15,8 @@ namespace Texnomic.DNS.Tests.Records
     {
         private ushort ID;
         private IResolver Resolver;
-        private Message RequestMessage;
-        private Message ResponseMessage;
+        private IMessage RequestMessage;
+        private IMessage ResponseMessage;
         
 
         [TestInitialize]
@@ -25,7 +24,7 @@ namespace Texnomic.DNS.Tests.Records
         {
             ID = (ushort)new Random().Next();
 
-            Resolver = new UDP(IPAddress.Parse("1.1.1.1"));
+            Resolver = new UDP(IPAddress.Parse("8.8.4.4"));
 
             RequestMessage = new Message()
             {

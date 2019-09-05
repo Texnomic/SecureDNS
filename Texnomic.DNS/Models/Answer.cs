@@ -1,11 +1,12 @@
 ﻿using BinarySerialization;
 using System;
 using System.Text.Json.Serialization;
+using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Records;
 
 namespace Texnomic.DNS.Models
 {
-    public class Answer : Question
+    public class Answer : Question, IAnswer
     {
         [FieldOrder(3)]
         [FieldBitLength(32)]
@@ -15,7 +16,11 @@ namespace Texnomic.DNS.Models
 
         [Ignore]
         [JsonIgnore]
-        public TimeSpan TimeToLive => new TimeSpan(0, 0, (int)TTL);
+        public TimeSpan TimeToLive
+        {
+            get => new TimeSpan(0, 0, (int) TTL);
+            set => throw new NotImplementedException();
+        }
 
         [FieldOrder(4)]
         [FieldBitLength(16)]

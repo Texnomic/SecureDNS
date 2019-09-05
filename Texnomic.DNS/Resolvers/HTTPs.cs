@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using RestSharp;
+using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Extensions;
 using Texnomic.DNS.Models;
 
@@ -31,7 +30,7 @@ namespace Texnomic.DNS.Resolvers
             return Async.RunSync(() => ResolveAsync(Query));
         }
 
-        public Message Resolve(Message Query)
+        public IMessage Resolve(IMessage Query)
         {
             return Async.RunSync(() => ResolveAsync(Query));
         }
@@ -45,16 +44,45 @@ namespace Texnomic.DNS.Resolvers
             return Response.RawBytes;
         }
 
-        public async Task<Message> ResolveAsync(Message Query)
+        public async Task<byte[]> ResolvePostAsync(byte[] Query)
+        {
+            var Request = new RestRequest("dns-query");
+            Request.AddHeader("Accept", "application/dns-message");
+            Request.AddParameter("application/dns-message", Query, "application/dns-message", ParameterType.RequestBody);
+            var Response = await RestClient.ExecutePostTaskAsync(Request);
+            return Response.RawBytes;
+        }
+
+        public async Task<IMessage> ResolveAsync(IMessage Query)
         {
             var Request = new RestRequest($"resolve?name={Query.Questions[0].Domain}&type={Query.Questions[0].Type}");
             Request.AddHeader("Accept", "application/dns-json");
             return await RestClient.GetAsync<Message>(Request);
         }
 
+        private bool IsDisposed;
+
         public void Dispose()
         {
-            
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool Disposing)
+        {
+            if (IsDisposed) return;
+
+            if (Disposing)
+            {
+                Semaphore.Dispose();
+            }
+
+            IsDisposed = true;
+        }
+
+        ~HTTPs()
+        {
+            Dispose(false);
         }
     }
 }

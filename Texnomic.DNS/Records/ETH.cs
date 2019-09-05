@@ -1,4 +1,5 @@
 ﻿using BinarySerialization;
+using Texnomic.DNS.Abstractions;
 
 namespace Texnomic.DNS.Records
 {

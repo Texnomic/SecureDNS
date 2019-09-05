@@ -3,9 +3,9 @@ using Texnomic.DNS.Abstractions;
 
 namespace Texnomic.DNS.Records
 {
-    public class CName : IRecord
+    public class TXT : IRecord
     {
         [FieldOrder(0)]
-        public IDomain Domain { get; set; }
+        public string Text { get; set; }
     }
 }

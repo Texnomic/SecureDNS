@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -9,7 +8,6 @@ using System.Threading.Tasks;
 using BinarySerialization;
 using Microsoft.Extensions.Hosting;
 using PipelineNet.ChainsOfResponsibility;
-using PipelineNet.Pipelines;
 using Texnomic.DNS.Models;
 
 namespace Texnomic.DNS.Servers
@@ -86,7 +84,7 @@ namespace Texnomic.DNS.Servers
                 {
                     var Result = await UdpClient.ReceiveAsync();
 
-                    var Request = await Serializer.DeserializeAsync<Message>(Result.Buffer);
+                    var Request = Message.FromArray(Result.Buffer);
 
                     IncomingCollection.Add((Request, Result.RemoteEndPoint));
 
@@ -95,20 +93,20 @@ namespace Texnomic.DNS.Servers
                 catch (BindingException Error)
                 {
                     this.Error?.Invoke(this, new ErrorEventArgs(Error));
-                    IsRunning = false;
-                    break;
+                    //IsRunning = false;
+                    //break;
                 }
                 catch (SocketException Error)
                 {
                     this.Error?.Invoke(this, new ErrorEventArgs(Error));
-                    IsRunning = false;
-                    break;
+                    //IsRunning = false;
+                    //break;
                 }
                 catch (Exception Error)
                 {
                     this.Error?.Invoke(this, new ErrorEventArgs(Error));
-                    IsRunning = false;
-                    break;
+                    //IsRunning = false;
+                    //break;
                 }
             }
 
@@ -131,20 +129,20 @@ namespace Texnomic.DNS.Servers
                 catch (BindingException Error)
                 {
                     this.Error?.Invoke(this, new ErrorEventArgs(Error));
-                    IsRunning = false;
-                    break;
+                    //IsRunning = false;
+                    //break;
                 }
                 catch (SocketException Error)
                 {
                     this.Error?.Invoke(this, new ErrorEventArgs(Error));
-                    IsRunning = false;
-                    break;
+                    //IsRunning = false;
+                    //break;
                 }
                 catch (Exception Error)
                 {
                     this.Error?.Invoke(this, new ErrorEventArgs(Error));
-                    IsRunning = false;
-                    break;
+                    //IsRunning = false;
+                    //break;
                 }
             }
         }
@@ -158,11 +156,7 @@ namespace Texnomic.DNS.Servers
                 {
                     var (Response, Remote) = OutgoingCollection.Take();
 
-                    var Stream = new MemoryStream();
-
-                    await Serializer.SerializeAsync(Stream, Response);
-
-                    var Bytes = Stream.ToArray();
+                    var Bytes = Response.ToArray();
 
                     await UdpClient.SendAsync(Bytes, Bytes.Length, Remote);
 
@@ -171,31 +165,24 @@ namespace Texnomic.DNS.Servers
                 catch (BindingException Error)
                 {
                     this.Error?.Invoke(this, new ErrorEventArgs(Error));
-                    IsRunning = false;
-                    break;
+                    //IsRunning = false;
+                    //break;
                 }
                 catch (SocketException Error)
                 {
                     this.Error?.Invoke(this, new ErrorEventArgs(Error));
-                    IsRunning = false;
-                    break;
+                    //IsRunning = false;
+                    //break;
                 }
                 catch (Exception Error)
                 {
                     this.Error?.Invoke(this, new ErrorEventArgs(Error));
-                    IsRunning = false;
-                    break;
+                    //IsRunning = false;
+                    //break;
                 }
             }
 
             UdpClient.Dispose();
-        }
-
-        public void Dispose()
-        {
-            UdpClient.Dispose();
-            IncomingCollection.Dispose();
-            OutgoingCollection.Dispose();
         }
 
         public class RequestedEventArgs : EventArgs
@@ -244,6 +231,34 @@ namespace Texnomic.DNS.Servers
             {
                 this.Error = Error;
             }
+        }
+
+
+        private bool IsDisposed;
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool Disposing)
+        {
+            if (IsDisposed) return;
+
+            if (Disposing)
+            {
+                UdpClient.Dispose();
+                IncomingCollection.Dispose();
+                OutgoingCollection.Dispose();
+            }
+
+            IsDisposed = true;
+        }
+
+        ~ProxyServer()
+        {
+            Dispose(false);
         }
     }
 }

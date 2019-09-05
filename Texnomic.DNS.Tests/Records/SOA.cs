@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Texnomic.DNS.Abstractions;
@@ -10,7 +13,7 @@ using Texnomic.DNS.Resolvers;
 namespace Texnomic.DNS.Tests.Records
 {
     [TestClass]
-    public class CName
+    public class SOA
     {
         private ushort ID;
         private IResolver Resolver;
@@ -23,30 +26,19 @@ namespace Texnomic.DNS.Tests.Records
         {
             ID = (ushort)new Random().Next();
 
-            Resolver = new UDP(IPAddress.Parse("1.1.1.1"));
+            Resolver = new UDP(IPAddress.Parse("8.8.4.4"));
 
             RequestMessage = new Message()
             {
                 ID = ID,
-                //MessageType = MessageType.Query,
-                //OperationCode = OperationCode.Query,
-                //AuthoritativeAnswer = AuthoritativeAnswer.Cache,
-                //Truncated = false,
                 RecursionDesired = true,
-                //RecursionAvailable = false,
-                //Zero = 0,
-                //AuthenticatedData = false,
-                //CheckingDisabled = false,
-                //ResponseCode = ResponseCode.NoError,
-                //QuestionsCount = 1,
-                //AnswersCount = 0,
                 Questions = new[]
                 {
                     new Question()
                     {
-                        Domain = Domain.FromString("facebook.com"),
+                        Domain = Domain.FromString("texnomic.com"),
                         Class = RecordClass.Internet,
-                        Type = RecordType.CNAME
+                        Type = RecordType.SOA
                     }
                 }
             };
@@ -60,8 +52,7 @@ namespace Texnomic.DNS.Tests.Records
             Assert.AreEqual(ID, ResponseMessage.ID);
             Assert.IsNotNull(ResponseMessage.Questions);
             Assert.IsNotNull(ResponseMessage.Answers);
-            Assert.AreEqual(ResponseCode.NXRRSet, ResponseMessage.ResponseCode);
-            //Assert.IsInstanceOfType(ResponseMessage.Answers.First().Record, typeof(DNS.Records.CName));
+            Assert.IsInstanceOfType(ResponseMessage.Answers.First().Record, typeof(DNS.Records.SOA));
         }
     }
 }

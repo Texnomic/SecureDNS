@@ -4,14 +4,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Texnomic.DNS.Enums;
+using Texnomic.DNS.Abstractions;
+using Texnomic.DNS.Abstractions.Enums;
 
 namespace Texnomic.DNS.Models
 {
-    public class Domain : IBinarySerializable
+    public class Domain : IBinarySerializable, IDomain
     {
         [Ignore]
-        public List<Label> Labels { get; private set; }
+        public List<ILabel> Labels { get; private set; }
 
         [Ignore]
         public string Name => ToString();
@@ -21,19 +22,18 @@ namespace Texnomic.DNS.Models
         /// </summary>
         public Domain()
         {
-            Labels = new List<Label>();
+            Labels = new List<ILabel>();
         }
 
         public Domain(string Domain)
         {
-            Labels = Domain.Split('.')
-                           .Select(Label => new Label
-                           {
-                               Type = LabelType.Normal,
-                               Count = (ushort)Label.Length,
-                               Text = Label
-                           })
-                           .ToList();
+            Labels.AddRange(Domain.Split('.')
+                    .Select(Label => new Label
+                    {
+                        Type = LabelType.Normal,
+                        Count = (ushort)Label.Length,
+                        Text = Label
+                    }));
         }
 
         public override string ToString()
@@ -48,88 +48,53 @@ namespace Texnomic.DNS.Models
 
         public void Serialize(Stream Stream, Endianness Endianness, BinarySerializationContext Context)
         {
-            if (Context.ParentContext.Value is Answer)
-            {
-                SerializeCompressedLabels(Stream);
-            }
-            else
-            {
-                SerializeNormalLabels(Stream, Context);
-            }
+            SerializeLabels(Stream, Context);
         }
+
 
         public void Deserialize(Stream Stream, Endianness Endianness, BinarySerializationContext Context)
         {
-            var Type = ReadLabelType(Stream);
+            var Root = GetRootStream(Stream);
 
-            switch (Type)
+            var Byte = Root.ReadByte();
+
+            while (Byte > 0)
+            {
+                Process(Root, Byte);
+
+                Byte = Root.ReadByte();
+            }
+        }
+
+        private void Process(Stream Stream, int Byte)
+        {
+            var LabelType = GetLabelType(Byte);
+
+            switch (LabelType)
             {
                 case LabelType.Normal:
                     {
-                        DeserializeNormalLabels(Stream);
+                        var LabelLength = GetLabelLength(Byte);
+
+                        GetLabel(Stream, LabelLength);
 
                         break;
                     }
                 case LabelType.Compressed:
                     {
-                        DeserializeCompressedLabels(Stream, Context);
+                        var SecondByte = Stream.ReadByte();
+
+                        Stream.Position = GetPointer(Byte, SecondByte);
 
                         break;
                     }
                 case LabelType.Extended:
                 case LabelType.Unallocated:
-                default: throw new NotImplementedException(Enum.GetName(typeof(LabelType), Type));
+                default: throw new NotImplementedException(Enum.GetName(typeof(Abstractions.Enums.LabelType), LabelType));
             }
         }
 
-        private void DeserializeNormalLabels(Stream Stream)
-        {
-            const byte LengthMask = 0b11000000;
-
-            Stream.Position = 0;
-
-            var Byte = Stream.ReadByte();
-
-            while (Byte != 0)
-            {
-                var Length = Byte & ~LengthMask;
-
-                var Buffer = new byte[Length];
-
-                Stream.Read(Buffer, 0, Length);
-
-                var String = Encoding.ASCII.GetString(Buffer);
-
-                var Label = new Label
-                {
-                    Type = LabelType.Normal,
-                    Text = String,
-                    Count = (ushort)String.Length,
-                };
-
-                Labels.Add(Label);
-
-                Byte = Stream.ReadByte();
-            }
-        }
-        private void DeserializeCompressedLabels(Stream Stream, BinarySerializationContext Context)
-        {
-            const byte PointerMask = 0b11000000;
-
-            Stream.Position = 0;
-
-            var Byte = Stream.ReadByte();
-
-            var Pointer = (Byte & ~PointerMask) + Stream.ReadByte();
-
-            if (Pointer != 12) throw new NotImplementedException($"Compressed Label with OffSet Pointer {Pointer}.");
-
-            var Message = Context.ParentContext.ParentContext.ParentValue as Message;
-
-            Labels = Message.Questions.First().Domain.Labels;
-        }
-
-        private void SerializeNormalLabels(Stream Stream, BinarySerializationContext Context)
+        private void SerializeLabels(Stream Stream, BinarySerializationContext Context)
         {
             const byte NullOctet = 0b00000000;
 
@@ -150,24 +115,64 @@ namespace Texnomic.DNS.Models
 
             Stream.WriteByte(NullOctet);
         }
-        private void SerializeCompressedLabels(Stream Stream)
+
+
+
+        private int GetLabelLength(int Byte)
         {
-            const byte CompressedLabel = 0b11000000;
-            const byte LabelPointer = 0b00001100;
-
-            Stream.WriteByte(CompressedLabel);
-            Stream.WriteByte(LabelPointer);
+            const byte LengthMask = 0b11000000;
+            return Byte & ~LengthMask;
         }
+        private int GetPointer(int FirstByte, int SecondByte)
+        {
+            const byte PointerMask = 0b11000000;
+            return (FirstByte & ~PointerMask) + SecondByte;
+        }
+        private void GetLabel(Stream Stream, int Length)
+        {
+            var Buffer = new byte[Length];
 
-        private LabelType ReadLabelType(Stream Stream)
+            Stream.Read(Buffer, 0, Length);
+
+            var String = Encoding.ASCII.GetString(Buffer);
+
+            var Label = new Label
+            {
+                Type = Abstractions.Enums.LabelType.Normal,
+                Text = String,
+                Count = (ushort)String.Length,
+            };
+
+            Labels.Add(Label);
+        }
+        private Abstractions.Enums.LabelType GetLabelType(int Byte)
         {
             const byte LabelMask = 0b00111111;
 
-            var Byte = Stream.ReadByte();
-
             var Flag = (Byte & ~LabelMask) >> 6;
 
-            return (LabelType)Flag;
+            return (Abstractions.Enums.LabelType)Flag;
+        }
+        private MemoryStream GetRootStream(Stream Stream)
+        {
+            var BoundedStream = Stream as BoundedStream;
+
+            while (true)
+            {
+                if (BoundedStream?.Source is BoundedStream Source)
+                {
+                    BoundedStream = Source;
+                }
+                else
+                {
+                    return BoundedStream?.Source as MemoryStream;
+                }
+            }
+        }
+
+        IDomain IDomain.FromString(string Domain)
+        {
+            throw new NotImplementedException();
         }
     }
 }

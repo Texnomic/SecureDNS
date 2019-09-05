@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Net;
 using BinarySerialization;
+using Texnomic.DNS.Abstractions;
 
 namespace Texnomic.DNS.Records
 {

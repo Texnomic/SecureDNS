@@ -16,7 +16,7 @@ namespace Texnomic.DNS.Middlewares
         {
             var Bytes = await ResolveAsync(Message.ToArray());
 
-            return await Next(Message.FromArray(Bytes));
+            return Message.FromArray(Bytes);
         }
     }
 }

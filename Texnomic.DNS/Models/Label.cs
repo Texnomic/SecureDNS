@@ -1,8 +1,9 @@
-﻿using Texnomic.DNS.Enums;
+﻿using Texnomic.DNS.Abstractions;
+using Texnomic.DNS.Abstractions.Enums;
 
 namespace Texnomic.DNS.Models
 {
-    public class Label
+    public class Label : ILabel
     {
         public LabelType Type { get; set; }
 
