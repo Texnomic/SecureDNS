@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Nethereum.ENS;
@@ -62,7 +63,7 @@ namespace Texnomic.DNS.Resolvers
             return Async.RunSync(() => ResolveAsync(Query));
         }
 
-        public IMessage Resolve(IMessage Query)
+        public Message Resolve(Message Query)
         {
             return Async.RunSync(() => ResolveAsync(Query));
         }
@@ -76,12 +77,12 @@ namespace Texnomic.DNS.Resolvers
             return Response.ToArray();
         }
 
-        public async Task<IMessage> ResolveAsync(IMessage Query)
+        public async Task<Message> ResolveAsync(Message Query)
         {
             var Address = await ResolveAsync(Query.Questions.First().Name);
 
             Query.MessageType = MessageType.Response;
-            Query.Answers = new IAnswer[]
+            Query.Answers = new List<Answer>()
             {
                 new Answer()
                 {

@@ -1,15 +1,16 @@
 ﻿using BinarySerialization;
 using Texnomic.DNS.Abstractions;
+using Texnomic.DNS.Models;
 
 namespace Texnomic.DNS.Records
 {
     public class SOA : IRecord
     {
         [FieldOrder(0)]
-        public IDomain PrimaryNameServer { get; set; }
+        public Domain PrimaryNameServer { get; set; }
 
         [FieldOrder(1)] 
-        public IDomain ResponsibleAuthorityMailbox { get; set; }
+        public Domain ResponsibleAuthorityMailbox { get; set; }
 
         [FieldOrder(2), FieldEndianness(Endianness.Big)]
         public uint SerialNumber { get; set; }

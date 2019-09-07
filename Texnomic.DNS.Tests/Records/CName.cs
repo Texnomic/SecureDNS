@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Models;
 using Texnomic.DNS.Resolvers;
@@ -14,8 +15,8 @@ namespace Texnomic.DNS.Tests.Records
     {
         private ushort ID;
         private IResolver Resolver;
-        private IMessage RequestMessage;
-        private IMessage ResponseMessage;
+        private Message RequestMessage;
+        private Message ResponseMessage;
         
 
         [TestInitialize]
@@ -28,19 +29,8 @@ namespace Texnomic.DNS.Tests.Records
             RequestMessage = new Message()
             {
                 ID = ID,
-                //MessageType = MessageType.Query,
-                //OperationCode = OperationCode.Query,
-                //AuthoritativeAnswer = AuthoritativeAnswer.Cache,
-                //Truncated = false,
                 RecursionDesired = true,
-                //RecursionAvailable = false,
-                //Zero = 0,
-                //AuthenticatedData = false,
-                //CheckingDisabled = false,
-                //ResponseCode = ResponseCode.NoError,
-                //QuestionsCount = 1,
-                //AnswersCount = 0,
-                Questions = new[]
+                Questions = new List<Question>()
                 {
                     new Question()
                     {
@@ -61,7 +51,7 @@ namespace Texnomic.DNS.Tests.Records
             Assert.IsNotNull(ResponseMessage.Questions);
             Assert.IsNotNull(ResponseMessage.Answers);
             Assert.AreEqual(ResponseCode.NXRRSet, ResponseMessage.ResponseCode);
-            //Assert.IsInstanceOfType(ResponseMessage.Answers.First().Record, typeof(DNS.Records.CName));
+            Assert.IsInstanceOfType(ResponseMessage.Answers.First().Record, typeof(DNS.Records.CName));
         }
     }
 }

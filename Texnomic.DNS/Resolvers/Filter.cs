@@ -25,7 +25,7 @@ namespace Texnomic.DNS.Resolvers
             throw new NotImplementedException();
         }
 
-        public async Task<IMessage> ResolveAsync(IMessage Query)
+        public async Task<Message> ResolveAsync(Message Query)
         {
             throw new NotImplementedException();
         }
@@ -35,7 +35,7 @@ namespace Texnomic.DNS.Resolvers
             return Async.RunSync(() => ResolveAsync(Query));
         }
 
-        public IMessage Resolve(IMessage Query)
+        public Message Resolve(Message Query)
         {
             return Async.RunSync(() => ResolveAsync(Query));
         }

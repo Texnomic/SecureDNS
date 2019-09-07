@@ -32,7 +32,7 @@ namespace Texnomic.DNS.Resolvers
             return Client.Receive(ref IPEndPoint);
         }
 
-        public IMessage Resolve(IMessage Query)
+        public Message Resolve(Message Query)
         {
             var Buffer = Query.ToArray();
 
@@ -52,7 +52,7 @@ namespace Texnomic.DNS.Resolvers
             return Result.Buffer;
         }
 
-        public async Task<IMessage> ResolveAsync(IMessage Query)
+        public async Task<Message> ResolveAsync(Message Query)
         {
             var Buffer = Query.ToArray();
 

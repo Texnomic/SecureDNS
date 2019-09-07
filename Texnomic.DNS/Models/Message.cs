@@ -2,6 +2,7 @@
 using BinarySerialization;
 using Nerdbank.Streams;
 using System.Buffers;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -10,10 +11,11 @@ using System.Threading.Tasks;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Extensions;
+using Texnomic.DNS.Factories;
 
 namespace Texnomic.DNS.Models
 {
-    public class Message : IMessage
+    public class Message
     {
         //private ushort? Size;
 
@@ -70,7 +72,7 @@ namespace Texnomic.DNS.Models
         [FieldOrder(12), FieldBitLength(16), FieldEndianness(Endianness.Big), JsonIgnore]
         public ushort QuestionsCount
         {
-            get => _QuestionsCount ?? (ushort)(Questions?.Length ?? 0);
+            get => _QuestionsCount ?? (ushort)(Questions?.Count ?? 0);
             set => _QuestionsCount = value;
         }
 
@@ -79,7 +81,7 @@ namespace Texnomic.DNS.Models
         [FieldOrder(13), FieldBitLength(16), FieldEndianness(Endianness.Big), JsonIgnore]
         public ushort AnswersCount
         {
-            get => _AnswersCount ?? (ushort) (Answers?.Length ?? 0);
+            get => _AnswersCount ?? (ushort)(Answers?.Count ?? 0);
             set => _AnswersCount = value;
         }
 
@@ -97,13 +99,15 @@ namespace Texnomic.DNS.Models
 
         [FieldOrder(16)]
         [FieldCount(nameof(QuestionsCount))]
+        //[ItemSubtypeFactory(nameof(Questions), typeof(QuestionFactory))]
         [JsonPropertyName("Question")]
-        public IQuestion[] Questions { get; set; }
+        public List<Question> Questions { get; set; }
 
         [FieldOrder(17)]
         [FieldCount(nameof(AnswersCount))]
+        //[ItemSubtypeFactory(nameof(Answers), typeof(AnswerFactory))]
         [JsonPropertyName("Answer")]
-        public IAnswer[] Answers { get; set; }
+        public List<Answer> Answers { get; set; }
 
         [Ignore]
         [JsonPropertyName("Comment")]

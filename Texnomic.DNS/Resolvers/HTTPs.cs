@@ -30,7 +30,7 @@ namespace Texnomic.DNS.Resolvers
             return Async.RunSync(() => ResolveAsync(Query));
         }
 
-        public IMessage Resolve(IMessage Query)
+        public Message Resolve(Message Query)
         {
             return Async.RunSync(() => ResolveAsync(Query));
         }
@@ -53,7 +53,7 @@ namespace Texnomic.DNS.Resolvers
             return Response.RawBytes;
         }
 
-        public async Task<IMessage> ResolveAsync(IMessage Query)
+        public async Task<Message> ResolveAsync(Message Query)
         {
             var Request = new RestRequest($"resolve?name={Query.Questions[0].Domain}&type={Query.Questions[0].Type}");
             Request.AddHeader("Accept", "application/dns-json");

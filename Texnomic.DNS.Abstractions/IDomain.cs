@@ -8,6 +8,6 @@ namespace Texnomic.DNS.Abstractions
 
         string Name { get; }
 
-        IDomain FromString(string Domain);
+        //IDomain FromString(string Domain);
     }
 }

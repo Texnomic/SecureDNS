@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Buffers;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Texnomic.DNS.Abstractions.Enums;
 
@@ -41,10 +42,10 @@ namespace Texnomic.DNS.Abstractions
         ushort AdditionalCount { get; set; }
 
 
-        IQuestion[] Questions { get; set; }
+        List<IQuestion> Questions { get; set; }
 
 
-        IAnswer[] Answers { get; set; }
+        List<IAnswer> Answers { get; set; }
 
         string Comment { get; set; }
 

@@ -2,11 +2,11 @@
 using System;
 using System.Text.Json.Serialization;
 using Texnomic.DNS.Abstractions;
-using Texnomic.DNS.Records;
+using Texnomic.DNS.Factories;
 
 namespace Texnomic.DNS.Models
 {
-    public class Answer : Question, IAnswer
+    public class Answer : Question
     {
         [FieldOrder(3)]
         [FieldBitLength(32)]

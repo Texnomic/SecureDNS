@@ -1,9 +1,10 @@
-﻿using BinarySerialization;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using BinarySerialization;
 using Texnomic.DNS.Abstractions.Enums;
+using Texnomic.DNS.Records;
 
-namespace Texnomic.DNS.Records
+namespace Texnomic.DNS.Factories
 {
     public class RecordFactory : ISubtypeFactory
     {

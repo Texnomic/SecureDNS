@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using RestSharp.Extensions;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
 
@@ -12,7 +13,7 @@ namespace Texnomic.DNS.Models
     public class Domain : IBinarySerializable, IDomain
     {
         [Ignore]
-        public List<ILabel> Labels { get; private set; }
+        public List<ILabel> Labels { get; }
 
         [Ignore]
         public string Name => ToString();
@@ -27,6 +28,7 @@ namespace Texnomic.DNS.Models
 
         public Domain(string Domain)
         {
+            Labels = new List<ILabel>();
             Labels.AddRange(Domain.Split('.')
                     .Select(Label => new Label
                     {
@@ -48,63 +50,15 @@ namespace Texnomic.DNS.Models
 
         public void Serialize(Stream Stream, Endianness Endianness, BinarySerializationContext Context)
         {
-            SerializeLabels(Stream, Context);
-        }
-
-
-        public void Deserialize(Stream Stream, Endianness Endianness, BinarySerializationContext Context)
-        {
-            var Root = GetRootStream(Stream);
-
-            var Byte = Root.ReadByte();
-
-            while (Byte > 0)
-            {
-                Process(Root, Byte);
-
-                Byte = Root.ReadByte();
-            }
-        }
-
-        private void Process(Stream Stream, int Byte)
-        {
-            var LabelType = GetLabelType(Byte);
-
-            switch (LabelType)
-            {
-                case LabelType.Normal:
-                    {
-                        var LabelLength = GetLabelLength(Byte);
-
-                        GetLabel(Stream, LabelLength);
-
-                        break;
-                    }
-                case LabelType.Compressed:
-                    {
-                        var SecondByte = Stream.ReadByte();
-
-                        Stream.Position = GetPointer(Byte, SecondByte);
-
-                        break;
-                    }
-                case LabelType.Extended:
-                case LabelType.Unallocated:
-                default: throw new NotImplementedException(Enum.GetName(typeof(Abstractions.Enums.LabelType), LabelType));
-            }
-        }
-
-        private void SerializeLabels(Stream Stream, BinarySerializationContext Context)
-        {
             const byte NullOctet = 0b00000000;
 
             var Domain = Context.Value as Domain;
 
             foreach (var Label in Domain.Labels)
             {
-                var Flag = (ushort)Label.Type << 6;
+                var Flag = (ushort) Label.Type << 6;
 
-                var FlagSize = (byte)(Flag + Label.Count);
+                var FlagSize = (byte) (Flag + Label.Count);
 
                 Stream.WriteByte(FlagSize);
 
@@ -117,8 +71,64 @@ namespace Texnomic.DNS.Models
         }
 
 
+        public void Deserialize(Stream Stream, Endianness Endianness, BinarySerializationContext Context)
+        {
+            var Root = GetRootStream(Stream);
 
-        private int GetLabelLength(int Byte)
+            var GlobalPosition = Root.Position;
+
+            Root.Position = 0;
+
+            var Bytes = Root.ReadAsBytes();
+
+            Root.Position = GlobalPosition;
+
+            Process(ref Stream, ref Bytes, (int)GlobalPosition);
+        }
+
+        private void Process(ref Stream Stream, ref byte[] Bytes, int Offset, bool Ehab = true)
+        {
+            if (Bytes[Offset] == 0)
+            {
+                if (Ehab) Stream.Position += 1; 
+                return;
+            }
+
+            var LabelType = GetLabelType(Bytes[Offset]);
+
+            switch (LabelType)
+            {
+                case LabelType.Normal:
+                    {
+                        var LabelLength = GetLabelLength(Bytes[Offset]);
+
+                        Offset += 1;
+
+                        if(Ehab) Stream.Position += LabelLength + 1;
+
+                        GetLabel(ref Bytes, Offset, LabelLength);
+
+                        Process(ref Stream, ref Bytes, Offset + LabelLength, Ehab);
+
+                        break;
+                    }
+                case LabelType.Compressed:
+                    {
+                        var Pointer = GetPointer(Bytes[Offset], Bytes[Offset + 1]);
+
+                        Stream.Position += 2;
+
+                        Process(ref Stream, ref Bytes, Pointer, false);
+
+                        break;
+                    }
+                case LabelType.Extended:
+                case LabelType.Unallocated:
+                default: throw new NotImplementedException(Enum.GetName(typeof(LabelType), LabelType));
+            }
+        }
+
+        private int GetLabelLength(byte Byte)
         {
             const byte LengthMask = 0b11000000;
             return Byte & ~LengthMask;
@@ -128,30 +138,30 @@ namespace Texnomic.DNS.Models
             const byte PointerMask = 0b11000000;
             return (FirstByte & ~PointerMask) + SecondByte;
         }
-        private void GetLabel(Stream Stream, int Length)
+        private void GetLabel(ref byte[] Bytes, int Offset, int Length)
         {
             var Buffer = new byte[Length];
 
-            Stream.Read(Buffer, 0, Length);
+            Array.Copy(Bytes, Offset, Buffer, 0, Length);
 
             var String = Encoding.ASCII.GetString(Buffer);
 
             var Label = new Label
             {
-                Type = Abstractions.Enums.LabelType.Normal,
+                Type = LabelType.Normal,
                 Text = String,
                 Count = (ushort)String.Length,
             };
 
             Labels.Add(Label);
         }
-        private Abstractions.Enums.LabelType GetLabelType(int Byte)
+        private LabelType GetLabelType(byte Byte)
         {
             const byte LabelMask = 0b00111111;
 
             var Flag = (Byte & ~LabelMask) >> 6;
 
-            return (Abstractions.Enums.LabelType)Flag;
+            return (LabelType)Flag;
         }
         private MemoryStream GetRootStream(Stream Stream)
         {
@@ -168,11 +178,6 @@ namespace Texnomic.DNS.Models
                     return BoundedStream?.Source as MemoryStream;
                 }
             }
-        }
-
-        IDomain IDomain.FromString(string Domain)
-        {
-            throw new NotImplementedException();
         }
     }
 }

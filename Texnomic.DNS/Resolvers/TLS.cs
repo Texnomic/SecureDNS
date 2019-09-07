@@ -12,7 +12,6 @@ using Org.BouncyCastle.Crypto.Tls;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Models;
 using Texnomic.DNS.Extensions;
-using StreamExtensions = BinarySerialization.StreamExtensions;
 
 namespace Texnomic.DNS.Resolvers
 {
@@ -55,7 +54,7 @@ namespace Texnomic.DNS.Resolvers
             return Async.RunSync(() => ResolveAsync(Query));
         }
 
-        public IMessage Resolve(IMessage Query)
+        public Message Resolve(Message Query)
         {
             return Async.RunSync(() => ResolveAsync(Query));
         }
@@ -81,7 +80,7 @@ namespace Texnomic.DNS.Resolvers
             return Result.Buffer.Slice(2).ToArray();
         }
 
-        public async Task<IMessage> ResolveAsync(IMessage Request)
+        public async Task<Message> ResolveAsync(Message Request)
         {
             if (!TcpClient.Connected || !SslStream.CanWrite) await InitializeAsync();
 

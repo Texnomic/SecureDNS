@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Models;
 using Texnomic.DNS.Resolvers;
@@ -17,8 +15,8 @@ namespace Texnomic.DNS.Tests.Resolvers
     {
         private ushort ID;
         private IResolver Resolver;
-        private IMessage RequestMessage;
-        private IMessage ResponseMessage;
+        private Message RequestMessage;
+        private Message ResponseMessage;
 
 
         [TestInitialize]
@@ -33,7 +31,7 @@ namespace Texnomic.DNS.Tests.Resolvers
             {
                 ID = ID,
                 RecursionDesired = true,
-                Questions = new[]
+                Questions = new List<Question>()
                 {
                     new Question()
                     {
