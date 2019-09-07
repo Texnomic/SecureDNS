@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Texnomic.DNS.Serialization\Texnomic.DNS.Serialization.csproj" />
+    <ProjectReference Include="..\Texnomic.DNS.Abstractions\Texnomic.DNS.Abstractions.csproj" />
   </ItemGroup>
 
 </Project>
