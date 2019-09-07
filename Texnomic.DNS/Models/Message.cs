@@ -109,6 +109,11 @@ namespace Texnomic.DNS.Models
         [JsonPropertyName("Answer")]
         public List<Answer> Answers { get; set; }
 
+        [FieldOrder(18)]
+        [FieldCount(nameof(AuthorityCount))]
+        [JsonPropertyName("Authority")]
+        public List<Answer> Authority { get; set; }
+
         [Ignore]
         [JsonPropertyName("Comment")]
         public string Comment { get; set; }

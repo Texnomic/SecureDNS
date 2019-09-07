@@ -24,7 +24,7 @@ namespace Texnomic.DNS.Tests.Records
         {
             ID = (ushort)new Random().Next();
 
-            Resolver = new UDP(IPAddress.Parse("1.1.1.1"));
+            Resolver = new UDP(IPAddress.Parse("8.8.8.8"));
 
             RequestMessage = new Message()
             {
@@ -34,7 +34,7 @@ namespace Texnomic.DNS.Tests.Records
                 {
                     new Question()
                     {
-                        Domain = Domain.FromString("facebook.com"),
+                        Domain = Domain.FromString("www.binary.exposed"),
                         Class = RecordClass.Internet,
                         Type = RecordType.CNAME
                     }
@@ -51,7 +51,7 @@ namespace Texnomic.DNS.Tests.Records
             Assert.IsNotNull(ResponseMessage.Questions);
             Assert.IsNotNull(ResponseMessage.Answers);
             Assert.AreEqual(ResponseCode.NXRRSet, ResponseMessage.ResponseCode);
-            Assert.IsInstanceOfType(ResponseMessage.Answers.First().Record, typeof(DNS.Records.CName));
+            Assert.IsInstanceOfType(ResponseMessage.Authority.First().Record, typeof(DNS.Records.SOA));
         }
     }
 }
