@@ -10,6 +10,7 @@ using BinarySerialization;
 using Microsoft.Extensions.Hosting;
 using PipelineNet.ChainsOfResponsibility;
 using PipelineNet.Pipelines;
+using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Models;
 
 namespace Texnomic.DNS.Servers
@@ -35,7 +36,8 @@ namespace Texnomic.DNS.Servers
                 try
                 {
                     var UdpReceiveResult = await UdpClient.ReceiveAsync();
-                    Workers.Add(ResolveAsync(UdpReceiveResult));
+                    //Workers.Add(ResolveAsync(UdpReceiveResult));
+                    ResolveAsync(UdpReceiveResult);
                 }
                 catch (Exception Error)
                 {
@@ -46,16 +48,30 @@ namespace Texnomic.DNS.Servers
 
         public async Task ResolveAsync(UdpReceiveResult UdpReceiveResult)
         {
+            ushort ID = 0;
+
             try
             {
                 var Request = Message.FromArray(UdpReceiveResult.Buffer);
+                ID = Request.ID;
                 var Response = await ResponsibilityChain.Execute(Request);
                 var ResponseBytes = Response.ToArray();
                 await UdpClient.SendAsync(ResponseBytes, ResponseBytes.Length, UdpReceiveResult.RemoteEndPoint);
             }
             catch (Exception Error)
             {
-                Console.WriteLine(Error);
+                var Response = new Message()
+                {
+                    ID = ID,
+                    MessageType = MessageType.Response,
+                    ResponseCode = ResponseCode.FormatError,
+                };
+
+                var ResponseBytes = Response.ToArray();
+
+                await UdpClient.SendAsync(ResponseBytes, ResponseBytes.Length, UdpReceiveResult.RemoteEndPoint);
+
+                //Console.WriteLine(Error);
             }
         }
 

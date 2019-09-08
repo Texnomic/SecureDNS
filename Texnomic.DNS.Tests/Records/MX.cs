@@ -11,7 +11,7 @@ using Texnomic.DNS.Resolvers;
 namespace Texnomic.DNS.Tests.Records
 {
     [TestClass]
-    public class CName
+    public class MX
     {
         private ushort ID;
         private IResolver Resolver;
@@ -34,9 +34,9 @@ namespace Texnomic.DNS.Tests.Records
                 {
                     new Question()
                     {
-                        Domain = Domain.FromString("zonetransfer.me"),
+                        Domain = Domain.FromString("texnomic.com"),
                         Class = RecordClass.Internet,
-                        Type = RecordType.CNAME
+                        Type = RecordType.MX
                     }
                 }
             };
@@ -51,7 +51,7 @@ namespace Texnomic.DNS.Tests.Records
             Assert.IsNotNull(ResponseMessage.Questions);
             Assert.IsNotNull(ResponseMessage.Answers);
             Assert.AreEqual(ResponseCode.NXRRSet, ResponseMessage.ResponseCode);
-            Assert.IsInstanceOfType(ResponseMessage.Authority.First().Record, typeof(DNS.Records.SOA));
+            Assert.IsInstanceOfType(ResponseMessage.Answers.First().Record, typeof(DNS.Records.MX));
         }
     }
 }

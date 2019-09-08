@@ -86,7 +86,7 @@ namespace Texnomic.DNS.Resolvers
             {
                 new Answer()
                 {
-                    TTL = 60 * 60,
+                    TimeToLive = new TimeToLive() { Value = new TimeSpan(0,0,60 * 60) },
                     Length = (ushort)Address.Length,
                     Domain = Query.Questions.First().Domain,
                     Record = new ETH()

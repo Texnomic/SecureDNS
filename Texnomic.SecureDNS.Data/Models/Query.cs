@@ -18,7 +18,7 @@ namespace Texnomic.SecureDNS.Data.Models
         public string Resolve => Response.Answers
                                          .Where(Record => Record.Type == RecordType.A || Record.Type == RecordType.PTR)
                                          .Cast<A>()
-                                         .Select(Record => Record.IPAddress)
+                                         .Select(Record => Record.Address.Value)
                                          .First()
                                          .ToString();
     }

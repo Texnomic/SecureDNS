@@ -9,6 +9,9 @@ using Texnomic.DNS.Models;
 
 namespace Texnomic.DNS.Resolvers
 {
+    /// <summary>
+    /// DNS Over HTTPS <see href="https://tools.ietf.org/html/rfc8484">(DoH)</see>
+    /// </summary>
     public class HTTPs : IResolver
     {
         private readonly string PublicKey;
@@ -41,6 +44,8 @@ namespace Texnomic.DNS.Resolvers
             var Request = new RestRequest($"dns-query?dns={Message}");
             Request.AddHeader("Accept", "application/dns-message");
             var Response = await RestClient.ExecuteGetTaskAsync(Request);
+            if (Response.StatusCode != HttpStatusCode.OK)
+                throw new Exception($"HTTP Status {nameof(Response.StatusCode)}");
             return Response.RawBytes;
         }
 

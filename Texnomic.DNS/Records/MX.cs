@@ -7,16 +7,21 @@ namespace Texnomic.DNS.Records
     //                                 1  1  1  1  1  1
     //   0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5
     // +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-    // /                     CNAME                     /
+    // |                  PREFERENCE                   |
+    // +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    // /                   EXCHANGE                    /
     // /                                               /
     // +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
 
     /// <summary>
-    /// Canonical Name Resource Record <see href="https://tools.ietf.org/html/rfc1035#section-3.3.1">(CName)</see>
+    /// Mail Exchange Resource Record <see href="https://tools.ietf.org/html/rfc1035#section-3.3.9">(MX)</see>
     /// </summary>
-    public class CName : IRecord
+    public class MX : IRecord
     {
-        [FieldOrder(0)]
+        [FieldOrder(0), FieldCount(16), FieldEndianness(Endianness.Big)]
+        public short Preference { get; set; }
+
+        [FieldOrder(1)] 
         public Domain Domain { get; set; }
     }
 }

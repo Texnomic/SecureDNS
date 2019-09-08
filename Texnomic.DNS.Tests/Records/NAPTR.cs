@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Texnomic.DNS.Abstractions.Enums;
@@ -11,7 +12,7 @@ using Texnomic.DNS.Resolvers;
 namespace Texnomic.DNS.Tests.Records
 {
     [TestClass]
-    public class CName
+    public class NAPTR
     {
         private ushort ID;
         private IResolver Resolver;
@@ -24,7 +25,7 @@ namespace Texnomic.DNS.Tests.Records
         {
             ID = (ushort)new Random().Next();
 
-            Resolver = new UDP(IPAddress.Parse("8.8.8.8"));
+            Resolver = new UDP(IPAddress.Parse("8.8.4.4"));
 
             RequestMessage = new Message()
             {
@@ -36,7 +37,7 @@ namespace Texnomic.DNS.Tests.Records
                     {
                         Domain = Domain.FromString("zonetransfer.me"),
                         Class = RecordClass.Internet,
-                        Type = RecordType.CNAME
+                        Type = RecordType.NAPTR
                     }
                 }
             };
@@ -50,8 +51,7 @@ namespace Texnomic.DNS.Tests.Records
             Assert.AreEqual(ID, ResponseMessage.ID);
             Assert.IsNotNull(ResponseMessage.Questions);
             Assert.IsNotNull(ResponseMessage.Answers);
-            Assert.AreEqual(ResponseCode.NXRRSet, ResponseMessage.ResponseCode);
-            Assert.IsInstanceOfType(ResponseMessage.Authority.First().Record, typeof(DNS.Records.SOA));
+            Assert.IsInstanceOfType(ResponseMessage.Answers.First().Record, typeof(DNS.Records.NAPTR));
         }
     }
 }

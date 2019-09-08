@@ -83,14 +83,14 @@ namespace Texnomic.DNS.Models
 
             Root.Position = GlobalPosition;
 
-            Process(ref Stream, ref Bytes, (int)GlobalPosition);
+            Deserialize(ref Stream, ref Bytes, (int)GlobalPosition);
         }
 
-        private void Process(ref Stream Stream, ref byte[] Bytes, int Offset, bool Ehab = true)
+        private void Deserialize(ref Stream Stream, ref byte[] Bytes, int Offset, bool Reposition = true)
         {
             if (Bytes[Offset] == 0)
             {
-                if (Ehab) Stream.Position += 1; 
+                if (Reposition) Stream.Position += 1; 
                 return;
             }
 
@@ -104,11 +104,11 @@ namespace Texnomic.DNS.Models
 
                         Offset += 1;
 
-                        if(Ehab) Stream.Position += LabelLength + 1;
+                        if(Reposition) Stream.Position += LabelLength + 1;
 
                         GetLabel(ref Bytes, Offset, LabelLength);
 
-                        Process(ref Stream, ref Bytes, Offset + LabelLength, Ehab);
+                        Deserialize(ref Stream, ref Bytes, Offset + LabelLength, Reposition);
 
                         break;
                     }
@@ -118,13 +118,14 @@ namespace Texnomic.DNS.Models
 
                         Stream.Position += 2;
 
-                        Process(ref Stream, ref Bytes, Pointer, false);
+                        Deserialize(ref Stream, ref Bytes, Pointer, false);
 
                         break;
                     }
                 case LabelType.Extended:
                 case LabelType.Unallocated:
-                default: throw new NotImplementedException(Enum.GetName(typeof(LabelType), LabelType));
+                //default: throw new NotImplementedException(Enum.GetName(typeof(LabelType), LabelType));
+                default: break;
             }
         }
 

@@ -9,18 +9,8 @@ namespace Texnomic.DNS.Models
     public class Answer : Question
     {
         [FieldOrder(3)]
-        [FieldBitLength(32)]
-        [FieldEndianness(Endianness.Big)]
         [JsonPropertyName("TTL")]
-        public uint TTL { get; set; }
-
-        [Ignore]
-        [JsonIgnore]
-        public TimeSpan TimeToLive
-        {
-            get => new TimeSpan(0, 0, (int) TTL);
-            set => throw new NotImplementedException();
-        }
+        public TimeToLive TimeToLive { get; set; }
 
         [FieldOrder(4)]
         [FieldBitLength(16)]
