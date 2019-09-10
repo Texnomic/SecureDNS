@@ -18,6 +18,7 @@ namespace Texnomic.DNS.Models
 
         public void Serialize(Stream Stream, Endianness Endianness, BinarySerializationContext SerializationContext)
         {
+            var Test = Value.GetAddressBytes();
             Stream.Write(Value.GetAddressBytes());
         }
     }

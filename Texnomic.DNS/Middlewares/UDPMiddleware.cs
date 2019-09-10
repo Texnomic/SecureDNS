@@ -13,9 +13,7 @@ namespace Texnomic.DNS.Middlewares
 
         public async Task<Message> Run(Message Message, Func<Message, Task<Message>> Next)
         {
-            await ResolveAsync(Message);
-
-            return await Next(Message);
+            return await ResolveAsync(Message);
         }
     }
 }

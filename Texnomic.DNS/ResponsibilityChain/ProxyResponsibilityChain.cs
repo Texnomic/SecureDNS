@@ -11,7 +11,7 @@ namespace Texnomic.DNS.ResponsibilityChain
     {
         public ProxyResponsibilityChain(IMiddlewareResolver MiddlewareResolver) : base(MiddlewareResolver)
         {
-            Chain<Quad9TLSMiddleware>();
+            Chain<GoogleUDPMiddleware>();
         }
     }
 }

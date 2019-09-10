@@ -15,7 +15,7 @@ namespace Texnomic.DNS.Records
     /// </summary>
     public class A : IRecord
     {
-        [FieldOrder(0), FieldLength(32)]
+        [FieldOrder(0)]
         public IPv4Address Address { get; set; }
     }
 }

@@ -15,7 +15,7 @@ namespace Texnomic.DNS.Records
     /// </summary>
     public class AAAA : IRecord
     {
-        [FieldOrder(0), FieldLength(128)]
+        [FieldOrder(0)]
         public IPv6Address Address { get; set; }
     }
 }

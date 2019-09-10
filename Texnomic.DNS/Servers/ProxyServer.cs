@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -98,6 +99,8 @@ namespace Texnomic.DNS.Servers
                 {
                     var Result = await UdpClient.ReceiveAsync();
 
+                    //Debug(Result.Buffer);
+
                     await SerializerQueue.SendAsync(Result);
 
                     Requested?.Invoke(this, new RequestedEventArgs(Result.RemoteEndPoint));
@@ -105,6 +108,7 @@ namespace Texnomic.DNS.Servers
                 catch (Exception Error)
                 {
                     this.Error?.Invoke(this, new ErrorEventArgs(Error));
+
                     Console.WriteLine(Error.Message);
                 }
             }
@@ -143,11 +147,6 @@ namespace Texnomic.DNS.Servers
                 {
                     var Response = await ResponsibilityChain.Execute(Request);
 
-                    if (Response == null)
-                    {
-
-                    }
-
                     await OutgoingQueue.SendAsync((Response, Remote));
 
                     Resolved?.Invoke(this, new ResolvedEventArgs(Request, Response, Remote));
@@ -155,6 +154,7 @@ namespace Texnomic.DNS.Servers
                 catch (Exception Error)
                 {
                     this.Error?.Invoke(this, new ErrorEventArgs(Error));
+
                     Console.WriteLine(Error.Message);
 
                     await SendError(Request.ID, Remote);
@@ -171,6 +171,8 @@ namespace Texnomic.DNS.Servers
 
                     var Bytes = Response.ToArray();
 
+                    //Debug(Bytes);
+
                     await UdpClient.SendAsync(Bytes, Bytes.Length, Remote);
 
                     Responded?.Invoke(this, new RespondedEventArgs(Response, Remote));
@@ -185,18 +187,32 @@ namespace Texnomic.DNS.Servers
 
         private async Task SendError(ushort ID, IPEndPoint RemoteEndPoint)
         {
-            var Response = new Message()
+            try
             {
-                ID = ID,
-                MessageType = MessageType.Response,
-                ResponseCode = ResponseCode.FormatError,
-            };
+                var Response = new Message()
+                {
+                    ID = ID,
+                    MessageType = MessageType.Response,
+                    ResponseCode = ResponseCode.FormatError,
+                };
 
-            var ResponseBytes = Response.ToArray();
+                var ResponseBytes = Response.ToArray();
 
-            await UdpClient.SendAsync(ResponseBytes, ResponseBytes.Length, RemoteEndPoint);
+                await UdpClient.SendAsync(ResponseBytes, ResponseBytes.Length, RemoteEndPoint);
 
-            Responded?.Invoke(this, new RespondedEventArgs(Response, RemoteEndPoint));
+                Responded?.Invoke(this, new RespondedEventArgs(Response, RemoteEndPoint));
+            }
+            catch (Exception Error)
+            {
+                Console.WriteLine(Error.Message);
+            }
+        }
+
+        private void Debug(byte[] Bytes)
+        {
+            var Binary = Bytes.ToList().Select(Byte => Convert.ToString(Byte, 2).PadLeft(8, '0')).ToList();
+            var Message = string.Join(' ', Binary);
+            Console.WriteLine(Message);
         }
 
         public class RequestedEventArgs : EventArgs
