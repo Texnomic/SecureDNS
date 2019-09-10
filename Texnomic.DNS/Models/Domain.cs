@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using RestSharp.Extensions;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
 
@@ -56,9 +55,9 @@ namespace Texnomic.DNS.Models
 
             foreach (var Label in Domain.Labels)
             {
-                var Flag = (ushort) Label.Type << 6;
+                var Flag = (ushort)Label.Type << 6;
 
-                var FlagSize = (byte) (Flag + Label.Count);
+                var FlagSize = (byte)(Flag + Label.Count);
 
                 Stream.WriteByte(FlagSize);
 
@@ -70,62 +69,47 @@ namespace Texnomic.DNS.Models
             Stream.WriteByte(NullOctet);
         }
 
-
         public void Deserialize(Stream Stream, Endianness Endianness, BinarySerializationContext Context)
         {
-            var Root = GetRootStream(Stream);
-
-            var GlobalPosition = Root.Position;
-
-            Root.Position = 0;
-
-            var Bytes = Root.ReadAsBytes();
-
-            Root.Position = GlobalPosition;
-
-            Deserialize(ref Stream, ref Bytes, (int)GlobalPosition);
-        }
-
-        private void Deserialize(ref Stream Stream, ref byte[] Bytes, int Offset, bool Reposition = true)
-        {
-            if (Bytes[Offset] == 0)
+            while (true)
             {
-                if (Reposition) Stream.Position += 1; 
-                return;
-            }
+                var Byte = (byte)Stream.ReadByte();
 
-            var LabelType = GetLabelType(Bytes[Offset]);
+                if (Byte == 0) return;
 
-            switch (LabelType)
-            {
-                case LabelType.Normal:
-                    {
-                        var LabelLength = GetLabelLength(Bytes[Offset]);
+                var LabelType = GetLabelType(Byte);
 
-                        Offset += 1;
+                switch (LabelType)
+                {
+                    case LabelType.Normal:
+                        {
+                            var LabelLength = GetLabelLength(Byte);
 
-                        if(Reposition) Stream.Position += LabelLength + 1;
+                            GetLabel(Stream, LabelLength);
 
-                        GetLabel(ref Bytes, Offset, LabelLength);
+                            continue;
+                        }
+                    case LabelType.Compressed:
+                        {
+                            var Pointer = GetPointer(Byte, Stream.ReadByte());
 
-                        Deserialize(ref Stream, ref Bytes, Offset + LabelLength, Reposition);
+                            var Message = Context.FindAncestor<Message>();
 
-                        break;
-                    }
-                case LabelType.Compressed:
-                    {
-                        var Pointer = GetPointer(Bytes[Offset], Bytes[Offset + 1]);
+                            var QLabel = Message.Questions
+                                                .Select(Question => Question.Domain)
+                                                .Where(Domain => Domain.Labels.Any(Label => Label.Offset == Pointer))
+                                                .SelectMany(Domain => Domain.Labels)
+                                                .Where(Label => Label.Offset >= Pointer);
 
-                        Stream.Position += 2;
+                            Labels.AddRange(QLabel);
 
-                        Deserialize(ref Stream, ref Bytes, Pointer, false);
-
-                        break;
-                    }
-                case LabelType.Extended:
-                case LabelType.Unallocated:
-                //default: throw new NotImplementedException(Enum.GetName(typeof(LabelType), LabelType));
-                default: break;
+                            return;
+                        }
+                    case LabelType.Extended:
+                    case LabelType.Unallocated:
+                    default:
+                        throw new NotImplementedException(Enum.GetName(typeof(LabelType), LabelType));
+                }
             }
         }
 
@@ -139,11 +123,13 @@ namespace Texnomic.DNS.Models
             const byte PointerMask = 0b11000000;
             return (FirstByte & ~PointerMask) + SecondByte;
         }
-        private void GetLabel(ref byte[] Bytes, int Offset, int Length)
+        private void GetLabel(Stream Stream, int Length)
         {
+            var Offset = ((BoundedStream)Stream).GlobalPosition.TotalByteCount - 1;
+
             var Buffer = new byte[Length];
 
-            Array.Copy(Bytes, Offset, Buffer, 0, Length);
+            Stream.Read(Buffer);
 
             var String = Encoding.ASCII.GetString(Buffer);
 
@@ -151,6 +137,7 @@ namespace Texnomic.DNS.Models
             {
                 Type = LabelType.Normal,
                 Text = String,
+                Offset = Offset,
                 Count = (ushort)String.Length,
             };
 
@@ -163,22 +150,6 @@ namespace Texnomic.DNS.Models
             var Flag = (Byte & ~LabelMask) >> 6;
 
             return (LabelType)Flag;
-        }
-        private MemoryStream GetRootStream(Stream Stream)
-        {
-            var BoundedStream = Stream as BoundedStream;
-
-            while (true)
-            {
-                if (BoundedStream?.Source is BoundedStream Source)
-                {
-                    BoundedStream = Source;
-                }
-                else
-                {
-                    return BoundedStream?.Source as MemoryStream;
-                }
-            }
         }
     }
 }

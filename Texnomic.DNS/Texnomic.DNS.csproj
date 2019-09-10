@@ -11,13 +11,14 @@
 
   <ItemGroup>
     <PackageReference Include="BinarySerializer" Version="8.4.3" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="3.0.0-preview8.19405.4" />
-    <PackageReference Include="Nerdbank.Streams" Version="2.3.26" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="3.0.0-preview9.19423.4" />
+    <PackageReference Include="Nerdbank.Streams" Version="2.3.32" />
     <PackageReference Include="Nethereum.ENS" Version="3.4.0" />
     <PackageReference Include="Nethereum.Web3" Version="3.4.0" />
     <PackageReference Include="PipelineNet" Version="0.9.0" />
     <PackageReference Include="RestSharp" Version="106.6.10" />
-    <PackageReference Include="System.Text.Json" Version="4.6.0-preview8.19405.3" />
+    <PackageReference Include="System.Text.Json" Version="4.6.0-preview9.19421.4" />
+    <PackageReference Include="System.Threading.Tasks.Dataflow" Version="4.10.0-preview9.19421.4" />
   </ItemGroup>
 
   <ItemGroup>

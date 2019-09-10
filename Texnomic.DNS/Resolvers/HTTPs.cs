@@ -45,7 +45,7 @@ namespace Texnomic.DNS.Resolvers
             Request.AddHeader("Accept", "application/dns-message");
             var Response = await RestClient.ExecuteGetTaskAsync(Request);
             if (Response.StatusCode != HttpStatusCode.OK)
-                throw new Exception($"HTTP Status {nameof(Response.StatusCode)}");
+                throw new Exception($"HTTP Status {Enum.GetName(typeof(HttpStatusCode), Response.StatusCode)}");
             return Response.RawBytes;
         }
 

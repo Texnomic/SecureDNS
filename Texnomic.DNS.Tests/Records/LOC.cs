@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Texnomic.DNS.Abstractions.Enums;
@@ -12,7 +11,7 @@ using Texnomic.DNS.Resolvers;
 namespace Texnomic.DNS.Tests.Records
 {
     [TestClass]
-    public class NAPTR
+    public class LOC
     {
         private ushort ID;
         private IResolver Resolver;
@@ -25,19 +24,19 @@ namespace Texnomic.DNS.Tests.Records
         {
             ID = (ushort)new Random().Next();
 
-            Resolver = new UDP(IPAddress.Parse("8.8.4.4"));
+            Resolver = new UDP(IPAddress.Parse("8.8.8.8"));
 
             RequestMessage = new Message()
             {
                 ID = ID,
                 RecursionDesired = true,
-                Questions = new List<Question>()
+                Questions =new List<Question>()
                 {
                     new Question()
                     {
-                        Domain = Domain.FromString("cloudflare.com"),
+                        Domain = Domain.FromString("geekatlas.com"),
                         Class = RecordClass.Internet,
-                        Type = RecordType.NAPTR
+                        Type = RecordType.LOC
                     }
                 }
             };
@@ -51,7 +50,7 @@ namespace Texnomic.DNS.Tests.Records
             Assert.AreEqual(ID, ResponseMessage.ID);
             Assert.IsNotNull(ResponseMessage.Questions);
             Assert.IsNotNull(ResponseMessage.Answers);
-            Assert.IsInstanceOfType(ResponseMessage.Answers.First().Record, typeof(DNS.Records.NAPTR));
+            Assert.IsInstanceOfType(ResponseMessage.Answers.First().Record, typeof(DNS.Records.LOC));
         }
     }
 }

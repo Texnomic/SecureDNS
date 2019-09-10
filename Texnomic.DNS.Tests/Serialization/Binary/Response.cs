@@ -29,12 +29,12 @@ namespace Texnomic.DNS.Tests.Serialization.Binary
         [TestInitialize]
         public void Initialize()
         {
-            var Length = BitConverter.GetBytes((ushort)RequestBytes.Length);
-            Array.Reverse(Length);
-            var Bytes = new byte[RequestBytes.Length + 2];
-            Array.Copy(Length, Bytes, 2);
-            Array.Copy(RequestBytes, 0, Bytes, 2, RequestBytes.Length);
-            RequestBytes = Bytes;
+            //var Length = BitConverter.GetBytes((ushort)RequestBytes.Length);
+            //Array.Reverse(Length);
+            //var Bytes = new byte[RequestBytes.Length + 2];
+            //Array.Copy(Length, Bytes, 2);
+            //Array.Copy(RequestBytes, 0, Bytes, 2, RequestBytes.Length);
+            //RequestBytes = Bytes;
         }
 
         [TestMethod, Priority(1)]
@@ -46,8 +46,8 @@ namespace Texnomic.DNS.Tests.Serialization.Binary
             Assert.AreEqual(OperationCode.Query, Msg.OperationCode);
             Assert.AreEqual(AuthoritativeAnswer.Cache, Msg.AuthoritativeAnswer);
             Assert.AreEqual(false, Msg.Truncated);
-            Assert.AreEqual(RecursionDesired.Recursive, Msg.RecursionDesired);
-            //Assert.AreEqual(true, Msg.RecursionAvailable);
+            Assert.AreEqual(true, Msg.RecursionDesired);
+            Assert.AreEqual(false, Msg.RecursionAvailable);
             Assert.AreEqual(0, Msg.Zero);
             Assert.AreEqual(false, Msg.AuthenticatedData);
             Assert.AreEqual(false, Msg.CheckingDisabled);

@@ -8,8 +8,6 @@ using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using BinarySerialization;
-using Org.BouncyCastle.Crypto.Tls;
-using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Models;
 using Texnomic.DNS.Extensions;
 

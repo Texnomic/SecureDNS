@@ -29,7 +29,7 @@ namespace Texnomic.DNS.Records
     // +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
 
     /// <summary>
-    /// Mail Exchange Resource Record <see href="https://tools.ietf.org/html/rfc1035#section-3.3.13">(SOA)</see>
+    /// Start Of Authority Resource Record <see href="https://tools.ietf.org/html/rfc1035#section-3.3.13">(SOA)</see>
     /// </summary>
     public class SOA : IRecord
     {

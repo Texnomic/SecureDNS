@@ -143,6 +143,11 @@ namespace Texnomic.DNS.Models
             var Serializer = new BinarySerializer();
             return Serializer.Deserialize<Message>(Data);
         }
+        public static Task<Message> FromArrayAsync(byte[] Data)
+        {
+            var Serializer = new BinarySerializer();
+            return Serializer.DeserializeAsync<Message>(Data);
+        }
 
         public static Message FromArray(ReadOnlySequence<byte> Data)
         {

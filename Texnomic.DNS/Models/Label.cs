@@ -7,6 +7,8 @@ namespace Texnomic.DNS.Models
     {
         public LabelType Type { get; set; }
 
+        public long Offset { get; set; }
+
         public ushort Count { get; set; }
 
         public string Text { get; set; }

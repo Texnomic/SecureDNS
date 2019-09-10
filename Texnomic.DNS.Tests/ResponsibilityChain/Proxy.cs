@@ -1,31 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using PipelineNet.MiddlewareResolver;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Models;
 using Texnomic.DNS.Resolvers;
+using Texnomic.DNS.ResponsibilityChain;
 
-namespace Texnomic.DNS.Tests.Records
+namespace Texnomic.DNS.Tests.ResponsibilityChain
 {
     [TestClass]
-    public class NAPTR
+    public class Proxy
     {
         private ushort ID;
-        private IResolver Resolver;
         private Message RequestMessage;
         private Message ResponseMessage;
-        
+
 
         [TestInitialize]
         public void Initialize()
         {
-            ID = (ushort)new Random().Next();
-
-            Resolver = new UDP(IPAddress.Parse("8.8.4.4"));
+            ID = (ushort) new Random().Next();
 
             RequestMessage = new Message()
             {
@@ -35,23 +33,25 @@ namespace Texnomic.DNS.Tests.Records
                 {
                     new Question()
                     {
-                        Domain = Domain.FromString("cloudflare.com"),
+                        Domain = Domain.FromString("google.com"),
                         Class = RecordClass.Internet,
-                        Type = RecordType.NAPTR
+                        Type = RecordType.A
                     }
                 }
             };
         }
 
         [TestMethod]
-        public async Task QueryAsync()
+        public async Task RunAsync()
         {
-            ResponseMessage = await Resolver.ResolveAsync(RequestMessage);
+            var ActivatorMiddlewareResolver = new ActivatorMiddlewareResolver();
+            var ProxyResponsibilityChain = new ProxyResponsibilityChain(ActivatorMiddlewareResolver);
+            ResponseMessage = await ProxyResponsibilityChain.Execute(RequestMessage);
 
             Assert.AreEqual(ID, ResponseMessage.ID);
             Assert.IsNotNull(ResponseMessage.Questions);
             Assert.IsNotNull(ResponseMessage.Answers);
-            Assert.IsInstanceOfType(ResponseMessage.Answers.First().Record, typeof(DNS.Records.NAPTR));
+            Assert.IsInstanceOfType(ResponseMessage.Answers.First().Record, typeof(DNS.Records.A));
         }
     }
 }
