@@ -1,7 +1,6 @@
 ﻿using BinarySerialization;
 using System.Text.Json.Serialization;
 using Texnomic.DNS.Abstractions.Enums;
-using Texnomic.DNS.Factories;
 
 namespace Texnomic.DNS.Models
 {

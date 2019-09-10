@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-
-namespace Texnomic.SecureDNS.Automation.Models
+﻿namespace Texnomic.SecureDNS.Automation.Models
 {
     public class Adapter
     {

@@ -7,7 +7,6 @@ using Nethereum.ENS.ENSRegistry.ContractDefinition;
 using Nethereum.Hex.HexConvertors.Extensions;
 using Texnomic.DNS.Models;
 using Nethereum.Web3;
-using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Extensions;
 using Texnomic.DNS.Records;

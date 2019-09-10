@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Net;
 using System.Threading.Tasks;
 using PipelineNet.Middleware;
-using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Models;
 using Texnomic.DNS.Resolvers;
 

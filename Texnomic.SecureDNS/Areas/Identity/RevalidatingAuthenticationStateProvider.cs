@@ -2,91 +2,69 @@
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Server;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Texnomic.SecureDNS.Data.Identity;
+using Microsoft.Extensions.Options;
 
 namespace Texnomic.SecureDNS.Areas.Identity
 {
-    /// <summary>
-    /// An <see cref="AuthenticationStateProvider"/> service that revalidates the
-    /// authentication state at regular intervals. If a signed-in user's security
-    /// stamp changes, this revalidation mechanism will sign the user out.
-    /// </summary>
-    /// <typeparam name="TUser">The type encapsulating a user.</typeparam>
-    public class RevalidatingAuthenticationStateProvider<TUser> : AuthenticationStateProvider, IDisposable where TUser : User
+    public class RevalidatingIdentityAuthenticationStateProvider<TUser> : RevalidatingServerAuthenticationStateProvider where TUser : class
     {
-        private static readonly TimeSpan RevalidationInterval = TimeSpan.FromMinutes(30);
-
-        private readonly CancellationTokenSource LoopCancellationTokenSource = new CancellationTokenSource();
         private readonly IServiceScopeFactory ScopeFactory;
-        private readonly ILogger Logger;
-        private Task<AuthenticationState> CurrentAuthenticationStateTask;
+        private readonly IdentityOptions Options;
 
-        public RevalidatingAuthenticationStateProvider(IServiceScopeFactory ScopeFactory, SignInManager<TUser> CircuitScopeSignInManager, ILogger<RevalidatingAuthenticationStateProvider<TUser>> Logger)
+        public RevalidatingIdentityAuthenticationStateProvider(ILoggerFactory LoggerFactory, IServiceScopeFactory ScopeFactory, IOptions<IdentityOptions> OptionsAccessor)
+            : base(LoggerFactory)
         {
-            var InitialUser = CircuitScopeSignInManager.Context.User;
-            CurrentAuthenticationStateTask = Task.FromResult(new AuthenticationState(InitialUser));
             this.ScopeFactory = ScopeFactory;
-            this.Logger = Logger;
-
-            if (InitialUser.Identity.IsAuthenticated)
-            {
-                _ = RevalidationLoop();
-            }
+            Options = OptionsAccessor.Value;
         }
 
-        public override Task<AuthenticationState> GetAuthenticationStateAsync() => CurrentAuthenticationStateTask;
+        protected override TimeSpan RevalidationInterval => TimeSpan.FromMinutes(30);
 
-        private async Task RevalidationLoop()
+        protected override async Task<bool> ValidateAuthenticationStateAsync(AuthenticationState AuthenticationState, CancellationToken CancellationToken)
         {
-            var CancellationToken = LoopCancellationTokenSource.Token;
+            // Get the user manager from a new scope to ensure it fetches fresh data
+            var Scope = ScopeFactory.CreateScope();
 
-            while (!CancellationToken.IsCancellationRequested)
-            {
-                try
-                {
-                    await Task.Delay(RevalidationInterval, CancellationToken);
-                }
-                catch (TaskCanceledException)
-                {
-                    break;
-                }
-
-                var IsValid = await CheckIfAuthenticationStateIsValidAsync();
-
-                if (IsValid) continue;
-
-                // Force sign-out. Also stop the revalidation loop, because the user can
-                // only sign back in by starting a new connection.
-                var AnonymousUser = new ClaimsPrincipal(new ClaimsIdentity());
-
-                CurrentAuthenticationStateTask = Task.FromResult(new AuthenticationState(AnonymousUser));
-                NotifyAuthenticationStateChanged(CurrentAuthenticationStateTask);
-                LoopCancellationTokenSource.Cancel();
-            }
-        }
-
-        private async Task<bool> CheckIfAuthenticationStateIsValidAsync()
-        {
             try
             {
-                // Get the sign-in manager from a new scope to ensure it fetches fresh data
-                using var Scope = ScopeFactory.CreateScope();
-                var SignInManager = Scope.ServiceProvider.GetRequiredService<SignInManager<TUser>>();
-                var AuthenticationState = await CurrentAuthenticationStateTask;
-                var ValidatedUser = await SignInManager.ValidateSecurityStampAsync(AuthenticationState.User);
-                return ValidatedUser != null;
+                var UserManager = Scope.ServiceProvider.GetRequiredService<UserManager<TUser>>();
+                return await ValidateSecurityStampAsync(UserManager, AuthenticationState.User);
             }
-            catch (Exception ex)
+            finally
             {
-                Logger.LogError(ex, "An error occurred while revalidating authentication state");
-                return false;
+                if (Scope is IAsyncDisposable AsyncDisposable)
+                {
+                    await AsyncDisposable.DisposeAsync();
+                }
+                else
+                {
+                    Scope.Dispose();
+                }
             }
         }
 
-        void IDisposable.Dispose() => LoopCancellationTokenSource.Cancel();
+        private async Task<bool> ValidateSecurityStampAsync(UserManager<TUser> UserManager, ClaimsPrincipal Principal)
+        {
+            var User = await UserManager.GetUserAsync(Principal);
+            if (User == null)
+            {
+                return false;
+            }
+            else if (!UserManager.SupportsUserSecurityStamp)
+            {
+                return true;
+            }
+            else
+            {
+                var PrincipalStamp = Principal.FindFirstValue(Options.ClaimsIdentity.SecurityStampClaimType);
+                var UserStamp = await UserManager.GetSecurityStampAsync(User);
+                return PrincipalStamp == UserStamp;
+            }
+        }
     }
 }

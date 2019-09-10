@@ -3,7 +3,6 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using RestSharp;
-using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Extensions;
 using Texnomic.DNS.Models;
 

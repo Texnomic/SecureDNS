@@ -1,5 +1,4 @@
-﻿using System;
-using BinarySerialization;
+﻿using BinarySerialization;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Models;
 

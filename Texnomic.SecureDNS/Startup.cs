@@ -5,11 +5,9 @@ using ElectronNET.API.Entities;
 using Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Newtonsoft.Json.Serialization;
 using Texnomic.SecureDNS.Data;
 using Texnomic.SecureDNS.Extensions;
 using Texnomic.SecureDNS.Hangfire;
@@ -65,6 +63,7 @@ namespace Texnomic.SecureDNS
             //http://docs.hangfire.io/en/latest/background-methods/using-ioc-containers.html
             GlobalConfiguration.Configuration.UseActivator(new HangfireJobActivator(ServiceProvider));
 
+            App.UseHttpsRedirection();
             App.UseHangfireDashboard();
             App.UseHangfireServer();
             App.UseStaticFiles();
@@ -75,7 +74,7 @@ namespace Texnomic.SecureDNS
             App.UseEndpoints(Endpoints =>
             {
                 Endpoints.MapControllers();
-                Endpoints.MapBlazorHub<App>(selector: "App");
+                Endpoints.MapBlazorHub();
                 Endpoints.MapFallbackToPage("/_Host");
             });
 

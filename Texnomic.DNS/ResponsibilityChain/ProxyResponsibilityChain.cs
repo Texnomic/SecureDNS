@@ -1,5 +1,4 @@
-﻿using System.Net;
-using PipelineNet.ChainsOfResponsibility;
+﻿using PipelineNet.ChainsOfResponsibility;
 using PipelineNet.MiddlewareResolver;
 using Texnomic.DNS.Middlewares;
 using Texnomic.DNS.Models;

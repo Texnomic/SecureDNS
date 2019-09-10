@@ -1,5 +1,4 @@
 ﻿using BinarySerialization;
-using System;
 using System.Text.Json.Serialization;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Factories;

@@ -8,8 +8,7 @@ namespace Texnomic.SecureDNS
     {
         public static void Main(string[] Args)
         {
-            CreateHostBuilder(Args).Build()
-                                   .Run();
+            CreateHostBuilder(Args).Build().Run();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] Args)
@@ -18,6 +17,6 @@ namespace Texnomic.SecureDNS
                        .ConfigureWebHostDefaults(WebBuilder => WebBuilder
                        .UseElectron(Args)
                        .UseStartup<Startup>());
-        }                                           
+        }
     }
 }

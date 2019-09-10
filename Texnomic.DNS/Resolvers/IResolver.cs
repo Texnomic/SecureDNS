@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Models;
 
 namespace Texnomic.DNS.Resolvers

@@ -1,4 +1,7 @@
 @page "/Blacklists"
+@using Syncfusion.EJ2.Blazor.Grids
+@using Syncfusion.EJ2.Blazor.Buttons
+@using Texnomic.SecureDNS.Data.Models
 @inherits BlacklistsBase
 
 <h1>Blacklists</h1>
@@ -13,14 +16,14 @@
 </div>
 
 <div>
-    <EjsGrid ID="BlacklistGrid" @ref="@DefaultGrid" @ref:suppressField DataSource="@DatabaseContext.Blacklists.AsQueryable()" EnablePersistence="false" AllowResizing="true" AllowPaging="true" AllowSorting="true" AllowFiltering="true" AllowGrouping="true" AllowExcelExport="true" AllowPdfExport="true" ShowColumnMenu="true" ColumnMenuItems="@MenuItems" Toolbar="@Toolbar">
+    <EjsGrid ID="BlacklistGrid" @ref="@DefaultGrid" DataSource="@DatabaseContext.Blacklists.AsQueryable()" EnablePersistence="false" AllowResizing="true" AllowPaging="true" AllowSorting="true" AllowFiltering="true" AllowGrouping="true" AllowExcelExport="true" AllowPdfExport="true" ShowColumnMenu="true" ColumnMenuItems="@MenuItems" Toolbar="@Toolbar">
         <GridPageSettings PageSize="25"></GridPageSettings>
         <GridSelectionSettings Type="SelectionType.Multiple"></GridSelectionSettings>
         <GridEditSettings AllowAdding="true" AllowEditing="true" AllowDeleting="true" Mode="EditMode.Normal"></GridEditSettings>
         <GridColumns>
             <GridColumn Field="@nameof(Blacklist.ID)" IsPrimaryKey="true" IsIdentity="true" HeaderText="ID" TextAlign="TextAlign.Center"></GridColumn>
-            <GridColumn Field="Domain.Text" HeaderText="Domain" TextAlign="TextAlign.Left"></GridColumn>
-            <GridColumn Field="@nameof(Blacklist.Timestamp)" HeaderText="Time Stamp" Format="yMd" Type="date" TextAlign="TextAlign.Left"></GridColumn>
+            <GridColumn Field="Domain.Name" HeaderText="Domain" TextAlign="TextAlign.Left"></GridColumn>
+            <GridColumn Field="@nameof(Blacklist.Timestamp)" HeaderText="Time Stamp" Format="yMd" Type="ColumnType.Date" TextAlign="TextAlign.Left"></GridColumn>
         </GridColumns>
     </EjsGrid>
 </div>

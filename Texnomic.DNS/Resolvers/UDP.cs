@@ -2,7 +2,6 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Models;
 
 namespace Texnomic.DNS.Resolvers

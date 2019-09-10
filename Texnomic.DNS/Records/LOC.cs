@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using BinarySerialization;
+﻿using BinarySerialization;
 using Texnomic.DNS.Abstractions;
 
 namespace Texnomic.DNS.Records

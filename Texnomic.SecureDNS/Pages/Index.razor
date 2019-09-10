@@ -1,4 +1,6 @@
 ﻿@page "/"
+@using Syncfusion.EJ2.Blazor.Layouts
+@using Syncfusion.EJ2.Blazor.Charts
 
 <EjsDashboardLayout Columns="8" CellSpacing="@CellSpacing" AllowResizing="true" MediaQuery="max-width:700px">
     <DashboardLayoutPanels>
@@ -62,7 +64,8 @@
     </DashboardLayoutPanels>
 </EjsDashboardLayout>
 
-@code {
+@code
+{
     public double[] CellSpacing = { 10, 10 };
     public string Height = "200px";
 

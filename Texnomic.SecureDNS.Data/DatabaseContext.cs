@@ -212,19 +212,6 @@ namespace Texnomic.SecureDNS.Data
                             TLS = false,
                             HTTPS = false,
                             CRYPT = true
-                        },
-                        new Resolver()
-                        {
-                            ID = 8,
-                            Name = "Cloudflare #1",
-                            Domain = Domain.FromString("one.one.one.one"),
-                            IPAddress = IPAddress.Parse("1.1.1.1"),
-                            Hash = null,
-                            UDP = true,
-                            TCP = false,
-                            TLS = false,
-                            HTTPS = false,
-                            CRYPT = true
                         });
         }
     }

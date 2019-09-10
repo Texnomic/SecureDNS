@@ -4,11 +4,9 @@ using Microsoft.Extensions.Hosting;
 using System.Reflection;
 using System.Collections.Generic;
 using System.IO;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Serialization;
-using Texnomic.DNS;
 using Texnomic.SecureDNS.Areas.Identity;
 using Texnomic.SecureDNS.Data;
 using Texnomic.SecureDNS.Data.Identity;
@@ -55,7 +53,7 @@ namespace Texnomic.SecureDNS.Extensions
             Services.AddDefaultIdentity<User>()
                     .AddEntityFrameworkStores<DatabaseContext>();
 
-            Services.AddScoped<AuthenticationStateProvider, RevalidatingAuthenticationStateProvider<User>>();
+            Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<User>>();
 
             return Services;
         }

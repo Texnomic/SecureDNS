@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using System.Threading.Tasks;
 using Syncfusion.EJ2.Blazor.Grids;
 using Texnomic.SecureDNS.Data;

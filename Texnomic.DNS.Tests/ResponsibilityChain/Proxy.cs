@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PipelineNet.MiddlewareResolver;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Models;
-using Texnomic.DNS.Resolvers;
 using Texnomic.DNS.ResponsibilityChain;
 
 namespace Texnomic.DNS.Tests.ResponsibilityChain
