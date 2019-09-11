@@ -1,16 +1,18 @@
 ﻿using PipelineNet.ChainsOfResponsibility;
 using PipelineNet.MiddlewareResolver;
 using Texnomic.DNS.Models;
+using Texnomic.DNS.Protocols;
 using Texnomic.DNS.Servers.Middlewares;
 
 namespace Texnomic.DNS.Servers.ResponsibilityChain
 {
-    public class ProxyResponsibilityChain : AsyncResponsibilityChain<Message, Message>
+    public class ServerResponsibilityChain : AsyncResponsibilityChain<Message, Message>
 
     {
-        public ProxyResponsibilityChain(IMiddlewareResolver MiddlewareResolver) : base(MiddlewareResolver)
+        public ServerResponsibilityChain(IMiddlewareResolver MiddlewareResolver) : base(MiddlewareResolver)
         {
             Chain<GoogleUDPMiddleware>();
+            Chain<ServerMiddleware>();
         }
     }
 }

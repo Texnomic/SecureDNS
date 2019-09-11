@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Texnomic.DNS.Extensions;
 using Texnomic.DNS.Models;
 
 namespace Texnomic.DNS.Protocols

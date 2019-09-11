@@ -6,11 +6,12 @@ using System.Net;
 using System.Reflection;
 using Texnomic.SecureDNS.Data.Identity;
 using Texnomic.DNS.Models;
+using Texnomic.SecureDNS.Data.Abstractions;
 using Texnomic.SecureDNS.Data.Models;
 
 namespace Texnomic.SecureDNS.Data
 {
-    public class DatabaseContext : IdentityDbContext<User, Role, Guid, UserClaim, UserRole, UserLogin, RoleClaim, UserToken>
+    public class DatabaseContext : IdentityDbContext<User, Role, Guid, UserClaim, UserRole, UserLogin, RoleClaim, UserToken>, IDatabaseContext
     {
         public DbSet<Cache> Cache { get; set; }
         public DbSet<Resolver> Resolvers { get; set; }

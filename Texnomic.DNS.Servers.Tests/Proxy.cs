@@ -18,7 +18,7 @@ namespace Texnomic.DNS.Servers.Tests
             //Stop-Service -DisplayName 'Internet Connection Sharing (ICS)'
 
             var ActivatorMiddlewareResolver = new ActivatorMiddlewareResolver();
-            var ProxyResponsibilityChain = new ProxyResponsibilityChain(ActivatorMiddlewareResolver);
+            var ProxyResponsibilityChain = new ServerResponsibilityChain(ActivatorMiddlewareResolver);
             Server = new SimpleServer(ProxyResponsibilityChain);
         }
 

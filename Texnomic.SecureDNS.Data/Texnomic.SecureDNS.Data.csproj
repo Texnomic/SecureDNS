@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Texnomic.DNS\Texnomic.DNS.csproj" />
+    <ProjectReference Include="..\Texnomic.SecureDNS.Data.Abstractions\Texnomic.SecureDNS.Data.Abstractions.csproj" />
   </ItemGroup>
 
 </Project>

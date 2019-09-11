@@ -6,18 +6,20 @@ using Texnomic.DNS.Protocols;
 
 namespace Texnomic.DNS.Servers.Middlewares
 {
-    public class ServerMiddleware<TProtocol> : IAsyncMiddleware<Message, Message> where TProtocol : IProtocol, new()
+    public class ServerMiddleware : IAsyncMiddleware<Message, Message>
     {
-        private readonly TProtocol Protocol;
+        private readonly IProtocol Protocol;
 
-        public ServerMiddleware(TProtocol Protocol)
+        public ServerMiddleware(IProtocol Protocol)
         {
             this.Protocol = Protocol;
         }
 
-        public Task<Message> Run(Message Message, Func<Message, Task<Message>> Next)
+        public async Task<Message> Run(Message Message, Func<Message, Task<Message>> Next)
         {
-            throw new NotImplementedException();
+            Message = await Protocol.ResolveAsync(Message);
+
+            return Next is null ? Message : await Next(Message);
         }
     }
 }
