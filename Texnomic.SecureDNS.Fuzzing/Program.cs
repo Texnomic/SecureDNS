@@ -3,8 +3,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using PipelineNet.MiddlewareResolver;
-using Texnomic.DNS.ResponsibilityChain;
 using Texnomic.DNS.Servers;
+using Texnomic.DNS.Servers.ResponsibilityChain;
 
 namespace Texnomic.SecureDNS.Fuzzing
 {

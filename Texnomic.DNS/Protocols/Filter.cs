@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 using Texnomic.DNS.Extensions;
 using Texnomic.DNS.Models;
 
-namespace Texnomic.DNS.Resolvers
+namespace Texnomic.DNS.Protocols
 {
-    public class Filter : IResolver
+    public class Filter : IProtocol
     {
         public void Dispose()
         {

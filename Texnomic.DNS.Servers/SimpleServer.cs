@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Security;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
@@ -75,10 +76,29 @@ namespace Texnomic.DNS.Servers
 
         }
 
+        private bool IsDisposed;
+
         public void Dispose()
         {
-            UdpClient.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
+        protected virtual void Dispose(bool Disposing)
+        {
+            if (IsDisposed) return;
+
+            if (Disposing)
+            {
+                UdpClient.Dispose();
+            }
+
+            IsDisposed = true;
+        }
+
+        ~SimpleServer()
+        {
+            Dispose(false);
+        }
     }
 }

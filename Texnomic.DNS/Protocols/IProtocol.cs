@@ -2,9 +2,9 @@
 using System.Threading.Tasks;
 using Texnomic.DNS.Models;
 
-namespace Texnomic.DNS.Resolvers
+namespace Texnomic.DNS.Protocols
 {
-    public interface IResolver : IDisposable
+    public interface IProtocol : IDisposable
     {
         byte[] Resolve(byte[] Query);
         Message Resolve(Message Query);

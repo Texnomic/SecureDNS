@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Texnomic.DNS.Servers\Texnomic.DNS.Servers.csproj" />
     <ProjectReference Include="..\Texnomic.DNS\Texnomic.DNS.csproj" />
   </ItemGroup>
 

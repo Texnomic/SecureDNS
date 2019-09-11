@@ -11,9 +11,9 @@ using BinarySerialization;
 using Texnomic.DNS.Models;
 using Texnomic.DNS.Extensions;
 
-namespace Texnomic.DNS.Resolvers
+namespace Texnomic.DNS.Protocols
 {
-    public class TLS : IResolver
+    public class TLS : IProtocol
     {
         private readonly BinarySerializer Serializer;
         private readonly string PublicKey;

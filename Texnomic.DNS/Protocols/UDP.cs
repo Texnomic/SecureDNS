@@ -4,9 +4,9 @@ using System.Net.Sockets;
 using System.Threading.Tasks;
 using Texnomic.DNS.Models;
 
-namespace Texnomic.DNS.Resolvers
+namespace Texnomic.DNS.Protocols
 {
-    public class UDP : IResolver
+    public class UDP : IProtocol
     {
         private IPEndPoint IPEndPoint;
         private readonly UdpClient Client;

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Models;
-using Texnomic.DNS.Resolvers;
+using Texnomic.DNS.Protocols;
 
 namespace Texnomic.DNS.Tests.Records
 {
@@ -14,7 +14,7 @@ namespace Texnomic.DNS.Tests.Records
     public class CName
     {
         private ushort ID;
-        private IResolver Resolver;
+        private IProtocol Resolver;
         private Message RequestMessage;
         private Message ResponseMessage;
         
@@ -51,7 +51,7 @@ namespace Texnomic.DNS.Tests.Records
             Assert.IsNotNull(ResponseMessage.Questions);
             Assert.IsNotNull(ResponseMessage.Answers);
             Assert.AreEqual(ResponseCode.NXRRSet, ResponseMessage.ResponseCode);
-            Assert.IsInstanceOfType(ResponseMessage.Authority.First().Record, typeof(DNS.Records.SOA));
+            Assert.IsInstanceOfType(ResponseMessage.Answers.First().Record, typeof(DNS.Records.CName));
         }
     }
 }

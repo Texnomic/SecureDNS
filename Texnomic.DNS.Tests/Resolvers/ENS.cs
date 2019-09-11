@@ -12,14 +12,14 @@ namespace Texnomic.DNS.Tests.Resolvers
     public class ENS
     {
         private ushort ID;
-        private DNS.Resolvers.ENS Resolver;
+        private DNS.Protocols.ENS Resolver;
         private Message RequestMessage;
         private Message ResponseMessage;
 
         [TestInitialize]
         public void Initialize()
         {
-            Resolver = new DNS.Resolvers.ENS("7238211010344719ad14a89db874158c");
+            Resolver = new DNS.Protocols.ENS("7238211010344719ad14a89db874158c");
 
             ID = (ushort) new Random().Next();
 

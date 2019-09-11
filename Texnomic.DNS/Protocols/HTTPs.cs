@@ -6,12 +6,12 @@ using RestSharp;
 using Texnomic.DNS.Extensions;
 using Texnomic.DNS.Models;
 
-namespace Texnomic.DNS.Resolvers
+namespace Texnomic.DNS.Protocols
 {
     /// <summary>
     /// DNS Over HTTPS <see href="https://tools.ietf.org/html/rfc8484">(DoH)</see>
     /// </summary>
-    public class HTTPs : IResolver
+    public class HTTPs : IProtocol
     {
         private readonly string PublicKey;
         private readonly IPAddress IPAddress;

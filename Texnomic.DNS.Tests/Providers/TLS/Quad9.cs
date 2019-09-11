@@ -5,7 +5,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Texnomic.DNS.Abstractions.Enums;
-using Texnomic.DNS.Resolvers;
+using Texnomic.DNS.Protocols;
 using Texnomic.DNS.Models;
 
 namespace Texnomic.DNS.Tests.Providers.TLS
@@ -14,7 +14,7 @@ namespace Texnomic.DNS.Tests.Providers.TLS
     public class Quad9
     {
         private ushort ID;
-        private IResolver Resolver;
+        private IProtocol Resolver;
         private Message RequestMessage;
         private Message ResponseMessage;
 
@@ -24,7 +24,7 @@ namespace Texnomic.DNS.Tests.Providers.TLS
         {
             ID = (ushort) new Random().Next();
 
-            Resolver = new DNS.Resolvers.TLS(IPAddress.Parse("9.9.9.9"), "047D8BD71D03850D1825B3341C29A127D4AC0125488AA0F1EA02B9D8512C086AAC7256ECFA3DA6A09F4909558EACFEB973175C02FB78CC2491946F4323890E1D66");
+            Resolver = new DNS.Protocols.TLS(IPAddress.Parse("9.9.9.9"), "047D8BD71D03850D1825B3341C29A127D4AC0125488AA0F1EA02B9D8512C086AAC7256ECFA3DA6A09F4909558EACFEB973175C02FB78CC2491946F4323890E1D66");
 
             RequestMessage = new Message()
             {

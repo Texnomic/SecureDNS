@@ -1,9 +1,9 @@
 ﻿using PipelineNet.ChainsOfResponsibility;
 using PipelineNet.MiddlewareResolver;
-using Texnomic.DNS.Middlewares;
 using Texnomic.DNS.Models;
+using Texnomic.DNS.Servers.Middlewares;
 
-namespace Texnomic.DNS.ResponsibilityChain
+namespace Texnomic.DNS.Servers.ResponsibilityChain
 {
     public class ProxyResponsibilityChain : AsyncResponsibilityChain<Message, Message>
 

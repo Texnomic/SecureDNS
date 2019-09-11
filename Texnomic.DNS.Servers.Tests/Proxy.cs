@@ -2,10 +2,9 @@
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PipelineNet.MiddlewareResolver;
-using Texnomic.DNS.ResponsibilityChain;
-using Texnomic.DNS.Servers;
+using Texnomic.DNS.Servers.ResponsibilityChain;
 
-namespace Texnomic.DNS.Tests.Servers
+namespace Texnomic.DNS.Servers.Tests
 {
     [TestClass]
     public class Proxy
@@ -28,7 +27,5 @@ namespace Texnomic.DNS.Tests.Servers
         {
             await Server.StartAsync(new CancellationToken());
         }
-
-
     }
 }

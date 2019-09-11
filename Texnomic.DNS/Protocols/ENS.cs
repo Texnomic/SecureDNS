@@ -11,9 +11,9 @@ using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Extensions;
 using Texnomic.DNS.Records;
 
-namespace Texnomic.DNS.Resolvers
+namespace Texnomic.DNS.Protocols
 {
-    public class ENS : IResolver
+    public class ENS : IProtocol
     {
         private readonly Web3 Web3;
         private readonly EnsUtil EnsUtil;

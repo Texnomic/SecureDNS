@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using PipelineNet.Middleware;
 using Texnomic.DNS.Models;
-using Texnomic.DNS.Resolvers;
+using Texnomic.DNS.Protocols;
 
 namespace Texnomic.DNS.Middlewares
 {

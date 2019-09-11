@@ -31,7 +31,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.Blazor.Components"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.DNS.Abstractions", "Texnomic.DNS.Abstractions\Texnomic.DNS.Abstractions.csproj", "{4785617B-AD42-4EBE-A93E-06A4B15A99BB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Texnomic.SecureDNS.Fuzzing", "Texnomic.SecureDNS.Fuzzing\Texnomic.SecureDNS.Fuzzing.csproj", "{66D712B8-4952-4BA9-980A-EB6618BD228C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.SecureDNS.Fuzzing", "Texnomic.SecureDNS.Fuzzing\Texnomic.SecureDNS.Fuzzing.csproj", "{66D712B8-4952-4BA9-980A-EB6618BD228C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Texnomic.DNS.Servers", "Texnomic.DNS.Servers\Texnomic.DNS.Servers.csproj", "{D1EEFB21-54EE-438B-8AD7-ABBD735C1901}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Texnomic.DNS.Servers.Tests", "Texnomic.DNS.Servers.Tests\Texnomic.DNS.Servers.Tests.csproj", "{E06C729A-DC27-479E-8A2B-6A83EAE7F5F4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -79,6 +83,14 @@ Global
 		{66D712B8-4952-4BA9-980A-EB6618BD228C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{66D712B8-4952-4BA9-980A-EB6618BD228C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{66D712B8-4952-4BA9-980A-EB6618BD228C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1EEFB21-54EE-438B-8AD7-ABBD735C1901}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1EEFB21-54EE-438B-8AD7-ABBD735C1901}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1EEFB21-54EE-438B-8AD7-ABBD735C1901}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1EEFB21-54EE-438B-8AD7-ABBD735C1901}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E06C729A-DC27-479E-8A2B-6A83EAE7F5F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E06C729A-DC27-479E-8A2B-6A83EAE7F5F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E06C729A-DC27-479E-8A2B-6A83EAE7F5F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E06C729A-DC27-479E-8A2B-6A83EAE7F5F4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

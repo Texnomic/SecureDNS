@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Texnomic.DNS.Abstractions
 {
-    public interface IResolver : IDisposable
+    public interface IProtocol : IDisposable
     {
         byte[] Resolve(byte[] Query);
         IMessage Resolve(IMessage Query);

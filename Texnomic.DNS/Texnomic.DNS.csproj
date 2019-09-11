@@ -11,7 +11,6 @@
 
   <ItemGroup>
     <PackageReference Include="BinarySerializer" Version="8.4.3" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="3.0.0-preview9.19423.4" />
     <PackageReference Include="Nerdbank.Streams" Version="2.3.32" />
     <PackageReference Include="Nethereum.ENS" Version="3.4.0" />
     <PackageReference Include="Nethereum.Web3" Version="3.4.0" />

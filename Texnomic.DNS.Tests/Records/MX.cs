@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Models;
-using Texnomic.DNS.Resolvers;
+using Texnomic.DNS.Protocols;
 
 namespace Texnomic.DNS.Tests.Records
 {
@@ -14,7 +14,7 @@ namespace Texnomic.DNS.Tests.Records
     public class MX
     {
         private ushort ID;
-        private IResolver Resolver;
+        private IProtocol Resolver;
         private Message RequestMessage;
         private Message ResponseMessage;
         

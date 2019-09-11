@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Models;
-using Texnomic.DNS.Resolvers;
+using Texnomic.DNS.Protocols;
 
 namespace Texnomic.DNS.Tests.Providers.TLS
 {
@@ -14,7 +14,7 @@ namespace Texnomic.DNS.Tests.Providers.TLS
     public class Cloudflare
     {
         private ushort ID;
-        private IResolver Resolver;
+        private IProtocol Resolver;
         private Message RequestMessage;
         private Message ResponseMessage;
 
@@ -24,7 +24,7 @@ namespace Texnomic.DNS.Tests.Providers.TLS
         {
             ID = (ushort) new Random().Next();
 
-            Resolver = new DNS.Resolvers.TLS(IPAddress.Parse("1.1.1.1"), "04C520708C204250281E7D44417C3079291C635E1D449BC5F7713A2BDED2A2A4B16C3D6AC877B8CB8F2E5053FDF418267F6137EDFFC2BEE90B5DB97EE1DF1CE274");
+            Resolver = new DNS.Protocols.TLS(IPAddress.Parse("1.1.1.1"), "04C520708C204250281E7D44417C3079291C635E1D449BC5F7713A2BDED2A2A4B16C3D6AC877B8CB8F2E5053FDF418267F6137EDFFC2BEE90B5DB97EE1DF1CE274");
 
             RequestMessage = new Message()
             {

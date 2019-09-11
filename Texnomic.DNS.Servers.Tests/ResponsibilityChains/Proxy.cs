@@ -6,9 +6,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PipelineNet.MiddlewareResolver;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Models;
-using Texnomic.DNS.ResponsibilityChain;
+using Texnomic.DNS.Servers.ResponsibilityChain;
 
-namespace Texnomic.DNS.Tests.ResponsibilityChain
+namespace Texnomic.DNS.Servers.Tests.ResponsibilityChains
 {
     [TestClass]
     public class Proxy

@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace Texnomic.DNS.Middlewares
+namespace Texnomic.DNS.Servers.Middlewares
 {
     public class GoogleUDPMiddleware : UDPMiddleware
     {
