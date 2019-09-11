@@ -11,7 +11,7 @@ using Texnomic.DNS.Resolvers;
 namespace Texnomic.DNS.Tests.Records
 {
     [TestClass]
-    public class CName
+    public class SRV
     {
         private ushort ID;
         private IResolver Resolver;
@@ -24,7 +24,7 @@ namespace Texnomic.DNS.Tests.Records
         {
             ID = (ushort)new Random().Next();
 
-            Resolver = new UDP(IPAddress.Parse("8.8.8.8"));
+            Resolver = new UDP(IPAddress.Parse("8.8.4.4"));
 
             RequestMessage = new Message()
             {
@@ -34,9 +34,9 @@ namespace Texnomic.DNS.Tests.Records
                 {
                     new Question()
                     {
-                        Domain = Domain.FromString("www.texnomic.com"),
+                        Domain = Domain.FromString("_sip._tls.texnomic.com"),
                         Class = RecordClass.Internet,
-                        Type = RecordType.CNAME
+                        Type = RecordType.SRV
                     }
                 }
             };
@@ -50,8 +50,7 @@ namespace Texnomic.DNS.Tests.Records
             Assert.AreEqual(ID, ResponseMessage.ID);
             Assert.IsNotNull(ResponseMessage.Questions);
             Assert.IsNotNull(ResponseMessage.Answers);
-            Assert.AreEqual(ResponseCode.NXRRSet, ResponseMessage.ResponseCode);
-            Assert.IsInstanceOfType(ResponseMessage.Authority.First().Record, typeof(DNS.Records.SOA));
+            Assert.IsInstanceOfType(ResponseMessage.Answers.First().Record, typeof(DNS.Records.SRV));
         }
     }
 }
