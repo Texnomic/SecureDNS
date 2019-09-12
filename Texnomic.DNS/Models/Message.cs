@@ -6,16 +6,12 @@ using System.Threading.Tasks;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Extensions;
-using Texnomic.DNS.Factories;
 
 namespace Texnomic.DNS.Models
 {
     public class Message : IMessage
     {
-        [FieldOrder(1)]
-        [FieldBitLength(16)]
-        [FieldEndianness(Endianness.Big)]
-        [JsonIgnore]
+        [FieldOrder(1), FieldBitLength(16), FieldEndianness(Endianness.Big), JsonIgnore]
         public ushort ID { get; set; }
 
         [FieldOrder(6), FieldBitLength(1), JsonIgnore]
@@ -33,21 +29,19 @@ namespace Texnomic.DNS.Models
         [FieldOrder(2), FieldBitLength(1), FieldEndianness(Endianness.Big), JsonPropertyName("RD")]
         public bool RecursionDesired { get; set; }
 
-        [FieldOrder(7)]
-        [FieldBitLength(1)]
-        [JsonPropertyName("RA")]
+        [FieldOrder(11), FieldBitLength(1), JsonPropertyName("RA")]
         public bool RecursionAvailable { get; set; }
 
-        [FieldOrder(8), FieldBitLength(1), JsonIgnore]
+        [FieldOrder(10), FieldBitLength(1), JsonIgnore]
         public int Zero { get; set; } = 0;
 
         [FieldOrder(9), FieldBitLength(1), JsonPropertyName("AD")]
         public bool AuthenticatedData { get; set; }
 
-        [FieldOrder(10), FieldBitLength(1), JsonPropertyName("CD")]
+        [FieldOrder(8), FieldBitLength(1), JsonPropertyName("CD")]
         public bool CheckingDisabled { get; set; }
 
-        [FieldOrder(11), FieldBitLength(4), FieldEndianness(Endianness.Big), JsonPropertyName("Status")]
+        [FieldOrder(7), FieldBitLength(4), FieldEndianness(Endianness.Big), JsonPropertyName("Status")]
         public ResponseCode ResponseCode { get; set; }
 
         private ushort? _QuestionsCount;

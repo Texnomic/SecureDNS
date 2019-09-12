@@ -39,11 +39,11 @@ namespace Texnomic.DNS.Tests.Serialization.Binary
             Assert.AreEqual(AuthoritativeAnswer.Cache, Msg.AuthoritativeAnswer);
             Assert.AreEqual(false, Msg.Truncated);
             Assert.AreEqual(true, Msg.RecursionDesired);
-            Assert.AreEqual(false, Msg.RecursionAvailable);
+            Assert.AreEqual(true, Msg.RecursionAvailable);
             Assert.AreEqual(0, Msg.Zero);
             Assert.AreEqual(false, Msg.AuthenticatedData);
             Assert.AreEqual(false, Msg.CheckingDisabled);
-            Assert.AreEqual(ResponseCode.NXRRSet, Msg.ResponseCode);
+            Assert.AreEqual(ResponseCode.NoError, Msg.ResponseCode);
             Assert.AreEqual(1, Msg.QuestionsCount);
             Assert.AreEqual(1, Msg.AnswersCount);
             Assert.AreEqual(0, Msg.AuthorityCount);
