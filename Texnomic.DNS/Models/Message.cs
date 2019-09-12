@@ -9,6 +9,12 @@ using Texnomic.DNS.Extensions;
 
 namespace Texnomic.DNS.Models
 {
+    /// <summary>
+    /// DNS Message
+    /// </summary>
+    /// <remarks>
+    /// Reverse FieldOrder Workaround <see cref="https://github.com/jefffhaynes/BinarySerializer/issues/138"/>
+    /// </remarks>
     public class Message : IMessage
     {
         [FieldOrder(1), FieldBitLength(16), FieldEndianness(Endianness.Big), JsonIgnore]

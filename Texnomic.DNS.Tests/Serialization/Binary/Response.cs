@@ -77,6 +77,8 @@ namespace Texnomic.DNS.Tests.Serialization.Binary
             var OriginalResponse = PrintBinary(ResponseBytes);
             var SerializedResponse = PrintBinary(Bytes);
 
+            //Will never match unless compressed labels are supported in Serialization Phase. 
+
             Assert.AreEqual(Convert.ToBase64String(ResponseBytes), Convert.ToBase64String(Bytes));
         }
 
