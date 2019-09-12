@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BinarySerialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Models;
+using Texnomic.DNS.Extensions;
 
 namespace Texnomic.DNS.Tests.Resolvers
 {
@@ -12,14 +15,17 @@ namespace Texnomic.DNS.Tests.Resolvers
     public class ENS
     {
         private ushort ID;
-        private DNS.Protocols.ENS Resolver;
-        private Message RequestMessage;
-        private Message ResponseMessage;
+        private Protocols.ENS Resolver;
+        private IMessage RequestMessage;
+        private IMessage ResponseMessage;
+        private BinarySerializer BinarySerializer;
 
         [TestInitialize]
         public void Initialize()
         {
-            Resolver = new DNS.Protocols.ENS("7238211010344719ad14a89db874158c");
+            BinarySerializer = new BinarySerializer();
+
+            Resolver = new Protocols.ENS("7238211010344719ad14a89db874158c");
 
             ID = (ushort) new Random().Next();
 
@@ -27,7 +33,7 @@ namespace Texnomic.DNS.Tests.Resolvers
             {
                 ID = ID,
                 RecursionDesired = true,
-                Questions = new List<Question>()
+                Questions = new List<IQuestion>()
                 {
                     new Question()
                     {
@@ -59,11 +65,11 @@ namespace Texnomic.DNS.Tests.Resolvers
         [TestMethod]
         public async Task BytesAsync()
         {
-            var RequestBytes = RequestMessage.ToArray();
+            var RequestBytes = await BinarySerializer.SerializeAsync(RequestMessage);
 
             var ResponseBytes = await Resolver.ResolveAsync(RequestBytes);
 
-            ResponseMessage = Message.FromArray(ResponseBytes);
+            ResponseMessage = await BinarySerializer.DeserializeAsync<Message>(ResponseBytes);
 
             Assertions();
         }

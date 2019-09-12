@@ -4,4 +4,8 @@
     <TargetFramework>netstandard2.1</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\BinarySerializer\BinarySerializer\BinarySerializer.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -5,11 +5,12 @@ using Texnomic.DNS.Factories;
 
 namespace Texnomic.DNS.Models
 {
-    public class Answer : Question
+    public class Answer : Question, IAnswer
     {
         [FieldOrder(3)]
+        [SubtypeFactory(nameof(TimeToLive), typeof(TimeToLiveFactory), BindingMode = BindingMode.OneWayToSource)]
         [JsonPropertyName("TTL")]
-        public TimeToLive TimeToLive { get; set; }
+        public ITimeToLive TimeToLive { get; set; }
 
         [FieldOrder(4)]
         [FieldBitLength(16)]

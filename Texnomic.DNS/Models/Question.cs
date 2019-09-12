@@ -1,15 +1,19 @@
-﻿using BinarySerialization;
+﻿using System;
+using BinarySerialization;
 using System.Text.Json.Serialization;
+using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
+using Texnomic.DNS.Factories;
 
 namespace Texnomic.DNS.Models
 {
-    public class Question
+    public class Question : IQuestion
     {
         [FieldOrder(0)]
-        //[ItemSubtypeFactory(nameof(Domain), typeof(DomainFactory))]
+        [SubtypeFactory(nameof(Domain), typeof(DomainFactory), BindingMode = BindingMode.OneWayToSource)]
+        //[SubtypeDefault(typeof(Domain))]
         [JsonIgnore]
-        public Domain Domain { get; set; }
+        public IDomain Domain { get; set; }
 
         [Ignore]
         [JsonPropertyName("name")]

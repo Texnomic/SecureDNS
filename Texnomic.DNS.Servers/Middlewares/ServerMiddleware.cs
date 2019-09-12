@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
 using PipelineNet.Middleware;
-using Texnomic.DNS.Models;
-using Texnomic.DNS.Protocols;
+using Texnomic.DNS.Abstractions;
 
 namespace Texnomic.DNS.Servers.Middlewares
 {
-    public class ServerMiddleware : IAsyncMiddleware<Message, Message>
+    public class ServerMiddleware : IAsyncMiddleware<IMessage, IMessage>
     {
         private readonly IProtocol Protocol;
 
@@ -15,7 +14,7 @@ namespace Texnomic.DNS.Servers.Middlewares
             this.Protocol = Protocol;
         }
 
-        public async Task<Message> Run(Message Message, Func<Message, Task<Message>> Next)
+        public async Task<IMessage> Run(IMessage Message, Func<IMessage, Task<IMessage>> Next)
         {
             Message = await Protocol.ResolveAsync(Message);
 

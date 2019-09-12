@@ -4,7 +4,7 @@ using Texnomic.DNS.Models;
 
 namespace Texnomic.DNS.Factories
 {
-    public class DomainFactory : ISubtypeFactory
+    public class IPv4AddressFactory : ISubtypeFactory
     {
         public bool TryGetKey(Type ValueType, out object Key)
         {
@@ -13,7 +13,7 @@ namespace Texnomic.DNS.Factories
 
         public bool TryGetType(object Key, out Type Type)
         {
-            Type = typeof(Domain);
+            Type = typeof(IPv4Address);
             return true;
         }
     }

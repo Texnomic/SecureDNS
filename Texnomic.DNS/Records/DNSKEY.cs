@@ -50,7 +50,8 @@ namespace Texnomic.DNS.Records
         [FieldOrder(3), FieldBitLength(8)] 
         public Algorithm Algorithm { get; set; }
 
-        [FieldOrder(4)] 
-        public Base64String PublicKey { get; set; }
+        [FieldOrder(4)]
+        [SubtypeDefault(typeof(Base64String))]
+        public IBase64String PublicKey { get; set; }
     }
 }

@@ -1,9 +1,10 @@
 ﻿using System;
 using BinarySerialization;
+using Texnomic.DNS.Abstractions;
 
 namespace Texnomic.DNS.Models
 {
-    public class Base64String
+    public class Base64String : IBase64String
     {
         [FieldOrder(0)]
         public byte[] Bytes { get; set; }

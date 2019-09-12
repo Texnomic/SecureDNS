@@ -3,23 +3,22 @@ using System.Net;
 using System.Threading.Tasks;
 using BinarySerialization;
 using PipelineNet.Middleware;
-using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Models;
 using Texnomic.DNS.Protocols;
 using Texnomic.DNS.Extensions;
 
 namespace Texnomic.DNS.Servers.Middlewares
 {
-    public class HTTPsMiddleware : HTTPs, IAsyncMiddleware<IMessage, IMessage>
+    public class CloudflareHTTPsMiddleware : HTTPs, IAsyncMiddleware<Message, Message>
     {
         private readonly BinarySerializer BinarySerializer;
 
-        public HTTPsMiddleware(IPAddress IPAddress, string PublicKey) : base(IPAddress, PublicKey)
+        public CloudflareHTTPsMiddleware() : base(IPAddress.Parse("1.1.1.1"), "")
         {
             BinarySerializer = new BinarySerializer();
         }
 
-        public async Task<IMessage> Run(IMessage Message, Func<IMessage, Task<IMessage>> Next)
+        public async Task<Message> Run(Message Message, Func<Message, Task<Message>> Next)
         {
             //Using Binary Format Over HTTPs 
 

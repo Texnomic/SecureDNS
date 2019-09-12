@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using BinarySerialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Models;
-using Texnomic.DNS.Protocols;
+using Texnomic.DNS.Extensions;
 
 
 namespace Texnomic.DNS.Tests.Resolvers
@@ -16,13 +18,16 @@ namespace Texnomic.DNS.Tests.Resolvers
     {
         private ushort ID;
         private IProtocol Resolver;
-        private Message RequestMessage;
-        private Message ResponseMessage;
+        private IMessage RequestMessage;
+        private IMessage ResponseMessage;
+        private BinarySerializer BinarySerializer;
 
         [TestInitialize]
         public void Initialize()
         {
-            Resolver = new DNS.Protocols.TLS(IPAddress.Parse("9.9.9.9"), "047D8BD71D03850D1825B3341C29A127D4AC0125488AA0F1EA02B9D8512C086AAC7256ECFA3DA6A09F4909558EACFEB973175C02FB78CC2491946F4323890E1D66");
+            BinarySerializer = new BinarySerializer();
+
+            Resolver = new Protocols.TLS(IPAddress.Parse("9.9.9.9"), "047D8BD71D03850D1825B3341C29A127D4AC0125488AA0F1EA02B9D8512C086AAC7256ECFA3DA6A09F4909558EACFEB973175C02FB78CC2491946F4323890E1D66");
 
             ID = (ushort)new Random().Next();
 
@@ -30,7 +35,7 @@ namespace Texnomic.DNS.Tests.Resolvers
             {
                 ID = ID,
                 RecursionDesired = true,
-                Questions = new List<Question>()
+                Questions = new List<IQuestion>()
                 {
                     new Question()
                     {
@@ -53,11 +58,11 @@ namespace Texnomic.DNS.Tests.Resolvers
         [TestMethod]
         public async Task BytesAsync()
         {
-            var RequestBytes = RequestMessage.ToArray();
+            var RequestBytes = await BinarySerializer.SerializeAsync(RequestMessage);
 
             var ResponseBytes = await Resolver.ResolveAsync(RequestBytes);
 
-            ResponseMessage = Message.FromArray(ResponseBytes);
+            ResponseMessage = await BinarySerializer.DeserializeAsync<Message>(ResponseBytes);
 
             Assertions();
         }

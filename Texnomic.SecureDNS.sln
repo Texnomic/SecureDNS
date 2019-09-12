@@ -39,6 +39,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Texnomic.DNS.Servers.Tests"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Texnomic.SecureDNS.Data.Abstractions", "Texnomic.SecureDNS.Data.Abstractions\Texnomic.SecureDNS.Data.Abstractions.csproj", "{0D389991-63B0-4BE7-BFBD-B333A39768F8}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BinarySerializer", "..\BinarySerializer\BinarySerializer\BinarySerializer.csproj", "{6479B35D-EF60-47CA-9E54-53E37D64ED08}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -97,6 +99,10 @@ Global
 		{0D389991-63B0-4BE7-BFBD-B333A39768F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0D389991-63B0-4BE7-BFBD-B333A39768F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0D389991-63B0-4BE7-BFBD-B333A39768F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6479B35D-EF60-47CA-9E54-53E37D64ED08}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6479B35D-EF60-47CA-9E54-53E37D64ED08}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6479B35D-EF60-47CA-9E54-53E37D64ED08}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6479B35D-EF60-47CA-9E54-53E37D64ED08}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

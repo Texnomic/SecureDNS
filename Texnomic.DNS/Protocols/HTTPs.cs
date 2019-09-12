@@ -3,6 +3,7 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using RestSharp;
+using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Extensions;
 using Texnomic.DNS.Models;
 
@@ -32,7 +33,7 @@ namespace Texnomic.DNS.Protocols
             return Async.RunSync(() => ResolveAsync(Query));
         }
 
-        public Message Resolve(Message Query)
+        public IMessage Resolve(IMessage Query)
         {
             return Async.RunSync(() => ResolveAsync(Query));
         }
@@ -57,7 +58,7 @@ namespace Texnomic.DNS.Protocols
             return Response.RawBytes;
         }
 
-        public async Task<Message> ResolveAsync(Message Query)
+        public async Task<IMessage> ResolveAsync(IMessage Query)
         {
             var Request = new RestRequest($"resolve?name={Query.Questions[0].Domain}&type={Query.Questions[0].Type}");
             Request.AddHeader("Accept", "application/dns-json");

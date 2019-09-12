@@ -1,28 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net.Security;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using BinarySerialization;
 using Microsoft.Extensions.Hosting;
 using PipelineNet.ChainsOfResponsibility;
+using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Models;
+using Texnomic.DNS.Extensions;
 
 namespace Texnomic.DNS.Servers
 {
     public class SimpleServer : IHostedService, IDisposable
     {
         private readonly List<Task> Workers;
-        private readonly IAsyncResponsibilityChain<Message, Message> ResponsibilityChain;
-
+        private readonly IAsyncResponsibilityChain<IMessage, IMessage> ResponsibilityChain;
+        private readonly BinarySerializer BinarySerializer;
         private readonly UdpClient UdpClient;
 
-        public SimpleServer(IAsyncResponsibilityChain<Message, Message> ResponsibilityChain)
+        public SimpleServer(IAsyncResponsibilityChain<IMessage, IMessage> ResponsibilityChain)
         {
             this.ResponsibilityChain = ResponsibilityChain;
             Workers = new List<Task>();
             UdpClient = new UdpClient(53);
+            BinarySerializer = new BinarySerializer();
         }
 
         public async Task StartAsync(CancellationToken CancellationToken)
@@ -48,10 +51,10 @@ namespace Texnomic.DNS.Servers
 
             try
             {
-                var Request = Message.FromArray(UdpReceiveResult.Buffer);
+                var Request = await BinarySerializer.DeserializeAsync<Message>(UdpReceiveResult.Buffer);
                 ID = Request.ID;
                 var Response = await ResponsibilityChain.Execute(Request);
-                var ResponseBytes = Response.ToArray();
+                var ResponseBytes = await BinarySerializer.SerializeAsync(Response);
                 await UdpClient.SendAsync(ResponseBytes, ResponseBytes.Length, UdpReceiveResult.RemoteEndPoint);
             }
             catch (Exception Error)

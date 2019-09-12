@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Models;
 using Texnomic.DNS.Protocols;
@@ -15,9 +16,9 @@ namespace Texnomic.DNS.Tests.Records
     {
         private ushort ID;
         private IProtocol Resolver;
-        private Message RequestMessage;
-        private Message ResponseMessage;
-        
+        private IMessage RequestMessage;
+        private IMessage ResponseMessage;
+
 
         [TestInitialize]
         public void Initialize()
@@ -30,7 +31,7 @@ namespace Texnomic.DNS.Tests.Records
             {
                 ID = ID,
                 RecursionDesired = true,
-                Questions =new List<Question>()
+                Questions = new List<IQuestion>()
                 {
                     new Question()
                     {

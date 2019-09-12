@@ -1,10 +1,11 @@
 ﻿using System;
 using System.IO;
 using BinarySerialization;
+using Texnomic.DNS.Abstractions;
 
 namespace Texnomic.DNS.Models
 {
-    public class TimeToLive : IBinarySerializable
+    public class TimeToLive : IBinarySerializable, ITimeToLive
     {
         [Ignore]
         public TimeSpan Value { get; set; }

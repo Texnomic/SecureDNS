@@ -47,13 +47,6 @@ namespace Texnomic.DNS.Abstractions
 
         string Comment { get; set; }
 
-        byte[] ToArray();
-        Task<byte[]> ToArrayAsync();
-        //IMessage FromArray(byte[] Data);
-        //IMessage FromArray(ReadOnlySequence<byte> Data);
-        //IMessage FromJson(string Json);
         string ToJson();
-        Task<string> ToJsonAsync();
-        
     }
 }

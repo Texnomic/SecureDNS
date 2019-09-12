@@ -1,32 +1,17 @@
-﻿using System;
-using BinarySerialization;
-using Nerdbank.Streams;
-using System.Buffers;
+﻿using BinarySerialization;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Extensions;
+using Texnomic.DNS.Factories;
 
 namespace Texnomic.DNS.Models
 {
-    public class Message
+    public class Message : IMessage
     {
-        //private ushort? Size;
-
-        //[FieldOrder(0)]
-        //[FieldBitLength(16)]
-        //[FieldEndianness(Endianness.Big)]
-        //[JsonIgnore]
-        //public ushort Length
-        //{
-        //    get => Size ?? CalculateLength();
-        //    set => Size = value;
-        //}
-
         [FieldOrder(1)]
         [FieldBitLength(16)]
         [FieldEndianness(Endianness.Big)]
@@ -97,94 +82,25 @@ namespace Texnomic.DNS.Models
 
         [FieldOrder(16)]
         [FieldCount(nameof(QuestionsCount))]
-        //[ItemSubtypeFactory(nameof(Questions), typeof(QuestionFactory))]
+        [ItemSubtypeDefault(typeof(Question))]
         [JsonPropertyName("Question")]
-        public List<Question> Questions { get; set; }
+        public List<IQuestion> Questions { get; set; }
 
         [FieldOrder(17)]
         [FieldCount(nameof(AnswersCount))]
-        //[ItemSubtypeFactory(nameof(Answers), typeof(AnswerFactory))]
+        [ItemSubtypeDefault(typeof(Answer))]
         [JsonPropertyName("Answer")]
-        public List<Answer> Answers { get; set; }
+        public List<IAnswer> Answers { get; set; }
 
         [FieldOrder(18)]
         [FieldCount(nameof(AuthorityCount))]
+        [ItemSubtypeDefault(typeof(Answer))]
         [JsonPropertyName("Authority")]
-        public List<Answer> Authority { get; set; }
+        public List<IAnswer> Authority { get; set; }
 
         [Ignore]
         [JsonPropertyName("Comment")]
         public string Comment { get; set; }
-
-        private ushort CalculateLength()
-        {
-            var QuestionsSize = Questions?.Sum(Q => 4 + Q.Domain.Labels.Sum(Label => 2 + Label.Count)) ?? 0;
-            var AnswersSize = Answers?.Sum(A => 10 + A.Domain.Labels.Sum(Label => 2 + Label.Count) + A.Length) ?? 0;
-
-            return (ushort)(12 + QuestionsSize + AnswersSize);
-        }
-
-        public byte[] ToArray()
-        {
-            var Serializer = new BinarySerializer();
-
-            //Serializer.MemberSerializing += OnMemberSerializing;
-            //Serializer.MemberSerialized += OnMemberSerialized;
-            //Serializer.MemberDeserializing += OnMemberDeserializing;
-            //Serializer.MemberDeserialized += OnMemberDeserialized;
-
-            return Serializer.Serialize(this);
-        }
-
-        private static void OnMemberSerializing(object sender, MemberSerializingEventArgs e)
-        {
-            Console.CursorLeft = e.Context.Depth * 4;
-            Console.WriteLine("S-Start: {0} @ {1}", e.MemberName, e.Offset);
-        }
-
-        private static void OnMemberSerialized(object sender, MemberSerializedEventArgs e)
-        {
-            Console.CursorLeft = e.Context.Depth * 4;
-            var value = e.Value ?? "null";
-            Console.WriteLine("S-End: {0} ({1}) @ {2}", e.MemberName, value, e.Offset);
-        }
-
-        private static void OnMemberDeserializing(object sender, MemberSerializingEventArgs e)
-        {
-            Console.CursorLeft = e.Context.Depth * 4;
-            Console.WriteLine("D-Start: {0} @ {1}", e.MemberName, e.Offset);
-        }
-
-        private static void OnMemberDeserialized(object sender, MemberSerializedEventArgs e)
-        {
-            Console.CursorLeft = e.Context.Depth * 4;
-            var value = e.Value ?? "null";
-            Console.WriteLine("D-End: {0} ({1}) @ {2}", e.MemberName, value, e.Offset);
-        }
-
-        public async Task<byte[]> ToArrayAsync()
-        {
-            var Serializer = new BinarySerializer();
-            return await Serializer.SerializeAsync(this);
-        }
-
-        public static Message FromArray(byte[] Data)
-        {
-            var Serializer = new BinarySerializer();
-            return Serializer.Deserialize<Message>(Data);
-        }
-        public static Task<Message> FromArrayAsync(byte[] Data)
-        {
-            var Serializer = new BinarySerializer();
-            return Serializer.DeserializeAsync<Message>(Data);
-        }
-
-        public static Message FromArray(ReadOnlySequence<byte> Data)
-        {
-            var Serializer = new BinarySerializer();
-            return Serializer.Deserialize<Message>(Data.AsStream());
-        }
-
 
         public string ToJson()
         {
@@ -192,24 +108,33 @@ namespace Texnomic.DNS.Models
             return JsonSerializer.Serialize(this, JsonSerializerOptions);
         }
 
-        public async Task<string> ToJsonAsync()
-        {
-            var JsonSerializerOptions = new JsonSerializerOptions();
-            await using var Stream = new MemoryStream();
-            using var Reader = new StreamReader(Stream);
-            await JsonSerializer.SerializeAsync(Stream, this, JsonSerializerOptions);
-            return await Reader.ReadToEndAsync();
-        }
-
-        public static Message FromJson(string Json)
-        {
-            var JsonSerializerOptions = new JsonSerializerOptions();
-            return JsonSerializer.Deserialize<Message>(Json, JsonSerializerOptions);
-        }
-
         public override string ToString()
         {
             return ToJson();
+        }
+
+        public static Message FromArray(byte[] Data)
+        {
+            var Serializer = new BinarySerializer();
+            return Serializer.Deserialize<Message>(Data);
+        }
+
+        public static Task<Message> FromArrayAsync(byte[] Data)
+        {
+            var Serializer = new BinarySerializer();
+            return Serializer.DeserializeAsync<Message>(Data);
+        }
+
+        public byte[] ToArray()
+        {
+            var Serializer = new BinarySerializer();
+            return Serializer.Serialize(this);
+        }
+
+        public async Task<byte[]> ToArrayAsync()
+        {
+            var Serializer = new BinarySerializer();
+            return await Serializer.SerializeAsync(this);
         }
     }
 }

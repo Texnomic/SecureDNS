@@ -1,10 +1,11 @@
 ﻿using System.IO;
 using System.Net;
 using BinarySerialization;
+using Texnomic.DNS.Abstractions;
 
 namespace Texnomic.DNS.Models
 {
-    public class IPv6Address : IBinarySerializable
+    public class IPv6Address : IBinarySerializable, IIPv6Address
     {
         [Ignore]
         public IPAddress Value { get; set; }

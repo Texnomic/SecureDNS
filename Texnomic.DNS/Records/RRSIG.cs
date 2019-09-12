@@ -1,6 +1,7 @@
 ﻿using BinarySerialization;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
+using Texnomic.DNS.Factories;
 using Texnomic.DNS.Models;
 
 namespace Texnomic.DNS.Records
@@ -33,7 +34,7 @@ namespace Texnomic.DNS.Records
         [FieldOrder(0), FieldBitLength(16), FieldEndianness(Endianness.Big)] 
         public RecordType TypeCovered { get; set; }
 
-        [FieldOrder(1), FieldBitLength(8), FieldEndianness(Endianness.Big)] 
+        [FieldOrder(1), FieldBitLength(8), FieldEndianness(Endianness.Big)]
         public Algorithm Algorithm { get; set; }
 
         [FieldOrder(2), FieldBitLength(8), FieldEndianness(Endianness.Big)] 
@@ -42,19 +43,23 @@ namespace Texnomic.DNS.Records
         [FieldOrder(3), FieldBitLength(32), FieldEndianness(Endianness.Big)] 
         public int OriginalTTL { get; set; }
 
-        [FieldOrder(4), FieldBitLength(32), FieldEndianness(Endianness.Big)] 
-        public Epoch SignatureExpiration { get; set; }
+        [FieldOrder(4), FieldBitLength(32), FieldEndianness(Endianness.Big)]
+        [SubtypeFactory(nameof(SignatureExpiration), typeof(EpochFactory), BindingMode = BindingMode.OneWayToSource)]
+        public IEpoch SignatureExpiration { get; set; }
 
-        [FieldOrder(5), FieldBitLength(32), FieldEndianness(Endianness.Big)] 
-        public Epoch SignatureInception { get; set; }
+        [FieldOrder(5), FieldBitLength(32), FieldEndianness(Endianness.Big)]
+        [SubtypeFactory(nameof(SignatureInception), typeof(EpochFactory), BindingMode = BindingMode.OneWayToSource)]
+        public IEpoch SignatureInception { get; set; }
 
         [FieldOrder(6), FieldBitLength(16), FieldEndianness(Endianness.Big)]
         public ushort KeyTag { get; set; }
 
         [FieldOrder(7)]
-        public Domain SignerName { get; set; }
+        [SubtypeFactory(nameof(SignerName), typeof(DomainFactory), BindingMode = BindingMode.OneWayToSource)]
+        public IDomain SignerName { get; set; }
 
-        [FieldOrder(8)] 
-        public Base64String Signature { get; set; }
+        [FieldOrder(8)]
+        [SubtypeDefault(typeof(Base64String))]
+        public IBase64String Signature { get; set; }
     }
 }

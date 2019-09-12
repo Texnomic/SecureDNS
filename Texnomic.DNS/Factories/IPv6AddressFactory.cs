@@ -1,9 +1,10 @@
 ﻿using System;
 using BinarySerialization;
+using Texnomic.DNS.Models;
 
 namespace Texnomic.DNS.Factories
 {
-    public class QuestionFactory : ISubtypeFactory
+    public class IPv6AddressFactory : ISubtypeFactory
     {
         public bool TryGetKey(Type ValueType, out object Key)
         {
@@ -12,7 +13,8 @@ namespace Texnomic.DNS.Factories
 
         public bool TryGetType(object Key, out Type Type)
         {
-            throw new NotImplementedException();
+            Type = typeof(IPv6Address);
+            return true;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using BinarySerialization;
+using Texnomic.DNS.Abstractions;
 
 namespace Texnomic.DNS.Models
 {
@@ -6,7 +7,7 @@ namespace Texnomic.DNS.Models
     /// Character-String is a single length octet followed by that number of characters.
     /// <see cref="https://tools.ietf.org/html/rfc1035#section-3.3"/>
     /// </summary>
-    public class CharacterString
+    public class CharacterString : ICharacterString
     {
         [FieldOrder(0)]
         [FieldBitLength(8)]

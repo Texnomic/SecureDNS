@@ -2,6 +2,9 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using BinarySerialization;
+using Texnomic.DNS.Abstractions;
+using Texnomic.DNS.Extensions;
 using Texnomic.DNS.Models;
 
 namespace Texnomic.DNS.Protocols
@@ -10,9 +13,11 @@ namespace Texnomic.DNS.Protocols
     {
         private IPEndPoint IPEndPoint;
         private readonly UdpClient Client;
+        private readonly BinarySerializer BinarySerializer;
 
         public UDP(IPAddress IPAddress)
         {
+            BinarySerializer = new BinarySerializer();
             IPEndPoint = new IPEndPoint(IPAddress, 53);
             Client = new UdpClient
             {
@@ -31,15 +36,15 @@ namespace Texnomic.DNS.Protocols
             return Client.Receive(ref IPEndPoint);
         }
 
-        public Message Resolve(Message Query)
+        public IMessage Resolve(IMessage Query)
         {
-            var Buffer = Query.ToArray();
+            var Buffer = BinarySerializer.Serialize(Query);
 
             Client.Send(Buffer, Buffer.Length, IPEndPoint);
 
             Buffer = Client.Receive(ref IPEndPoint);
 
-            return Message.FromArray(Buffer);
+            return BinarySerializer.Deserialize<Message>(Buffer);
         }
 
         public async Task<byte[]> ResolveAsync(byte[] Query)
@@ -51,15 +56,15 @@ namespace Texnomic.DNS.Protocols
             return Result.Buffer;
         }
 
-        public async Task<Message> ResolveAsync(Message Query)
+        public async Task<IMessage> ResolveAsync(IMessage Query)
         {
-            var Buffer = Query.ToArray();
+            var Buffer = await BinarySerializer.SerializeAsync(Query);
 
             await Client.SendAsync(Buffer, Buffer.Length, IPEndPoint);
 
             var Result = await Client.ReceiveAsync();
 
-            return Message.FromArray(Result.Buffer);
+            return await BinarySerializer.DeserializeAsync<Message>(Result.Buffer);
         }
 
         private bool IsDisposed;

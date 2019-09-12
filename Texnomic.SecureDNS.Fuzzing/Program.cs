@@ -15,8 +15,8 @@ namespace Texnomic.SecureDNS.Fuzzing
             try
             {
                 var ActivatorMiddlewareResolver = new ActivatorMiddlewareResolver();
-                var ProxyResponsibilityChain = new ServerResponsibilityChain(ActivatorMiddlewareResolver);
-                var Server = new ProxyServer(ProxyResponsibilityChain, 1);
+                var ServerResponsibilityChain = new ServerResponsibilityChain(ActivatorMiddlewareResolver);
+                var Server = new ProxyServer(ServerResponsibilityChain);
                 Server.Started += Server_Started;
                 Server.Requested += Server_Requested;
                 Server.Resolved += Server_Resolved;

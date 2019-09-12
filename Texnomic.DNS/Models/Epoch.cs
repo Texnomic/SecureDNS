@@ -1,10 +1,11 @@
 ﻿using System;
 using System.IO;
 using BinarySerialization;
+using Texnomic.DNS.Abstractions;
 
 namespace Texnomic.DNS.Models
 {
-    public class Epoch : IBinarySerializable
+    public class Epoch : IEpoch, IBinarySerializable
     {
         [Ignore]
         public DateTime Value { get; set; }

@@ -8,6 +8,7 @@ using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using BinarySerialization;
+using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Models;
 using Texnomic.DNS.Extensions;
 
@@ -15,7 +16,7 @@ namespace Texnomic.DNS.Protocols
 {
     public class TLS : IProtocol
     {
-        private readonly BinarySerializer Serializer;
+        private readonly BinarySerializer BinarySerializer;
         private readonly string PublicKey;
         private readonly IPAddress IPAddress;
 
@@ -26,7 +27,7 @@ namespace Texnomic.DNS.Protocols
 
         public TLS(IPAddress IPAddress, string PublicKey)
         {
-            Serializer = new BinarySerializer();
+            BinarySerializer = new BinarySerializer();
             this.IPAddress = IPAddress;
             this.PublicKey = PublicKey;
             Async.RunSync(InitializeAsync);
@@ -52,7 +53,7 @@ namespace Texnomic.DNS.Protocols
             return Async.RunSync(() => ResolveAsync(Query));
         }
 
-        public Message Resolve(Message Query)
+        public IMessage Resolve(IMessage Query)
         {
             return Async.RunSync(() => ResolveAsync(Query));
         }
@@ -78,11 +79,11 @@ namespace Texnomic.DNS.Protocols
             return Result.Buffer.Slice(2).ToArray();
         }
 
-        public async Task<Message> ResolveAsync(Message Request)
+        public async Task<IMessage> ResolveAsync(IMessage Request)
         {
             if (!TcpClient.Connected || !SslStream.CanWrite) await InitializeAsync();
 
-            var Bytes = Request.ToArray();
+            var Bytes = await BinarySerializer.SerializeAsync(Request);
 
             var Length = BitConverter.GetBytes((ushort)Bytes.Length);
 
@@ -96,7 +97,7 @@ namespace Texnomic.DNS.Protocols
 
             var Result = await PipeReader.ReadAsync();
 
-            var Response = Message.FromArray(Result.Buffer.Slice(2));
+            var Response = await BinarySerializer.DeserializeAsync<Message>(Result.Buffer.Slice(2));
 
             PipeReader.Complete();
 

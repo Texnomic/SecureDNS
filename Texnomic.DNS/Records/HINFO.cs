@@ -18,9 +18,11 @@ namespace Texnomic.DNS.Records
     public class HINFO : IRecord
     {
         [FieldOrder(0)]
-        public CharacterString CPU { get; set; }
+        [SubtypeDefault(typeof(CharacterString))]
+        public ICharacterString CPU { get; set; }
 
-        [FieldOrder(1)] 
-        public CharacterString OS { get; set; }
+        [FieldOrder(1)]
+        [SubtypeDefault(typeof(CharacterString))]
+        public ICharacterString OS { get; set; }
     }
 }

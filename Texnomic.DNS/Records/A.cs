@@ -1,6 +1,6 @@
 ﻿using BinarySerialization;
 using Texnomic.DNS.Abstractions;
-using Texnomic.DNS.Models;
+using Texnomic.DNS.Factories;
 
 namespace Texnomic.DNS.Records
 {
@@ -16,6 +16,7 @@ namespace Texnomic.DNS.Records
     public class A : IRecord
     {
         [FieldOrder(0)]
-        public IPv4Address Address { get; set; }
+        [SubtypeFactory(nameof(Address), typeof(IPv4AddressFactory), BindingMode = BindingMode.OneWayToSource)]
+        public IIPv4Address Address { get; set; }
     }
 }

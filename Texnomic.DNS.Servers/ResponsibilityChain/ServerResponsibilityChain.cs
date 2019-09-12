@@ -1,12 +1,11 @@
 ﻿using PipelineNet.ChainsOfResponsibility;
 using PipelineNet.MiddlewareResolver;
-using Texnomic.DNS.Models;
-using Texnomic.DNS.Protocols;
+using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Servers.Middlewares;
 
 namespace Texnomic.DNS.Servers.ResponsibilityChain
 {
-    public class ServerResponsibilityChain : AsyncResponsibilityChain<Message, Message>
+    public class ServerResponsibilityChain : AsyncResponsibilityChain<IMessage, IMessage>
 
     {
         public ServerResponsibilityChain(IMiddlewareResolver MiddlewareResolver) : base(MiddlewareResolver)

@@ -1,6 +1,8 @@
-﻿using System.IO;
+﻿using System.Buffers;
+using System.IO;
 using System.Threading.Tasks;
 using BinarySerialization;
+using Nerdbank.Streams;
 
 namespace Texnomic.DNS.Extensions
 {
@@ -18,6 +20,11 @@ namespace Texnomic.DNS.Extensions
             using var Stream = new MemoryStream();
             Serializer.Serialize(Stream, Object);
             return Stream.ToArray();
+        }
+
+        public static async Task<T> DeserializeAsync<T>(this BinarySerializer Serializer, ReadOnlySequence<byte> ReadOnlySequence)
+        {
+            return await Serializer.DeserializeAsync<T>(ReadOnlySequence.AsStream());
         }
     }
 }

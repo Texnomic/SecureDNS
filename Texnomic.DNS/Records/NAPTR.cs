@@ -20,9 +20,11 @@ namespace Texnomic.DNS.Records
         public ushort Preference { get; set; }
 
         [FieldOrder(2)]
-        public CharacterString Flags { get; set; }
+        [SubtypeDefault(typeof(CharacterString))]
+        public ICharacterString Flags { get; set; }
 
-        [FieldOrder(3)] 
-        public CharacterString Parameters { get; set; }
+        [FieldOrder(3)]
+        [SubtypeDefault(typeof(CharacterString))]
+        public ICharacterString Parameters { get; set; }
     }
 }

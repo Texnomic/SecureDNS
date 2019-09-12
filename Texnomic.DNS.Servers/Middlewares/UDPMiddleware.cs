@@ -2,18 +2,20 @@
 using System.Net;
 using System.Threading.Tasks;
 using PipelineNet.Middleware;
-using Texnomic.DNS.Models;
+using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Protocols;
 
 namespace Texnomic.DNS.Servers.Middlewares
 {
-    public class UDPMiddleware : UDP, IAsyncMiddleware<Message, Message>
+    public class UDPMiddleware : UDP, IAsyncMiddleware<IMessage, IMessage>
     {
         public UDPMiddleware(IPAddress IPAddress) : base(IPAddress) { }
 
-        public async Task<Message> Run(Message Message, Func<Message, Task<Message>> Next)
+        public async Task<IMessage> Run(IMessage Message, Func<IMessage, Task<IMessage>> Next)
         {
-            return await ResolveAsync(Message);
+            Message = await ResolveAsync(Message);
+
+            return Next is null ? Message : await Next(Message);
         }
     }
 }

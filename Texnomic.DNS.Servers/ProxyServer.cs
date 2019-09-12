@@ -6,10 +6,13 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
+using BinarySerialization;
 using Microsoft.Extensions.Hosting;
 using PipelineNet.ChainsOfResponsibility;
+using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Models;
+using Texnomic.DNS.Extensions;
 
 namespace Texnomic.DNS.Servers
 {
@@ -17,9 +20,10 @@ namespace Texnomic.DNS.Servers
     {
         private readonly int Threads;
         private readonly List<Task> Workers;
-        private readonly IAsyncResponsibilityChain<Message, Message> ResponsibilityChain;
+        private readonly BinarySerializer BinarySerializer;
+        private readonly IAsyncResponsibilityChain<IMessage, IMessage> ResponsibilityChain;
         private readonly BufferBlock<UdpReceiveResult> SerializerQueue;
-        private readonly BufferBlock<(Message, IPEndPoint)> IncomingQueue, OutgoingQueue;
+        private readonly BufferBlock<(IMessage, IPEndPoint)> IncomingQueue, OutgoingQueue;
 
         public event EventHandler<RequestedEventArgs> Requested;
         public event EventHandler<ResolvedEventArgs> Resolved;
@@ -34,24 +38,23 @@ namespace Texnomic.DNS.Servers
 
         private readonly UdpClient UdpClient;
 
-        private readonly IPEndPoint IPEndPoint;
-
-
-        public ProxyServer(IAsyncResponsibilityChain<Message, Message> ResponsibilityChain, int Threads = 0)
+        public ProxyServer(IAsyncResponsibilityChain<IMessage, IMessage> ResponsibilityChain, int Threads = 0)
         {
             this.Threads = Threads == 0 ? Environment.ProcessorCount : Threads;
 
             this.ResponsibilityChain = ResponsibilityChain;
 
+            BinarySerializer = new BinarySerializer();
+
             Workers = new List<Task>();
 
             UdpClient = new UdpClient();
 
-            IPEndPoint = new IPEndPoint(IPAddress.Any, Port);
+            var IPEndPoint = new IPEndPoint(IPAddress.Any, Port);
 
             UdpClient.Client.Bind(IPEndPoint);
 
-            IncomingQueue = OutgoingQueue = new BufferBlock<(Message, IPEndPoint)>();
+            IncomingQueue = OutgoingQueue = new BufferBlock<(IMessage, IPEndPoint)>();
 
             SerializerQueue = new BufferBlock<UdpReceiveResult>();
         }
@@ -124,7 +127,7 @@ namespace Texnomic.DNS.Servers
 
                 try
                 {
-                    Request = await Message.FromArrayAsync(Result.Buffer);
+                    Request = await BinarySerializer.DeserializeAsync<Message>(Result.Buffer);
 
                     await IncomingQueue.SendAsync((Request, Result.RemoteEndPoint));
                 }
@@ -169,7 +172,7 @@ namespace Texnomic.DNS.Servers
                 {
                     var (Response, Remote) = await OutgoingQueue.ReceiveAsync();
 
-                    var Bytes = Response.ToArray();
+                    var Bytes = await BinarySerializer.SerializeAsync(Response);
 
                     //Debug(Bytes);
 
@@ -227,11 +230,11 @@ namespace Texnomic.DNS.Servers
 
         public class ResolvedEventArgs : EventArgs
         {
-            public readonly Message Request;
-            public readonly Message Response;
+            public readonly IMessage Request;
+            public readonly IMessage Response;
             public readonly IPEndPoint EndPoint;
 
-            public ResolvedEventArgs(Message Request, Message Response, IPEndPoint EndPoint)
+            public ResolvedEventArgs(IMessage Request, IMessage Response, IPEndPoint EndPoint)
             {
                 this.Request = Request;
                 this.Response = Response;
@@ -241,10 +244,10 @@ namespace Texnomic.DNS.Servers
 
         public class RespondedEventArgs : EventArgs
         {
-            public readonly Message Response;
+            public readonly IMessage Response;
             public readonly IPEndPoint EndPoint;
 
-            public RespondedEventArgs(Message Response, IPEndPoint EndPoint)
+            public RespondedEventArgs(IMessage Response, IPEndPoint EndPoint)
             {
                 this.Response = Response;
                 this.EndPoint = EndPoint;

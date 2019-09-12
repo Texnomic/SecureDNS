@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Text.Json;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Models;
 
@@ -19,8 +21,8 @@ namespace Texnomic.DNS.Tests.Serialization.Json
         [TestMethod]
         public void FromJson()
         {
-            var RequestMsg = Message.FromJson(RequestJson);
-            var ResponseMsg = Message.FromJson(ResponseJson);
+            var RequestMsg = JsonSerializer.Deserialize<Message>(RequestJson);
+            var ResponseMsg = JsonSerializer.Deserialize<Message>(ResponseJson);
         }
 
         [TestMethod]
@@ -34,7 +36,7 @@ namespace Texnomic.DNS.Tests.Serialization.Json
                 RecursionAvailable = true,
                 AuthenticatedData = true,
                 CheckingDisabled = false,
-                Questions = new List<Question>()
+                Questions = new List<IQuestion>()
                 {
                     new Question()
                     {

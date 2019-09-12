@@ -1,19 +1,24 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
+using BinarySerialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Models;
 using Texnomic.DNS.Records;
+using Texnomic.DNS.Extensions;
 
 namespace Texnomic.DNS.Tests.Serialization.Binary
 {
     [TestClass]
     public class Response
     {
+        private readonly BinarySerializer BinarySerializer = new BinarySerializer();
+
         /// <summary>
         /// WireShark => Show Packet Bytes => Decode As None => Show As C Array
         /// </summary>
-        private byte[] RequestBytes =
+        private readonly byte[] ResponseBytes =
         {
             0x9b, 0xf2, 0x81, 0x80, 0x00, 0x01, 0x00, 0x01,
             0x00, 0x00, 0x00, 0x00, 0x08, 0x66, 0x61, 0x63,
@@ -23,25 +28,12 @@ namespace Texnomic.DNS.Tests.Serialization.Binary
             0x00, 0x04, 0xb3, 0x3c, 0xc0, 0x24
         };
 
-        /// <summary>
-        /// Prepend Array with Big Indian Message Length
-        /// </summary>
-        [TestInitialize]
-        public void Initialize()
-        {
-            //var Length = BitConverter.GetBytes((ushort)RequestBytes.Length);
-            //Array.Reverse(Length);
-            //var Bytes = new byte[RequestBytes.Length + 2];
-            //Array.Copy(Length, Bytes, 2);
-            //Array.Copy(RequestBytes, 0, Bytes, 2, RequestBytes.Length);
-            //RequestBytes = Bytes;
-        }
-
         [TestMethod, Priority(1)]
-        public void FromArray()
+        public async Task FromArray()
         {
-            var Msg = Message.FromArray(RequestBytes);
-            //Assert.AreEqual(Msg.ID, 256);
+            var Msg = await BinarySerializer.DeserializeAsync<Message>(ResponseBytes);
+
+            Assert.AreEqual(Msg.ID, 39922);
             Assert.AreEqual(MessageType.Response, Msg.MessageType);
             Assert.AreEqual(OperationCode.Query, Msg.OperationCode);
             Assert.AreEqual(AuthoritativeAnswer.Cache, Msg.AuthoritativeAnswer);
@@ -51,7 +43,7 @@ namespace Texnomic.DNS.Tests.Serialization.Binary
             Assert.AreEqual(0, Msg.Zero);
             Assert.AreEqual(false, Msg.AuthenticatedData);
             Assert.AreEqual(false, Msg.CheckingDisabled);
-            //Assert.AreEqual(ResponseCode.NoError, Msg.ResponseCode);
+            Assert.AreEqual(ResponseCode.NXRRSet, Msg.ResponseCode);
             Assert.AreEqual(1, Msg.QuestionsCount);
             Assert.AreEqual(1, Msg.AnswersCount);
             Assert.AreEqual(0, Msg.AuthorityCount);
@@ -76,13 +68,21 @@ namespace Texnomic.DNS.Tests.Serialization.Binary
         }
 
         [TestMethod, Priority(2)]
-        public void ToArray()
+        public async Task ToArray()
         {
-            var Msg = Message.FromArray(RequestBytes);
+            var Message = await BinarySerializer.DeserializeAsync<Message>(ResponseBytes);
 
-            var Bytes = Msg.ToArray();
+            var Bytes = await BinarySerializer.SerializeAsync(Message);
 
-            Assert.AreEqual(Convert.ToBase64String(RequestBytes), Convert.ToBase64String(Bytes));
+            var OriginalResponse = PrintBinary(ResponseBytes);
+            var SerializedResponse = PrintBinary(Bytes);
+
+            Assert.AreEqual(Convert.ToBase64String(ResponseBytes), Convert.ToBase64String(Bytes));
+        }
+
+        public string PrintBinary(byte[] Bytes)
+        {
+            return string.Join(' ', Bytes.Select(Byte => Convert.ToString(Byte, 2).PadLeft(8, '0')));
         }
     }
 }

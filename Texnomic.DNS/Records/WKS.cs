@@ -29,6 +29,6 @@ namespace Texnomic.DNS.Records
         public Protocol Protocol { get; set; }
 
         [FieldOrder(2)] 
-        public BitMap BitMap { get; set; }
+        public byte[] BitMap { get; set; }
     }
 }

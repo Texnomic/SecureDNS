@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PipelineNet.MiddlewareResolver;
+using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Models;
 using Texnomic.DNS.Servers.ResponsibilityChain;
@@ -14,8 +15,8 @@ namespace Texnomic.DNS.Servers.Tests.ResponsibilityChains
     public class Proxy
     {
         private ushort ID;
-        private Message RequestMessage;
-        private Message ResponseMessage;
+        private IMessage RequestMessage;
+        private IMessage ResponseMessage;
 
 
         [TestInitialize]
@@ -27,7 +28,7 @@ namespace Texnomic.DNS.Servers.Tests.ResponsibilityChains
             {
                 ID = ID,
                 RecursionDesired = true,
-                Questions = new List<Question>()
+                Questions = new List<IQuestion>()
                 {
                     new Question()
                     {
