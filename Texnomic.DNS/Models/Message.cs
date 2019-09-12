@@ -98,6 +98,12 @@ namespace Texnomic.DNS.Models
         [JsonPropertyName("Authority")]
         public List<IAnswer> Authority { get; set; }
 
+        [FieldOrder(19)]
+        [FieldCount(nameof(AdditionalCount))]
+        [ItemSubtypeDefault(typeof(Answer))]
+        [JsonPropertyName("Additional")]
+        public List<IAnswer> Additional { get; set; }
+
         [Ignore]
         [JsonPropertyName("Comment")]
         public string Comment { get; set; }

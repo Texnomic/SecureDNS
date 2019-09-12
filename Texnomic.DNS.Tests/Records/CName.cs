@@ -52,7 +52,7 @@ namespace Texnomic.DNS.Tests.Records
             Assert.IsNotNull(ResponseMessage.Questions);
             Assert.IsNotNull(ResponseMessage.Answers);
             Assert.AreEqual(ResponseCode.NXRRSet, ResponseMessage.ResponseCode);
-            Assert.IsInstanceOfType(ResponseMessage.Answers.First().Record, typeof(DNS.Records.CName));
+            Assert.IsInstanceOfType(ResponseMessage.Answers.First().Record, typeof(DNS.Records.CNAME));
         }
     }
 }

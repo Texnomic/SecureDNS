@@ -12,7 +12,7 @@ namespace Texnomic.DNS.Factories
         {
             { RecordType.A, typeof(A) },
             { RecordType.AAAA, typeof(AAAA) },
-            { RecordType.CNAME, typeof(CName) },
+            { RecordType.CNAME, typeof(CNAME) },
             { RecordType.HINFO, typeof(HINFO) },
             { RecordType.NAPTR, typeof(NAPTR) },
             { RecordType.DNSKEY, typeof(DNSKEY) },
@@ -25,6 +25,7 @@ namespace Texnomic.DNS.Factories
             { RecordType.PTR, typeof(PTR) },
             { RecordType.LOC, typeof(LOC) },
             { RecordType.SRV, typeof(SRV) },
+            { RecordType.OPT, typeof(OPT) },
             { RecordType.MX, typeof(MX) },
             { RecordType.MB, typeof(MB) },
             { RecordType.MD, typeof(MD) },
@@ -38,7 +39,7 @@ namespace Texnomic.DNS.Factories
         {
             { typeof(A), RecordType.A },
             { typeof(AAAA), RecordType.AAAA },
-            { typeof(CName), RecordType.CNAME },
+            { typeof(CNAME), RecordType.CNAME },
             { typeof(HINFO), RecordType.HINFO },
             { typeof(NAPTR), RecordType.NAPTR },
             { typeof(DNSKEY), RecordType.DNSKEY },
@@ -51,12 +52,13 @@ namespace Texnomic.DNS.Factories
             { typeof(PTR), RecordType.PTR },
             { typeof(LOC), RecordType.LOC },
             { typeof(SRV), RecordType.SRV },
-            { typeof(MX), RecordType.MX},
-            { typeof(MB), RecordType.MB},
-            { typeof(MD), RecordType.MD},
-            { typeof(MF), RecordType.MF},
-            { typeof(MG), RecordType.MG},
-            { typeof(MR), RecordType.MR},
+            { typeof(OPT), RecordType.OPT },
+            { typeof(MX), RecordType.MX },
+            { typeof(MB), RecordType.MB },
+            { typeof(MD), RecordType.MD },
+            { typeof(MF), RecordType.MF },
+            { typeof(MG), RecordType.MG },
+            { typeof(MR), RecordType.MR },
         };
 
         public bool TryGetKey(Type ValueType, out object Key)

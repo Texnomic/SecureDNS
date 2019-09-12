@@ -14,7 +14,7 @@ namespace Texnomic.DNS.Records
     /// <summary>
     /// Canonical Name Resource Record <see href="https://tools.ietf.org/html/rfc1035#section-3.3.1">(CName)</see>
     /// </summary>
-    public class CName : IRecord
+    public class CNAME : IRecord
     {
         [FieldOrder(0)]
         public Domain Domain { get; set; }
