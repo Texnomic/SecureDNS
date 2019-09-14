@@ -29,7 +29,6 @@
     <PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="3.0.0-preview9-01" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Texnomic.Blazor.Components\Texnomic.Blazor.Components.csproj" />
     <ProjectReference Include="..\Texnomic.DNS\Texnomic.DNS.csproj" />
     <ProjectReference Include="..\Texnomic.SecureDNS.Data\Texnomic.SecureDNS.Data.csproj" />
   </ItemGroup>

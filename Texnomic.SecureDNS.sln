@@ -28,8 +28,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.SecureDNS.Automati
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.SecureDNS.Data", "Texnomic.SecureDNS.Data\Texnomic.SecureDNS.Data.csproj", "{10DECCB9-F189-416F-ABCE-29A53E273EBD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.Blazor.Components", "Texnomic.Blazor.Components\Texnomic.Blazor.Components.csproj", "{5C9239F0-A6C7-4FB1-8383-8524F2AE0FA9}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.DNS.Abstractions", "Texnomic.DNS.Abstractions\Texnomic.DNS.Abstractions.csproj", "{4785617B-AD42-4EBE-A93E-06A4B15A99BB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.SecureDNS.Fuzzing", "Texnomic.SecureDNS.Fuzzing\Texnomic.SecureDNS.Fuzzing.csproj", "{66D712B8-4952-4BA9-980A-EB6618BD228C}"
@@ -82,10 +80,6 @@ Global
 		{10DECCB9-F189-416F-ABCE-29A53E273EBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{10DECCB9-F189-416F-ABCE-29A53E273EBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{10DECCB9-F189-416F-ABCE-29A53E273EBD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5C9239F0-A6C7-4FB1-8383-8524F2AE0FA9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5C9239F0-A6C7-4FB1-8383-8524F2AE0FA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5C9239F0-A6C7-4FB1-8383-8524F2AE0FA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5C9239F0-A6C7-4FB1-8383-8524F2AE0FA9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4785617B-AD42-4EBE-A93E-06A4B15A99BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4785617B-AD42-4EBE-A93E-06A4B15A99BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4785617B-AD42-4EBE-A93E-06A4B15A99BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
