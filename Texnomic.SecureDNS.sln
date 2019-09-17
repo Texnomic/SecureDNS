@@ -45,8 +45,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.FilterLists", "Tex
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.FilterLists.Tests", "Texnomic.FilterLists.Tests\Texnomic.FilterLists.Tests.csproj", "{79743923-C66D-48DB-B325-9B9D3D0381E0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.ENS.Ganache", "Texnomic.ENS.Ganache\Texnomic.ENS.Ganache.csproj", "{8E2D26B3-FDC7-4793-A4A2-2E77B10F43FC}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.ENS.PublicResolver", "Texnomic.ENS.PublicResolver\Texnomic.ENS.PublicResolver.csproj", "{18C77745-80D6-45B1-B98D-AE0A6374D09D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.DNS.Roots", "Texnomic.DNS.Roots\Texnomic.DNS.Roots.csproj", "{16735997-48F0-40D1-937E-B20E5FB6A378}"
@@ -54,6 +52,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.DNS.Roots.Tests", "Texnomic.DNS.Roots.Tests\Texnomic.DNS.Roots.Tests.csproj", "{77507239-323C-45B5-AC7F-1ACBDBD0F61E}"
 EndProject
 Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "Texnomic.ENS.Infrastructure", "Texnomic.ENS.Infrastructure\Texnomic.ENS.Infrastructure.njsproj", "{74DA0A9A-FEA2-4367-B5E0-C6514DA8513D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.ENS.Infrastructure.Tests", "Texnomic.ENS.Infrastructure.Tests\Texnomic.ENS.Infrastructure.Tests.csproj", "{2D2E6604-A43C-406A-AF2E-4D1C70136004}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -121,10 +121,6 @@ Global
 		{79743923-C66D-48DB-B325-9B9D3D0381E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{79743923-C66D-48DB-B325-9B9D3D0381E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{79743923-C66D-48DB-B325-9B9D3D0381E0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8E2D26B3-FDC7-4793-A4A2-2E77B10F43FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8E2D26B3-FDC7-4793-A4A2-2E77B10F43FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8E2D26B3-FDC7-4793-A4A2-2E77B10F43FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8E2D26B3-FDC7-4793-A4A2-2E77B10F43FC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{18C77745-80D6-45B1-B98D-AE0A6374D09D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{18C77745-80D6-45B1-B98D-AE0A6374D09D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{18C77745-80D6-45B1-B98D-AE0A6374D09D}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -141,6 +137,10 @@ Global
 		{74DA0A9A-FEA2-4367-B5E0-C6514DA8513D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{74DA0A9A-FEA2-4367-B5E0-C6514DA8513D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{74DA0A9A-FEA2-4367-B5E0-C6514DA8513D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D2E6604-A43C-406A-AF2E-4D1C70136004}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D2E6604-A43C-406A-AF2E-4D1C70136004}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D2E6604-A43C-406A-AF2E-4D1C70136004}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D2E6604-A43C-406A-AF2E-4D1C70136004}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

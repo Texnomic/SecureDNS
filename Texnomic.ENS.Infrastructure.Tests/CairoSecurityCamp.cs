@@ -1,24 +1,22 @@
 using System;
 using System.Net;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Texnomic.ENS.PublicResolver.ContractDefinition;
 using Nethereum.ENS;
 using Nethereum.ENS.ENSRegistry.ContractDefinition;
 using Nethereum.ENS.FIFSRegistrar.ContractDefinition;
 using Nethereum.Hex.HexConvertors.Extensions;
 using Nethereum.Hex.HexTypes;
-using Nethereum.RPC.Eth.Blocks;
 using Nethereum.RPC.Eth.DTOs;
 using Nethereum.Web3;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Models;
 using Texnomic.DNS.Records;
+using Texnomic.ENS.PublicResolver.ContractDefinition;
 using PublicResolverService = Texnomic.ENS.PublicResolver.PublicResolverService;
 
-namespace Texnomic.ENS.Ganache
+namespace Texnomic.ENS.Infrastructure.Tests
 {
     [TestClass]
     public class CairoSecurityCamp
