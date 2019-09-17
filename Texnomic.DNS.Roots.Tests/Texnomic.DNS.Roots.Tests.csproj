@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Texnomic.FilterLists\Texnomic.FilterLists.csproj" />
+    <ProjectReference Include="..\Texnomic.DNS.Roots\Texnomic.DNS.Roots.csproj" />
   </ItemGroup>
 
 </Project>

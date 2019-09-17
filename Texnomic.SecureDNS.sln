@@ -49,6 +49,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.ENS.Ganache", "Tex
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Texnomic.ENS.PublicResolver", "Texnomic.ENS.PublicResolver\Texnomic.ENS.PublicResolver.csproj", "{18C77745-80D6-45B1-B98D-AE0A6374D09D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Texnomic.DNS.Roots", "Texnomic.DNS.Roots\Texnomic.DNS.Roots.csproj", "{16735997-48F0-40D1-937E-B20E5FB6A378}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Texnomic.DNS.Roots.Tests", "Texnomic.DNS.Roots.Tests\Texnomic.DNS.Roots.Tests.csproj", "{77507239-323C-45B5-AC7F-1ACBDBD0F61E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -123,6 +127,14 @@ Global
 		{18C77745-80D6-45B1-B98D-AE0A6374D09D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{18C77745-80D6-45B1-B98D-AE0A6374D09D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{18C77745-80D6-45B1-B98D-AE0A6374D09D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{16735997-48F0-40D1-937E-B20E5FB6A378}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16735997-48F0-40D1-937E-B20E5FB6A378}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16735997-48F0-40D1-937E-B20E5FB6A378}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16735997-48F0-40D1-937E-B20E5FB6A378}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77507239-323C-45B5-AC7F-1ACBDBD0F61E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77507239-323C-45B5-AC7F-1ACBDBD0F61E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77507239-323C-45B5-AC7F-1ACBDBD0F61E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77507239-323C-45B5-AC7F-1ACBDBD0F61E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

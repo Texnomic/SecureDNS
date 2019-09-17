@@ -5,22 +5,16 @@ using Texnomic.FilterLists.Models;
 
 namespace Texnomic.FilterLists
 {
-    public class FilterListsClient
+    public static class FilterListsClient
     {
-        private readonly RestClient RestClient;
-        private readonly RestRequest RestRequest;
+        private static readonly RestClient RestClient = new RestClient($"https://filterlists.com/api/v1/lists/");
+        
+        private static readonly RestRequest RestRequest = new RestRequest();
 
-        public FilterListsClient()
+        public static async Task<List<FilterList>> GetLists()
         {
-            RestClient = new RestClient($"https://filterlists.com/api/v1/lists/");
-
-            RestRequest = new RestRequest();
-
             RestClient.UseSerializer<NewtonsoftJsonSerializer>();
-        }
 
-        public async Task<List<FilterList>> GetLists()
-        {
             var Response = await RestClient.ExecuteGetTaskAsync<List<FilterList>>(RestRequest);
 
             return Response.Data;
