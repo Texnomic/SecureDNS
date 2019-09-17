@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
+using Texnomic.DNS.Extensions;
 
 namespace Texnomic.DNS.Models
 {
@@ -150,6 +152,19 @@ namespace Texnomic.DNS.Models
             var Flag = (Byte & ~LabelMask) >> 6;
 
             return (LabelType)Flag;
+        }
+
+
+        public byte[] ToArray()
+        {
+            var Serializer = new BinarySerializer();
+            return Serializer.Serialize(this);
+        }
+
+        public async Task<byte[]> ToArrayAsync()
+        {
+            var Serializer = new BinarySerializer();
+            return await Serializer.SerializeAsync(this);
         }
     }
 }

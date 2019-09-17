@@ -1,5 +1,6 @@
 ﻿using BinarySerialization;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Factories;
 
@@ -27,6 +28,18 @@ namespace Texnomic.DNS.Models
         [Ignore]
         [JsonPropertyName("data")]
         public string Data { get; set; }
+
+        public new static Answer FromArray(byte[] Bytes)
+        {
+            var Serializer = new BinarySerializer();
+            return Serializer.Deserialize<Answer>(Bytes);
+        }
+
+        public new static async Task<Answer> FromArrayAsync(byte[] Bytes)
+        {
+            var Serializer = new BinarySerializer();
+            return await Serializer.DeserializeAsync<Answer>(Bytes);
+        }
     }
 
 }

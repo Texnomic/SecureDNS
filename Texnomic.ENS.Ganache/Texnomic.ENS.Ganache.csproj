@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Texnomic.DNS\Texnomic.DNS.csproj" />
+    <ProjectReference Include="..\Texnomic.ENS.PublicResolver\Texnomic.ENS.PublicResolver.csproj" />
   </ItemGroup>
 
 </Project>

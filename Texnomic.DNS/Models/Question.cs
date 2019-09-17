@@ -48,5 +48,17 @@ namespace Texnomic.DNS.Models
             var Serializer = new BinarySerializer();
             return await Serializer.SerializeAsync(this);
         }
+
+        public static Question FromArray(byte[] Bytes)
+        {
+            var Serializer = new BinarySerializer();
+            return Serializer.Deserialize<Question>(Bytes);
+        }
+
+        public static async Task<Question> FromArrayAsync(byte[] Bytes)
+        {
+            var Serializer = new BinarySerializer();
+            return await Serializer.DeserializeAsync<Question>(Bytes);
+        }
     }
 }
