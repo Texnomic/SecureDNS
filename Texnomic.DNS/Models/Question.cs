@@ -1,8 +1,10 @@
 ﻿using System;
 using BinarySerialization;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
+using Texnomic.DNS.Extensions;
 using Texnomic.DNS.Factories;
 
 namespace Texnomic.DNS.Models
@@ -34,5 +36,17 @@ namespace Texnomic.DNS.Models
         [FieldEndianness(Endianness.Big)]
         [JsonIgnore]
         public RecordClass Class { get; set; }
+
+        public byte[] ToArray()
+        {
+            var Serializer = new BinarySerializer();
+            return Serializer.Serialize(this);
+        }
+
+        public async Task<byte[]> ToArrayAsync()
+        {
+            var Serializer = new BinarySerializer();
+            return await Serializer.SerializeAsync(this);
+        }
     }
 }
