@@ -21,16 +21,16 @@ namespace Texnomic.DNS.Protocols
         private readonly EnsUtil EnsUtil;
         private readonly ENSRegistryService ENSRegistryService;
         private readonly BinarySerializer BinarySerializer;
-        private const string Mainnet = "0x314159265dd8dbb310642f98f50c066173c1259b";
-        private const string Ropsten = "0x112234455c3a32fd11230c42e7bccd4a84e02010";
-        private const string Rinkeby = "0xe7410170f87102df0055eb195163a03b7f2bff4a";
-        private const string Goerli = "0x112234455c3a32fd11230c42e7bccd4a84e02010";
+        private const string ENSRegistryMainnet = "0x314159265dd8dbb310642f98f50c066173c1259b";
+        private const string ENSRegistryRopsten = "0x112234455c3a32fd11230c42e7bccd4a84e02010";
+        private const string ENSRegistryRinkeby = "0xe7410170f87102df0055eb195163a03b7f2bff4a";
+        private const string ENSRegistryGoerli = "0x112234455c3a32fd11230c42e7bccd4a84e02010";
 
         public ENS(string ProjectID)
         {
             Web3 = new Web3($"https://mainnet.infura.io/v3/{ProjectID}");
             EnsUtil = new EnsUtil();
-            ENSRegistryService = new ENSRegistryService(Web3, Mainnet);
+            ENSRegistryService = new ENSRegistryService(Web3, ENSRegistryMainnet);
             BinarySerializer = new BinarySerializer();
         }
 

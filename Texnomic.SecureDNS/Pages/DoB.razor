@@ -1,0 +1,75 @@
+﻿@page "/DoB"
+@using Texnomic.DNS.Protocols
+
+<div class="container">
+    <div class="card">
+        <div class="card-content">
+            <form>
+                <ul class="stepper">
+                    <li class="@Step1Style">
+                        <div class="step-title waves-effect">Step 1: Domain</div>
+                        <div class="step-content">
+                            <!-- Your step content goes here (like inputs or so) -->
+                            <div class="row">
+                                <div class="input-field col s12">
+                                    <input id="Domain" name="Domain" type="text" pattern="^([a-zA-Z0-9]*)(\.eth)$" class="validate" required="" @bind="@Domain" />
+                                    <label for="Domain" class="">Domain</label>
+                                </div>
+                            </div>
+                            <div class="step-actions">
+                                <!-- Here goes your actions buttons -->
+                                <button class="waves-effect waves-dark btn btn-primary" @onclick="@Resolve">Resolve</button>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="@Step2Style">
+                        <div class="step-title waves-effect">Step 2: Blockchain</div>
+                        <div class="step-content">
+                            <!-- Your step content goes here (like inputs or so) -->
+                            <div class="spinner-border m-1" role="status" />
+                            <p>Doing Dark Magic...</p>
+                            <div class="step-actions">
+                                <!-- Here goes your actions buttons -->
+                            </div>
+                        </div>
+                    </li>
+                    <li class="@Step3Style">
+                        <div class="step-title waves-effect">Step 4: Address</div>
+                        <div class="step-content">
+                            <!-- Your step content goes here (like inputs or so) -->
+                            <i class="material-icons">done_all</i>
+                            <p>@Address</p>
+                            <div class="step-actions">
+                                <!-- Here goes your actions buttons -->
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </form>
+        </div>
+    </div>
+</div>
+
+@code
+{
+    public ENS Resolver = new ENS("7238211010344719ad14a89db874158c");
+
+
+    public string Domain { get; set; }
+    public string Address { get; set; }
+    public string Step1Style { get; set; } = "step active";
+    public string Step2Style { get; set; } = "step";
+    public string Step3Style { get; set; } = "step";
+
+
+    public async Task Resolve()
+    {
+        Step1Style = "step";
+        Step2Style = "step active";
+        StateHasChanged();
+        Address = await Resolver.ResolveAsync(Domain);
+        Step2Style = "step";
+        Step3Style = "step active";
+    }
+
+}

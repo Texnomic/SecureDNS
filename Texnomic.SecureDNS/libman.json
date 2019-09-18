@@ -1,5 +1,43 @@
 {
   "version": "1.0",
   "defaultProvider": "cdnjs",
-  "libraries": []
+  "libraries": [
+    {
+      "provider": "unpkg",
+      "library": "materialize-stepper@3.1.0",
+      "destination": "wwwroot/lib/materialize-stepper/",
+      "files": [
+        "dist/css/mstepper.min.css",
+        "dist/js/mstepper.min.js"
+      ]
+    },
+    {
+      "library": "materialize@1.0.0",
+      "destination": "wwwroot/lib/materialize/",
+      "files": [
+        "css/materialize.min.css",
+        "css/materialize.css",
+        "js/materialize.min.js"
+      ]
+    },
+    {
+      "library": "material-design-icons@3.0.1",
+      "destination": "wwwroot/lib/material-design-icons/",
+      "files": [
+        "iconfont/material-icons.min.css",
+        "iconfont/MaterialIcons-Regular.eot",
+        "iconfont/MaterialIcons-Regular.svg",
+        "iconfont/MaterialIcons-Regular.ttf",
+        "iconfont/MaterialIcons-Regular.woff",
+        "iconfont/MaterialIcons-Regular.woff2"
+      ]
+    },
+    {
+      "library": "jquery@3.4.1",
+      "destination": "wwwroot/lib/jquery/",
+      "files": [
+        "jquery.min.js"
+      ]
+    }
+  ]
 }

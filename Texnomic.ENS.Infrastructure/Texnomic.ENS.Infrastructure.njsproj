@@ -1,90 +1,107 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-    <PropertyGroup>
-        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-        <SchemaVersion>2.0</SchemaVersion>
-        <ProjectGuid>{74da0a9a-fea2-4367-b5e0-c6514da8513d}</ProjectGuid>
-        <ProjectHome>.</ProjectHome>
-        <ProjectView>ShowAllFiles</ProjectView>
-        <StartupFile>truffle-config.js</StartupFile>
-        <WorkingDirectory>.</WorkingDirectory>
-        <OutputPath>.</OutputPath>
-        <ProjectTypeGuids>{3AF33F2E-1136-4D97-BBB7-1795711AC8B8};{349c5851-65df-11da-9384-00065b846f21};{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}</ProjectTypeGuids>
-        <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">16.0</VisualStudioVersion>
-        <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
-    <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
-    <ItemGroup>
-        <Content Include="package-lock.json" />
-        <Content Include="package.json" />
-        <Content Include="truffle-config.js" />
-        <Content Include="Migrations\1_InitialMigration.js" />
-        <Content Include="build\contracts\ABIResolver.json" />
-        <Content Include="build\contracts\AddrResolver.json" />
-        <Content Include="build\contracts\Buffer.json" />
-        <Content Include="build\contracts\BytesUtils.json" />
-        <Content Include="build\contracts\ContentHashResolver.json" />
-        <Content Include="build\contracts\DNSResolver.json" />
-        <Content Include="build\contracts\ENS.json" />
-        <Content Include="build\contracts\ENSRegistry.json" />
-        <Content Include="build\contracts\FIFSRegistrar.json" />
-        <Content Include="build\contracts\InterfaceResolver.json" />
-        <Content Include="build\contracts\Migrations.json" />
-        <Content Include="build\contracts\NameResolver.json" />
-        <Content Include="build\contracts\PubkeyResolver.json" />
-        <Content Include="build\contracts\PublicResolver.json" />
-        <Content Include="build\contracts\Resolver.json" />
-        <Content Include="build\contracts\ResolverBase.json" />
-        <Content Include="build\contracts\ReverseRegistrar.json" />
-        <Content Include="build\contracts\RRUtils.json" />
-        <Content Include="build\contracts\TextResolver.json" />
-    </ItemGroup>
-    <ItemGroup>
-        <Folder Include="build" />
-        <Folder Include="build\contracts" />
-        <Folder Include="Contracts" />
-        <Folder Include="Contracts\Profiles" />
-        <Folder Include="Migrations" />
-    </ItemGroup>
-    <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-    <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsToolsV2.targets" />
-    <ProjectExtensions>
-        <VisualStudio>
-          <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
-            <WebProjectProperties>
-              <UseIIS>False</UseIIS>
-              <AutoAssignPort>True</AutoAssignPort>
-              <DevelopmentServerPort>0</DevelopmentServerPort>
-              <DevelopmentServerVPath>/</DevelopmentServerVPath>
-              <IISUrl>http://localhost:48022/</IISUrl>
-              <NTLMAuthentication>False</NTLMAuthentication>
-              <UseCustomServer>True</UseCustomServer>
-              <CustomServerUrl>http://localhost:1337</CustomServerUrl>
-              <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
-            </WebProjectProperties>
-          </FlavorProperties>
-          <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}" User="">
-            <WebProjectProperties>
-              <StartPageUrl>
-              </StartPageUrl>
-              <StartAction>CurrentPage</StartAction>
-              <AspNetDebugging>True</AspNetDebugging>
-              <SilverlightDebugging>False</SilverlightDebugging>
-              <NativeDebugging>False</NativeDebugging>
-              <SQLDebugging>False</SQLDebugging>
-              <ExternalProgram>
-              </ExternalProgram>
-              <StartExternalURL>
-              </StartExternalURL>
-              <StartCmdLineArguments>
-              </StartCmdLineArguments>
-              <StartWorkingDirectory>
-              </StartWorkingDirectory>
-              <EnableENC>False</EnableENC>
-              <AlwaysStartWebServerOnDebug>False</AlwaysStartWebServerOnDebug>
-            </WebProjectProperties>
-          </FlavorProperties>
-        </VisualStudio>
-    </ProjectExtensions>
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{74da0a9a-fea2-4367-b5e0-c6514da8513d}</ProjectGuid>
+    <ProjectHome>.</ProjectHome>
+    <ProjectView>ShowAllFiles</ProjectView>
+    <StartupFile>truffle-config.js</StartupFile>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <ProjectTypeGuids>{3AF33F2E-1136-4D97-BBB7-1795711AC8B8};{349c5851-65df-11da-9384-00065b846f21};{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}</ProjectTypeGuids>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">16.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
+  <ItemGroup>
+    <Content Include="Contracts\ENS.sol" />
+    <Content Include="Contracts\ENSRegistry.sol" />
+    <Content Include="Contracts\FIFSRegistrar.sol" />
+    <Content Include="Contracts\Migrations.sol" />
+    <Content Include="Contracts\Profiles\ABIResolver.sol" />
+    <Content Include="Contracts\Profiles\AddrResolver.sol" />
+    <Content Include="Contracts\Profiles\ContentHashResolver.sol" />
+    <Content Include="Contracts\Profiles\DNSResolver.sol" />
+    <Content Include="Contracts\Profiles\InterfaceResolver.sol" />
+    <Content Include="Contracts\Profiles\NameResolver.sol" />
+    <Content Include="Contracts\Profiles\PubkeyResolver.sol" />
+    <Content Include="Contracts\Profiles\TextResolver.sol" />
+    <Content Include="Contracts\PublicResolver.sol" />
+    <Content Include="Contracts\Resolver.sol" />
+    <Content Include="Contracts\ResolverBase.sol" />
+    <Content Include="Contracts\ReverseRegistrar.sol" />
+    <Content Include="Contracts\TexnomicResolver.sol" />
+    <Content Include="package-lock.json" />
+    <Content Include="package.json" />
+    <Content Include="truffle-config.js" />
+    <Content Include="Migrations\1_InitialMigration.js" />
+    <Content Include="build\contracts\ABIResolver.json" />
+    <Content Include="build\contracts\AddrResolver.json" />
+    <Content Include="build\contracts\Buffer.json" />
+    <Content Include="build\contracts\BytesUtils.json" />
+    <Content Include="build\contracts\ContentHashResolver.json" />
+    <Content Include="build\contracts\DNSResolver.json" />
+    <Content Include="build\contracts\ENS.json" />
+    <Content Include="build\contracts\ENSRegistry.json" />
+    <Content Include="build\contracts\FIFSRegistrar.json" />
+    <Content Include="build\contracts\InterfaceResolver.json" />
+    <Content Include="build\contracts\Migrations.json" />
+    <Content Include="build\contracts\NameResolver.json" />
+    <Content Include="build\contracts\PubkeyResolver.json" />
+    <Content Include="build\contracts\PublicResolver.json" />
+    <Content Include="build\contracts\Resolver.json" />
+    <Content Include="build\contracts\ResolverBase.json" />
+    <Content Include="build\contracts\ReverseRegistrar.json" />
+    <Content Include="build\contracts\RRUtils.json" />
+    <Content Include="build\contracts\TextResolver.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="build" />
+    <Folder Include="build\contracts" />
+    <Folder Include="Contracts" />
+    <Folder Include="Contracts\Profiles" />
+    <Folder Include="Migrations" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsToolsV2.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>False</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>0</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:48022/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>True</UseCustomServer>
+          <CustomServerUrl>http://localhost:1337</CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}" User="">
+        <WebProjectProperties>
+          <StartPageUrl>
+          </StartPageUrl>
+          <StartAction>CurrentPage</StartAction>
+          <AspNetDebugging>True</AspNetDebugging>
+          <SilverlightDebugging>False</SilverlightDebugging>
+          <NativeDebugging>False</NativeDebugging>
+          <SQLDebugging>False</SQLDebugging>
+          <ExternalProgram>
+          </ExternalProgram>
+          <StartExternalURL>
+          </StartExternalURL>
+          <StartCmdLineArguments>
+          </StartCmdLineArguments>
+          <StartWorkingDirectory>
+          </StartWorkingDirectory>
+          <EnableENC>False</EnableENC>
+          <AlwaysStartWebServerOnDebug>False</AlwaysStartWebServerOnDebug>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>

@@ -2,6 +2,7 @@
   "dependencies": {
     "@ensdomains/buffer": "github:ensdomains/buffer",
     "@ensdomains/dnssec-oracle": "github:ensdomains/dnssec-oracle",
+    "@truffle/hdwallet-provider": "^1.0.18",
     "eth-ens-namehash": "^2.0.8",
     "web3-utils": "^1.2.1"
   },
