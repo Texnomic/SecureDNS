@@ -14,6 +14,7 @@ namespace Texnomic.DNS.Protocols
         private IPEndPoint IPEndPoint;
         private readonly UdpClient Client;
         private readonly BinarySerializer BinarySerializer;
+        private const int Timeout = 2000;
 
         public UDP(IPAddress IPAddress)
         {
@@ -23,8 +24,8 @@ namespace Texnomic.DNS.Protocols
             {
                 Client =
                 {
-                    SendTimeout = 2000,
-                    ReceiveTimeout = 2000
+                    SendTimeout = Timeout,
+                    ReceiveTimeout = Timeout
                 }
             };
         }
@@ -51,7 +52,11 @@ namespace Texnomic.DNS.Protocols
         {
             await Client.SendAsync(Query, Query.Length, IPEndPoint);
 
-            var Result = await Client.ReceiveAsync();
+            var Task = Client.ReceiveAsync();
+
+            Task.Wait(Timeout);
+
+            var Result = Task.IsCompleted ? Task.Result : throw new TimeoutException();
 
             return Result.Buffer;
         }
@@ -62,7 +67,11 @@ namespace Texnomic.DNS.Protocols
 
             await Client.SendAsync(Buffer, Buffer.Length, IPEndPoint);
 
-            var Result = await Client.ReceiveAsync();
+            var Task = Client.ReceiveAsync();
+
+            Task.Wait(Timeout);
+
+            var Result = Task.IsCompleted ? Task.Result : throw new TimeoutException();
 
             return await BinarySerializer.DeserializeAsync<Message>(Result.Buffer);
         }

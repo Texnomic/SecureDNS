@@ -7,6 +7,7 @@
     <PublishSingleFile>true</PublishSingleFile>
     <!--<PublishReadyToRun>true</PublishReadyToRun>-->
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <UserSecretsId>70d8f4a6-4148-4aca-a794-d1b8ccdf410c</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AsyncEnumerator" Version="3.0.2-beta" />
