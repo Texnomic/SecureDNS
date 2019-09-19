@@ -13,10 +13,11 @@ namespace Texnomic.SecureDNS.Data
 {
     public class DatabaseContext : IdentityDbContext<User, Role, Guid, UserClaim, UserRole, UserLogin, RoleClaim, UserToken>, IDatabaseContext
     {
-        public DbSet<Cache> Cache { get; set; }
-        public DbSet<Resolver> Resolvers { get; set; }
-        public DbSet<Host> Hosts { get; set; }
-        public DbSet<Blacklist> Blacklists { get; set; }
+        public virtual DbSet<Configuration> Configurations { get; set; }
+        public virtual DbSet<Cache> Cache { get; set; }
+        public virtual DbSet<Resolver> Resolvers { get; set; }
+        public virtual DbSet<Host> Hosts { get; set; }
+        public virtual DbSet<Blacklist> Blacklists { get; set; }
 
         public DatabaseContext() { }
 
