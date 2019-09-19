@@ -24,6 +24,7 @@ namespace Texnomic.SecureDNS.Extensions
             var Configurations = new ConfigurationBuilder()
                 .AddJsonFile("AppSettings.json", true, true)
                 .AddJsonFile($"AppSettings.{Environment.EnvironmentName}.json", true, true)
+                .AddEnvironmentVariables()
                 .Build();
 
             Services.AddSingleton(Configurations);

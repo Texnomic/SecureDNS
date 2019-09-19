@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
@@ -12,19 +11,23 @@ namespace Texnomic.SecureDNS.Configurations
 {
     public class DatabaseConfigurationProvider : IConfigurationProvider
     {
-        private readonly ConfigurationDatabaseContext DatabaseContext;
-
-        private readonly Dictionary<string, string> Configurations;
+        private readonly DatabaseContext DatabaseContext;
+        private readonly ConfigurationReloadToken ConfigurationReloadToken;
+        private Dictionary<string, string> Configurations;
 
         public DatabaseConfigurationProvider(Action<DbContextOptionsBuilder> OptionsBuilderAction)
         {
-            var OptionsBuilder = new DbContextOptionsBuilder<ConfigurationDatabaseContext>();
+            var OptionsBuilder = new DbContextOptionsBuilder<DatabaseContext>();
 
             OptionsBuilderAction(OptionsBuilder);
 
-            DatabaseContext = new ConfigurationDatabaseContext(OptionsBuilder.Options);
+            DatabaseContext = new DatabaseContext(OptionsBuilder.Options);
 
             Configurations = new Dictionary<string, string>();
+
+            ConfigurationReloadToken = new ConfigurationReloadToken();
+
+            //TODO Implement ConfigurationReloadToken
         }
 
         public void Set(string Key, string Value)
@@ -42,7 +45,7 @@ namespace Texnomic.SecureDNS.Configurations
                 : CreateAndSaveDefaultValues(DatabaseContext);
         }
 
-        private static Dictionary<string, string> CreateAndSaveDefaultValues(ConfigurationDatabaseContext DatabaseContext)
+        private static Dictionary<string, string> CreateAndSaveDefaultValues(DatabaseContext DatabaseContext)
         {
             var InitialConfigurations = new Dictionary<string, string>
             {
@@ -66,12 +69,14 @@ namespace Texnomic.SecureDNS.Configurations
 
         public IEnumerable<string> GetChildKeys(IEnumerable<string> EarlierKeys, string ParentPath)
         {
-            throw new NotImplementedException();
+            Configurations.TryGetValue(ParentPath, out string Value);
+
+            return Value is null ? new List<string>() : new List<string>() { Value };
         }
 
         public IChangeToken GetReloadToken()
         {
-            throw new NotImplementedException();
+            return ConfigurationReloadToken;
         }
 
         public bool TryGet(string Key, out string Value)

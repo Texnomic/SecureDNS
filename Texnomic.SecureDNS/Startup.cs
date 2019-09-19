@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Serilog;
 using Texnomic.SecureDNS.Data;
 using Texnomic.SecureDNS.Extensions;
 using Texnomic.SecureDNS.Hangfire;
@@ -28,7 +29,7 @@ namespace Texnomic.SecureDNS
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection Services)
         {
-
+            Services.AddLogging();
             Services.AddDatabase();
             Services.AddIdentity();
             Services.AddTypes();
@@ -63,6 +64,7 @@ namespace Texnomic.SecureDNS
             //http://docs.hangfire.io/en/latest/background-methods/using-ioc-containers.html
             GlobalConfiguration.Configuration.UseActivator(new HangfireJobActivator(ServiceProvider));
 
+            App.UseSerilogRequestLogging();
             App.UseHttpsRedirection();
             App.UseHangfireDashboard();
             App.UseHangfireServer();
