@@ -29,6 +29,7 @@ namespace Texnomic.SecureDNS
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection Services)
         {
+            Services.AddJsonConfigurations();
             Services.AddLogging();
             Services.AddDatabase();
             Services.AddIdentity();
@@ -36,7 +37,6 @@ namespace Texnomic.SecureDNS
             Services.AddControllers();
             Services.AddRazorWithJsonSerialization();
             Services.AddServerSideBlazor();
-            Services.AddJsonConfigurations();
             Services.AddHttpClient();
             Services.AddProxyServer();
             Services.AddHangfire();
@@ -47,8 +47,6 @@ namespace Texnomic.SecureDNS
         {
             if (Env.IsDevelopment())
             {
-                //DatabaseContext.Database.EnsureDeleted();
-                //DatabaseContext.Database.EnsureCreated();
                 App.UseDeveloperExceptionPage();
                 App.UseDatabaseErrorPage();
             }
@@ -62,7 +60,8 @@ namespace Texnomic.SecureDNS
 
             //Configure Hangfire to Use Our JobActivator with ASP.NET IoC Containers
             //http://docs.hangfire.io/en/latest/background-methods/using-ioc-containers.html
-            GlobalConfiguration.Configuration.UseActivator(new HangfireJobActivator(ServiceProvider));
+            GlobalConfiguration.Configuration.UseSerilogLogProvider()
+                                             .UseActivator(new HangfireJobActivator(ServiceProvider));
 
             App.UseSerilogRequestLogging();
             App.UseHttpsRedirection();

@@ -1,13 +1,15 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using System.Reflection;
 using System.Collections.Generic;
 using System.IO;
+using Hangfire;
+using Hangfire.SQLite;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Serialization;
 using Texnomic.SecureDNS.Areas.Identity;
+using Texnomic.SecureDNS.Configurations;
 using Texnomic.SecureDNS.Data;
 using Texnomic.SecureDNS.Data.Identity;
 
@@ -15,19 +17,22 @@ namespace Texnomic.SecureDNS.Extensions
 {
     public static class ServiceCollectionExtensions
     {
+        public static IServiceCollection AddHangfire(this IServiceCollection Services)
+        {
+            var Connection = $"Data Source={Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\\SecureDNS.sqlite;";
+
+            Services.AddHangfire(Configuration => Configuration.UseSQLiteStorage(Connection, new SQLiteStorageOptions
+            {
+                //InvisibilityTimeout = TimeSpan.FromDays(1),
+                JobExpirationCheckInterval = TimeSpan.FromDays(1),
+            }));
+
+            return Services;
+        }
+
         public static IServiceCollection AddJsonConfigurations(this IServiceCollection Services)
         {
-            using var Provider = Services.BuildServiceProvider();
-
-            var Environment = Provider.GetRequiredService<IHostEnvironment>();
-
-            var Configurations = new ConfigurationBuilder()
-                .AddJsonFile("AppSettings.json", true, true)
-                .AddJsonFile($"AppSettings.{Environment.EnvironmentName}.json", true, true)
-                .AddEnvironmentVariables()
-                .Build();
-
-            Services.AddSingleton(Configurations);
+            Services.AddSingleton(JsonConfigurationProvider.BuildConfigurations());
 
             return Services;
         }

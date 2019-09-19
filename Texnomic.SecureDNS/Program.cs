@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Serilog.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Texnomic.SecureDNS.Configurations;
 using Texnomic.SecureDNS.Extensions;
 
@@ -16,47 +16,40 @@ namespace Texnomic.SecureDNS
     public class Program
     {
         private static string[] Arguments;
-        private static IConfiguration Configurations => GetConfiguration();
-        private static readonly LoggerProviderCollection LoggerProviders = new LoggerProviderCollection();
 
         public static void Main(string[] Args)
         {
             Arguments = Args;
 
-            Log.Logger = new LoggerConfiguration()
-                        .ReadFrom.Configuration(Configurations)
-                        .WriteTo.Providers(LoggerProviders)
-                        .CreateLogger();
-
-            try
-            {
-                Log.Information("Getting the motors running...");
-
-                CreateHostBuilder().Build().Run();
-            }
-            catch (Exception Error)
-            {
-                Log.Fatal(Error, "Host terminated unexpectedly");
-            }
-            finally
-            {
-                Log.CloseAndFlush();
-            }
+            CreateHostBuilder().Build().Run();
         }
 
         public static IHostBuilder CreateHostBuilder()
         {
             return Host.CreateDefaultBuilder(Arguments)
-                       .ConfigureAppConfiguration(SetAppConfiguration)
-                       .ConfigureWebHostDefaults(SetWebHostDefaults);
+                .ConfigureLogging(SetLogging)
+                .ConfigureAppConfiguration(SetAppConfiguration)
+                .ConfigureWebHostDefaults(SetWebHostDefaults);
+
+        }
+
+        private static void SetLogging(HostBuilderContext HostBuilderContext, ILoggingBuilder LoggingBuilder)
+        {
+            //Workaround to clear all providers before Serilog takes over.
+            LoggingBuilder.ClearProviders();
         }
 
         private static void SetWebHostDefaults(IWebHostBuilder WebHostBuilder)
         {
             WebHostBuilder.UseElectron(Arguments)
                           .UseStartup<Startup>()
-                          .UseConfiguration(Configurations)
-                          .UseSerilog(providers: LoggerProviders);
+                          .UseConfiguration(JsonConfigurationProvider.BuildConfigurations())
+                          .UseSerilog(ConfigureLogger, writeToProviders: true);
+        }
+
+        private static void ConfigureLogger(WebHostBuilderContext WebHostBuilderContext, LoggerConfiguration LoggerConfiguration)
+        {
+            LoggerConfiguration.ReadFrom.Configuration(JsonConfigurationProvider.BuildConfigurations());
         }
 
         private static void SetAppConfiguration(HostBuilderContext HostBuilderContext, IConfigurationBuilder ConfigurationBuilder)
@@ -65,18 +58,6 @@ namespace Texnomic.SecureDNS
 
             ConfigurationBuilder.AddDatabaseConfigurations(OptionsBuilder =>
                 OptionsBuilder.UseSqlite($"Data Source={Directory}\\SecureDNS.sqlite;"));
-        }
-
-        public static IConfiguration GetConfiguration()
-        {
-            var EnvironmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
-
-            return new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("AppSettings.json", true, true)
-                .AddJsonFile($"AppSettings.{EnvironmentName}.json", true, true)
-                .AddEnvironmentVariables()
-                .Build();
         }
     }
 }
