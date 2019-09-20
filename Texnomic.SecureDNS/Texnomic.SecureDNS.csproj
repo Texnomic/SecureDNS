@@ -10,7 +10,39 @@
     <UserSecretsId>70d8f4a6-4148-4aca-a794-d1b8ccdf410c</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
+    <Content Remove="wwwroot\lib\blazorise\blazorise.bootstrap.css" />
+    <Content Remove="wwwroot\lib\blazorise\blazorise.bootstrap.js" />
+    <Content Remove="wwwroot\lib\blazorise\blazorise.bulma.css" />
+    <Content Remove="wwwroot\lib\blazorise\blazorise.bulma.js" />
+    <Content Remove="wwwroot\lib\blazorise\blazorise.charts.js" />
+    <Content Remove="wwwroot\lib\blazorise\blazorise.css" />
+    <Content Remove="wwwroot\lib\blazorise\blazorise.frolic.css" />
+    <Content Remove="wwwroot\lib\blazorise\blazorise.frolic.js" />
+    <Content Remove="wwwroot\lib\blazorise\blazorise.js" />
+    <Content Remove="wwwroot\lib\blazorise\blazorise.material.css" />
+    <Content Remove="wwwroot\lib\blazorise\blazorise.material.js" />
+    <Content Remove="wwwroot\lib\blazorise\blazorise.sidebar.css" />
+    <Content Remove="wwwroot\lib\blazorise\blazorise.snackbar.css" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="wwwroot\lib\blazorise\blazorise.bootstrap.css" />
+    <None Include="wwwroot\lib\blazorise\blazorise.bootstrap.js" />
+    <None Include="wwwroot\lib\blazorise\blazorise.bulma.css" />
+    <None Include="wwwroot\lib\blazorise\blazorise.bulma.js" />
+    <None Include="wwwroot\lib\blazorise\blazorise.charts.js" />
+    <None Include="wwwroot\lib\blazorise\blazorise.css" />
+    <None Include="wwwroot\lib\blazorise\blazorise.frolic.css" />
+    <None Include="wwwroot\lib\blazorise\blazorise.frolic.js" />
+    <None Include="wwwroot\lib\blazorise\blazorise.js" />
+    <None Include="wwwroot\lib\blazorise\blazorise.material.css" />
+    <None Include="wwwroot\lib\blazorise\blazorise.material.js" />
+    <None Include="wwwroot\lib\blazorise\blazorise.sidebar.css" />
+    <None Include="wwwroot\lib\blazorise\blazorise.snackbar.css" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="AsyncEnumerator" Version="3.0.2-beta" />
+    <PackageReference Include="Blazorise.Bootstrap" Version="0.8.5" />
+    <PackageReference Include="Blazorise.Icons.FontAwesome" Version="0.8.5" />
     <PackageReference Include="ElectronNET.API" Version="5.22.14" />
     <PackageReference Include="FlexLabs.EntityFrameworkCore.Upsert" Version="3.0.0-netcore3-00140" />
     <PackageReference Include="Hangfire" Version="1.7.6" />
@@ -30,13 +62,12 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.0.0-rc1.19456.10" />
     <PackageReference Include="morelinq" Version="3.2.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="3.0.1-dev-00099" />
-    <PackageReference Include="Serilog.Enrichers.CorrelationId" Version="1.0.1" />
+    <PackageReference Include="Serilog.Enrichers.AspnetcoreHttpcontext" Version="1.1.0" />
     <PackageReference Include="Serilog.Enrichers.Environment" Version="2.1.3" />
-    <PackageReference Include="Serilog.Enrichers.HttpContextData" Version="0.1.3" />
     <PackageReference Include="Serilog.Enrichers.Memory" Version="1.0.4" />
     <PackageReference Include="Serilog.Enrichers.Process" Version="2.0.1" />
     <PackageReference Include="Serilog.Enrichers.Thread" Version="3.2.0-dev-00747" />
-    <PackageReference Include="Serilog.Extensions.Logging" Version="3.0.2-dev-10256" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="3.0.2-dev-10257" />
     <PackageReference Include="Serilog.Formatting.Compact" Version="1.0.1-dev-00925" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.1-dev-00209" />
     <PackageReference Include="Serilog.Sinks.Seq" Version="4.0.1-dev-00159" />

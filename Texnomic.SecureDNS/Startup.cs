@@ -1,4 +1,7 @@
 using System;
+using Blazorise;
+using Blazorise.Bootstrap;
+using Blazorise.Icons.FontAwesome;
 using System.Threading.Tasks;
 using ElectronNET.API;
 using ElectronNET.API.Entities;
@@ -29,6 +32,9 @@ namespace Texnomic.SecureDNS
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection Services)
         {
+            Services.AddBlazorise(Options => { Options.ChangeTextOnKeyPress = true; });
+            Services.AddBootstrapProviders();
+            Services.AddFontAwesomeIcons();
             Services.AddJsonConfigurations();
             Services.AddLogging();
             Services.AddDatabase();
@@ -69,6 +75,8 @@ namespace Texnomic.SecureDNS
             App.UseHangfireServer();
             App.UseStaticFiles();
             App.UseRouting();
+            App.ApplicationServices.UseBootstrapProviders();
+            App.ApplicationServices.UseFontAwesomeIcons();
             App.UseAuthentication();
             App.UseAuthorization();
 

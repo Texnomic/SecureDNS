@@ -38,6 +38,58 @@
       "files": [
         "jquery.min.js"
       ]
+    },
+    {
+      "provider": "jsdelivr",
+      "library": "bootstrap@4.3.1",
+      "destination": "wwwroot/lib/bootstrap",
+      "files": [
+        "dist/css/bootstrap.min.css",
+        "dist/js/bootstrap.min.js"
+      ]
+    },
+    {
+      "library": "font-awesome@5.10.2",
+      "destination": "wwwroot/lib/font-awesome/",
+      "files": [
+        "css/all.min.css",
+        "webfonts/fa-brands-400.eot",
+        "webfonts/fa-brands-400.svg",
+        "webfonts/fa-brands-400.ttf",
+        "webfonts/fa-brands-400.woff",
+        "webfonts/fa-brands-400.woff2",
+        "webfonts/fa-regular-400.eot",
+        "webfonts/fa-regular-400.svg",
+        "webfonts/fa-regular-400.ttf",
+        "webfonts/fa-regular-400.woff",
+        "webfonts/fa-regular-400.woff2",
+        "webfonts/fa-solid-900.eot",
+        "webfonts/fa-solid-900.svg",
+        "webfonts/fa-solid-900.ttf",
+        "webfonts/fa-solid-900.woff",
+        "webfonts/fa-solid-900.woff2",
+        "js/all.min.js"
+      ]
+    },
+    {
+      "library": "popper.js@1.15.0",
+      "destination": "wwwroot/lib/popper.js/",
+      "files": [
+        "popper.min.js"
+      ]
+    },
+    {
+      "provider": "filesystem",
+      "library": "Assets/Blazorise/",
+      "destination": "wwwroot/lib/Blazorise/",
+      "files": [
+        "blazorise.css",
+        "blazorise.bootstrap.css",
+        "blazorise.sidebar.css",
+        "blazorise.snackbar.css",
+        "blazorise.js",
+        "blazorise.charts.js"
+      ]
     }
   ]
 }
