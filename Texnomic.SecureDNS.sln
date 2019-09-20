@@ -39,8 +39,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.DNS.Servers.Tests"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.SecureDNS.Data.Abstractions", "Texnomic.SecureDNS.Data.Abstractions\Texnomic.SecureDNS.Data.Abstractions.csproj", "{0D389991-63B0-4BE7-BFBD-B333A39768F8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BinarySerializer", "..\BinarySerializer\BinarySerializer\BinarySerializer.csproj", "{6479B35D-EF60-47CA-9E54-53E37D64ED08}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.FilterLists", "Texnomic.FilterLists\Texnomic.FilterLists.csproj", "{C4C6C7A3-CA58-45C7-AAB7-67E519075A6F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.FilterLists.Tests", "Texnomic.FilterLists.Tests\Texnomic.FilterLists.Tests.csproj", "{79743923-C66D-48DB-B325-9B9D3D0381E0}"
@@ -109,10 +107,6 @@ Global
 		{0D389991-63B0-4BE7-BFBD-B333A39768F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0D389991-63B0-4BE7-BFBD-B333A39768F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0D389991-63B0-4BE7-BFBD-B333A39768F8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6479B35D-EF60-47CA-9E54-53E37D64ED08}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6479B35D-EF60-47CA-9E54-53E37D64ED08}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6479B35D-EF60-47CA-9E54-53E37D64ED08}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6479B35D-EF60-47CA-9E54-53E37D64ED08}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C4C6C7A3-CA58-45C7-AAB7-67E519075A6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C4C6C7A3-CA58-45C7-AAB7-67E519075A6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C4C6C7A3-CA58-45C7-AAB7-67E519075A6F}.Release|Any CPU.ActiveCfg = Release|Any CPU

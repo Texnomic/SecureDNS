@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\BinarySerializer\BinarySerializer\BinarySerializer.csproj" />
+    <PackageReference Include="BinarySerializer" Version="8.4.3" />
   </ItemGroup>
 
 </Project>
