@@ -1,8 +1,9 @@
 ﻿using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using PipelineNet.MiddlewareResolver;
+using Serilog;
+using Serilog.Core;
 using Texnomic.DNS.Servers;
 using Texnomic.DNS.Servers.ResponsibilityChain;
 
@@ -10,10 +11,16 @@ namespace Texnomic.SecureDNS.Fuzzing
 {
     class Program
     {
+        static Logger Log = new LoggerConfiguration()
+                            //.WriteTo.Console()
+                            .WriteTo.Seq("http://127.0.0.1:5341", apiKey: "PFscdeWf391ACwwiPCvy")
+                            .CreateLogger();
+
         static async Task Main(string[] args)
         {
             try
             {
+
                 var ActivatorMiddlewareResolver = new ActivatorMiddlewareResolver();
                 var ServerResponsibilityChain = new ServerResponsibilityChain(ActivatorMiddlewareResolver);
                 var Server = new ProxyServer(ServerResponsibilityChain);
@@ -29,40 +36,39 @@ namespace Texnomic.SecureDNS.Fuzzing
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
-                Console.WriteLine(e.StackTrace);
+                Log.Fatal(e, "Server Died");
                 Console.ReadLine();
             }
         }
 
         private static void Server_Stopped(object Sender, EventArgs e)
         {
-            Console.WriteLine("[Server] Stopped");
+            Log.Information("Server Stopped");
         }
 
         private static void Server_Started(object Sender, EventArgs e)
         {
-            Console.WriteLine("[Server] Started");
+            Log.Information("Server Started");
         }
 
         private static void Server_Error(object Sender, ProxyServer.ErrorEventArgs e)
         {
-            Console.WriteLine($"[Error] EndPoint: {e.Error.Message}");
+            Log.Error(e.Error, "Error Occurred with {@Message}", e.Message);
         }
 
         private static void Server_Responded(object Sender, ProxyServer.RespondedEventArgs e)
         {
-            Console.WriteLine($"[Responded] EndPoint: {e.EndPoint} | Record: {e.Response.Questions.First().Type.ToString().PadLeft(5)} | Domain: {e.Response.Questions.First().Domain.Name}");
+            Log.Information("Responded To {@EndPoint} For {@Record}", e.EndPoint.ToString(), e.Response?.Answers);
         }
 
         private static void Server_Resolved(object Sender, ProxyServer.ResolvedEventArgs e)
         {
-            Console.WriteLine($"[Resolved] EndPoint: {e.EndPoint} | Record: {e.Request.Questions.First().Type.ToString().PadLeft(5)} | Domain: {e.Request.Questions.First().Domain.Name}");
+            Log.Information("Resolved To {@EndPoint} For {@Record}", e.EndPoint.ToString(), e.Response?.Answers);
         }
 
         private static void Server_Requested(object Sender, ProxyServer.RequestedEventArgs e)
         {
-            Console.WriteLine($"[Requested] EndPoint: {e.EndPoint}");
+            Log.Information("Requested To {@EndPoint} For {@Record}", e.EndPoint.ToString(), e.Request?.Questions);
         }
     }
 }

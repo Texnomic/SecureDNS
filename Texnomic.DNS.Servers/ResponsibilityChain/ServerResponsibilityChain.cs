@@ -10,8 +10,8 @@ namespace Texnomic.DNS.Servers.ResponsibilityChain
     {
         public ServerResponsibilityChain(IMiddlewareResolver MiddlewareResolver) : base(MiddlewareResolver)
         {
-            Chain<GoogleUDPMiddleware>();
-            Chain<ServerMiddleware>();
+            Chain<Quad9TLSMiddleware>();
+            //Chain<ServerMiddleware>();
         }
     }
 }

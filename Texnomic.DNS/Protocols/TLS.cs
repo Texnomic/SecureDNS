@@ -6,8 +6,10 @@ using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading;
 using System.Threading.Tasks;
 using BinarySerialization;
+using Nethereum.ABI;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Models;
 using Texnomic.DNS.Extensions;
@@ -24,6 +26,8 @@ namespace Texnomic.DNS.Protocols
         private SslStream SslStream;
         private PipeReader PipeReader;
         private PipeWriter PipeWriter;
+
+        private const int Timeout = 2000;
 
         public TLS(IPAddress IPAddress, string PublicKey)
         {
@@ -42,6 +46,10 @@ namespace Texnomic.DNS.Protocols
             SslStream = new SslStream(TcpClient.GetStream(), true, ValidateServerCertificate);
 
             await SslStream.AuthenticateAsClientAsync(IPAddress.ToString());
+
+            SslStream.ReadTimeout = Timeout;
+
+            SslStream.WriteTimeout = Timeout;
 
             PipeReader = SslStream.UsePipeReader();
 
@@ -72,11 +80,30 @@ namespace Texnomic.DNS.Protocols
 
             PipeWriter.Complete();
 
-            var Result = await PipeReader.ReadAsync();
+            var Task = PipeReader.ReadAsync().AsTask();
 
-            PipeReader.Complete();
+            Task.Wait(Timeout);
 
-            return Result.Buffer.Slice(2).ToArray();
+            if (Task.IsCompleted)
+            {
+                var Result = Task.Result;
+
+                PipeReader.Complete();
+
+                var Buffer = Result.Buffer.Length > 14
+                    ? Result.Buffer.Slice(2)
+                    : throw new OperationCanceledException();
+
+                return Buffer.ToArray();
+            }
+            else
+            {
+                PipeReader.CancelPendingRead();
+
+                PipeReader.Complete();
+
+                throw new TimeoutException();
+            }
         }
 
         public async Task<IMessage> ResolveAsync(IMessage Request)
@@ -95,13 +122,32 @@ namespace Texnomic.DNS.Protocols
 
             PipeWriter.Complete();
 
-            var Result = await PipeReader.ReadAsync();
+            var Task = PipeReader.ReadAsync().AsTask();
 
-            var Response = await BinarySerializer.DeserializeAsync<Message>(Result.Buffer.Slice(2));
+            Task.Wait(Timeout);
 
-            PipeReader.Complete();
+            if (Task.IsCompleted)
+            {
+                var Result = Task.Result;
 
-            return Response;
+                var Buffer = Result.Buffer.Length > 14
+                    ? Result.Buffer.Slice(2)
+                    : throw new OperationCanceledException();
+
+                var Response = await BinarySerializer.DeserializeAsync<Message>(Buffer);
+
+                PipeReader.Complete();
+
+                return Response;
+            }
+            else
+            {
+                PipeReader.CancelPendingRead();
+
+                PipeReader.Complete();
+
+                throw new TimeoutException();
+            }
         }
 
 

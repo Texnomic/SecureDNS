@@ -4,9 +4,12 @@
 @using Texnomic.SecureDNS.Data.Models
 @inherits BlacklistsBase
 
-<h1>Blacklists</h1>
 
-<button class="btn btn-primary" @onclick="@InitializeAsync">Initialize</button>
+<Alert Color="Color.Dark" IsShow="true">
+    <strong>Blacklist Initialization: </strong><Button Color="Color.Primary" Clicked="@InitializeAsync">Run</Button>
+</Alert>
+
+
 
 <p>@Output</p>
 

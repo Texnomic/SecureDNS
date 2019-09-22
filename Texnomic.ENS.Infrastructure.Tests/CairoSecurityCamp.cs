@@ -27,12 +27,14 @@ namespace Texnomic.ENS.Infrastructure.Tests
         private FIFSRegistrarService FIFSRegistrarService;
         private PublicResolverService PublicResolverService;
 
-        private const string ENSRegistryAddress = "0x8B8152162100Da762eD163e963Ac2085369a8A0f";
-        private const string FIFSRegistrarAddress = "0xb6225EA5c8E2E05c8A72Cb3b546Aa64637829245";
-        private const string PublicResolverAddress = "0x58DE50afF1C7ac8192804c399b115C1bDE3ffDaF";
-
         private const string Domain = "texnomic";
-        private const string OwnerAddress = "0x8eFbc9feec80f9195bCF3eb52B135a979c7194Bc";
+
+        private const string OwnerAddress = "";
+        private const string ENSRegistryAddress = "";
+        private const string FIFSRegistrarAddress = "";
+        private const string PublicResolverAddress = "";
+
+        
 
         [TestInitialize]
         public void Initialize()

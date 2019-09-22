@@ -22,7 +22,6 @@ namespace Texnomic.DNS.Servers
         private readonly List<Task> Workers;
         private readonly BinarySerializer BinarySerializer;
         private readonly IAsyncResponsibilityChain<IMessage, IMessage> ResponsibilityChain;
-        private readonly BufferBlock<UdpReceiveResult> SerializerQueue;
         private readonly BufferBlock<(IMessage, IPEndPoint)> IncomingQueue, OutgoingQueue;
 
         public event EventHandler<RequestedEventArgs> Requested;
@@ -55,8 +54,6 @@ namespace Texnomic.DNS.Servers
             UdpClient.Client.Bind(IPEndPoint);
 
             IncomingQueue = OutgoingQueue = new BufferBlock<(IMessage, IPEndPoint)>();
-
-            SerializerQueue = new BufferBlock<UdpReceiveResult>();
         }
 
         public async Task StartAsync(CancellationToken CancellationToken)
@@ -69,7 +66,6 @@ namespace Texnomic.DNS.Servers
 
             for (var I = 0; I < Threads; I++)
             {
-                Workers.Add(Task.Factory.StartNew(SerializeAsync, CancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default));
                 Workers.Add(Task.Factory.StartNew(ResolveAsync, CancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default));
                 Workers.Add(Task.Factory.StartNew(ForwardAsync, CancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default));
             }
@@ -89,7 +85,6 @@ namespace Texnomic.DNS.Servers
 
             IncomingQueue.Complete();
             OutgoingQueue.Complete();
-            SerializerQueue.Complete();
 
             Stopped?.Invoke(this, EventArgs.Empty);
         }
@@ -98,57 +93,40 @@ namespace Texnomic.DNS.Servers
         {
             while (IsRunning)
             {
+                Message Request = null;
+
                 try
                 {
                     var Result = await UdpClient.ReceiveAsync();
 
                     //Debug(Result.Buffer);
 
-                    await SerializerQueue.SendAsync(Result);
-
-                    Requested?.Invoke(this, new RequestedEventArgs(Result.RemoteEndPoint));
-                }
-                catch (Exception Error)
-                {
-                    this.Error?.Invoke(this, new ErrorEventArgs(Error));
-
-                    Console.WriteLine(Error.Message);
-                }
-            }
-        }
-
-        private async Task SerializeAsync()
-        {
-            while (IsRunning)
-            {
-                Message Request = null;
-
-                var Result = await SerializerQueue.ReceiveAsync();
-
-                try
-                {
                     Request = await BinarySerializer.DeserializeAsync<Message>(Result.Buffer);
 
                     await IncomingQueue.SendAsync((Request, Result.RemoteEndPoint));
+
+                    Requested?.Invoke(this, new RequestedEventArgs(Request, Result.RemoteEndPoint));
                 }
                 catch (Exception Error)
                 {
-                    this.Error?.Invoke(this, new ErrorEventArgs(Error));
-                    Console.WriteLine(Error.Message);
+                    this.Error?.Invoke(this, new ErrorEventArgs(Request, Error));
 
-                    await SendError(Request?.ID ?? 0, Result.RemoteEndPoint);
+                    Console.WriteLine(Error.Message);
                 }
             }
         }
+
         private async Task ResolveAsync()
         {
             while (IsRunning)
             {
+                IMessage Response = null;
+
                 var (Request, Remote) = await IncomingQueue.ReceiveAsync();
 
                 try
                 {
-                    var Response = await ResponsibilityChain.Execute(Request);
+                    Response = await ResponsibilityChain.Execute(Request);
 
                     await OutgoingQueue.SendAsync((Response, Remote));
 
@@ -156,7 +134,7 @@ namespace Texnomic.DNS.Servers
                 }
                 catch (Exception Error)
                 {
-                    this.Error?.Invoke(this, new ErrorEventArgs(Error));
+                    this.Error?.Invoke(this, new ErrorEventArgs(Response, Error));
 
                     Console.WriteLine(Error.Message);
 
@@ -182,7 +160,7 @@ namespace Texnomic.DNS.Servers
                 }
                 catch (Exception Error)
                 {
-                    this.Error?.Invoke(this, new ErrorEventArgs(Error));
+                    this.Error?.Invoke(this, new ErrorEventArgs(null, Error));
                     Console.WriteLine(Error.Message);
                 }
             }
@@ -220,10 +198,12 @@ namespace Texnomic.DNS.Servers
 
         public class RequestedEventArgs : EventArgs
         {
+            public readonly IMessage Request;
             public readonly IPEndPoint EndPoint;
 
-            public RequestedEventArgs(IPEndPoint EndPoint)
+            public RequestedEventArgs(IMessage Request, IPEndPoint EndPoint)
             {
+                this.Request = Request;
                 this.EndPoint = EndPoint;
             }
         }
@@ -256,10 +236,12 @@ namespace Texnomic.DNS.Servers
 
         public class ErrorEventArgs : EventArgs
         {
+            public readonly IMessage Message;
             public readonly Exception Error;
 
-            public ErrorEventArgs(Exception Error)
+            public ErrorEventArgs(IMessage Message, Exception Error)
             {
+                this.Message = Message;
                 this.Error = Error;
             }
         }

@@ -2,72 +2,85 @@
 @using Texnomic.DNS.Protocols
 
 <div class="container">
-    <Card>
-        <CardBody>
-            <ul class="stepper">
-                <li class="@Step1Style">
-                    <div class="step-title waves-effect">Step 1: Domain</div>
-                    <div class="step-content">
-                        <!-- Your step content goes here (like inputs or so) -->
-                        <div class="row">
-                            <div class="input-field col s12">
-                                <input id="Domain" name="Domain" type="text" pattern="^([a-zA-Z0-9]*)(\.eth)$" class="validate" required="" @bind="@Domain" />
-                                <label for="Domain" class="">Domain</label>
+    <div class="row">
+        <div class="col-sm">
+            <Card>
+                <CardBody>
+                    <ul class="stepper">
+                        <li class="@Card1Step1Style">
+                            <div class="step-title waves-effect">Domain</div>
+                            <div class="step-content">
+                                <!-- Your step content goes here (like inputs or so) -->
+                                <div class="row">
+                                    <div class="input-field col s12">
+                                        <input id="Domain" name="Domain" type="text" pattern="^([a-zA-Z0-9]*)(\.eth)$" class="validate" required="" @bind="@Card1Domain" />
+                                        <label for="Domain" class="">Domain</label>
+                                    </div>
+                                </div>
+                                <div class="step-actions">
+                                    <!-- Here goes your actions buttons -->
+                                    <Button Class="waves-effect" Color="Color.Primary" Clicked="@InfuraResolve">Resolve</Button>
+                                </div>
                             </div>
-                        </div>
-                        <div class="step-actions">
-                            <!-- Here goes your actions buttons -->
-                            <Button Class="waves-effect" Color="Color.Primary" Clicked="@Resolve">Resolve</Button>
-                        </div>
-                    </div>
-                </li>
-                <li class="@Step2Style">
-                    <div class="step-title waves-effect">Step 2: Blockchain</div>
-                    <div class="step-content">
-                        <!-- Your step content goes here (like inputs or so) -->
-                        <p>
-                            <div class="spinner-border m-1" role="status" /> Doing Dark Magic...
-                        </p>
-                        <div class="step-actions">
-                            <!-- Here goes your actions buttons -->
-                        </div>
-                    </div>
-                </li>
-                <li class="@Step3Style">
-                    <div class="step-title waves-effect">Step 4: Address</div>
-                    <div class="step-content">
-                        <!-- Your step content goes here (like inputs or so) -->
-                        <p><i class="fas fa-thumbs-up green-text"></i> @Address</p>
-                        <div class="step-actions">
-                            <!-- Here goes your actions buttons -->
-                        </div>
-                    </div>
-                </li>
-            </ul>
-        </CardBody>
-    </Card>
+                        </li>
+                        <li class="@Card1Step2Style">
+                            <div class="step-title waves-effect">Blockchain</div>
+                            <div class="step-content">
+                                <!-- Your step content goes here (like inputs or so) -->
+                                <p>
+                                    <div class="spinner-border m-1" role="status" /> Doing Dark Magic...
+                                </p>
+                                <div class="step-actions">
+                                    <!-- Here goes your actions buttons -->
+                                </div>
+                            </div>
+                        </li>
+                        <li class="@Card1Step3Style">
+                            <div class="step-title waves-effect">SmartContract Address</div>
+                            <div class="step-content">
+                                <!-- Your step content goes here (like inputs or so) -->
+                                <p><i class="fas fa-thumbs-up green-text"></i> @Card1Address</p>
+                                <div class="step-actions">
+                                    <!-- Here goes your actions buttons -->
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </CardBody>
+            </Card>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
 </div>
 
 @code
 {
-    public ENS Resolver = new ENS(new Uri("https://mainnet.infura.io/v3/7238211010344719ad14a89db874158c"));
+    readonly ENS InfuraResolver = new ENS(new Uri("https://mainnet.infura.io/v3/7238211010344719ad14a89db874158c"),"0x314159265dd8dbb310642f98f50c066173c1259b");
+    
+
+    const string Step = "step";
+    const string StepActive = "step active";
+
+    public string Card1Domain { get; set; }
+    public string Card1Address { get; set; }
+    public string Card1Step1Style { get; set; } = StepActive;
+    public string Card1Step2Style { get; set; } = Step;
+    public string Card1Step3Style { get; set; } = Step;
 
 
-    public string Domain { get; set; }
-    public string Address { get; set; }
-    public string Step1Style { get; set; } = "step active";
-    public string Step2Style { get; set; } = "step";
-    public string Step3Style { get; set; } = "step";
 
 
-    public async Task Resolve()
+    public async Task InfuraResolve()
     {
-        Step1Style = "step";
-        Step2Style = "step active";
+        Card1Step1Style = Step;
+        Card1Step2Style = StepActive;
         StateHasChanged();
-        Address = await Resolver.ResolveAsync(Domain);
-        Step2Style = "step";
-        Step3Style = "step active";
+        Card1Address = await InfuraResolver.ResolveAsync(Card1Domain);
+        Card1Step2Style = Step;
+        Card1Step3Style = StepActive;
     }
 
 }

@@ -1,37 +1,33 @@
-<div class="top-row pl-4 navbar navbar-dark">
-    <a class="navbar-brand" href="">Texnomic SecureDNS</a>
-    <button class="navbar-toggler" @onclick="@ToggleNavMenu">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-</div>
+<Sidebar @ref="Sidebar">
+    <SidebarContent>
+        <SidebarBrand>
+            <a href="">SecureDNS</a>
+        </SidebarBrand>
+        <SidebarNavigation>
+            <SidebarItem>
+                <SidebarLink To="" Title="Home" Margin="Margin.IsAuto">
+                    <i class="fas fa-tachometer-alt"></i> Home
+                </SidebarLink>
+            </SidebarItem>
+            <SidebarItem>
+                <SidebarLink To="Blacklists" Margin="Margin.IsAuto">
+                    <i class="fas fa-clipboard-list"></i> Blacklists
+                </SidebarLink>
+            </SidebarItem>
+            <SidebarItem>
+                <SidebarLink To="DoB" Margin="Margin.IsAuto">
+                    <i class="fas fa-cubes"></i> DNS Over Blockchain
+                </SidebarLink>
+            </SidebarItem>
+        </SidebarNavigation>
+    </SidebarContent>
+</Sidebar>
 
-<div class="@NavMenuCssClass" @onclick="@ToggleNavMenu">
-    <ul class="nav flex-column">
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="Blacklists">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Blacklists
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="DoB">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> DNS Over Blockchain
-            </NavLink>
-        </li>
-    </ul>
-</div>
+@code{
+    Sidebar Sidebar;
 
-@functions {
-    bool collapseNavMenu = true;
-
-    string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-    void ToggleNavMenu()
+    void ToggleSidebar()
     {
-        collapseNavMenu = !collapseNavMenu;
+        Sidebar.Toggle();
     }
 }

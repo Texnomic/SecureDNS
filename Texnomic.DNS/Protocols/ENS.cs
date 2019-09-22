@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using BinarySerialization;
-using Common.Logging;
 using Nethereum.ENS;
 using Nethereum.ENS.ENSRegistry.ContractDefinition;
 using Nethereum.Hex.HexConvertors.Extensions;
@@ -23,16 +21,16 @@ namespace Texnomic.DNS.Protocols
         private readonly EnsUtil EnsUtil;
         private readonly ENSRegistryService ENSRegistryService;
         private readonly BinarySerializer BinarySerializer;
-        private const string ENSRegistryMainnet = "0x314159265dd8dbb310642f98f50c066173c1259b";
-        private const string ENSRegistryRopsten = "0x112234455c3a32fd11230c42e7bccd4a84e02010";
-        private const string ENSRegistryRinkeby = "0xe7410170f87102df0055eb195163a03b7f2bff4a";
-        private const string ENSRegistryGoerli = "0x112234455c3a32fd11230c42e7bccd4a84e02010";
+        private const string MainnetRegistryAddress = "0x314159265dd8dbb310642f98f50c066173c1259b";
+        private const string RopstenRegistryAddress = "0x112234455c3a32fd11230c42e7bccd4a84e02010";
+        private const string RinkebyRegistryAddress = "0xe7410170f87102df0055eb195163a03b7f2bff4a";
+        private const string GoerliRegistryAddress = "0x112234455c3a32fd11230c42e7bccd4a84e02010";
 
-        public ENS(Uri Uri)
+        public ENS(Uri Uri, string RegistryAddress)
         {
             Web3 = new Web3(Uri.ToString());
             EnsUtil = new EnsUtil();
-            ENSRegistryService = new ENSRegistryService(Web3, ENSRegistryMainnet);
+            ENSRegistryService = new ENSRegistryService(Web3, RegistryAddress);
             BinarySerializer = new BinarySerializer();
         }
 

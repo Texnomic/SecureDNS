@@ -25,7 +25,7 @@ namespace Texnomic.DNS.Tests.Resolvers
         {
             BinarySerializer = new BinarySerializer();
 
-            Resolver = new Protocols.ENS(new Uri("https://mainnet.infura.io/v3/7238211010344719ad14a89db874158c"));
+            Resolver = new Protocols.ENS(new Uri("https://mainnet.infura.io/v3/7238211010344719ad14a89db874158c"), "0x314159265dd8dbb310642f98f50c066173c1259b");
 
             ID = (ushort)new Random().Next();
 
