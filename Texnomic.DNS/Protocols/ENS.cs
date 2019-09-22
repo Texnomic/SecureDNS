@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using BinarySerialization;
+using Common.Logging;
 using Nethereum.ENS;
 using Nethereum.ENS.ENSRegistry.ContractDefinition;
 using Nethereum.Hex.HexConvertors.Extensions;
@@ -26,9 +28,9 @@ namespace Texnomic.DNS.Protocols
         private const string ENSRegistryRinkeby = "0xe7410170f87102df0055eb195163a03b7f2bff4a";
         private const string ENSRegistryGoerli = "0x112234455c3a32fd11230c42e7bccd4a84e02010";
 
-        public ENS(string ProjectID)
+        public ENS(Uri Uri)
         {
-            Web3 = new Web3($"https://mainnet.infura.io/v3/{ProjectID}");
+            Web3 = new Web3(Uri.ToString());
             EnsUtil = new EnsUtil();
             ENSRegistryService = new ENSRegistryService(Web3, ENSRegistryMainnet);
             BinarySerializer = new BinarySerializer();
