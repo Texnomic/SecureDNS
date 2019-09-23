@@ -27,14 +27,15 @@ namespace Texnomic.ENS.Infrastructure.Tests
         private FIFSRegistrarService FIFSRegistrarService;
         private PublicResolverService PublicResolverService;
 
-        private const string Domain = "texnomic";
+        private const string Domain = "dina";
 
-        private const string OwnerAddress = "";
-        private const string ENSRegistryAddress = "";
-        private const string FIFSRegistrarAddress = "";
-        private const string PublicResolverAddress = "";
+        private const string OwnerAddress = "0xCf5f18513388Ad45f5C28e7c965e5aB81CA5C1F3";
 
-        
+        private const string ENSRegistryAddress = "0x7A5a999E06E3Ee43066D9Ea1725e0f46Ec2cf557";
+        private const string FIFSRegistrarAddress = "0x779A44526DA54a033c5Db71D04c072AE47AB5BDE";
+        private const string PublicResolverAddress = "0x5e7270094CfDacdAd113256e2f0b6016c5772757";
+
+
 
         [TestInitialize]
         public void Initialize()
@@ -68,7 +69,9 @@ namespace Texnomic.ENS.Infrastructure.Tests
             {
                 Subnode = EnsUtil.GetLabelHash(Domain).HexToByteArray(),
                 Owner = OwnerAddress,
-                FromAddress = OwnerAddress
+                FromAddress = OwnerAddress,
+                Gas = new HexBigInteger(100000),
+                GasPrice = new HexBigInteger(100000),
             };
 
             return await FIFSRegistrarService.RegisterRequestAndWaitForReceiptAsync(RegisterRequest);
@@ -80,7 +83,9 @@ namespace Texnomic.ENS.Infrastructure.Tests
             {
                 Node = EnsUtil.GetNameHash($"{Domain}.eth").HexToByteArray(),
                 Resolver = PublicResolverAddress,
-                FromAddress = OwnerAddress
+                FromAddress = OwnerAddress,
+                Gas = new HexBigInteger(100000),
+                GasPrice = new HexBigInteger(100000),
             };
 
             return await ENSRegistryService.SetResolverRequestAndWaitForReceiptAsync(SetResolverFunction);
@@ -93,7 +98,9 @@ namespace Texnomic.ENS.Infrastructure.Tests
             {
                 Node = EnsUtil.GetNameHash($"{Domain}.eth").HexToByteArray(),
                 Addr = OwnerAddress,
-                FromAddress = OwnerAddress
+                FromAddress = OwnerAddress,
+                Gas = new HexBigInteger(100000),
+                GasPrice = new HexBigInteger(100000),
             };
 
             return await PublicResolverService.SetAddrRequestAndWaitForReceiptAsync(SetAddressFunction);

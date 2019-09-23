@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using PipelineNet.MiddlewareResolver;
@@ -58,17 +59,19 @@ namespace Texnomic.SecureDNS.Fuzzing
 
         private static void Server_Responded(object Sender, ProxyServer.RespondedEventArgs e)
         {
-            Log.Information("Responded To {@EndPoint} For {@Record}", e.EndPoint.ToString(), e.Response?.Answers);
+            Log.Information("Responded To {@EndPoint} For {@Record}", e.EndPoint.ToString(), e.Response?.Answers?.FirstOrDefault()?.Domain?.ToString());
         }
 
         private static void Server_Resolved(object Sender, ProxyServer.ResolvedEventArgs e)
         {
-            Log.Information("Resolved To {@EndPoint} For {@Record}", e.EndPoint.ToString(), e.Response?.Answers);
+            Log.Information("Resolved To {@EndPoint} For {@Record}", e.EndPoint.ToString(), e.Response?.Answers
+                .FirstOrDefault()?.Domain?.ToString());
         }
 
         private static void Server_Requested(object Sender, ProxyServer.RequestedEventArgs e)
         {
-            Log.Information("Requested To {@EndPoint} For {@Record}", e.EndPoint.ToString(), e.Request?.Questions);
+            Log.Information("Requested To {@EndPoint} For {@Record}", e.EndPoint.ToString(), e.Request?.Questions
+                .FirstOrDefault()?.Domain?.ToString());
         }
     }
 }
