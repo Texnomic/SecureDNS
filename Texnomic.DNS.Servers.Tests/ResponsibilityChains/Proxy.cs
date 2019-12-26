@@ -44,7 +44,7 @@ namespace Texnomic.DNS.Servers.Tests.ResponsibilityChains
         public async Task RunAsync()
         {
             var ActivatorMiddlewareResolver = new ActivatorMiddlewareResolver();
-            var ProxyResponsibilityChain = new ServerResponsibilityChain(ActivatorMiddlewareResolver);
+            var ProxyResponsibilityChain = new ProxyResponsibilityChain(ActivatorMiddlewareResolver);
             ResponseMessage = await ProxyResponsibilityChain.Execute(RequestMessage);
 
             Assert.AreEqual(ID, ResponseMessage.ID);

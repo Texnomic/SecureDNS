@@ -20,7 +20,7 @@ namespace Texnomic.DNS.Servers.Tests
             //Resolve-DnsName -Name mail.google.com -Server 127.0.0.1 -Type A
 
             var ActivatorMiddlewareResolver = new ActivatorMiddlewareResolver();
-            var ProxyResponsibilityChain = new ServerResponsibilityChain(ActivatorMiddlewareResolver);
+            var ProxyResponsibilityChain = new ProxyResponsibilityChain(ActivatorMiddlewareResolver);
             Server = new SimpleServer(ProxyResponsibilityChain);
         }
 
