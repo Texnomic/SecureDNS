@@ -15,7 +15,9 @@ namespace Texnomic.DNS.Servers.Tests
         public void Initialize()
         {
             //Stop-Service -DisplayName 'Docker Desktop Service'
+            //Set-Service -Name 'Internet Connection Sharing (ICS)' -StartupType Disabled
             //Stop-Service -DisplayName 'Internet Connection Sharing (ICS)'
+            //Resolve-DnsName -Name mail.google.com -Server 127.0.0.1 -Type A
 
             var ActivatorMiddlewareResolver = new ActivatorMiddlewareResolver();
             var ProxyResponsibilityChain = new ServerResponsibilityChain(ActivatorMiddlewareResolver);

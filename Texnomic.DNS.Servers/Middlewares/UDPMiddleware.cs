@@ -15,7 +15,7 @@ namespace Texnomic.DNS.Servers.Middlewares
         {
             Message = await ResolveAsync(Message);
 
-            return Next is null ? Message : await Next(Message);
+            return await Next(Message);
         }
     }
 }

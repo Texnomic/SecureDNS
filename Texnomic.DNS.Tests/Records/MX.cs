@@ -51,7 +51,7 @@ namespace Texnomic.DNS.Tests.Records
             Assert.AreEqual(ID, ResponseMessage.ID);
             Assert.IsNotNull(ResponseMessage.Questions);
             Assert.IsNotNull(ResponseMessage.Answers);
-            Assert.AreEqual(ResponseCode.NXRRSet, ResponseMessage.ResponseCode);
+            Assert.AreEqual(ResponseCode.NoError, ResponseMessage.ResponseCode);
             Assert.IsInstanceOfType(ResponseMessage.Answers.First().Record, typeof(DNS.Records.MX));
         }
     }

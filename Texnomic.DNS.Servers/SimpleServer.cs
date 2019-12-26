@@ -15,7 +15,6 @@ namespace Texnomic.DNS.Servers
 {
     public class SimpleServer : IHostedService, IDisposable
     {
-        private readonly List<Task> Workers;
         private readonly IAsyncResponsibilityChain<IMessage, IMessage> ResponsibilityChain;
         private readonly BinarySerializer BinarySerializer;
         private readonly UdpClient UdpClient;
@@ -23,7 +22,6 @@ namespace Texnomic.DNS.Servers
         public SimpleServer(IAsyncResponsibilityChain<IMessage, IMessage> ResponsibilityChain)
         {
             this.ResponsibilityChain = ResponsibilityChain;
-            Workers = new List<Task>();
             UdpClient = new UdpClient(53);
             BinarySerializer = new BinarySerializer();
         }
@@ -35,8 +33,7 @@ namespace Texnomic.DNS.Servers
                 try
                 {
                     var UdpReceiveResult = await UdpClient.ReceiveAsync();
-                    //Workers.Add(ResolveAsync(UdpReceiveResult));
-                    ResolveAsync(UdpReceiveResult);
+                    await ResolveAsync(UdpReceiveResult);
                 }
                 catch (Exception Error)
                 {
@@ -70,7 +67,7 @@ namespace Texnomic.DNS.Servers
 
                 await UdpClient.SendAsync(ResponseBytes, ResponseBytes.Length, UdpReceiveResult.RemoteEndPoint);
 
-                //Console.WriteLine(Error);
+                Console.WriteLine(Error);
             }
         }
 

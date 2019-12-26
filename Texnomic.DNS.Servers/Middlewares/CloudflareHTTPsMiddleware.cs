@@ -28,7 +28,7 @@ namespace Texnomic.DNS.Servers.Middlewares
 
             Message = await BinarySerializer.DeserializeAsync<Message>(ResponseBytes);
 
-            return Next is null ? Message : await Next(Message);
+            return await Next(Message);
         }
     }
 }
