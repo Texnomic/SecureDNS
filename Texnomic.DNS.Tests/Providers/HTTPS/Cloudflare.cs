@@ -1,20 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using PipelineNet.MiddlewareResolver;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Models;
-using Texnomic.DNS.Servers.ResponsibilityChain;
+using Texnomic.DNS.Protocols;
 
-namespace Texnomic.DNS.Servers.Tests.ResponsibilityChains
+namespace Texnomic.DNS.Tests.Providers.HTTPS
 {
     [TestClass]
-    public class Proxy
+    public class Cloudflare
     {
         private ushort ID;
+        private IProtocol Resolver;
         private IMessage RequestMessage;
         private IMessage ResponseMessage;
 
@@ -24,6 +25,8 @@ namespace Texnomic.DNS.Servers.Tests.ResponsibilityChains
         {
             ID = (ushort) new Random().Next();
 
+            Resolver = new HTTPs(IPAddress.Parse("104.16.248.249"), "04C520708C204250281E7D44417C3079291C635E1D449BC5F7713A2BDED2A2A4B16C3D6AC877B8CB8F2E5053FDF418267F6137EDFFC2BEE90B5DB97EE1DF1CE274");
+
             RequestMessage = new Message()
             {
                 ID = ID,
@@ -32,7 +35,7 @@ namespace Texnomic.DNS.Servers.Tests.ResponsibilityChains
                 {
                     new Question()
                     {
-                        Domain = Domain.FromString("google.com"),
+                        Domain = Domain.FromString("facebook.com"),
                         Class = RecordClass.Internet,
                         Type = RecordType.A
                     }
@@ -41,16 +44,20 @@ namespace Texnomic.DNS.Servers.Tests.ResponsibilityChains
         }
 
         [TestMethod]
-        public async Task RunAsync()
+        public async Task QueryAsync()
         {
-            var ActivatorMiddlewareResolver = new ActivatorMiddlewareResolver();
-            var ProxyResponsibilityChain = new ProxyResponsibilityChain(ActivatorMiddlewareResolver);
-            ResponseMessage = await ProxyResponsibilityChain.Execute(RequestMessage);
+            //Using Binary Format Over HTTPs 
+
+            var RequestBytes = await RequestMessage.ToArrayAsync();
+
+            var ResponseBytes = await Resolver.ResolveAsync(RequestBytes);
+
+            ResponseMessage = await Message.FromArrayAsync(ResponseBytes);
 
             Assert.AreEqual(ID, ResponseMessage.ID);
             Assert.IsNotNull(ResponseMessage.Questions);
             Assert.IsNotNull(ResponseMessage.Answers);
-            Assert.IsInstanceOfType(ResponseMessage.Answers.First().Record, typeof(Records.A));
+            Assert.IsInstanceOfType(ResponseMessage.Answers.First().Record, typeof(DNS.Records.A));
         }
     }
 }

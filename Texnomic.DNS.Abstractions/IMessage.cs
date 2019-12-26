@@ -48,5 +48,9 @@ namespace Texnomic.DNS.Abstractions
         string Comment { get; set; }
 
         string ToJson();
+
+        byte[] ToArray();
+
+        Task<byte[]> ToArrayAsync();
     }
 }
