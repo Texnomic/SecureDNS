@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 using Polly;
@@ -18,30 +20,55 @@ namespace Texnomic.DNS.Protocols
     public class HTTPs : IProtocol
     {
         private readonly string PublicKey;
-        private readonly IPAddress IPAddress;
-        private readonly RestClient RestClient;
-        private readonly AsyncRetryPolicy<IRestResponse> RetryPolicy;
-        private readonly SemaphoreSlim Semaphore;
-        private readonly Random Random;
+
+        private RestClient RestClient;
+        private AsyncRetryPolicy<IRestResponse> RetryPolicy;
+        private Random Random;
 
         public HTTPs(IPAddress IPAddress, string PublicKey)
         {
-            this.IPAddress = IPAddress;
             this.PublicKey = PublicKey;
 
+            Initialize(IPAddress.ToString());
+        }
+
+        public HTTPs(IPAddress IPAddress, int Port, string PublicKey)
+        {
+            this.PublicKey = PublicKey;
+
+            Initialize(IPAddress.ToString(), Port);
+        }
+
+        public HTTPs(Uri Address, string PublicKey)
+        {
+            this.PublicKey = PublicKey;
+
+            Initialize(Address.DnsSafeHost);
+        }
+
+        public HTTPs(Uri Address, int Port, string PublicKey)
+        {
+            this.PublicKey = PublicKey;
+
+            Initialize(Address.DnsSafeHost, Port);
+        }
+
+        private void Initialize(string Address, int Port = 443)
+        {
             Random = new Random();
 
-            RestClient = new RestClient($"https://{IPAddress}/");
-            //RestClient.FollowRedirects = false; //Google will fail
+            ServicePointManager.ServerCertificateValidationCallback += ValidateServerCertificate;
+
+            RestClient = new RestClient($"https://{Address}:{Port}/");
+            
             RestClient.AddDefaultHeader("Cache-Control", "no-cache");
             RestClient.AddDefaultHeader("Accept", "application/dns-message");
 
-            //RestClient.Proxy = new WebProxy("127.0.0.1:8888");
+            //RestClient.Proxy = new WebProxy("127.0.0.1:8888"); //Debugging with Fiddler
+            //RestClient.FollowRedirects = false; //Google will fail
 
             RetryPolicy = Policy.HandleResult<IRestResponse>(ResultPredicate)
                                 .RetryAsync(3);
-
-            Semaphore = new SemaphoreSlim(1, 1);
         }
 
         private bool ResultPredicate(IRestResponse Response)
@@ -59,32 +86,33 @@ namespace Texnomic.DNS.Protocols
             return Async.RunSync(() => ResolveAsync(Query));
         }
 
-        public async Task<byte[]> ResolveAsync(byte[] Query)
+        public async Task<byte[]> ResolveGetAsync(byte[] Query)
         {
             //Replace "==" due to parsing bug in RestSharp
-            var Message = Convert.ToBase64String(Query).Replace("==","");
+            var Message = Convert.ToBase64String(Query).Replace("==", "");
 
             //Random Number to avoid Cache Servers
-            var Request = new RestRequest($"dns-query?dns={Message}&r={Random.Next(0, 99999999)}")
-            {
-                Timeout = 500
-            };
-
-            //var Response = await RestClient.ExecuteGetTaskAsync(Request);
+            var Request = new RestRequest($"dns-query?dns={Message}&r={Random.Next(0, 99999999)}");
 
             var Response = await RetryPolicy.ExecuteAsync(() => RestClient.ExecuteGetTaskAsync(Request));
 
             if (Response.StatusCode != HttpStatusCode.OK)
                 throw new Exception($"HTTP Status {Enum.GetName(typeof(HttpStatusCode), Response.StatusCode)}");
-            
+
             return Response.RawBytes;
         }
 
-        public async Task<byte[]> ResolvePostAsync(byte[] Query)
+        public async Task<byte[]> ResolveAsync(byte[] Query)
         {
             var Request = new RestRequest("dns-query");
+            
             Request.AddParameter("application/dns-message", Query, "application/dns-message", ParameterType.RequestBody);
-            var Response = await RestClient.ExecutePostTaskAsync(Request);
+            
+            var Response = await RetryPolicy.ExecuteAsync(() => RestClient.ExecutePostTaskAsync(Request));
+
+            if (Response.StatusCode != HttpStatusCode.OK)
+                throw new Exception($"HTTP Status {Enum.GetName(typeof(HttpStatusCode), Response.StatusCode)}");
+
             return Response.RawBytes;
         }
 
@@ -93,6 +121,13 @@ namespace Texnomic.DNS.Protocols
             var Request = new RestRequest($"resolve?name={Query.Questions[0].Domain}&type={Query.Questions[0].Type}");
             return await RestClient.GetAsync<Message>(Request);
         }
+
+        private bool ValidateServerCertificate(object Sender, X509Certificate Certificate, X509Chain Chain, SslPolicyErrors SslPolicyErrors)
+        {
+            //return SslPolicyErrors == SslPolicyErrors.None && Certificate.GetPublicKeyString() == PublicKey;
+            return true;
+        }
+
 
         private bool IsDisposed;
 
@@ -108,7 +143,7 @@ namespace Texnomic.DNS.Protocols
 
             if (Disposing)
             {
-                Semaphore.Dispose();
+                RestClient.ClearHandlers();
             }
 
             IsDisposed = true;
