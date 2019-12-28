@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
-using System.Threading;
 using System.Threading.Tasks;
+using BinarySerialization;
 using Polly;
 using Polly.Retry;
 using RestSharp;
@@ -22,6 +21,7 @@ namespace Texnomic.DNS.Protocols
         private readonly string PublicKey;
 
         private RestClient RestClient;
+        private BinarySerializer BinarySerializer;
         private AsyncRetryPolicy<IRestResponse> RetryPolicy;
         private Random Random;
 
@@ -58,6 +58,8 @@ namespace Texnomic.DNS.Protocols
             Random = new Random();
 
             ServicePointManager.ServerCertificateValidationCallback += ValidateServerCertificate;
+
+            BinarySerializer = new BinarySerializer();
 
             RestClient = new RestClient($"https://{Address}:{Port}/");
             
@@ -116,10 +118,13 @@ namespace Texnomic.DNS.Protocols
             return Response.RawBytes;
         }
 
-        public async Task<IMessage> ResolveAsync(IMessage Query)
+        public async Task<IMessage> ResolveAsync(IMessage Message)
         {
-            var Request = new RestRequest($"resolve?name={Query.Questions[0].Domain}&type={Query.Questions[0].Type}");
-            return await RestClient.GetAsync<Message>(Request);
+            var RequestBytes = await BinarySerializer.SerializeAsync(Message);
+
+            var ResponseBytes = await ResolveAsync(RequestBytes);
+
+            return await BinarySerializer.DeserializeAsync<Message>(ResponseBytes);
         }
 
         private bool ValidateServerCertificate(object Sender, X509Certificate Certificate, X509Chain Chain, SslPolicyErrors SslPolicyErrors)

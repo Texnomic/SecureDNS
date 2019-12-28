@@ -53,7 +53,9 @@ namespace Texnomic.DNS.Servers
 
             UdpClient.Client.Bind(IPEndPoint);
 
-            IncomingQueue = OutgoingQueue = new BufferBlock<(IMessage, IPEndPoint)>();
+            IncomingQueue = new BufferBlock<(IMessage, IPEndPoint)>();
+
+            OutgoingQueue = new BufferBlock<(IMessage, IPEndPoint)>();
         }
 
         public async Task StartAsync(CancellationToken CancellationToken)
@@ -109,7 +111,7 @@ namespace Texnomic.DNS.Servers
                 }
                 catch (Exception Error)
                 {
-                    this.Error?.Invoke(this, new ErrorEventArgs(Request, Error));
+                    this.Error?.Invoke(this, new ErrorEventArgs(Request, null, Error));
 
                     Console.WriteLine(Error.Message);
                 }
@@ -134,7 +136,7 @@ namespace Texnomic.DNS.Servers
                 }
                 catch (Exception Error)
                 {
-                    this.Error?.Invoke(this, new ErrorEventArgs(Response, Error));
+                    this.Error?.Invoke(this, new ErrorEventArgs(Request, Response, Error));
 
                     Console.WriteLine(Error.Message);
 
@@ -146,10 +148,10 @@ namespace Texnomic.DNS.Servers
         {
             while (IsRunning)
             {
+                var (Response, Remote) = await OutgoingQueue.ReceiveAsync();
+
                 try
                 {
-                    var (Response, Remote) = await OutgoingQueue.ReceiveAsync();
-
                     var Bytes = await BinarySerializer.SerializeAsync(Response);
 
                     //Debug(Bytes);
@@ -160,7 +162,7 @@ namespace Texnomic.DNS.Servers
                 }
                 catch (Exception Error)
                 {
-                    this.Error?.Invoke(this, new ErrorEventArgs(null, Error));
+                    this.Error?.Invoke(this, new ErrorEventArgs(null, Response, Error));
                     Console.WriteLine(Error.Message);
                 }
             }
@@ -236,12 +238,14 @@ namespace Texnomic.DNS.Servers
 
         public class ErrorEventArgs : EventArgs
         {
-            public readonly IMessage Message;
+            public readonly IMessage Request;
+            public readonly IMessage Response;
             public readonly Exception Error;
 
-            public ErrorEventArgs(IMessage Message, Exception Error)
+            public ErrorEventArgs(IMessage Request, IMessage Response, Exception Error)
             {
-                this.Message = Message;
+                this.Request = Request;
+                this.Response = Response;
                 this.Error = Error;
             }
         }

@@ -25,9 +25,9 @@ namespace Texnomic.SecureDNS.Fuzzing
                 var ActivatorMiddlewareResolver = new ActivatorMiddlewareResolver();
                 var ServerResponsibilityChain = new ProxyResponsibilityChain(ActivatorMiddlewareResolver);
                 var Server = new ProxyServer(ServerResponsibilityChain);
-                Server.Started += Server_Started;
-                Server.Requested += Server_Requested;
-                Server.Resolved += Server_Resolved;
+                Server.Started += Server_Started; 
+                //Server.Requested += Server_Requested;
+                //Server.Resolved += Server_Resolved;
                 Server.Responded += Server_Responded;
                 Server.Error += Server_Error;
                 Server.Stopped += Server_Stopped;
@@ -54,24 +54,22 @@ namespace Texnomic.SecureDNS.Fuzzing
 
         private static void Server_Error(object Sender, ProxyServer.ErrorEventArgs e)
         {
-            Log.Error(e.Error, "Error Occurred with {@Message}", e.Message);
+            Log.Error(e.Error, "{@Error} Occurred with {@Request} and {@Response}", e.Error,e.Request, e.Response);
         }
 
         private static void Server_Responded(object Sender, ProxyServer.RespondedEventArgs e)
         {
-            Log.Information("Responded To {@EndPoint} For {@Record}", e.EndPoint.ToString(), e.Response?.Answers?.FirstOrDefault()?.Domain?.ToString());
+            Log.Information("Responded To {@EndPoint} with {@Response}", e.EndPoint.ToString(), e.Response);
         }
 
         private static void Server_Resolved(object Sender, ProxyServer.ResolvedEventArgs e)
         {
-            Log.Information("Resolved To {@EndPoint} For {@Record}", e.EndPoint.ToString(), e.Response?.Answers
-                .FirstOrDefault()?.Domain?.ToString());
+            Log.Information("Resolved To {@EndPoint} {@Request} with {@Response}", e.EndPoint.ToString(), e.Request, e.Response);
         }
 
         private static void Server_Requested(object Sender, ProxyServer.RequestedEventArgs e)
         {
-            Log.Information("Requested To {@EndPoint} For {@Record}", e.EndPoint.ToString(), e.Request?.Questions
-                .FirstOrDefault()?.Domain?.ToString());
+            Log.Information("Requested To {@EndPoint} For {@Request}", e.EndPoint.ToString(), e.Request);
         }
     }
 }
