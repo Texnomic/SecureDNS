@@ -28,6 +28,8 @@ namespace Texnomic.SecureDNS.Data
         {
             if (OptionsBuilder.IsConfigured) return;
 
+            OptionsBuilder.UseLazyLoadingProxies();
+
             var Directory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             OptionsBuilder.UseSqlite($"Data Source={Directory}\\SecureDNS.sqlite;");
         }

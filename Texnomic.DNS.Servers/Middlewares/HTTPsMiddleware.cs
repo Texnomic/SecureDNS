@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Net;
 using System.Threading.Tasks;
-using BinarySerialization;
 using PipelineNet.Middleware;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Protocols;

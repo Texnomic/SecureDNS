@@ -57,9 +57,15 @@ namespace Texnomic.SecureDNS.Fuzzing
             Log.Error(e.Error, "{@Error} Occurred with {@Request} and {@Response}", e.Error,e.Request, e.Response);
         }
 
+        //private static void Server_Responded(object Sender, ProxyServer.RespondedEventArgs e)
+        //{
+        //    Log.Information("Responded To {@EndPoint} with {@Response}", e.EndPoint.ToString(), e.Response);
+        //}
+
         private static void Server_Responded(object Sender, ProxyServer.RespondedEventArgs e)
         {
-            Log.Information("Responded To {@EndPoint} with {@Response}", e.EndPoint.ToString(), e.Response);
+            Log.Information("Responded To {@EndPoint} with {@RecordType} For {@Domain} in {@Time} Milliseconds. {@Response}.", e.EndPoint.ToString(),
+                e.Response.Questions?.FirstOrDefault()?.Type, e.Response.Questions?.FirstOrDefault()?.Name, e.TimeSpan.TotalMilliseconds, e.Response);
         }
 
         private static void Server_Resolved(object Sender, ProxyServer.ResolvedEventArgs e)

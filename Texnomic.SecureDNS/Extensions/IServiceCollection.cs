@@ -70,7 +70,11 @@ namespace Texnomic.SecureDNS.Extensions
 
             var Directory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
-            Services.AddDbContext<DatabaseContext>(OptionsBuilder => OptionsBuilder.UseSqlite($"Data Source={Directory}\\SecureDNS.sqlite;"));
+            Services.AddDbContext<DatabaseContext>(OptionsBuilder =>
+            {
+                OptionsBuilder.UseLazyLoadingProxies()
+                              .UseSqlite($"Data Source={Directory}\\SecureDNS.sqlite;");
+            });
 
             return Services;
         }

@@ -22,7 +22,8 @@ namespace Texnomic.DNS.Servers
         private readonly List<Task> Workers;
         private readonly BinarySerializer BinarySerializer;
         private readonly IAsyncResponsibilityChain<IMessage, IMessage> ResponsibilityChain;
-        private readonly BufferBlock<(IMessage, IPEndPoint)> IncomingQueue, OutgoingQueue;
+        private readonly BufferBlock<(IMessage, IPEndPoint, DateTime)> IncomingQueue;
+        private readonly BufferBlock<(IMessage, IPEndPoint, TimeSpan)> OutgoingQueue;
 
         public event EventHandler<RequestedEventArgs> Requested;
         public event EventHandler<ResolvedEventArgs> Resolved;
@@ -53,9 +54,9 @@ namespace Texnomic.DNS.Servers
 
             UdpClient.Client.Bind(IPEndPoint);
 
-            IncomingQueue = new BufferBlock<(IMessage, IPEndPoint)>();
+            IncomingQueue = new BufferBlock<(IMessage, IPEndPoint, DateTime)>();
 
-            OutgoingQueue = new BufferBlock<(IMessage, IPEndPoint)>();
+            OutgoingQueue = new BufferBlock<(IMessage, IPEndPoint, TimeSpan)>();
         }
 
         public async Task StartAsync(CancellationToken CancellationToken)
@@ -105,7 +106,7 @@ namespace Texnomic.DNS.Servers
 
                     Request = await BinarySerializer.DeserializeAsync<Message>(Result.Buffer);
 
-                    await IncomingQueue.SendAsync((Request, Result.RemoteEndPoint));
+                    await IncomingQueue.SendAsync((Request, Result.RemoteEndPoint, DateTime.Now));
 
                     Requested?.Invoke(this, new RequestedEventArgs(Request, Result.RemoteEndPoint));
                 }
@@ -124,13 +125,13 @@ namespace Texnomic.DNS.Servers
             {
                 IMessage Response = null;
 
-                var (Request, Remote) = await IncomingQueue.ReceiveAsync();
+                var (Request, Remote, DateTime) = await IncomingQueue.ReceiveAsync();
 
                 try
                 {
                     Response = await ResponsibilityChain.Execute(Request);
 
-                    await OutgoingQueue.SendAsync((Response, Remote));
+                    await OutgoingQueue.SendAsync((Response, Remote, DateTime.Now.Subtract(DateTime)));
 
                     Resolved?.Invoke(this, new ResolvedEventArgs(Request, Response, Remote));
                 }
@@ -138,9 +139,7 @@ namespace Texnomic.DNS.Servers
                 {
                     this.Error?.Invoke(this, new ErrorEventArgs(Request, Response, Error));
 
-                    Console.WriteLine(Error.Message);
-
-                    await SendError(Request.ID, Remote);
+                    await SendError(Request.ID, Remote, DateTime);
                 }
             }
         }
@@ -148,7 +147,7 @@ namespace Texnomic.DNS.Servers
         {
             while (IsRunning)
             {
-                var (Response, Remote) = await OutgoingQueue.ReceiveAsync();
+                var (Response, Remote, TimeSpan) = await OutgoingQueue.ReceiveAsync();
 
                 try
                 {
@@ -158,7 +157,7 @@ namespace Texnomic.DNS.Servers
 
                     await UdpClient.SendAsync(Bytes, Bytes.Length, Remote);
 
-                    Responded?.Invoke(this, new RespondedEventArgs(Response, Remote));
+                    Responded?.Invoke(this, new RespondedEventArgs(Response, Remote, TimeSpan));
                 }
                 catch (Exception Error)
                 {
@@ -168,7 +167,7 @@ namespace Texnomic.DNS.Servers
             }
         }
 
-        private async Task SendError(ushort ID, IPEndPoint RemoteEndPoint)
+        private async Task SendError(ushort ID, IPEndPoint RemoteEndPoint, DateTime DateTime)
         {
             try
             {
@@ -183,7 +182,7 @@ namespace Texnomic.DNS.Servers
 
                 await UdpClient.SendAsync(ResponseBytes, ResponseBytes.Length, RemoteEndPoint);
 
-                Responded?.Invoke(this, new RespondedEventArgs(Response, RemoteEndPoint));
+                Responded?.Invoke(this, new RespondedEventArgs(Response, RemoteEndPoint, DateTime.Now.Subtract(DateTime)));
             }
             catch (Exception Error)
             {
@@ -228,11 +227,13 @@ namespace Texnomic.DNS.Servers
         {
             public readonly IMessage Response;
             public readonly IPEndPoint EndPoint;
+            public readonly TimeSpan TimeSpan;
 
-            public RespondedEventArgs(IMessage Response, IPEndPoint EndPoint)
+            public RespondedEventArgs(IMessage Response, IPEndPoint EndPoint, TimeSpan TimeSpan)
             {
                 this.Response = Response;
                 this.EndPoint = EndPoint;
+                this.TimeSpan = TimeSpan;
             }
         }
 
