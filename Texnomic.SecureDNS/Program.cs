@@ -27,9 +27,9 @@ namespace Texnomic.SecureDNS
         public static IHostBuilder CreateHostBuilder()
         {
             return Host.CreateDefaultBuilder(Arguments)
-                .ConfigureLogging(SetLogging)
-                .ConfigureAppConfiguration(SetAppConfiguration)
-                .ConfigureWebHostDefaults(SetWebHostDefaults);
+                       .ConfigureLogging(SetLogging)
+                       .ConfigureAppConfiguration(SetAppConfiguration)
+                       .ConfigureWebHostDefaults(SetWebHostDefaults);
 
         }
 

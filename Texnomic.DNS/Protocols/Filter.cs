@@ -7,11 +7,6 @@ namespace Texnomic.DNS.Protocols
 {
     public class Filter : IProtocol
     {
-        public void Dispose()
-        {
-            throw new NotImplementedException();
-        }
-
         public Filter()
         {
             
@@ -35,6 +30,31 @@ namespace Texnomic.DNS.Protocols
         public IMessage Resolve(IMessage Query)
         {
             return Async.RunSync(() => ResolveAsync(Query));
+        }
+
+        private bool IsDisposed;
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool Disposing)
+        {
+            if (IsDisposed) return;
+
+            if (Disposing)
+            {
+                //TODO
+            }
+
+            IsDisposed = true;
+        }
+
+        ~Filter()
+        {
+            Dispose(false);
         }
     }
 }

@@ -51,7 +51,7 @@ namespace Texnomic.SecureDNS
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder App, IWebHostEnvironment Env, IServiceProvider ServiceProvider, DatabaseContext DatabaseContext)
+        public void Configure(IApplicationBuilder App, IWebHostEnvironment Env, IServiceProvider ServiceProvider, IConfiguration Configuration, DatabaseContext DatabaseContext)
         {
             if (Env.IsDevelopment())
             {
@@ -65,6 +65,9 @@ namespace Texnomic.SecureDNS
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 App.UseHsts();
             }
+
+            //https://help.syncfusion.com/common/essential-studio/licensing/license-key
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(Configuration["Syncfusion:LicenseKey"]);
 
             //Configure Hangfire to Use Our JobActivator with ASP.NET IoC Containers
             //http://docs.hangfire.io/en/latest/background-methods/using-ioc-containers.html

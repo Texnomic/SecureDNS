@@ -14,6 +14,7 @@ namespace Texnomic.SecureDNS.Configurations
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("AppSettings.json", false, true)
                 .AddJsonFile($"AppSettings.{Stage}.json", false, true)
+                .AddUserSecrets<Startup>(true, true)
                 .AddEnvironmentVariables()
                 .Build();
         }
