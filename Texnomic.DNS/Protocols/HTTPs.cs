@@ -110,10 +110,15 @@ namespace Texnomic.DNS.Protocols
             
             Request.AddParameter("application/dns-message", Query, "application/dns-message", ParameterType.RequestBody);
             
-            var Response = await RetryPolicy.ExecuteAsync(() => RestClient.ExecutePostTaskAsync(Request));
+            //var Response = await RetryPolicy.ExecuteAsync(() => RestClient.ExecutePostTaskAsync(Request));
+
+            var Response = await RestClient.ExecutePostTaskAsync(Request);
+
+            //if (Response.StatusCode != HttpStatusCode.OK)
+            //    throw new Exception($"HTTP Status {Enum.GetName(typeof(HttpStatusCode), Response.StatusCode)}");
 
             if (Response.StatusCode != HttpStatusCode.OK)
-                throw new Exception($"HTTP Status {Enum.GetName(typeof(HttpStatusCode), Response.StatusCode)}");
+                throw Response.ErrorException;
 
             return Response.RawBytes;
         }
