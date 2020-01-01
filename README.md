@@ -54,3 +54,4 @@ The Project offically launched within my talk for [Cairo Security Camp](https://
 
 # Supported By
 ![JetBrains](https://raw.githubusercontent.com/Texnomic/SecureDNS/master/docs/JetBrains.png "JetBrains")
+![Syncfusion](https://raw.githubusercontent.com/Texnomic/SecureDNS/master/docs/Syncfusion.png "Syncfusion")
