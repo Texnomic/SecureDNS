@@ -31,7 +31,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.SecureDNS.Data", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.DNS.Abstractions", "Texnomic.DNS.Abstractions\Texnomic.DNS.Abstractions.csproj", "{4785617B-AD42-4EBE-A93E-06A4B15A99BB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.SecureDNS.Fuzzing", "Texnomic.SecureDNS.Fuzzing\Texnomic.SecureDNS.Fuzzing.csproj", "{66D712B8-4952-4BA9-980A-EB6618BD228C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.SecureDNS.CLI", "Texnomic.SecureDNS.CLI\Texnomic.SecureDNS.CLI.csproj", "{66D712B8-4952-4BA9-980A-EB6618BD228C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.DNS.Servers", "Texnomic.DNS.Servers\Texnomic.DNS.Servers.csproj", "{D1EEFB21-54EE-438B-8AD7-ABBD735C1901}"
 EndProject

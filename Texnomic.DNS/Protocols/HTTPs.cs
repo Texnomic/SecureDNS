@@ -62,7 +62,7 @@ namespace Texnomic.DNS.Protocols
             BinarySerializer = new BinarySerializer();
 
             RestClient = new RestClient($"https://{Address}:{Port}/");
-            
+
             RestClient.AddDefaultHeader("Cache-Control", "no-cache");
             RestClient.AddDefaultHeader("Accept", "application/dns-message");
 
@@ -73,9 +73,9 @@ namespace Texnomic.DNS.Protocols
                                 .RetryAsync(3);
         }
 
-        private bool ResultPredicate(IRestResponse Response)
+        private static bool ResultPredicate(IRestResponse Response)
         {
-            return Response.StatusCode != HttpStatusCode.OK;
+            return Response.ErrorException != null;
         }
 
         public byte[] Resolve(byte[] Query)
@@ -98,8 +98,7 @@ namespace Texnomic.DNS.Protocols
 
             var Response = await RetryPolicy.ExecuteAsync(() => RestClient.ExecuteGetTaskAsync(Request));
 
-            if (Response.StatusCode != HttpStatusCode.OK)
-                throw new Exception($"HTTP Status {Enum.GetName(typeof(HttpStatusCode), Response.StatusCode)}");
+            if (Response.ErrorException != null) throw Response.ErrorException;
 
             return Response.RawBytes;
         }
@@ -107,18 +106,12 @@ namespace Texnomic.DNS.Protocols
         public async Task<byte[]> ResolveAsync(byte[] Query)
         {
             var Request = new RestRequest("dns-query");
-            
+
             Request.AddParameter("application/dns-message", Query, "application/dns-message", ParameterType.RequestBody);
-            
-            //var Response = await RetryPolicy.ExecuteAsync(() => RestClient.ExecutePostTaskAsync(Request));
 
-            var Response = await RestClient.ExecutePostTaskAsync(Request);
+            var Response = await RetryPolicy.ExecuteAsync(() => RestClient.ExecutePostTaskAsync(Request));
 
-            //if (Response.StatusCode != HttpStatusCode.OK)
-            //    throw new Exception($"HTTP Status {Enum.GetName(typeof(HttpStatusCode), Response.StatusCode)}");
-
-            if (Response.StatusCode != HttpStatusCode.OK)
-                throw Response.ErrorException;
+            if (Response.ErrorException != null) throw Response.ErrorException;
 
             return Response.RawBytes;
         }
@@ -134,8 +127,7 @@ namespace Texnomic.DNS.Protocols
 
         private bool ValidateServerCertificate(object Sender, X509Certificate Certificate, X509Chain Chain, SslPolicyErrors SslPolicyErrors)
         {
-            //return SslPolicyErrors == SslPolicyErrors.None && Certificate.GetPublicKeyString() == PublicKey;
-            return true;
+            return SslPolicyErrors == SslPolicyErrors.None && Certificate.GetPublicKeyString() == PublicKey;
         }
 
 

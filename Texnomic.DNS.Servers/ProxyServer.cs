@@ -58,6 +58,9 @@ namespace Texnomic.DNS.Servers
 
             UdpClient = new UdpClient();
 
+            //https://stackoverflow.com/questions/5199026/c-sharp-async-udp-listener-socketexception
+            UdpClient.Client.IOControl(-1744830452, new byte[4], null);
+
             IPEndPoint = new IPEndPoint(IPAddress.Any, Port);
 
             UdpClient.Client.Bind(IPEndPoint);
@@ -80,7 +83,7 @@ namespace Texnomic.DNS.Servers
                 Workers.Add(Task.Factory.StartNew(SendAsync, CancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default));
             }
 
-            Logger.Information("Server Started with {@Threads} Threads. Listening On {@IPEndPoint}", Threads, IPEndPoint);
+            Logger?.Information("Server Started with {@Threads} Threads. Listening On {@IPEndPoint}", Threads * 3, IPEndPoint.ToString());
 
             Started?.Invoke(this, EventArgs.Empty);
 
@@ -98,7 +101,7 @@ namespace Texnomic.DNS.Servers
             IncomingQueue.Complete();
             OutgoingQueue.Complete();
 
-            Logger.Information("Server Stopped.");
+            Logger?.Information("Server Stopped.");
 
             Stopped?.Invoke(this, EventArgs.Empty);
         }
@@ -111,9 +114,9 @@ namespace Texnomic.DNS.Servers
             }
             catch (Exception Error)
             {
-                Logger.Error(Error, "{@Error} Occurred While Deserializing Message.", Error);
+                Logger?.Error(Error, "{@Error} Occurred While Deserializing Message.", Error);
 
-                Logger.Debug(Error, "{@Error} Occurred While Deserializing {@Bytes}.", Error, Bytes);
+                Logger?.Debug(Error, "{@Error} Occurred While Deserializing {@Bytes}.", Error, Bytes);
 
                 Errored?.Invoke(this, new ErroredEventArgs(Error));
 
@@ -133,7 +136,7 @@ namespace Texnomic.DNS.Servers
             }
             catch (Exception Error)
             {
-                Logger.Error(Error, "{@Error} Occurred While Serializing {@Message}.", Error, Message);
+                Logger?.Error(Error, "{@Error} Occurred While Serializing {@Message}.", Error, Message);
 
                 Errored?.Invoke(this, new ErroredEventArgs(Error));
 
@@ -155,7 +158,7 @@ namespace Texnomic.DNS.Servers
             }
             catch (Exception Error)
             {
-                Logger.Error(Error, "{@Error} Occurred While Resolving {@Query}.", Error, Query);
+                Logger?.Error(Error, "{@Error} Occurred While Resolving {@Query}.", Error, Query);
 
                 Errored?.Invoke(this, new ErroredEventArgs(Error));
 
@@ -184,8 +187,8 @@ namespace Texnomic.DNS.Servers
                             {
                                 await IncomingQueue.SendAsync((Message, Result.RemoteEndPoint));
 
-                                Logger.Information("Received {@Query} From {@RemoteEndPoint}.", Message,
-                                    Result.RemoteEndPoint);
+                                Logger?.Information("Received {@Query} From {@RemoteEndPoint}.", Message,
+                                    Result.RemoteEndPoint.ToString());
 
                                 Queried?.Invoke(this, new QueriedEventArgs(Message, Result.RemoteEndPoint));
 
@@ -196,8 +199,8 @@ namespace Texnomic.DNS.Servers
                             {
                                 await OutgoingQueue.SendAsync((Message, Result.RemoteEndPoint));
 
-                                Logger.Debug("Queueing (Outgoing) Format Error {@Answer} To {@RemoteEndPoint}.", Message,
-                                    Result.RemoteEndPoint);
+                                Logger?.Debug("Queueing (Outgoing) Format Error {@Answer} To {@RemoteEndPoint}.", Message,
+                                    Result.RemoteEndPoint.ToString());
 
                                 break;
                             }
@@ -207,13 +210,13 @@ namespace Texnomic.DNS.Servers
                 }
                 catch (SocketException Error)
                 {
-                    Logger.Error(Error, "{@Error} Occurred While Receiving Message.", Error);
+                    Logger?.Error(Error, "{@Error} Occurred While Receiving Message.", Error);
 
                     Errored?.Invoke(this, new ErroredEventArgs(Error));
                 }
                 catch (Exception Error)
                 {
-                    Logger.Fatal(Error, "Fatal {@Error} Occurred While Receiving Message.", Error);
+                    Logger?.Fatal(Error, "Fatal {@Error} Occurred While Receiving Message.", Error);
 
                     Errored?.Invoke(this, new ErroredEventArgs(Error));
 
@@ -234,14 +237,14 @@ namespace Texnomic.DNS.Servers
 
                     await OutgoingQueue.SendAsync((Answer, RemoteEndPoint));
 
-                    Logger.Information("Resolved {@Query} with {@ResponseCode} {@Answer} To {@RemoteEndPoint}.", Query,
-                        Answer.ResponseCode, Answer, RemoteEndPoint);
+                    Logger?.Information("Resolved {@Query} with {@ResponseCode} {@Answer} To {@RemoteEndPoint}.", Query,
+                        Answer.ResponseCode, Answer, RemoteEndPoint.ToString());
 
                     Resolved?.Invoke(this, new ResolvedEventArgs(Query, Answer, RemoteEndPoint));
                 }
                 catch (Exception Error)
                 {
-                    Logger.Fatal(Error, "Fatal {@Error} Occurred While Receiving Message.", Error);
+                    Logger?.Fatal(Error, "Fatal {@Error} Occurred While Receiving Message.", Error);
 
                     Errored?.Invoke(this, new ErroredEventArgs(Error));
 
@@ -262,14 +265,14 @@ namespace Texnomic.DNS.Servers
 
                     await UdpClient.SendAsync(Bytes, Bytes.Length, RemoteEndPoint);
 
-                    Logger.Information("Sent {@Answer} To {@RemoteEndPoint}.", Answer, RemoteEndPoint);
+                    Logger?.Information("Sent {@Answer} To {@RemoteEndPoint}.", Answer, RemoteEndPoint.ToString());
 
                     Answered?.Invoke(this, new AnsweredEventArgs(Answer, RemoteEndPoint));
 
                 }
                 catch (Exception Error)
                 {
-                    Logger.Fatal(Error, "Fatal {@Error} Occurred While Sending Message.", Error);
+                    Logger?.Fatal(Error, "Fatal {@Error} Occurred While Sending Message.", Error);
 
                     Errored?.Invoke(this, new ErroredEventArgs(Error));
 

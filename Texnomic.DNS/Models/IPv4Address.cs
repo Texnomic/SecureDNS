@@ -10,6 +10,9 @@ namespace Texnomic.DNS.Models
         [Ignore]
         public IPAddress Value { get; set; }
 
+        [Ignore]
+        public string IP => Value.ToString();
+
         public void Deserialize(Stream Stream, Endianness Endianness, BinarySerializationContext SerializationContext)
         {
             var Buffer = new byte[4];
