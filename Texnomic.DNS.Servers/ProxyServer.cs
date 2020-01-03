@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
@@ -58,8 +59,11 @@ namespace Texnomic.DNS.Servers
 
             UdpClient = new UdpClient();
 
-            //https://stackoverflow.com/questions/5199026/c-sharp-async-udp-listener-socketexception
-            UdpClient.Client.IOControl(-1744830452, new byte[4], null);
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                //https://stackoverflow.com/questions/5199026/c-sharp-async-udp-listener-socketexception
+                UdpClient.Client.IOControl(-1744830452, new byte[4], null);
+            }
 
             this.IPEndPoint = IPEndPoint ?? new IPEndPoint(IPAddress.Any, Port);
 

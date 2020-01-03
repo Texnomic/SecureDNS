@@ -1,18 +1,21 @@
 ![SecureDNS](https://raw.githubusercontent.com/Texnomic/SecureDNS/master/docs/Logo.png "SecureDNS")
 
-Building a Secure, Modern & Cross-Platform DNS Server Using C# 8.0 & .NET Core 3.0.
+Building a Secure, Modern, Cross-Platform & Cross-Architecture DNS Server Using C# 8.0 & .NET Core 3.1.
 
 The SecureDNS Server will implement **all secure DNS Communication Protocols regardless of being standardized or not** while maintaining backward compatibility with the classic unsecure DNS Over UDP Protocol via Reverse Proxy.
 
 The SecureDNS Server is implemented using modern [Clean-Architecture Patterns](https://www.amazon.com/Clean-Architecture-Craftsmans-Software-Structure/dp/0134494164).
 
+# Releases
+The [v0.1 Alpha Release](https://github.com/Texnomic/SecureDNS/releases/tag/v0.1-alpha) is now available for early adopters.
+
 # Implementations
-1. [DNS Over Blockchain](https://readthedocs.org/projects/ens/downloads/pdf/latest/)
-2. [DNS Over UDP](https://tools.ietf.org/html/rfc1035)
-3. [DNS Over TCP](https://tools.ietf.org/html/rfc1035) *Pending*
-4. [DNS Over TLS](https://tools.ietf.org/html/rfc7858)
-5. [DNS Over HTTP/S](https://tools.ietf.org/html/rfc8484)
-6. [DNSCrypt](https://dnscrypt.info/) *Pending*
+- [x] [DNS Over Blockchain](https://readthedocs.org/projects/ens/downloads/pdf/latest/)
+- [x] [DNS Over UDP](https://tools.ietf.org/html/rfc1035)
+- [ ] [DNS Over TCP](https://tools.ietf.org/html/rfc1035)
+- [x] [DNS Over TLS](https://tools.ietf.org/html/rfc7858)
+- [x] [DNS Over HTTP/S](https://tools.ietf.org/html/rfc8484)
+- [ ] [DNSCrypt](https://dnscrypt.info/)
 
 # Integrations
 1. [Ethereum Name Service](https://ens.domains/)
@@ -20,6 +23,28 @@ The SecureDNS Server is implemented using modern [Clean-Architecture Patterns](h
 3. [FilterLists](https://github.com/collinbarrett/FilterLists)
 4. [IANA Root Files](https://www.iana.org/domains/root/files)
 5. [ICANN Zone Data Service](https://czds.icann.org/home)
+6. Public DNS Resolvers:
+	6.1. Goolge
+	6.2. Cloudflare
+	6.3. Quad9
+
+# Platforms Supported:
+* Alpine: 3.10+
+* Debian: 9+
+* Ubuntu: 16.04+
+* Fedora: 29+
+* RHEL: 6+
+* openSUSE: 15+
+* SUSE Enterprise Linux (SLES): 12 SP2+
+* macOS: 10.13+
+* Windows Client: 7, 8.1, 10 (1607+)
+* Windows Server: 2012 R2+
+
+# Chips Supported:
+* x64 on Windows, macOS, and Linux
+* x86 on Windows
+* ARM32 on Windows and Linux
+* ARM64 on Linux (kernel 4.14+)
 
 # Project Launch
 The Project offically launched within my talk for [Cairo Security Camp](https://cairosecuritycamp.com/sessions/rebuilding-the-domain-name-system/) on September 22nd.
@@ -32,10 +57,10 @@ The Project offically launched within my talk for [Cairo Security Camp](https://
 
 # Technology Stack
 1. [C# 8.0](https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-8)
-2. [.NET Core 3.0](https://dotnet.microsoft.com/download/dotnet-core/3.0)
-3. [ASP.NET Core 3.0](https://dotnet.microsoft.com/download/dotnet-core/3.0)
+2. [.NET Core 3.1](https://dotnet.microsoft.com/download/dotnet-core/3.0)
+3. [ASP.NET Core 3.1](https://dotnet.microsoft.com/download/dotnet-core/3.0)
 4. [PowerShell Core 7.0](https://github.com/PowerShell/PowerShell)
-5. [Entity Framework Core 3.0](https://docs.microsoft.com/en-us/ef/core/)
+5. [Entity Framework Core 3.1](https://docs.microsoft.com/en-us/ef/core/)
 6. [Blazor aka Razor Components](https://dotnet.microsoft.com/apps/aspnet/web-apps/client)
 7. [Solidity](https://github.com/ethereum/solidity)
 
@@ -50,6 +75,9 @@ The Project offically launched within my talk for [Cairo Security Camp](https://
 7. [Hangfire Extension Plugins](https://github.com/wanlitao/HangfireExtension)
 8. [Entity Framework Extensions](https://entityframework-extensions.net)
 9. [Nethereum](https://nethereum.com/)
+10. [Polly](https://github.com/App-vNext/Polly)
+11. [Terminal UI](https://github.com/migueldeicaza/gui.cs)
+12. [Command Line Parser](https://github.com/commandlineparser/commandline)
 
 
 # Supported By
