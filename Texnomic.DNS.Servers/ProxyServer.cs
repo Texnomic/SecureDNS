@@ -44,7 +44,7 @@ namespace Texnomic.DNS.Servers
 
         private readonly UdpClient UdpClient;
 
-        public ProxyServer(IAsyncResponsibilityChain<IMessage, IMessage> ResponsibilityChain, ILogger Logger, int Threads = 0)
+        public ProxyServer(IAsyncResponsibilityChain<IMessage, IMessage> ResponsibilityChain, ILogger Logger, IPEndPoint IPEndPoint = null, int Threads = 0)
         {
             this.Threads = Threads == 0 ? Environment.ProcessorCount : Threads;
 
@@ -61,9 +61,9 @@ namespace Texnomic.DNS.Servers
             //https://stackoverflow.com/questions/5199026/c-sharp-async-udp-listener-socketexception
             UdpClient.Client.IOControl(-1744830452, new byte[4], null);
 
-            IPEndPoint = new IPEndPoint(IPAddress.Any, Port);
+            this.IPEndPoint = IPEndPoint ?? new IPEndPoint(IPAddress.Any, Port);
 
-            UdpClient.Client.Bind(IPEndPoint);
+            UdpClient.Client.Bind(this.IPEndPoint);
 
             IncomingQueue = new BufferBlock<(IMessage, IPEndPoint)>();
 

@@ -1,29 +1,48 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Text;
+using System.Linq;
+using System.Net;
+using System.Net.NetworkInformation;
 using System.Threading;
+using System.Threading.Tasks;
 using PipelineNet.MiddlewareResolver;
 using Serilog;
 using Terminal.Gui;
 using Texnomic.DNS.Servers;
 using Texnomic.DNS.Servers.ResponsibilityChain;
 
+using Attribute = Terminal.Gui.Attribute;
+
 namespace Texnomic.SecureDNS.CLI
 {
-    public static class App
+    public class App
     {
-        public static ActivatorMiddlewareResolver ActivatorMiddlewareResolver = new ActivatorMiddlewareResolver();
-        public static ProxyResponsibilityChain ServerResponsibilityChain = new ProxyResponsibilityChain(ActivatorMiddlewareResolver);
-        public static ProxyServer ProxyServer = new ProxyServer(ServerResponsibilityChain, Log.Logger);
-        public static CancellationToken CancellationToken = new CancellationToken();
+        public ProxyServer ProxyServer;
 
-        public static void Run()
+        public Settings Settings;
+
+        public App(Settings Settings)
+        {
+            this.Settings = Settings;
+        }
+
+        private static readonly ColorScheme SuccessColorScheme = new ColorScheme()
+        {
+            Normal = Attribute.Make(Color.Black, Color.Green),
+            Focus = Attribute.Make(Color.Black, Color.Green)
+        };
+
+        private static readonly ColorScheme FailureColorScheme = new ColorScheme()
+        {
+            Normal = Attribute.Make(Color.White, Color.Red),
+            Focus = Attribute.Make(Color.White, Color.Red)
+        };
+
+        public void Run()
         {
             Application.Init();
 
-            var Window = new Window("Texnomic SecureDNS", 1)
+            var Window = new Window("Management", 1)
             {
                 X = 0,
                 Y = 1,
@@ -40,12 +59,14 @@ namespace Texnomic.SecureDNS.CLI
                 Y = 2,
             };
 
-            var ServerBindingText = new TextField("0.0.0.0:53")
+            var ServerBindingText = new TextField(Settings.ServerIPEndPoint.ToString())
             {
                 X = Pos.Right(ServerBindingLabel) + 2,
                 Y = Pos.Top(ServerBindingLabel),
                 Width = 30
             };
+
+            ServerBindingText.Changed += (Sender, Args) => CheckIPEndPoint(ServerBindingText);
 
             var SeqEndPointLabel = new Label("Seq EndPoint: ")
             {
@@ -53,76 +74,48 @@ namespace Texnomic.SecureDNS.CLI
                 Y = Pos.Top(ServerBindingLabel) + 2,
             };
 
-            var SeqEndPointText = new TextField("http://127.0.0.1:5341")
+            var SeqEndPointText = new TextField(Settings.SeqUriEndPoint.ToString())
             {
                 X = Pos.Right(SeqEndPointLabel) + 4,
                 Y = Pos.Top(SeqEndPointLabel),
-                Width = 30
+                Width = 30,
             };
+
+            SeqEndPointText.Changed += (Sender, Args) => CheckUri(SeqEndPointText);
 
             var StartButton = new Button("Start Server", true)
             {
-                X = Pos.Left(SeqEndPointLabel),
-                Y = 14,
-                Clicked = async () =>
-                {
-                    Log.Logger = new LoggerConfiguration()
-                                .WriteTo.Seq(SeqEndPointText.Text.ToString(), compact: true)
-                                .CreateLogger();
-
-                    await ProxyServer.StartAsync(CancellationToken);
-
-                    MessageBox.Query(40, 7, "SecureDNS", "Server Started.", "OK");
-                }
+                X = Pos.AnchorEnd(37),
+                Y = Pos.AnchorEnd(1),
+                Clicked = async () => await Start()
             };
 
             var StopButton = new Button("Stop Server")
             {
-                X = Pos.Right(StartButton) + 2,
-                Y = 14,
-                Clicked = async () =>
-                {
-                    await ProxyServer.StopAsync(CancellationToken);
-
-                    MessageBox.Query(40, 7, "SecureDNS", "Server Stopped.", "OK");
-                }
+                X = Pos.AnchorEnd(16),
+                Y = Pos.AnchorEnd(1),
+                Clicked = async () => await Stop()
             };
 
-            var MenuBar = new MenuBar(new []
+            var MenuBar = new MenuBar(new[]
             {
-                new MenuBarItem ("Server", new  []
+                new MenuBarItem ("SecureDNS", new  []
                 {
-                    new MenuItem ("Start", "", async () =>
-                    {
-                        Log.Logger = new LoggerConfiguration()
-                            .WriteTo.Seq(SeqEndPointText.Text.ToString(), compact: true)
-                            .CreateLogger();
+                    new MenuItem ("Start", "Server", async () => await Start()),
 
-                        await ProxyServer.StartAsync(CancellationToken);
+                    new MenuItem ("Stop", "Server", async () => await Stop()),
 
-                        MessageBox.Query(40, 7, "SecureDNS", "Server Started.", "OK");
-                    }),
-
-                    new MenuItem ("Stop", "", async () =>
-                    {
-                        await ProxyServer.StopAsync(CancellationToken);
-
-                        MessageBox.Query(40, 7, "SecureDNS", "Server Stopped.", "OK");
-                    }),
+                    new MenuItem ("Quite", "System", Application.RequestStop),
                 }),
 
                 new MenuBarItem ("Seq", new  []
                 {
-                    new MenuItem ("Browse", "", () =>
-                    {
-                        var Seq = new ProcessStartInfo(SeqEndPointText.Text.ToString())
-                        {
-                            UseShellExecute = true,
-                            Verb = "open"
-                        };
+                    new MenuItem ("Browse", "", () => Browse(SeqEndPointText.Text.ToString())),
+                }),
 
-                        Process.Start(Seq);
-                    }),
+                new MenuBarItem("About", new[]
+                {
+                    new MenuItem("Browse", "GitHub", () => Browse("https://github.com/Texnomic/SecureDNS")),
                 })
             });
 
@@ -137,6 +130,91 @@ namespace Texnomic.SecureDNS.CLI
                 StopButton);
 
             Application.Run();
+        }
+
+        private async Task Start()
+        {
+            try
+            {
+                var Available = CheckPort(IPEndPoint.Parse(Settings.ServerIPEndPoint).Port);
+
+                if (Available)
+                {
+                    Log.Logger = new LoggerConfiguration()
+                        .WriteTo.Seq(Settings.SeqUriEndPoint.ToString(), compact: true)
+                        .CreateLogger();
+
+                    var ActivatorMiddlewareResolver = new ActivatorMiddlewareResolver();
+
+                    var ServerResponsibilityChain = new ProxyResponsibilityChain(ActivatorMiddlewareResolver);
+
+                    ProxyServer = new ProxyServer(ServerResponsibilityChain, Log.Logger, IPEndPoint.Parse(Settings.ServerIPEndPoint));
+
+                    await ProxyServer.StartAsync(Settings.CancellationToken);
+
+                    MessageBox.Query(40, 7, "Information", "Server Started.", "OK");
+                }
+                else
+                {
+                    MessageBox.ErrorQuery(80, 7, "Error", $"Port {IPEndPoint.Parse(Settings.ServerIPEndPoint).Port} Already Used.", "OK");
+                }
+            }
+            catch (Exception Error)
+            {
+                MessageBox.ErrorQuery(80, 7, "Error", Error.Message, "OK");
+            }
+        }
+
+        private async Task Stop()
+        {
+            try
+            {
+                await ProxyServer.StopAsync(Settings.CancellationToken);
+
+                MessageBox.Query(40, 7, "Information", "Server Stopped.", "OK");
+            }
+            catch (Exception Error)
+            {
+                MessageBox.ErrorQuery(80, 7, "Error", Error.Message, "OK");
+            }
+        }
+
+        private static void Browse(string Url)
+        {
+            var Ps = new ProcessStartInfo(Url)
+            {
+                UseShellExecute = true,
+                Verb = "open"
+            };
+
+            Process.Start(Ps);
+        }
+
+        private static bool CheckPort(int Port)
+        {
+            return IPGlobalProperties.GetIPGlobalProperties()
+                                     .GetActiveUdpListeners()
+                                     .All(Connection => Connection.Port != Port);
+        }
+
+        private void CheckIPEndPoint(TextField TextField)
+        {
+            var IsValid = IPEndPoint.TryParse(TextField.Text.ToString(), out var Result);
+
+            TextField.ColorScheme = IsValid ? SuccessColorScheme : FailureColorScheme;
+
+            Settings.ServerIPEndPoint = IsValid ? Result.ToString() : Settings.ServerIPEndPoint;
+        }
+
+        private void CheckUri(TextField TextField)
+        {
+            var IsValid = Uri.TryCreate(TextField.Text.ToString(), UriKind.Absolute, out var Result);
+
+            IsValid = IsValid && Result.Scheme == Uri.UriSchemeHttp;
+
+            TextField.ColorScheme = IsValid ? SuccessColorScheme : FailureColorScheme;
+
+            Settings.SeqUriEndPoint = IsValid ? Result.ToString() : Settings.SeqUriEndPoint;
         }
     }
 }

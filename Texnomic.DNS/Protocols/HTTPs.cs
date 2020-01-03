@@ -127,7 +127,8 @@ namespace Texnomic.DNS.Protocols
 
         private bool ValidateServerCertificate(object Sender, X509Certificate Certificate, X509Chain Chain, SslPolicyErrors SslPolicyErrors)
         {
-            return SslPolicyErrors == SslPolicyErrors.None && Certificate.GetPublicKeyString() == PublicKey;
+            //return SslPolicyErrors == SslPolicyErrors.None && Certificate.GetPublicKeyString() == PublicKey;
+            return SslPolicyErrors == SslPolicyErrors.None;
         }
 
 
