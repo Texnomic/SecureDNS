@@ -83,6 +83,10 @@ The Project offically launched within my talk for [Cairo Security Camp](https://
 15. [Blazorise](https://blazorise.com/)
 16. [HtmlAgilityPack](https://html-agility-pack.net/)
 
+# Donations
+* **PayPal**: https://www.paypal.me/texnomic
+* **Bitcoin**: 13wMqy8yg9yhJAAP2AXu8A2De1ptAYh6s4
+* **Ethereum**: 0xfE171b1C5C5584b65ec58a6FA2009f6ECeE812D7
 
 # Supported By
 ![JetBrains](https://raw.githubusercontent.com/Texnomic/SecureDNS/master/docs/JetBrains.png "JetBrains")
