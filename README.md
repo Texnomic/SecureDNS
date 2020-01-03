@@ -2,7 +2,7 @@
 
 Building a Secure, Modern, Cross-Platform & Cross-Architecture DNS Server Using C# 8.0 & .NET Core 3.1.
 
-The SecureDNS Server will implement **all secure DNS Communication Protocols regardless of being standardized or not** while maintaining backward compatibility with the classic unsecure DNS Over UDP Protocol via Reverse Proxy.
+The SecureDNS Server implements **all secure DNS Communication Protocols regardless of being standardized or not** while maintaining backward compatibility with the classic unsecure DNS Over UDP Protocol via Reverse Proxy.
 
 The SecureDNS Server is implemented using modern [Clean-Architecture Patterns](https://www.amazon.com/Clean-Architecture-Craftsmans-Software-Structure/dp/0134494164).
 
@@ -28,7 +28,7 @@ The [v0.1 Alpha Release](https://github.com/Texnomic/SecureDNS/releases/tag/v0.1
 	6.2. Cloudflare
 	6.3. Quad9
 
-# Platforms Supported:
+# Platforms Supported
 * Alpine: 3.10+
 * Debian: 9+
 * Ubuntu: 16.04+
@@ -40,7 +40,7 @@ The [v0.1 Alpha Release](https://github.com/Texnomic/SecureDNS/releases/tag/v0.1
 * Windows Client: 7, 8.1, 10 (1607+)
 * Windows Server: 2012 R2+
 
-# Chips Supported:
+# Chips Supported
 * x64 on Windows, macOS, and Linux
 * x86 on Windows
 * ARM32 on Windows and Linux
@@ -78,6 +78,10 @@ The Project offically launched within my talk for [Cairo Security Camp](https://
 10. [Polly](https://github.com/App-vNext/Polly)
 11. [Terminal UI](https://github.com/migueldeicaza/gui.cs)
 12. [Command Line Parser](https://github.com/commandlineparser/commandline)
+13. [Async Enumerable](https://github.com/Dasync/AsyncEnumerable)
+14. [Colorful Console](http://colorfulconsole.com/)
+15. [Blazorise](https://blazorise.com/)
+16. [HtmlAgilityPack](https://html-agility-pack.net/)
 
 
 # Supported By
