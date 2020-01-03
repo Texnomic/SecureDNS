@@ -24,9 +24,9 @@ The [v0.1 Alpha Release](https://github.com/Texnomic/SecureDNS/releases/tag/v0.1
 4. [IANA Root Files](https://www.iana.org/domains/root/files)
 5. [ICANN Zone Data Service](https://czds.icann.org/home)
 6. Public DNS Resolvers:
-	6.1. Goolge
-	6.2. Cloudflare
-	6.3. Quad9
+   - Google
+   - Cloudflare
+   - Quad9
 
 # Platforms Supported
 * Alpine: 3.10+
