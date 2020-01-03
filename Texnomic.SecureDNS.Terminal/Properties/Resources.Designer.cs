@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Texnomic.SecureDNS.CLI.Properties {
+namespace Texnomic.SecureDNS.Terminal.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Texnomic.SecureDNS.CLI.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Texnomic.SecureDNS.CLI.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Texnomic.SecureDNS.Terminal.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

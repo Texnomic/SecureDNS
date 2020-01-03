@@ -12,7 +12,7 @@ using PipelineNet.MiddlewareResolver;
 using Serilog;
 using Texnomic.DNS.Servers;
 using Texnomic.DNS.Servers.ResponsibilityChain;
-using Texnomic.SecureDNS.CLI.Properties;
+using Texnomic.SecureDNS.Terminal.Properties;
 using Attribute = Terminal.Gui.Attribute;
 using Console = Colorful.Console;
 
