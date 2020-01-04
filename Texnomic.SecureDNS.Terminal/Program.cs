@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Net;
-using Terminal.Gui;
 using System.Threading;
 using System.Threading.Tasks;
 using Colorful;
@@ -13,10 +10,9 @@ using Serilog;
 using Texnomic.DNS.Servers;
 using Texnomic.DNS.Servers.ResponsibilityChain;
 using Texnomic.SecureDNS.Terminal.Properties;
-using Attribute = Terminal.Gui.Attribute;
 using Console = Colorful.Console;
 
-namespace Texnomic.SecureDNS.CLI
+namespace Texnomic.SecureDNS.Terminal
 {
     internal class Program
     {
@@ -76,7 +72,7 @@ namespace Texnomic.SecureDNS.CLI
 
             ProxyServer.Errored += (Sender, Args) => Console.WriteLine($"Server Error: {Args.Error.Message}");
 
-            ProxyServer.StartAsync(Settings.CancellationToken).Wait();
+            ProxyServer.StartAsync(Settings.CancellationTokenSource.Token).Wait();
         }
 
         private static void RunGUI()

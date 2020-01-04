@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Text;
-using System.Threading;
+﻿using System.Threading;
 using CommandLine;
 
-namespace Texnomic.SecureDNS.CLI
+namespace Texnomic.SecureDNS.Terminal
 {
     public class Settings
     {
@@ -15,6 +11,6 @@ namespace Texnomic.SecureDNS.CLI
         [Option('s', "seq", Required = true, Default = "http://127.0.0.1:5341", HelpText = "Seq Server API HTTP EndPoint.")]
         public string SeqUriEndPoint { get; set; } = "http://127.0.0.1:5341";
 
-        public CancellationToken CancellationToken { get; set; } = new CancellationToken();
+        public CancellationTokenSource CancellationTokenSource { get; set; } = new CancellationTokenSource();
     }
 }

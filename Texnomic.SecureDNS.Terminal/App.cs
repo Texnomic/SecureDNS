@@ -3,8 +3,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
-using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 using PipelineNet.MiddlewareResolver;
 using Serilog;
 using Terminal.Gui;
@@ -13,7 +13,8 @@ using Texnomic.DNS.Servers.ResponsibilityChain;
 
 using Attribute = Terminal.Gui.Attribute;
 
-namespace Texnomic.SecureDNS.CLI
+
+namespace Texnomic.SecureDNS.Terminal
 {
     public class App
     {
@@ -21,9 +22,13 @@ namespace Texnomic.SecureDNS.CLI
 
         public Settings Settings;
 
+        public Timer StatusTimer;
+
         public App(Settings Settings)
         {
             this.Settings = Settings;
+
+            StatusTimer = new Timer(500);
         }
 
         private static readonly ColorScheme SuccessColorScheme = new ColorScheme()
@@ -59,7 +64,7 @@ namespace Texnomic.SecureDNS.CLI
                 Y = 2,
             };
 
-            var ServerBindingText = new TextField(Settings.ServerIPEndPoint.ToString())
+            var ServerBindingText = new TextField(Settings.ServerIPEndPoint)
             {
                 X = Pos.Right(ServerBindingLabel) + 2,
                 Y = Pos.Top(ServerBindingLabel),
@@ -74,7 +79,7 @@ namespace Texnomic.SecureDNS.CLI
                 Y = Pos.Top(ServerBindingLabel) + 2,
             };
 
-            var SeqEndPointText = new TextField(Settings.SeqUriEndPoint.ToString())
+            var SeqEndPointText = new TextField(Settings.SeqUriEndPoint)
             {
                 X = Pos.Right(SeqEndPointLabel) + 4,
                 Y = Pos.Top(SeqEndPointLabel),
@@ -122,12 +127,24 @@ namespace Texnomic.SecureDNS.CLI
             Application.Top.Add(MenuBar);
 
 
+            var StatusListView = new ListView()
+            {
+                X = Pos.Left(SeqEndPointLabel),
+                Y = Pos.Top(SeqEndPointLabel) + 5,
+                Width = 40,
+                Height = 15,
+            };
+
+            StatusTimer.Elapsed += (Sender, Args) => StatusListView.SetSource(ProxyServer.Status().Distinct().ToList());
+
             Window.Add(ServerBindingLabel,
                 ServerBindingText,
                 SeqEndPointLabel,
                 SeqEndPointText,
                 StartButton,
-                StopButton);
+                StopButton,
+                StatusListView,
+                StatusListView);
 
             Application.Run();
         }
@@ -150,7 +167,9 @@ namespace Texnomic.SecureDNS.CLI
 
                     ProxyServer = new ProxyServer(ServerResponsibilityChain, Log.Logger, IPEndPoint.Parse(Settings.ServerIPEndPoint));
 
-                    await ProxyServer.StartAsync(Settings.CancellationToken);
+                    await ProxyServer.StartAsync(Settings.CancellationTokenSource.Token);
+
+                    StatusTimer.Start();
 
                     MessageBox.Query(40, 7, "Information", "Server Started.", "OK");
                 }
@@ -169,7 +188,11 @@ namespace Texnomic.SecureDNS.CLI
         {
             try
             {
-                await ProxyServer.StopAsync(Settings.CancellationToken);
+                Settings.CancellationTokenSource.Cancel(false);
+
+                await ProxyServer.StopAsync(Settings.CancellationTokenSource.Token);
+
+                StatusTimer.Stop();
 
                 MessageBox.Query(40, 7, "Information", "Server Stopped.", "OK");
             }

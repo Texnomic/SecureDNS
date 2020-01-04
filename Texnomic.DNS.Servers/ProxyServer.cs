@@ -17,6 +17,7 @@ using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Models;
 using Texnomic.DNS.Extensions;
 using Texnomic.DNS.Servers.Events;
+using Texnomic.DNS.Servers.Extensions;
 
 namespace Texnomic.DNS.Servers
 {
@@ -37,7 +38,7 @@ namespace Texnomic.DNS.Servers
         public event EventHandler<EventArgs> Stopped;
         public event EventHandler<ErroredEventArgs> Errored;
 
-        public bool IsRunning { get; private set; }
+        private CancellationToken CancellationToken;
 
         private const int Port = 53;
 
@@ -74,32 +75,31 @@ namespace Texnomic.DNS.Servers
             OutgoingQueue = new BufferBlock<(IMessage, IPEndPoint)>();
         }
 
-        public async Task StartAsync(CancellationToken CancellationToken)
+        public async Task StartAsync(CancellationToken Token)
         {
-            if (IsRunning) return;
-
-            IsRunning = true;
+            CancellationToken = Token;
 
             for (var I = 0; I < Threads; I++)
             {
-                Workers.Add(Task.Factory.StartNew(ReceiveAsync, CancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default));
-                Workers.Add(Task.Factory.StartNew(ResolveAsync, CancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default));
-                Workers.Add(Task.Factory.StartNew(SendAsync, CancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default));
+                Workers.Add(Task.Factory.StartNew(ReceiveAsync, CancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default).Unwrap());
+                Workers.Add(Task.Factory.StartNew(ResolveAsync, CancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default).Unwrap());
+                Workers.Add(Task.Factory.StartNew(SendAsync, CancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default).Unwrap());
             }
 
             Logger?.Information("Server Started with {@Threads} Threads. Listening On {@IPEndPoint}", Threads * 3, IPEndPoint.ToString());
 
             Started?.Invoke(this, EventArgs.Empty);
 
-            await Task.WhenAll(Workers);
+            await Task.Yield();
         }
 
-        public async Task StopAsync(CancellationToken CancellationToken)
+        public List<TaskStatus> Status()
         {
-            if (!IsRunning) return;
+            return Workers.Select(Worker => Worker.Status).ToList();
+        }
 
-            IsRunning = false;
-
+        public async Task StopAsync(CancellationToken Token)
+        {
             await Task.WhenAll(Workers);
 
             IncomingQueue.Complete();
@@ -177,11 +177,12 @@ namespace Texnomic.DNS.Servers
 
         private async Task ReceiveAsync()
         {
-            while (IsRunning)
+            while (!CancellationToken.IsCancellationRequested)
             {
                 try
                 {
-                    var Result = await UdpClient.ReceiveAsync();
+                    var Result = await UdpClient.ReceiveAsync()
+                                                .WithCancellation(CancellationToken);
 
                     var Message = await DeserializeAsync(Result.Buffer);
 
@@ -189,10 +190,9 @@ namespace Texnomic.DNS.Servers
                     {
                         case MessageType.Query:
                             {
-                                await IncomingQueue.SendAsync((Message, Result.RemoteEndPoint));
+                                await IncomingQueue.SendAsync((Message, Result.RemoteEndPoint), CancellationToken);
 
-                                Logger?.Information("Received {@Query} From {@RemoteEndPoint}.", Message,
-                                    Result.RemoteEndPoint.ToString());
+                                Logger?.Information("Received {@Query} From {@RemoteEndPoint}.", Message, Result.RemoteEndPoint.ToString());
 
                                 Queried?.Invoke(this, new QueriedEventArgs(Message, Result.RemoteEndPoint));
 
@@ -201,10 +201,9 @@ namespace Texnomic.DNS.Servers
 
                         case MessageType.Response:
                             {
-                                await OutgoingQueue.SendAsync((Message, Result.RemoteEndPoint));
+                                await OutgoingQueue.SendAsync((Message, Result.RemoteEndPoint), CancellationToken);
 
-                                Logger?.Debug("Queueing (Outgoing) Format Error {@Answer} To {@RemoteEndPoint}.", Message,
-                                    Result.RemoteEndPoint.ToString());
+                                Logger?.Debug("Queueing (Outgoing) Format Error {@Answer} To {@RemoteEndPoint}.", Message, Result.RemoteEndPoint.ToString());
 
                                 break;
                             }
@@ -218,53 +217,68 @@ namespace Texnomic.DNS.Servers
 
                     Errored?.Invoke(this, new ErroredEventArgs(Error));
                 }
+                catch (OperationCanceledException Error)
+                {
+                    Logger?.Error(Error, "{@Error} Operation Canceled While Receiving Message.", Error);
+
+                    Errored?.Invoke(this, new ErroredEventArgs(Error));
+                }
                 catch (Exception Error)
                 {
                     Logger?.Fatal(Error, "Fatal {@Error} Occurred While Receiving Message.", Error);
 
                     Errored?.Invoke(this, new ErroredEventArgs(Error));
 
-                    await StopAsync(new CancellationToken(true));
+                    await StopAsync(CancellationToken);
                 }
             }
         }
 
         private async Task ResolveAsync()
         {
-            while (IsRunning)
+            while (!CancellationToken.IsCancellationRequested)
             {
-                var (Query, RemoteEndPoint) = await IncomingQueue.ReceiveAsync();
-
                 try
                 {
+                    var (Query, RemoteEndPoint) = await IncomingQueue.ReceiveAsync(CancellationToken)
+                        .WithCancellation(CancellationToken);
+
+
                     var Answer = await ExecuteAsync(Query);
 
-                    await OutgoingQueue.SendAsync((Answer, RemoteEndPoint));
+                    await OutgoingQueue.SendAsync((Answer, RemoteEndPoint), CancellationToken);
 
                     Logger?.Information("Resolved {@Query} with {@ResponseCode} {@Answer} To {@RemoteEndPoint}.", Query,
                         Answer.ResponseCode, Answer, RemoteEndPoint.ToString());
 
                     Resolved?.Invoke(this, new ResolvedEventArgs(Query, Answer, RemoteEndPoint));
                 }
+                catch (OperationCanceledException Error)
+                {
+                    Logger?.Error(Error, "{@Error} Operation Canceled While Resolving Message.", Error);
+
+                    Errored?.Invoke(this, new ErroredEventArgs(Error));
+                }
                 catch (Exception Error)
                 {
-                    Logger?.Fatal(Error, "Fatal {@Error} Occurred While Receiving Message.", Error);
+                    Logger?.Fatal(Error, "Fatal {@Error} Occurred While Resolving Message.", Error);
 
                     Errored?.Invoke(this, new ErroredEventArgs(Error));
 
-                    await StopAsync(new CancellationToken(true));
+                    await StopAsync(CancellationToken);
                 }
             }
         }
 
         private async Task SendAsync()
         {
-            while (IsRunning)
+            while (!CancellationToken.IsCancellationRequested)
             {
                 try
                 {
-                    var (Answer, RemoteEndPoint) = await OutgoingQueue.ReceiveAsync();
-
+                    var (Answer, RemoteEndPoint) = await OutgoingQueue.ReceiveAsync(CancellationToken)
+                                                                            .WithCancellation(CancellationToken);
+                    
                     var Bytes = await SerializeAsync(Answer);
 
                     await UdpClient.SendAsync(Bytes, Bytes.Length, RemoteEndPoint);
@@ -274,24 +288,38 @@ namespace Texnomic.DNS.Servers
                     Answered?.Invoke(this, new AnsweredEventArgs(Answer, RemoteEndPoint));
 
                 }
+                catch (OperationCanceledException Error)
+                {
+                    Logger?.Error(Error, "{@Error} Operation Canceled While Sending Message.", Error);
+
+                    Errored?.Invoke(this, new ErroredEventArgs(Error));
+                }
                 catch (Exception Error)
                 {
                     Logger?.Fatal(Error, "Fatal {@Error} Occurred While Sending Message.", Error);
 
                     Errored?.Invoke(this, new ErroredEventArgs(Error));
 
-                    await StopAsync(new CancellationToken(true));
+                    await StopAsync(CancellationToken);
                 }
             }
         }
 
-        private void Debug(byte[] Bytes)
+        private Task<UdpReceiveResult> UdpReceiveAsync()
         {
-            var Binary = Bytes.ToList().Select(Byte => Convert.ToString(Byte, 2).PadLeft(8, '0')).ToList();
-            var Message = string.Join(' ', Binary);
-            Console.WriteLine(Message);
+            return Task.Factory.FromAsync(UdpClient.BeginReceive, EndReceive, this);
         }
 
+        private static UdpReceiveResult EndReceive(IAsyncResult AsyncResult)
+        {
+            var Client = (UdpClient)AsyncResult.AsyncState;
+
+            IPEndPoint RemoteEp = null;
+
+            var Buffer = Client.EndReceive(AsyncResult, ref RemoteEp);
+
+            return new UdpReceiveResult(Buffer, RemoteEp);
+        }
 
         private bool IsDisposed;
 
