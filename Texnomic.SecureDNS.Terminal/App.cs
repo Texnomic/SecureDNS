@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Threading.Tasks;
 using System.Timers;
+using Destructurama;
 using PipelineNet.MiddlewareResolver;
 using Serilog;
 using Terminal.Gui;
@@ -158,6 +159,7 @@ namespace Texnomic.SecureDNS.Terminal
                 if (Available)
                 {
                     Log.Logger = new LoggerConfiguration()
+                        .Destructure.UsingAttributes()
                         .WriteTo.Seq(Settings.SeqUriEndPoint.ToString(), compact: true)
                         .CreateLogger();
 

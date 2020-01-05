@@ -1,4 +1,5 @@
 ﻿using BinarySerialization;
+using Destructurama.Attributed;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Models;
 
@@ -20,10 +21,12 @@ namespace Texnomic.DNS.Records
         public ushort Preference { get; set; }
 
         [FieldOrder(2)]
+        [LogAsScalar(true)]
         [SubtypeDefault(typeof(CharacterString))]
         public ICharacterString Flags { get; set; }
 
         [FieldOrder(3)]
+        [LogAsScalar(true)]
         [SubtypeDefault(typeof(CharacterString))]
         public ICharacterString Parameters { get; set; }
     }

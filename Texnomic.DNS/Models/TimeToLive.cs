@@ -25,5 +25,10 @@ namespace Texnomic.DNS.Models
             Array.Reverse(Bytes);
             Stream.Write(Bytes);
         }
+
+        public override string ToString()
+        {
+            return Value.ToString(@"dd\.hh\:mm\:ss");
+        }
     }
 }

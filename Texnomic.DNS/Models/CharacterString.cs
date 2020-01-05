@@ -17,5 +17,10 @@ namespace Texnomic.DNS.Models
         [FieldOrder(2)]
         [FieldLength(nameof(Length))]
         public string Text { get; set; }
+
+        public override string ToString()
+        {
+            return Text;
+        }
     }
 }

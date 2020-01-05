@@ -1,4 +1,5 @@
 ﻿using BinarySerialization;
+using Destructurama.Attributed;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Models;
 
@@ -17,6 +18,7 @@ namespace Texnomic.DNS.Records
     public class PTR : IRecord
     {
         [FieldOrder(0)]
+        [LogAsScalar(true)]
         public Domain Domain { get; set; }
     }
 }

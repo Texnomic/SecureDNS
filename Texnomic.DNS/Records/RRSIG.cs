@@ -1,4 +1,5 @@
 ﻿using BinarySerialization;
+using Destructurama.Attributed;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Factories;
@@ -44,10 +45,12 @@ namespace Texnomic.DNS.Records
         public int OriginalTTL { get; set; }
 
         [FieldOrder(4), FieldBitLength(32), FieldEndianness(Endianness.Big)]
+        [LogAsScalar(true)]
         [SubtypeFactory(nameof(SignatureExpiration), typeof(EpochFactory), BindingMode = BindingMode.OneWayToSource)]
         public IEpoch SignatureExpiration { get; set; }
 
         [FieldOrder(5), FieldBitLength(32), FieldEndianness(Endianness.Big)]
+        [LogAsScalar(true)]
         [SubtypeFactory(nameof(SignatureInception), typeof(EpochFactory), BindingMode = BindingMode.OneWayToSource)]
         public IEpoch SignatureInception { get; set; }
 
@@ -59,6 +62,7 @@ namespace Texnomic.DNS.Records
         public IDomain SignerName { get; set; }
 
         [FieldOrder(8)]
+        [LogAsScalar(true)]
         [SubtypeDefault(typeof(Base64String))]
         public IBase64String Signature { get; set; }
     }

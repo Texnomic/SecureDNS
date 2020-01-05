@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Destructurama.Attributed;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Extensions;
@@ -38,7 +39,7 @@ namespace Texnomic.DNS.Models
         [FieldOrder(11), FieldBitLength(1), JsonPropertyName("RA")]
         public bool RecursionAvailable { get; set; }
 
-        [FieldOrder(10), FieldBitLength(1), JsonIgnore]
+        [FieldOrder(10), FieldBitLength(1), JsonIgnore, NotLogged]
         public int Zero { get; set; } = 0;
 
         [FieldOrder(9), FieldBitLength(1), JsonPropertyName("AD")]
@@ -104,7 +105,7 @@ namespace Texnomic.DNS.Models
         [JsonPropertyName("Additional")]
         public List<IAnswer> Additional { get; set; }
 
-        [Ignore]
+        [Ignore, NotLogged]
         [JsonPropertyName("Comment")]
         public string Comment { get; set; }
 

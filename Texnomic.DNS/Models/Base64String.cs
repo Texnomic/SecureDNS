@@ -15,5 +15,10 @@ namespace Texnomic.DNS.Models
             get => Convert.ToBase64String(Bytes);
             set => Bytes = Convert.FromBase64String(value);
         }
+
+        public override string ToString()
+        {
+            return Base64;
+        }
     }
 }

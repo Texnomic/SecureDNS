@@ -1,7 +1,7 @@
 ﻿using BinarySerialization;
+using Destructurama.Attributed;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Factories;
-using Texnomic.DNS.Models;
 
 namespace Texnomic.DNS.Records
 {
@@ -17,6 +17,7 @@ namespace Texnomic.DNS.Records
     public class AAAA : IRecord
     {
         [FieldOrder(0)]
+        [LogAsScalar(true)]
         [SubtypeFactory(nameof(Address), typeof(IPv6AddressFactory), BindingMode = BindingMode.OneWayToSource)]
         public IIPv6Address Address { get; set; }
     }

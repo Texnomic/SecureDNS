@@ -1,7 +1,7 @@
-﻿using System;
-using BinarySerialization;
+﻿using BinarySerialization;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Destructurama.Attributed;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Extensions;
@@ -13,11 +13,12 @@ namespace Texnomic.DNS.Models
     {
         [FieldOrder(0)]
         [SubtypeFactory(nameof(Domain), typeof(DomainFactory), BindingMode = BindingMode.OneWayToSource)]
-        //[SubtypeDefault(typeof(Domain))]
+        [LogAsScalar(true)]
         [JsonIgnore]
         public IDomain Domain { get; set; }
 
         [Ignore]
+        [NotLogged]
         [JsonPropertyName("name")]
         public string Name
         {

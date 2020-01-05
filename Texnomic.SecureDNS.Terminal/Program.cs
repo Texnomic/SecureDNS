@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Colorful;
 using CommandLine;
+using Destructurama;
 using PipelineNet.MiddlewareResolver;
 using Serilog;
 using Texnomic.DNS.Servers;
@@ -57,7 +58,8 @@ namespace Texnomic.SecureDNS.Terminal
         private static void RunCMD(Settings Settings)
         {
             Log.Logger = new LoggerConfiguration()
-                .WriteTo.Seq(Settings.SeqUriEndPoint.ToString(), compact: true)
+                .Destructure.UsingAttributes()
+                .WriteTo.Seq(Settings.SeqUriEndPoint, compact: true)
                 .CreateLogger();
 
             var ActivatorMiddlewareResolver = new ActivatorMiddlewareResolver();

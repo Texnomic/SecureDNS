@@ -1,4 +1,5 @@
 ﻿using BinarySerialization;
+using Destructurama.Attributed;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Models;
@@ -51,6 +52,7 @@ namespace Texnomic.DNS.Records
         public Algorithm Algorithm { get; set; }
 
         [FieldOrder(4)]
+        [LogAsScalar(true)]
         [SubtypeDefault(typeof(Base64String))]
         public IBase64String PublicKey { get; set; }
     }

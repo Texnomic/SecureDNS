@@ -1,5 +1,7 @@
 ﻿using BinarySerialization;
+using Destructurama.Attributed;
 using Texnomic.DNS.Abstractions;
+using Texnomic.DNS.Factories;
 using Texnomic.DNS.Models;
 
 namespace Texnomic.DNS.Records
@@ -34,24 +36,34 @@ namespace Texnomic.DNS.Records
     public class SOA : IRecord
     {
         [FieldOrder(0)]
+        [LogAsScalar(true)]
         public Domain PrimaryNameServer { get; set; }
 
-        [FieldOrder(1)] 
+        [FieldOrder(1)]
+        [LogAsScalar(true)]
         public Domain ResponsibleAuthorityMailbox { get; set; }
 
         [FieldOrder(2), FieldEndianness(Endianness.Big)]
         public uint SerialNumber { get; set; }
 
         [FieldOrder(3), FieldEndianness(Endianness.Big)]
-        public TimeToLive RefreshInterval { get; set; }
+        [SubtypeFactory(nameof(TimeToLive), typeof(TimeToLiveFactory), BindingMode = BindingMode.OneWayToSource)]
+        [LogAsScalar(true)]
+        public ITimeToLive RefreshInterval { get; set; }
 
         [FieldOrder(4), FieldEndianness(Endianness.Big)]
-        public TimeToLive RetryInterval { get; set; }
+        [SubtypeFactory(nameof(TimeToLive), typeof(TimeToLiveFactory), BindingMode = BindingMode.OneWayToSource)]
+        [LogAsScalar(true)]
+        public ITimeToLive RetryInterval { get; set; }
 
         [FieldOrder(5), FieldEndianness(Endianness.Big)]
-        public TimeToLive ExpiryLimit { get; set; }
+        [SubtypeFactory(nameof(TimeToLive), typeof(TimeToLiveFactory), BindingMode = BindingMode.OneWayToSource)]
+        [LogAsScalar(true)]
+        public ITimeToLive ExpiryLimit { get; set; }
 
         [FieldOrder(6), FieldEndianness(Endianness.Big)]
-        public TimeToLive TimeToLive { get; set; }
+        [SubtypeFactory(nameof(TimeToLive), typeof(TimeToLiveFactory), BindingMode = BindingMode.OneWayToSource)]
+        [LogAsScalar(true)]
+        public ITimeToLive TimeToLive { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using BinarySerialization;
+using Destructurama.Attributed;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Models;
 
@@ -18,10 +19,12 @@ namespace Texnomic.DNS.Records
     public class HINFO : IRecord
     {
         [FieldOrder(0)]
+        [LogAsScalar(true)]
         [SubtypeDefault(typeof(CharacterString))]
         public ICharacterString CPU { get; set; }
 
         [FieldOrder(1)]
+        [LogAsScalar(true)]
         [SubtypeDefault(typeof(CharacterString))]
         public ICharacterString OS { get; set; }
     }

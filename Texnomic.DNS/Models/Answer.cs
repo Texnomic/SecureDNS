@@ -1,6 +1,7 @@
 ﻿using BinarySerialization;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Destructurama.Attributed;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Factories;
 
@@ -10,6 +11,7 @@ namespace Texnomic.DNS.Models
     {
         [FieldOrder(3)]
         [SubtypeFactory(nameof(TimeToLive), typeof(TimeToLiveFactory), BindingMode = BindingMode.OneWayToSource)]
+        [LogAsScalar(true)]
         [JsonPropertyName("TTL")]
         public ITimeToLive TimeToLive { get; set; }
 
@@ -17,6 +19,7 @@ namespace Texnomic.DNS.Models
         [FieldBitLength(16)]
         [FieldEndianness(Endianness.Big)]
         [JsonIgnore]
+        [NotLogged]
         public ushort Length { get; set; }
 
         [FieldOrder(5)]
@@ -26,6 +29,7 @@ namespace Texnomic.DNS.Models
         public IRecord Record { get; set; }
 
         [Ignore]
+        [NotLogged]
         [JsonPropertyName("data")]
         public string Data { get; set; }
 
