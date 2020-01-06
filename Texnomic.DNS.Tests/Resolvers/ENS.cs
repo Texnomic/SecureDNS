@@ -37,22 +37,13 @@ namespace Texnomic.DNS.Tests.Resolvers
                 {
                     new Question()
                     {
-                        Domain = Domain.FromString("nickjohnson.eth"),
+                        Domain = Domain.FromString("texnomic.eth"),
                         Class = RecordClass.Internet,
                         Type = RecordType.ETH
                     }
                 }
             };
         }
-
-        [TestMethod]
-        public async Task StringAsync()
-        {
-            var Address = await Resolver.ResolveAsync("nickjohnson.eth");
-
-            Assert.AreEqual("0xfdb33f8ac7ce72d7d4795dd8610e323b4c122fbb", Address);
-        }
-
 
         [TestMethod]
         public async Task MessageAsync()
@@ -74,7 +65,7 @@ namespace Texnomic.DNS.Tests.Resolvers
             Assertions();
         }
 
-        public void Assertions()
+        private void Assertions()
         {
             Assert.IsNotNull(ResponseMessage);
             Assert.AreEqual(ID, ResponseMessage.ID);

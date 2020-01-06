@@ -53,6 +53,8 @@ Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "Texnomic.ENS.Infrastructure
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.ENS.Infrastructure.Tests", "Texnomic.ENS.Infrastructure.Tests\Texnomic.ENS.Infrastructure.Tests.csproj", "{2D2E6604-A43C-406A-AF2E-4D1C70136004}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Texnomic.ENS.BaseRegistrar", "Texnomic.ENS.BaseRegistrar\Texnomic.ENS.BaseRegistrar.csproj", "{53C3B522-403C-4EB4-BE21-A772A0131691}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -135,6 +137,10 @@ Global
 		{2D2E6604-A43C-406A-AF2E-4D1C70136004}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2D2E6604-A43C-406A-AF2E-4D1C70136004}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2D2E6604-A43C-406A-AF2E-4D1C70136004}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53C3B522-403C-4EB4-BE21-A772A0131691}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53C3B522-403C-4EB4-BE21-A772A0131691}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53C3B522-403C-4EB4-BE21-A772A0131691}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53C3B522-403C-4EB4-BE21-A772A0131691}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

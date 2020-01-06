@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Texnomic.DNS.Abstractions\Texnomic.DNS.Abstractions.csproj" />
+    <ProjectReference Include="..\Texnomic.ENS.BaseRegistrar\Texnomic.ENS.BaseRegistrar.csproj" />
   </ItemGroup>
 
 </Project>
