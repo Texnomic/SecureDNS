@@ -7,6 +7,7 @@ using PipelineNet.MiddlewareResolver;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Models;
+using Texnomic.DNS.Servers.Middlewares;
 using Texnomic.DNS.Servers.ResponsibilityChain;
 
 namespace Texnomic.DNS.Servers.Tests.ResponsibilityChains
@@ -44,7 +45,11 @@ namespace Texnomic.DNS.Servers.Tests.ResponsibilityChains
         public async Task RunAsync()
         {
             var ActivatorMiddlewareResolver = new ActivatorMiddlewareResolver();
-            var ProxyResponsibilityChain = new ProxyResponsibilityChain(ActivatorMiddlewareResolver);
+            var Middlewares = new List<Type>()
+            {
+                typeof(GoogleHTTPsMiddleware),
+            };
+            var ProxyResponsibilityChain = new ProxyResponsibilityChain(Middlewares, ActivatorMiddlewareResolver);
             ResponseMessage = await ProxyResponsibilityChain.Execute(RequestMessage);
 
             Assert.AreEqual(ID, ResponseMessage.ID);

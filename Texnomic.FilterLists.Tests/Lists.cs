@@ -11,7 +11,9 @@ namespace Texnomic.FilterLists.Tests
         [TestMethod]
         public async Task GetLists()
         {
-            var Lists = await FilterListsClient.GetLists();
+            var Client = new FilterListsClient();
+
+            var Lists = await Client.GetListsAsync();
 
             Assert.IsNotNull(Lists);
             Assert.IsInstanceOfType(Lists,typeof(List<FilterList>));

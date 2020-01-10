@@ -1,19 +1,21 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Threading.Tasks;
-using System.Timers;
 using Destructurama;
-using PipelineNet.MiddlewareResolver;
 using Serilog;
 using Terminal.Gui;
 using Texnomic.DNS.Servers;
+using Texnomic.DNS.Servers.Middlewares;
 using Texnomic.DNS.Servers.ResponsibilityChain;
+using Microsoft.Extensions.DependencyInjection;
 
 using Attribute = Terminal.Gui.Attribute;
-
+using Timer = System.Timers.Timer;
+using Texnomic.FilterLists.Enums;
 
 namespace Texnomic.SecureDNS.Terminal
 {
@@ -163,9 +165,28 @@ namespace Texnomic.SecureDNS.Terminal
                         .WriteTo.Seq(Settings.SeqUriEndPoint.ToString(), compact: true)
                         .CreateLogger();
 
-                    var ActivatorMiddlewareResolver = new ActivatorMiddlewareResolver();
+                    var FilterTags = new Tags[]
+                    {
+                        Tags.Malware,
+                        Tags.Phishing,
+                        Tags.Crypto,
+                     };
 
-                    var ServerResponsibilityChain = new ProxyResponsibilityChain(ActivatorMiddlewareResolver);
+                    var ServiceCollection = new ServiceCollection();
+                    ServiceCollection.AddSingleton(Log.Logger);
+                    ServiceCollection.AddSingleton(FilterTags);
+                    ServiceCollection.AddSingleton<FilterMiddleware>();
+                    ServiceCollection.AddSingleton<GoogleHTTPsMiddleware>();
+
+                    var ServerMiddlewareActivator = new ServerMiddlewareActivator(ServiceCollection.BuildServiceProvider());
+
+                    var Middlewares = new List<Type>()
+                    {
+                        typeof(FilterMiddleware),
+                        typeof(GoogleHTTPsMiddleware),
+                    };
+
+                    var ServerResponsibilityChain = new ProxyResponsibilityChain(Middlewares, ServerMiddlewareActivator);
 
                     ProxyServer = new ProxyServer(ServerResponsibilityChain, Log.Logger, IPEndPoint.Parse(Settings.ServerIPEndPoint));
 

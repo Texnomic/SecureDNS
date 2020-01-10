@@ -25,7 +25,8 @@ namespace Texnomic.DNS.Tests.Resolvers
         {
             BinarySerializer = new BinarySerializer();
 
-            Resolver = new Protocols.ENS(new Uri("https://mainnet.infura.io/v3/7238211010344719ad14a89db874158c"), "0x314159265dd8dbb310642f98f50c066173c1259b");
+            //Resolver = new Protocols.ENS(new Uri("https://mainnet.infura.io/v3/7238211010344719ad14a89db874158c"), Protocols.ENS.MainnetRegistryAddress);
+            Resolver = new Protocols.ENS(new Uri("https://cloudflare-eth.com/"), Protocols.ENS.MainnetRegistryAddress);
 
             ID = (ushort)new Random().Next();
 

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BinarySerialization;
-using Nethereum.ENS.TestRegistrar.ContractDefinition;
 using Nethereum.ENS;
 using Nethereum.ENS.ENSRegistry.ContractDefinition;
 using Nethereum.Hex.HexConvertors.Extensions;
@@ -13,11 +12,9 @@ using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Extensions;
 using Texnomic.DNS.Records;
-using System.Numerics;
-using Nethereum.ABI.FunctionEncoding.Attributes;
-using Nethereum.Contracts;
 using Texnomic.ENS.BaseRegistrar;
 using Texnomic.ENS.BaseRegistrar.ContractDefinition;
+
 using OwnerFunction = Nethereum.ENS.ENSRegistry.ContractDefinition.OwnerFunction;
 
 namespace Texnomic.DNS.Protocols
@@ -29,11 +26,11 @@ namespace Texnomic.DNS.Protocols
         private readonly ENSRegistryService ENSRegistryService;
         private readonly BaseRegistrarService BaseRegistrarService;
         private readonly BinarySerializer BinarySerializer;
-        private const string BaseRegistrar = "0xFaC7BEA255a6990f749363002136aF6556b31e04";
-        private const string MainnetRegistryAddress = "0x314159265dd8dbb310642f98f50c066173c1259b";
-        private const string RopstenRegistryAddress = "0x112234455c3a32fd11230c42e7bccd4a84e02010";
-        private const string RinkebyRegistryAddress = "0xe7410170f87102df0055eb195163a03b7f2bff4a";
-        private const string GoerliRegistryAddress = "0x112234455c3a32fd11230c42e7bccd4a84e02010";
+        public const string BaseRegistrar = "0xFaC7BEA255a6990f749363002136aF6556b31e04";
+        public const string MainnetRegistryAddress = "0x314159265dd8dbb310642f98f50c066173c1259b";
+        public const string RopstenRegistryAddress = "0x112234455c3a32fd11230c42e7bccd4a84e02010";
+        public const string RinkebyRegistryAddress = "0xe7410170f87102df0055eb195163a03b7f2bff4a";
+        public const string GoerliRegistryAddress = "0x112234455c3a32fd11230c42e7bccd4a84e02010";
 
         public ENS(Uri Web3Uri, string RegistryAddress)
         {

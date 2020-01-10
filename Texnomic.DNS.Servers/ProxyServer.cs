@@ -192,7 +192,7 @@ namespace Texnomic.DNS.Servers
                             {
                                 await IncomingQueue.SendAsync((Message, Result.RemoteEndPoint), CancellationToken);
 
-                                Logger?.Information("Received {@Query} From {@RemoteEndPoint}.", Message, Result.RemoteEndPoint.ToString());
+                                Logger?.Verbose("Received {@Query} From {@RemoteEndPoint}.", Message, Result.RemoteEndPoint.ToString());
 
                                 Queried?.Invoke(this, new QueriedEventArgs(Message, Result.RemoteEndPoint));
 
@@ -283,7 +283,7 @@ namespace Texnomic.DNS.Servers
 
                     await UdpClient.SendAsync(Bytes, Bytes.Length, RemoteEndPoint);
 
-                    Logger?.Information("Sent {@Answer} To {@RemoteEndPoint}.", Answer, RemoteEndPoint.ToString());
+                    Logger?.Verbose("Sent {@Answer} To {@RemoteEndPoint}.", Answer, RemoteEndPoint.ToString());
 
                     Answered?.Invoke(this, new AnsweredEventArgs(Answer, RemoteEndPoint));
 
