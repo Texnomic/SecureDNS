@@ -18,14 +18,16 @@ using Texnomic.DNS.Models;
 using Texnomic.DNS.Extensions;
 using Texnomic.DNS.Servers.Events;
 using Texnomic.DNS.Servers.Extensions;
+using Texnomic.DNS.Servers.Options;
+using Microsoft.Extensions.Options;
 
 namespace Texnomic.DNS.Servers
 {
     public class ProxyServer : IHostedService, IDisposable
     {
-        private readonly int Threads;
         private readonly ILogger Logger;
         private readonly List<Task> Workers;
+        private readonly ProxyServerOptions Options;
         private readonly BinarySerializer BinarySerializer;
         private readonly IAsyncResponsibilityChain<IMessage, IMessage> ResponsibilityChain;
         private readonly BufferBlock<(IMessage, IPEndPoint)> IncomingQueue;
@@ -40,15 +42,11 @@ namespace Texnomic.DNS.Servers
 
         private CancellationToken CancellationToken;
 
-        private const int Port = 53;
-
-        private readonly IPEndPoint IPEndPoint;
-
         private readonly UdpClient UdpClient;
 
-        public ProxyServer(IAsyncResponsibilityChain<IMessage, IMessage> ResponsibilityChain, ILogger Logger, IPEndPoint IPEndPoint = null, int Threads = 0)
+        public ProxyServer(IAsyncResponsibilityChain<IMessage, IMessage> ResponsibilityChain, ILogger Logger, IOptionsMonitor<ProxyServerOptions> Options)
         {
-            this.Threads = Threads == 0 ? Environment.ProcessorCount : Threads;
+            this.Options = Options.CurrentValue;
 
             this.ResponsibilityChain = ResponsibilityChain;
 
@@ -66,9 +64,7 @@ namespace Texnomic.DNS.Servers
                 UdpClient.Client.IOControl(-1744830452, new byte[4], null);
             }
 
-            this.IPEndPoint = IPEndPoint ?? new IPEndPoint(IPAddress.Any, Port);
-
-            UdpClient.Client.Bind(this.IPEndPoint);
+            UdpClient.Client.Bind(this.Options.IPEndPoint);
 
             IncomingQueue = new BufferBlock<(IMessage, IPEndPoint)>();
 
@@ -79,14 +75,14 @@ namespace Texnomic.DNS.Servers
         {
             CancellationToken = Token;
 
-            for (var I = 0; I < Threads; I++)
+            for (var I = 0; I < Options.Threads; I++)
             {
                 Workers.Add(Task.Factory.StartNew(ReceiveAsync, CancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default).Unwrap());
                 Workers.Add(Task.Factory.StartNew(ResolveAsync, CancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default).Unwrap());
                 Workers.Add(Task.Factory.StartNew(SendAsync, CancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default).Unwrap());
             }
 
-            Logger?.Information("Server Started with {@Threads} Threads. Listening On {@IPEndPoint}", Threads * 3, IPEndPoint.ToString());
+            Logger?.Information("Server Started with {@Threads} Threads. Listening On {@IPEndPoint}", Options.Threads, Options.IPEndPoint.ToString());
 
             Started?.Invoke(this, EventArgs.Empty);
 

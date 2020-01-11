@@ -2,17 +2,29 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Colorful;
 using CommandLine;
 using Destructurama;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using PipelineNet.ChainsOfResponsibility;
+using PipelineNet.Middleware;
+using PipelineNet.MiddlewareResolver;
 using Serilog;
+using Texnomic.DNS.Abstractions;
+using Texnomic.DNS.Models;
 using Texnomic.DNS.Servers;
 using Texnomic.DNS.Servers.Middlewares;
+using Texnomic.DNS.Servers.Options;
 using Texnomic.DNS.Servers.ResponsibilityChain;
 using Texnomic.FilterLists.Enums;
+using Texnomic.SecureDNS.Terminal.Enums;
+using Texnomic.SecureDNS.Terminal.Options;
 using Texnomic.SecureDNS.Terminal.Properties;
 
 using Console = Colorful.Console;
@@ -21,97 +33,113 @@ namespace Texnomic.SecureDNS.Terminal
 {
     internal class Program
     {
-        private static async Task Main(string[] Args)
+        private static IHostBuilder HostBuilder;
+
+        private static TerminalOptions Options;
+
+        public static async Task Main(string[] Arguments)
         {
-            try
+            Splash();
+
+            Parser.Default.ParseArguments<TerminalOptions>(Arguments)
+                          .WithParsed(StartWithOptions)
+                          .WithNotParsed(StartWithoutOptions);
+
+            BuildHost();
+
+            await HostBuilder.RunConsoleAsync();
+        }
+
+        private static void StartWithOptions(TerminalOptions TerminalOptions)
+        {
+            Options = TerminalOptions;
+        }
+
+        private static void StartWithoutOptions(IEnumerable<Error> Errors)
+        {
+            Options = new TerminalOptions();
+        }
+
+        private static void BuildHost()
+        {
+            HostBuilder = new HostBuilder()
+                 .ConfigureAppConfiguration(ConfigureApp)
+                 .ConfigureServices(ConfigureServices)
+                 .ConfigureLogging(ConfigureLogging);
+
+            if (Options.Mode == OperatingMode.Daemon)
             {
-                Console.Title = "Texnomic SecureDNS";
-
-                var Speed = new Figlet(FigletFont.Load(Resources.Speed));
-
-                Console.WriteWithGradient(Speed.ToAscii(" Texnomic").ConcreteValue.ToArray(), System.Drawing.Color.Yellow, System.Drawing.Color.Fuchsia, 14);
-
-                Console.WriteWithGradient(Speed.ToAscii(" SecureDNS").ConcreteValue.ToArray(), System.Drawing.Color.Yellow, System.Drawing.Color.Fuchsia, 14);
-
-                Console.WriteLine("");
-
-                if (Args.Length == 0)
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
-                    Console.WriteLine(" > Loading...");
-
-                    Console.WriteLine("");
-
-                    Thread.Sleep(2500);
-
-                    RunGUI();
+                    HostBuilder = HostBuilder.UseWindowsService();
                 }
-                else
+
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
                 {
-                    Parser.Default.ParseArguments<Settings>(Args)
-                                  .WithParsed(RunCMD);
+                    HostBuilder = HostBuilder.UseSystemd();
                 }
-
-            }
-            catch (Exception Error)
-            {
-                Console.WriteLine($"Fatal Error: {Error.Message}");
-                Console.ReadLine();
             }
         }
 
-        private static void RunCMD(Settings Settings)
+        private static void Splash()
         {
-            Log.Logger = new LoggerConfiguration()
-                            .Destructure.UsingAttributes()
-                            .WriteTo.Seq(Settings.SeqUriEndPoint, compact: true)
-                            .CreateLogger();
+            Console.Title = "Texnomic SecureDNS";
 
-            var FilterTags = new Tags[]
-            {
-                Tags.Malware,
-                Tags.Phishing,
-                Tags.Crypto,
-            };
+            var Speed = new Figlet(FigletFont.Load(Resources.Speed));
 
-            var ServiceCollection = new ServiceCollection();
-            ServiceCollection.AddSingleton(Log.Logger);
-            ServiceCollection.AddSingleton(FilterTags);
-            ServiceCollection.AddSingleton<FilterMiddleware>();
-            ServiceCollection.AddSingleton<GoogleHTTPsMiddleware>();
+            Console.WriteWithGradient(Speed.ToAscii(" Texnomic").ConcreteValue.ToArray(), System.Drawing.Color.Yellow, System.Drawing.Color.Fuchsia, 14);
 
-            var ServerMiddlewareActivator = new ServerMiddlewareActivator(ServiceCollection.BuildServiceProvider());
+            Console.WriteWithGradient(Speed.ToAscii(" SecureDNS").ConcreteValue.ToArray(), System.Drawing.Color.Yellow, System.Drawing.Color.Fuchsia, 14);
 
-            var Middlewares = new List<Type>()
-            {
-                typeof(FilterMiddleware),
-                typeof(GoogleHTTPsMiddleware),
-            };
+            Console.WriteLine("");
 
-            var ServerResponsibilityChain = new ProxyResponsibilityChain(Middlewares, ServerMiddlewareActivator);
+            Console.WriteLine(" > Loading...");
 
-            var ProxyServer = new ProxyServer(ServerResponsibilityChain, Log.Logger, IPEndPoint.Parse(Settings.ServerIPEndPoint));
+            Console.WriteLine("");
 
-            ProxyServer.Started += (Sender, Args) => Console.WriteLine($"Server Started.");
-
-            ProxyServer.Stopped += (Sender, Args) => Console.WriteLine($"Server Stopped.");
-
-            ProxyServer.Errored += (Sender, Args) => Console.WriteLine($"Server Error: {Args.Error.Message}");
-
-            ProxyServer.StartAsync(Settings.CancellationTokenSource.Token).Wait();
-
-            Console.WriteLine("Press Any Key To Exits...");
-
-            Console.ReadKey();
-
-            ProxyServer.StopAsync(Settings.CancellationTokenSource.Token).Wait();
+            Thread.Sleep(1500);
         }
 
-        private static void RunGUI()
+        private static void ConfigureApp(HostBuilderContext HostBuilderContext, IConfigurationBuilder Configuration)
         {
-            Console.ReplaceAllColorsWithDefaults();
-
-            var App = new App(new Settings());
-            App.Run();
+            Configuration.AddEnvironmentVariables();
         }
+        private static void ConfigureLogging(HostBuilderContext HostBuilderContext, ILoggingBuilder Logging)
+        {
+            Logging.AddConsole();
+        }
+        private static void ConfigureServices(HostBuilderContext HostBuilderContext, IServiceCollection Services)
+        {
+            Services.AddOptions();
+            Services.AddOptions<FilterMiddlewareOptions>();
+            Services.AddOptions<ProxyResponsibilityChainOptions>();
+
+            Services.AddSingleton(Log.Logger);
+            Services.AddSingleton(Options);
+            Services.AddSingleton(new ProxyServerOptions() { IPEndPoint = IPEndPoint.Parse(Options.ServerIPEndPoint) });
+
+            Services.AddSingleton<IAsyncMiddleware<IMessage, IMessage>, FilterMiddleware>();
+            Services.AddSingleton<IAsyncMiddleware<IMessage, IMessage>, GoogleHTTPsMiddleware>();
+            Services.AddSingleton<IMiddlewareResolver, ServerMiddlewareActivator>();
+            Services.AddSingleton<IAsyncResponsibilityChain<IMessage, IMessage>, ProxyResponsibilityChain>();
+
+            if (Options.Mode == OperatingMode.TerminalGUI)
+            {
+                Services.AddSingleton<ProxyServer>();
+                Services.AddSingleton<IHostedService, TerminalGUI>();
+            }
+
+            if (Options.Mode == OperatingMode.TerminalCMD)
+            {
+                Services.AddSingleton<ProxyServer>();
+                Services.AddSingleton<IHostedService, TerminalCMD>();
+            }
+
+            if (Options.Mode == OperatingMode.Daemon)
+            {
+                Services.AddSingleton<IHostedService, ProxyServer>();
+            }
+        }
+
     }
 }

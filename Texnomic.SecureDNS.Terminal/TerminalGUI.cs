@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
@@ -8,30 +7,35 @@ using System.Threading.Tasks;
 using Destructurama;
 using Serilog;
 using Terminal.Gui;
+using Texnomic.SecureDNS.Terminal.Options;
+using Microsoft.Extensions.Hosting;
+using System.Threading;
+using Microsoft.Extensions.Options;
 using Texnomic.DNS.Servers;
-using Texnomic.DNS.Servers.Middlewares;
-using Texnomic.DNS.Servers.ResponsibilityChain;
-using Microsoft.Extensions.DependencyInjection;
 
 using Attribute = Terminal.Gui.Attribute;
+using Console = Colorful.Console;
 using Timer = System.Timers.Timer;
-using Texnomic.FilterLists.Enums;
 
 namespace Texnomic.SecureDNS.Terminal
 {
-    public class App
+    public class TerminalGUI : IHostedService, IDisposable
     {
-        public ProxyServer ProxyServer;
+        private readonly TerminalOptions Options;
 
-        public Settings Settings;
+        private readonly ProxyServer Server;
 
-        public Timer StatusTimer;
+        private readonly Timer StatusTimer;
 
-        public App(Settings Settings)
+        public TerminalGUI(IOptionsMonitor<TerminalOptions> TerminalOptions, ProxyServer ProxyServer)
         {
-            this.Settings = Settings;
+            Console.ReplaceAllColorsWithDefaults();
 
-            StatusTimer = new Timer(500);
+            Options = TerminalOptions.CurrentValue;
+
+            Server = ProxyServer;
+
+            StatusTimer = new Timer(1000);
         }
 
         private static readonly ColorScheme SuccessColorScheme = new ColorScheme()
@@ -46,10 +50,8 @@ namespace Texnomic.SecureDNS.Terminal
             Focus = Attribute.Make(Color.White, Color.Red)
         };
 
-        public void Run()
+        private void Draw(CancellationToken CancellationToken)
         {
-            Application.Init();
-
             var Window = new Window("Management", 1)
             {
                 X = 0,
@@ -67,7 +69,7 @@ namespace Texnomic.SecureDNS.Terminal
                 Y = 2,
             };
 
-            var ServerBindingText = new TextField(Settings.ServerIPEndPoint)
+            var ServerBindingText = new TextField(Options.ServerIPEndPoint)
             {
                 X = Pos.Right(ServerBindingLabel) + 2,
                 Y = Pos.Top(ServerBindingLabel),
@@ -82,7 +84,7 @@ namespace Texnomic.SecureDNS.Terminal
                 Y = Pos.Top(ServerBindingLabel) + 2,
             };
 
-            var SeqEndPointText = new TextField(Settings.SeqUriEndPoint)
+            var SeqEndPointText = new TextField(Options.SeqUriEndPoint)
             {
                 X = Pos.Right(SeqEndPointLabel) + 4,
                 Y = Pos.Top(SeqEndPointLabel),
@@ -95,25 +97,25 @@ namespace Texnomic.SecureDNS.Terminal
             {
                 X = Pos.AnchorEnd(37),
                 Y = Pos.AnchorEnd(1),
-                Clicked = async () => await Start()
+                Clicked = async () => await StartServerAsync(CancellationToken)
             };
 
             var StopButton = new Button("Stop Server")
             {
                 X = Pos.AnchorEnd(16),
                 Y = Pos.AnchorEnd(1),
-                Clicked = async () => await Stop()
+                Clicked = async () => await StopServerAsync(CancellationToken)
             };
 
             var MenuBar = new MenuBar(new[]
             {
                 new MenuBarItem ("SecureDNS", new  []
                 {
-                    new MenuItem ("Start", "Server", async () => await Start()),
+                    new MenuItem ("Start", "Server", async () => await StartServerAsync(CancellationToken)),
 
-                    new MenuItem ("Stop", "Server", async () => await Stop()),
+                    new MenuItem ("Stop", "Server", async () => await StopServerAsync(CancellationToken)),
 
-                    new MenuItem ("Quite", "System", Application.RequestStop),
+                    new MenuItem ("Quit", "System", Application.RequestStop),
                 }),
 
                 new MenuBarItem ("Seq", new  []
@@ -138,7 +140,7 @@ namespace Texnomic.SecureDNS.Terminal
                 Height = 15,
             };
 
-            StatusTimer.Elapsed += (Sender, Args) => StatusListView.SetSource(ProxyServer.Status().Distinct().ToList());
+            StatusTimer.Elapsed += (Sender, Args) => StatusListView.SetSource(Server.Status().Distinct().ToList());
 
             Window.Add(ServerBindingLabel,
                 ServerBindingText,
@@ -149,56 +151,48 @@ namespace Texnomic.SecureDNS.Terminal
                 StatusListView,
                 StatusListView);
 
+            
+        }
+
+        public async Task StartAsync(CancellationToken CancellationToken)
+        {
+            Application.Init();
+
+            await Task.Run(() => Draw(CancellationToken));
+
+            StatusTimer.Start();
+
             Application.Run();
         }
 
-        private async Task Start()
+        public async Task StopAsync(CancellationToken CancellationToken)
+        {
+            StatusTimer.Stop();
+
+            await Task.Run(() => Application.RequestStop());
+        }
+
+
+        public async Task StartServerAsync(CancellationToken CancellationToken)
         {
             try
             {
-                var Available = CheckPort(IPEndPoint.Parse(Settings.ServerIPEndPoint).Port);
+                var Available = CheckPort(IPEndPoint.Parse(Options.ServerIPEndPoint).Port);
 
                 if (Available)
                 {
                     Log.Logger = new LoggerConfiguration()
-                        .Destructure.UsingAttributes()
-                        .WriteTo.Seq(Settings.SeqUriEndPoint.ToString(), compact: true)
-                        .CreateLogger();
+                            .Destructure.UsingAttributes()
+                            .WriteTo.Seq(Options.SeqUriEndPoint, compact: true)
+                            .CreateLogger();
 
-                    var FilterTags = new Tags[]
-                    {
-                        Tags.Malware,
-                        Tags.Phishing,
-                        Tags.Crypto,
-                     };
-
-                    var ServiceCollection = new ServiceCollection();
-                    ServiceCollection.AddSingleton(Log.Logger);
-                    ServiceCollection.AddSingleton(FilterTags);
-                    ServiceCollection.AddSingleton<FilterMiddleware>();
-                    ServiceCollection.AddSingleton<GoogleHTTPsMiddleware>();
-
-                    var ServerMiddlewareActivator = new ServerMiddlewareActivator(ServiceCollection.BuildServiceProvider());
-
-                    var Middlewares = new List<Type>()
-                    {
-                        typeof(FilterMiddleware),
-                        typeof(GoogleHTTPsMiddleware),
-                    };
-
-                    var ServerResponsibilityChain = new ProxyResponsibilityChain(Middlewares, ServerMiddlewareActivator);
-
-                    ProxyServer = new ProxyServer(ServerResponsibilityChain, Log.Logger, IPEndPoint.Parse(Settings.ServerIPEndPoint));
-
-                    await ProxyServer.StartAsync(Settings.CancellationTokenSource.Token);
-
-                    StatusTimer.Start();
+                    await Server.StartAsync(CancellationToken);
 
                     MessageBox.Query(40, 7, "Information", "Server Started.", "OK");
                 }
                 else
                 {
-                    MessageBox.ErrorQuery(80, 7, "Error", $"Port {IPEndPoint.Parse(Settings.ServerIPEndPoint).Port} Already Used.", "OK");
+                    MessageBox.ErrorQuery(80, 7, "Error", $"Port {IPEndPoint.Parse(Options.ServerIPEndPoint).Port} Already Used.", "OK");
                 }
             }
             catch (Exception Error)
@@ -207,15 +201,11 @@ namespace Texnomic.SecureDNS.Terminal
             }
         }
 
-        private async Task Stop()
+        public async Task StopServerAsync(CancellationToken CancellationToken)
         {
             try
             {
-                Settings.CancellationTokenSource.Cancel(false);
-
-                await ProxyServer.StopAsync(Settings.CancellationTokenSource.Token);
-
-                StatusTimer.Stop();
+                await Server.StopAsync(CancellationToken);
 
                 MessageBox.Query(40, 7, "Information", "Server Stopped.", "OK");
             }
@@ -249,7 +239,7 @@ namespace Texnomic.SecureDNS.Terminal
 
             TextField.ColorScheme = IsValid ? SuccessColorScheme : FailureColorScheme;
 
-            Settings.ServerIPEndPoint = IsValid ? Result.ToString() : Settings.ServerIPEndPoint;
+            Options.ServerIPEndPoint = IsValid ? Result.ToString() : Options.ServerIPEndPoint;
         }
 
         private void CheckUri(TextField TextField)
@@ -260,7 +250,36 @@ namespace Texnomic.SecureDNS.Terminal
 
             TextField.ColorScheme = IsValid ? SuccessColorScheme : FailureColorScheme;
 
-            Settings.SeqUriEndPoint = IsValid ? Result.ToString() : Settings.SeqUriEndPoint;
+            Options.SeqUriEndPoint = IsValid ? Result.ToString() : Options.SeqUriEndPoint;
+        }
+
+
+
+
+        private bool IsDisposed;
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool Disposing)
+        {
+            if (IsDisposed) return;
+
+            if (Disposing)
+            {
+                Server.Dispose();
+                StatusTimer.Dispose();
+            }
+
+            IsDisposed = true;
+        }
+
+        ~TerminalGUI()
+        {
+            Dispose(false);
         }
     }
 }

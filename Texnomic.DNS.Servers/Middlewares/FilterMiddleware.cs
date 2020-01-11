@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using PipelineNet.Middleware;
 using Polly;
 using Polly.Retry;
@@ -13,6 +14,7 @@ using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Models;
 using Texnomic.DNS.Records;
 using Texnomic.DNS.Servers.Extensions;
+using Texnomic.DNS.Servers.Options;
 using Texnomic.FilterLists;
 using Texnomic.FilterLists.Enums;
 using Texnomic.FilterLists.Models;
@@ -26,7 +28,7 @@ namespace Texnomic.DNS.Servers.Middlewares
         private readonly AsyncRetryPolicy<IRestResponse<string>> RetryPolicy;
         private readonly FastHashSet<string> Filter;
 
-        public FilterMiddleware(Tags[] Tags, ILogger Logger) : base()
+        public FilterMiddleware(IOptionsMonitor<FilterMiddlewareOptions> Options, ILogger Logger) : base()
         {
             this.Logger = Logger;
 
@@ -37,7 +39,7 @@ namespace Texnomic.DNS.Servers.Middlewares
             RetryPolicy = Policy.HandleResult<IRestResponse<string>>(ResultPredicate)
                                 .RetryAsync(3);
 
-            _ = InitializeAsync(Tags);
+            _ = InitializeAsync(Options.CurrentValue.ListTags);
         }
 
         public async Task<IMessage> Run(IMessage Message, Func<IMessage, Task<IMessage>> Next)
@@ -86,7 +88,7 @@ namespace Texnomic.DNS.Servers.Middlewares
             }
         }
 
-        public async Task InitializeAsync(Tags[] Tags)
+        public async Task InitializeAsync(List<Tags> Tags)
         {
             try
             {
@@ -115,11 +117,11 @@ namespace Texnomic.DNS.Servers.Middlewares
                             }
                         }
 
-                        Logger.Information("Downloaded FilterList {@FilterList}.", List.ViewUrl);
+                        Logger.Information("Downloaded FilterList {@FilterList}.", List);
                     }
                     catch (WebException Error)
                     {
-                        Logger.Error("{@Error} While Downloading FilterList {@FilterList}.", Error, List.ViewUrl);
+                        Logger.Error("{@Error} While Downloading {@FilterList}.", Error, List);
                     }
                 }
 
@@ -135,7 +137,7 @@ namespace Texnomic.DNS.Servers.Middlewares
             }
         }
 
-        private async Task<List<FilterList>> GetFilterListsAsync(Tags[] Tags)
+        private async Task<List<FilterList>> GetFilterListsAsync(List<Tags> Tags)
         {
             var Client = new FilterListsClient();
 
@@ -143,7 +145,6 @@ namespace Texnomic.DNS.Servers.Middlewares
 
             Lists = Lists.Where(List => List.Syntax == Syntax.Hosts)
                          .Where(List => List.Tags.Any(Tag => Tags.Contains(Tag)))
-                         .Take(5)
                          .ToList();
 
             return Lists;
