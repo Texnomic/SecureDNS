@@ -12,6 +12,7 @@
   <ItemGroup>
     <PackageReference Include="BinarySerializer" Version="8.4.3" />
     <PackageReference Include="Destructurama.Attributed" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="3.1.1" />
     <PackageReference Include="Nerdbank.Streams" Version="2.4.50" />
     <PackageReference Include="Nethereum.ENS" Version="3.5.0" />
     <PackageReference Include="Nethereum.Web3" Version="3.5.0" />

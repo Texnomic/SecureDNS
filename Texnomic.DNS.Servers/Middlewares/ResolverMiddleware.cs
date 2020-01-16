@@ -5,11 +5,11 @@ using Texnomic.DNS.Abstractions;
 
 namespace Texnomic.DNS.Servers.Middlewares
 {
-    public class ServerMiddleware : IAsyncMiddleware<IMessage, IMessage>
+    public class ResolverMiddleware : IAsyncMiddleware<IMessage, IMessage>
     {
         private readonly IProtocol Protocol;
 
-        public ServerMiddleware(IProtocol Protocol)
+        public ResolverMiddleware(IProtocol Protocol)
         {
             this.Protocol = Protocol;
         }

@@ -6,6 +6,6 @@ namespace Texnomic.DNS.Servers.Options
 {
     public class ProxyResponsibilityChainOptions
     {
-        public List<Type> Middlewares { get; set; } = new List<Type>() { typeof(FilterMiddleware), typeof(GoogleHTTPsMiddleware) };
+        public List<Type> Middlewares { get; set; } = new List<Type>() { typeof(FilterMiddleware), typeof(ResolverMiddleware) };
     }
 }

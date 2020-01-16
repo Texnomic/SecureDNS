@@ -18,6 +18,8 @@ using PipelineNet.MiddlewareResolver;
 using Serilog;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Models;
+using Texnomic.DNS.Options;
+using Texnomic.DNS.Protocols;
 using Texnomic.DNS.Servers;
 using Texnomic.DNS.Servers.Middlewares;
 using Texnomic.DNS.Servers.Options;
@@ -45,6 +47,11 @@ namespace Texnomic.SecureDNS.Terminal
                           .WithParsed(StartWithOptions)
                           .WithNotParsed(StartWithoutOptions);
 
+            Log.Logger = new LoggerConfiguration()
+                        .Destructure.UsingAttributes()
+                        .WriteTo.Seq(Options.SeqUriEndPoint, compact: true)
+                        .CreateLogger();
+
             BuildHost();
 
             await HostBuilder.RunConsoleAsync();
@@ -65,7 +72,8 @@ namespace Texnomic.SecureDNS.Terminal
             HostBuilder = new HostBuilder()
                  .ConfigureAppConfiguration(ConfigureApp)
                  .ConfigureServices(ConfigureServices)
-                 .ConfigureLogging(ConfigureLogging);
+                 .ConfigureLogging(ConfigureLogging)
+                 .UseSerilog(Log.Logger);
 
             if (Options.Mode == OperatingMode.Daemon)
             {
@@ -110,16 +118,19 @@ namespace Texnomic.SecureDNS.Terminal
         }
         private static void ConfigureServices(HostBuilderContext HostBuilderContext, IServiceCollection Services)
         {
+            //Services.AddLogging(Options => Options.AddSerilog(Log.Logger));
             Services.AddOptions();
             Services.AddOptions<FilterMiddlewareOptions>();
             Services.AddOptions<ProxyResponsibilityChainOptions>();
+            Services.AddOptions<HTTPsOptions>();
 
-            Services.AddSingleton(Log.Logger);
+            //Services.AddSingleton(Log.Logger);
             Services.AddSingleton(Options);
             Services.AddSingleton(new ProxyServerOptions() { IPEndPoint = IPEndPoint.Parse(Options.ServerIPEndPoint) });
 
             Services.AddSingleton<IAsyncMiddleware<IMessage, IMessage>, FilterMiddleware>();
-            Services.AddSingleton<IAsyncMiddleware<IMessage, IMessage>, GoogleHTTPsMiddleware>();
+            Services.AddSingleton<IAsyncMiddleware<IMessage, IMessage>, ResolverMiddleware>();
+            Services.AddSingleton<IProtocol, HTTPs>();
             Services.AddSingleton<IMiddlewareResolver, ServerMiddlewareActivator>();
             Services.AddSingleton<IAsyncResponsibilityChain<IMessage, IMessage>, ProxyResponsibilityChain>();
 

@@ -27,6 +27,8 @@ namespace Texnomic.SecureDNS.Terminal
 
         private readonly Timer StatusTimer;
 
+        private readonly CancellationTokenSource CancellationTokenSource;
+
         public TerminalGUI(IOptionsMonitor<TerminalOptions> TerminalOptions, ProxyServer ProxyServer)
         {
             Console.ReplaceAllColorsWithDefaults();
@@ -36,6 +38,8 @@ namespace Texnomic.SecureDNS.Terminal
             Server = ProxyServer;
 
             StatusTimer = new Timer(1000);
+
+            CancellationTokenSource = new CancellationTokenSource();
         }
 
         private static readonly ColorScheme SuccessColorScheme = new ColorScheme()
@@ -50,7 +54,7 @@ namespace Texnomic.SecureDNS.Terminal
             Focus = Attribute.Make(Color.White, Color.Red)
         };
 
-        private void Draw(CancellationToken CancellationToken)
+        private void Draw()
         {
             var Window = new Window("Management", 1)
             {
@@ -97,23 +101,23 @@ namespace Texnomic.SecureDNS.Terminal
             {
                 X = Pos.AnchorEnd(37),
                 Y = Pos.AnchorEnd(1),
-                Clicked = async () => await StartServerAsync(CancellationToken)
+                Clicked = async () => await StartServerAsync()
             };
 
             var StopButton = new Button("Stop Server")
             {
                 X = Pos.AnchorEnd(16),
                 Y = Pos.AnchorEnd(1),
-                Clicked = async () => await StopServerAsync(CancellationToken)
+                Clicked = async () => await StopServerAsync()
             };
 
             var MenuBar = new MenuBar(new[]
             {
                 new MenuBarItem ("SecureDNS", new  []
                 {
-                    new MenuItem ("Start", "Server", async () => await StartServerAsync(CancellationToken)),
+                    new MenuItem ("Start", "Server", async () => await StartServerAsync()),
 
-                    new MenuItem ("Stop", "Server", async () => await StopServerAsync(CancellationToken)),
+                    new MenuItem ("Stop", "Server", async () => await StopServerAsync()),
 
                     new MenuItem ("Quit", "System", Application.RequestStop),
                 }),
@@ -158,7 +162,7 @@ namespace Texnomic.SecureDNS.Terminal
         {
             Application.Init();
 
-            await Task.Run(() => Draw(CancellationToken));
+            Draw();
 
             StatusTimer.Start();
 
@@ -169,11 +173,15 @@ namespace Texnomic.SecureDNS.Terminal
         {
             StatusTimer.Stop();
 
-            await Task.Run(() => Application.RequestStop());
+            CancellationTokenSource.Cancel();
+
+            await Server.StopAsync(CancellationTokenSource.Token);
+
+            Application.RequestStop();
         }
 
 
-        public async Task StartServerAsync(CancellationToken CancellationToken)
+        public async Task StartServerAsync()
         {
             try
             {
@@ -181,12 +189,7 @@ namespace Texnomic.SecureDNS.Terminal
 
                 if (Available)
                 {
-                    Log.Logger = new LoggerConfiguration()
-                            .Destructure.UsingAttributes()
-                            .WriteTo.Seq(Options.SeqUriEndPoint, compact: true)
-                            .CreateLogger();
-
-                    await Server.StartAsync(CancellationToken);
+                    await Server.StartAsync(CancellationTokenSource.Token);
 
                     MessageBox.Query(40, 7, "Information", "Server Started.", "OK");
                 }
@@ -201,11 +204,13 @@ namespace Texnomic.SecureDNS.Terminal
             }
         }
 
-        public async Task StopServerAsync(CancellationToken CancellationToken)
+        public async Task StopServerAsync()
         {
             try
             {
-                await Server.StopAsync(CancellationToken);
+                CancellationTokenSource.Cancel();
+
+                await Server.StopAsync(CancellationTokenSource.Token);
 
                 MessageBox.Query(40, 7, "Information", "Server Stopped.", "OK");
             }
@@ -270,6 +275,7 @@ namespace Texnomic.SecureDNS.Terminal
 
             if (Disposing)
             {
+                CancellationTokenSource.Dispose();
                 Server.Dispose();
                 StatusTimer.Dispose();
             }

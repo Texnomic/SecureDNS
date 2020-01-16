@@ -4,12 +4,14 @@ using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using BinarySerialization;
+using Microsoft.Extensions.Options;
 using Polly;
 using Polly.Retry;
 using RestSharp;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Extensions;
 using Texnomic.DNS.Models;
+using Texnomic.DNS.Options;
 
 namespace Texnomic.DNS.Protocols
 {
@@ -18,59 +20,34 @@ namespace Texnomic.DNS.Protocols
     /// </summary>
     public class HTTPs : IProtocol
     {
-        private readonly string PublicKey;
+        private readonly HTTPsOptions Options;
+        private readonly RestClient RestClient;
+        private readonly BinarySerializer BinarySerializer;
+        private readonly AsyncRetryPolicy<IRestResponse> RetryPolicy;
+        private readonly Random Random;
 
-        private RestClient RestClient;
-        private BinarySerializer BinarySerializer;
-        private AsyncRetryPolicy<IRestResponse> RetryPolicy;
-        private Random Random;
-
-        public HTTPs(IPAddress IPAddress, string PublicKey)
+        public HTTPs(IOptionsMonitor<HTTPsOptions> HTTPsOptions)
         {
-            this.PublicKey = PublicKey;
+            Options = HTTPsOptions.CurrentValue;
 
-            Initialize(IPAddress.ToString());
-        }
-
-        public HTTPs(IPAddress IPAddress, int Port, string PublicKey)
-        {
-            this.PublicKey = PublicKey;
-
-            Initialize(IPAddress.ToString(), Port);
-        }
-
-        public HTTPs(Uri Address, string PublicKey)
-        {
-            this.PublicKey = PublicKey;
-
-            Initialize(Address.DnsSafeHost);
-        }
-
-        public HTTPs(Uri Address, int Port, string PublicKey)
-        {
-            this.PublicKey = PublicKey;
-
-            Initialize(Address.DnsSafeHost, Port);
-        }
-
-        private void Initialize(string Address, int Port = 443)
-        {
             Random = new Random();
 
             ServicePointManager.ServerCertificateValidationCallback += ValidateServerCertificate;
 
             BinarySerializer = new BinarySerializer();
 
-            RestClient = new RestClient($"https://{Address}:{Port}/");
+            RestClient = new RestClient(Options.Uri);
 
             RestClient.AddDefaultHeader("Cache-Control", "no-cache");
+
             RestClient.AddDefaultHeader("Accept", "application/dns-message");
 
-            //RestClient.Proxy = new WebProxy("127.0.0.1:8888"); //Debugging with Fiddler
-            //RestClient.FollowRedirects = false; //Google will fail
+            RestClient.Proxy = Options.WebProxy;
+
+            RestClient.FollowRedirects = Options.AllowRedirects;
 
             RetryPolicy = Policy.HandleResult<IRestResponse>(ResultPredicate)
-                                .RetryAsync(3);
+                                .RetryAsync(Options.Retries);
         }
 
         private static bool ResultPredicate(IRestResponse Response)
@@ -127,8 +104,7 @@ namespace Texnomic.DNS.Protocols
 
         private bool ValidateServerCertificate(object Sender, X509Certificate Certificate, X509Chain Chain, SslPolicyErrors SslPolicyErrors)
         {
-            //return SslPolicyErrors == SslPolicyErrors.None && Certificate.GetPublicKeyString() == PublicKey;
-            return SslPolicyErrors == SslPolicyErrors.None;
+            return Options.PublicKey == null ? SslPolicyErrors == SslPolicyErrors.None : SslPolicyErrors == SslPolicyErrors.None && Certificate.GetPublicKeyString() == Options.PublicKey;
         }
 
 

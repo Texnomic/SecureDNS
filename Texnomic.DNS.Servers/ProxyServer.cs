@@ -20,6 +20,7 @@ using Texnomic.DNS.Servers.Events;
 using Texnomic.DNS.Servers.Extensions;
 using Texnomic.DNS.Servers.Options;
 using Microsoft.Extensions.Options;
+using System.Net.NetworkInformation;
 
 namespace Texnomic.DNS.Servers
 {
@@ -44,9 +45,9 @@ namespace Texnomic.DNS.Servers
 
         private readonly UdpClient UdpClient;
 
-        public ProxyServer(IAsyncResponsibilityChain<IMessage, IMessage> ResponsibilityChain, ILogger Logger, IOptionsMonitor<ProxyServerOptions> Options)
+        public ProxyServer(IAsyncResponsibilityChain<IMessage, IMessage> ResponsibilityChain, ILogger Logger, IOptionsMonitor<ProxyServerOptions> ProxyServerOptions)
         {
-            this.Options = Options.CurrentValue;
+            Options = ProxyServerOptions.CurrentValue;
 
             this.ResponsibilityChain = ResponsibilityChain;
 
@@ -64,8 +65,6 @@ namespace Texnomic.DNS.Servers
                 UdpClient.Client.IOControl(-1744830452, new byte[4], null);
             }
 
-            UdpClient.Client.Bind(this.Options.IPEndPoint);
-
             IncomingQueue = new BufferBlock<(IMessage, IPEndPoint)>();
 
             OutgoingQueue = new BufferBlock<(IMessage, IPEndPoint)>();
@@ -74,6 +73,8 @@ namespace Texnomic.DNS.Servers
         public async Task StartAsync(CancellationToken Token)
         {
             CancellationToken = Token;
+
+            UdpClient.Client.Bind(Options.IPEndPoint);
 
             for (var I = 0; I < Options.Threads; I++)
             {
@@ -301,21 +302,6 @@ namespace Texnomic.DNS.Servers
             }
         }
 
-        private Task<UdpReceiveResult> UdpReceiveAsync()
-        {
-            return Task.Factory.FromAsync(UdpClient.BeginReceive, EndReceive, this);
-        }
-
-        private static UdpReceiveResult EndReceive(IAsyncResult AsyncResult)
-        {
-            var Client = (UdpClient)AsyncResult.AsyncState;
-
-            IPEndPoint RemoteEp = null;
-
-            var Buffer = Client.EndReceive(AsyncResult, ref RemoteEp);
-
-            return new UdpReceiveResult(Buffer, RemoteEp);
-        }
 
         private bool IsDisposed;
 

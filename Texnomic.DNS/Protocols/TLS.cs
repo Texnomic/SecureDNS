@@ -11,47 +11,44 @@ using BinarySerialization;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Models;
 using Texnomic.DNS.Extensions;
+using Texnomic.DNS.Options;
+using Microsoft.Extensions.Options;
 
 namespace Texnomic.DNS.Protocols
 {
     public class TLS : IProtocol
     {
         private readonly BinarySerializer BinarySerializer;
-        private readonly string PublicKey;
-        private readonly IPAddress IPAddress;
+        private readonly TLSOptions Options;
+        private readonly TcpClient TcpClient;
+        private readonly SslStream SslStream;
+        private readonly PipeReader PipeReader;
+        private readonly PipeWriter PipeWriter;
 
-        private TcpClient TcpClient;
-        private SslStream SslStream;
-        private PipeReader PipeReader;
-        private PipeWriter PipeWriter;
-
-        private const int Timeout = 2000;
-
-        public TLS(IPAddress IPAddress, string PublicKey)
+        public TLS(IOptionsMonitor<TLSOptions> TLSOptions)
         {
+            Options = TLSOptions.CurrentValue;
+
             BinarySerializer = new BinarySerializer();
-            this.IPAddress = IPAddress;
-            this.PublicKey = PublicKey;
-            Async.RunSync(InitializeAsync);
-        }
 
-        private async Task InitializeAsync()
-        {
             TcpClient = new TcpClient();
 
-            await TcpClient.ConnectAsync(IPAddress, 853);
-
-            SslStream = new SslStream(TcpClient.GetStream(), true, ValidateServerCertificate);
-
-            await SslStream.AuthenticateAsClientAsync(IPAddress.ToString());
-
-            SslStream.ReadTimeout = Timeout;
-
-            SslStream.WriteTimeout = Timeout;
+            SslStream = new SslStream(TcpClient.GetStream(), true, ValidateServerCertificate)
+            {
+                ReadTimeout = Options.Timeout,
+                WriteTimeout = Options.Timeout
+            };
 
             PipeReader = SslStream.UsePipeReader();
 
             PipeWriter = SslStream.UsePipeWriter();
+        }
+
+        private async Task InitializeAsync()
+        {
+            await TcpClient.ConnectAsync(Options.Host, Options.Port);
+
+            await SslStream.AuthenticateAsClientAsync(Options.Host);
         }
 
         public byte[] Resolve(byte[] Query)
@@ -80,7 +77,7 @@ namespace Texnomic.DNS.Protocols
 
             var Task = PipeReader.ReadAsync().AsTask();
 
-            Task.Wait(Timeout);
+            Task.Wait(Options.Timeout);
 
             if (Task.IsCompleted)
             {
@@ -122,7 +119,7 @@ namespace Texnomic.DNS.Protocols
 
             var Task = PipeReader.ReadAsync().AsTask();
 
-            Task.Wait(Timeout);
+            Task.Wait(Options.Timeout);
 
             if (Task.IsCompleted)
             {
@@ -151,7 +148,7 @@ namespace Texnomic.DNS.Protocols
 
         private bool ValidateServerCertificate(object Sender, X509Certificate Certificate, X509Chain Chain, SslPolicyErrors SslPolicyErrors)
         {
-            return SslPolicyErrors == SslPolicyErrors.None && Certificate.GetPublicKeyString() == PublicKey;
+            return Options.PublicKey == null ? SslPolicyErrors == SslPolicyErrors.None : SslPolicyErrors == SslPolicyErrors.None && Certificate.GetPublicKeyString() == Options.PublicKey;
         }
 
         private bool IsDisposed;
