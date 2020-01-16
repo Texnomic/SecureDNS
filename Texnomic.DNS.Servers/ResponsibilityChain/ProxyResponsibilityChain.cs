@@ -1,8 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using PipelineNet.ChainsOfResponsibility;
 using PipelineNet.MiddlewareResolver;
 using Texnomic.DNS.Abstractions;
+using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Servers.Options;
 
 namespace Texnomic.DNS.Servers.ResponsibilityChain
@@ -12,7 +14,16 @@ namespace Texnomic.DNS.Servers.ResponsibilityChain
         public ProxyResponsibilityChain(IOptionsMonitor<ProxyResponsibilityChainOptions> Options, IMiddlewareResolver MiddlewareResolver) : base(MiddlewareResolver)
         {
             Options.CurrentValue.Middlewares.ForEach(Middleware => Chain(Middleware));
-            Finally(Task.FromResult);
+
+            Finally(FinalCheck);
+        }
+
+        public async Task<IMessage> FinalCheck(IMessage Message)
+        {
+            if (Message.MessageType != MessageType.Response)
+                throw new NotImplementedException("Responsibility Chain Fall-throw!");
+
+            return await Task.FromResult(Message);
         }
     }
 }

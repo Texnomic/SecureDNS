@@ -245,8 +245,7 @@ namespace Texnomic.DNS.Servers
 
                     await OutgoingQueue.SendAsync((Answer, RemoteEndPoint), CancellationToken);
 
-                    Logger?.Information("Resolved {@Query} with {@ResponseCode} {@Answer} To {@RemoteEndPoint}.", Query,
-                        Answer.ResponseCode, Answer, RemoteEndPoint.ToString());
+                    Logger?.Information("Resolved {@Answer} with {@ResponseCode} To {@RemoteEndPoint}.", Answer, Answer.ResponseCode, RemoteEndPoint.ToString());
 
                     Resolved?.Invoke(this, new ResolvedEventArgs(Query, Answer, RemoteEndPoint));
                 }

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Colorful;
 using CommandLine;
 using Destructurama;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -128,8 +129,9 @@ namespace Texnomic.SecureDNS.Terminal
             Services.AddSingleton(Options);
             Services.AddSingleton(new ProxyServerOptions() { IPEndPoint = IPEndPoint.Parse(Options.ServerIPEndPoint) });
 
-            Services.AddSingleton<IAsyncMiddleware<IMessage, IMessage>, FilterMiddleware>();
-            Services.AddSingleton<IAsyncMiddleware<IMessage, IMessage>, ResolverMiddleware>();
+            Services.AddSingleton<MemoryCache>();
+            Services.AddSingleton<FilterMiddleware>();
+            Services.AddSingleton<ResolverMiddleware>();
             Services.AddSingleton<IProtocol, HTTPs>();
             Services.AddSingleton<IMiddlewareResolver, ServerMiddlewareActivator>();
             Services.AddSingleton<IAsyncResponsibilityChain<IMessage, IMessage>, ProxyResponsibilityChain>();

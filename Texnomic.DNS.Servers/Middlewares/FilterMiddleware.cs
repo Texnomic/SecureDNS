@@ -52,34 +52,8 @@ namespace Texnomic.DNS.Servers.Middlewares
                 {
                     ID = Message.ID,
                     MessageType = MessageType.Response,
-                    ResponseCode = ResponseCode.NoError,
-                    Questions = Message.Questions,
-                    Answers = new List<IAnswer>()
-                    {
-                        new Answer()
-                        {
-                            Type = RecordType.A,
-
-                            Class = RecordClass.Internet,
-
-                            Domain = Message.Questions.First().Domain,
-
-                            Length = 32,
-
-                            TimeToLive = new TimeToLive()
-                            {
-                               Value = TimeSpan.FromDays(1)
-                            },
-
-                            Record = new A()
-                            {
-                                 Address = new IPv4Address()
-                                 {
-                                     Value = IPAddress.Parse("192.168.254.230")
-                                 }
-                            }
-                        }
-                    }
+                    ResponseCode = ResponseCode.Refused,
+                    Questions = Message.Questions
                 };
             }
             else
@@ -137,7 +111,7 @@ namespace Texnomic.DNS.Servers.Middlewares
             }
         }
 
-        private async Task<List<FilterList>> GetFilterListsAsync(List<Tags> Tags)
+        private static async Task<List<FilterList>> GetFilterListsAsync(List<Tags> Tags)
         {
             var Client = new FilterListsClient();
 
