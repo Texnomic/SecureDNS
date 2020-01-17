@@ -31,14 +31,14 @@ namespace Texnomic.DNS.Servers.Middlewares
 
             Filter = new FastHashSet<string>();
 
-            _ = InitializeAsync(Options.CurrentValue.ListTags);
+            _ = InitializeAsync(Options.CurrentValue.Predicate);
         }
 
         public async Task<IMessage> Run(IMessage Message, Func<IMessage, Task<IMessage>> Next)
         {
-            if (Filter.Contains(Message.Questions.First().Domain.Name))
+            if (Filter.Contains(Message.Questions[0].Domain.Name))
             {
-                Logger.Warning("Filtered Query {@ID}.", Message.ID);
+                Logger.Warning("Filtered Query {@ID} To {@Domain}.", Message.ID, Message.Questions[0].Domain.Name);
 
                 return new Message()
                 {
@@ -54,15 +54,15 @@ namespace Texnomic.DNS.Servers.Middlewares
             }
         }
 
-        public async Task InitializeAsync(List<Tags> Tags)
+        public async Task InitializeAsync(Func<FilterList, bool> Predicate)
         {
             try
             {
-                Logger.Verbose("FilterLists Initialization Started with {@Tags} Selected.", Tags);
+                Logger.Verbose("FilterLists Initialization Started.");
 
-                var Lists = await GetFilterListsAsync(Tags);
+                var Lists = await GetFilterListsAsync(Predicate);
 
-                Logger.Information("FilterLists Initialization Started with {@Count} Selected Lists.", Lists.Count);
+                Logger.Information("FilterLists Initialization Started with {@Count} Selected Lists.", string.Format("{0:n0}", Lists.Count));
 
                 string File = null;
                 string[] Domains = null;
@@ -95,7 +95,7 @@ namespace Texnomic.DNS.Servers.Middlewares
                 Domains = null;
                 Lists = null;
 
-                Logger.Information("FilterLists Initialization Completed with {@Count} Domains.", Filter.Count);
+                Logger.Information("FilterLists Initialization Completed with {@Count} Domains.", string.Format("{0:n0}", Filter.Count));
             }
             catch (Exception Error)
             {
@@ -103,14 +103,13 @@ namespace Texnomic.DNS.Servers.Middlewares
             }
         }
 
-        private static async Task<List<FilterList>> GetFilterListsAsync(List<Tags> Tags)
+        private static async Task<List<FilterList>> GetFilterListsAsync(Func<FilterList, bool> Predicate)
         {
             var Client = new FilterListsClient();
 
             var Lists = await Client.GetListsAsync();
 
-            Lists = Lists.Where(List => List.Syntax == Syntax.Hosts)
-                         .Where(List => List.Tags.Any(Tag => Tags.Contains(Tag)))
+            Lists = Lists.Where(Predicate)
                          .ToList();
 
             return Lists;

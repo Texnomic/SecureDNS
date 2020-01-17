@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
 using BinarySerialization;
@@ -8,8 +9,8 @@ using PipelineNet.Middleware;
 using Serilog;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
-using Texnomic.DNS.Extensions;
 using Texnomic.DNS.Models;
+using Texnomic.DNS.Records;
 
 namespace Texnomic.DNS.Servers.Middlewares
 {
@@ -43,61 +44,40 @@ namespace Texnomic.DNS.Servers.Middlewares
 
         public async Task<IMessage> Run(IMessage Message, Func<IMessage, Task<IMessage>> Next)
         {
-            var Answers = TryGetCache(Message);
+            var Answers = GetCache(Message);
 
-            if (Answers.Count == 0)
+            if (Answers == null)
             {
                 Message = await Protocol.ResolveAsync(Message);
 
-                Cache(Message.Answers);
+                SetCache(Message);
 
                 return await Next(Message);
             }
             else
             {
-                if (Answers.Count == Message.QuestionsCount)
-                {
-                    Message = CreateAnswer(Message);
+                Message = CreateAnswer(Message);
 
-                    Message.Answers = Answers;
+                Message.Answers = Answers;
 
-                    Logger.Information("Query {@ID} Resolved From Cache.", Message.ID);
+                Logger.Information("Resolved Query {@ID} For {@Domain} From Cache.", Message.ID, Message.Questions[0].Domain.Name);
 
-                    return await Next(Message);
-                }
-                else
-                {
-                    return await Next(Message);
-                }
+                return await Next(Message);
             }
         }
 
-        public void Cache(List<IAnswer> Answers)
+        private void SetCache(IMessage Message)
         {
-            foreach (var Answer in Answers)
-            {
-                MemoryCache.Set($"{Answer.Domain.Name}:{Answer.Type}", Answer, Answer.TimeToLive.Value);
+            if (Message.ResponseCode != ResponseCode.NoError) return;
 
-                Logger.Verbose("Added {@Answers} To Cache.", Answers);
-            }
+            if (Message.AnswersCount == 0) return;
+
+            MemoryCache.Set($"{Message.Questions[0].Domain.Name}:{Message.Questions[0].Type}", Message.Answers, Message.Answers[0].TimeToLive.Value);
         }
 
-        public List<IAnswer> TryGetCache(IMessage Message)
+        private List<IAnswer> GetCache(IMessage Message)
         {
-            var Answers = new List<IAnswer>();
-
-            foreach (var Question in Message.Questions)
-            {
-                var FoundType = MemoryCache.TryGetValue<Answer>($"{Question.Domain.Name}:{Question.Type}", out var TypeAnswer);
-
-                if (FoundType) { Answers.Add(TypeAnswer); continue; }
-
-                var FoundCNAME = MemoryCache.TryGetValue<Answer>($"{Question.Domain.Name}:{RecordType.CNAME}", out var CNameAnswer);
-
-                if (FoundCNAME) Answers.Add(CNameAnswer);
-            }
-
-            return Answers;
+            return MemoryCache.Get<List<IAnswer>>($"{Message.Questions[0].Domain.Name}:{Message.Questions[0].Type}");
         }
 
         private static IMessage CreateAnswer(IMessage Query)
