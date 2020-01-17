@@ -5,14 +5,10 @@ using System.Net;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using PipelineNet.Middleware;
-using Polly;
-using Polly.Retry;
-using RestSharp;
 using Serilog;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Models;
-using Texnomic.DNS.Records;
 using Texnomic.DNS.Servers.Extensions;
 using Texnomic.DNS.Servers.Options;
 using Texnomic.FilterLists;
@@ -24,20 +20,16 @@ namespace Texnomic.DNS.Servers.Middlewares
     public class FilterMiddleware : IAsyncMiddleware<IMessage, IMessage>
     {
         private readonly ILogger Logger;
-        private readonly RestClient RestClient;
-        private readonly AsyncRetryPolicy<IRestResponse<string>> RetryPolicy;
+        private readonly WebClient WebClient;
         private readonly FastHashSet<string> Filter;
 
         public FilterMiddleware(IOptionsMonitor<FilterMiddlewareOptions> Options, ILogger Logger) : base()
         {
             this.Logger = Logger;
 
-            RestClient = new RestClient();
+            WebClient = new WebClient();
 
             Filter = new FastHashSet<string>();
-
-            RetryPolicy = Policy.HandleResult<IRestResponse<string>>(ResultPredicate)
-                                .RetryAsync(3);
 
             _ = InitializeAsync(Options.CurrentValue.ListTags);
         }
@@ -46,7 +38,7 @@ namespace Texnomic.DNS.Servers.Middlewares
         {
             if (Filter.Contains(Message.Questions.First().Domain.Name))
             {
-                Logger.Warning("Filtered {@Query}.", Message);
+                Logger.Warning("Filtered Query {@ID}.", Message.ID);
 
                 return new Message()
                 {
@@ -66,11 +58,11 @@ namespace Texnomic.DNS.Servers.Middlewares
         {
             try
             {
-                Logger.Information("Initializing FilterLists.");
+                Logger.Verbose("FilterLists Initialization Started with {@Tags} Selected.", Tags);
 
                 var Lists = await GetFilterListsAsync(Tags);
 
-                Logger.Information("Found {@Count} FilterLists.", Lists.Count);
+                Logger.Information("FilterLists Initialization Started with {@Count} Selected Lists.", Lists.Count);
 
                 string File = null;
                 string[] Domains = null;
@@ -79,7 +71,7 @@ namespace Texnomic.DNS.Servers.Middlewares
                 {
                     try
                     {
-                        File = await DownloadAsync(List.ViewUrl);
+                        File = await WebClient.DownloadStringTaskAsync(List.ViewUrl);
 
                         Domains = Parse(File);
 
@@ -91,9 +83,9 @@ namespace Texnomic.DNS.Servers.Middlewares
                             }
                         }
 
-                        Logger.Information("Downloaded FilterList {@FilterList}.", List);
+                        Logger.Verbose("{@FilterList} Download Completed.", List);
                     }
-                    catch (WebException Error)
+                    catch (Exception Error)
                     {
                         Logger.Error("{@Error} While Downloading {@FilterList}.", Error, List);
                     }
@@ -103,7 +95,7 @@ namespace Texnomic.DNS.Servers.Middlewares
                 Domains = null;
                 Lists = null;
 
-                Logger.Information("FilterLists Initialized.");
+                Logger.Information("FilterLists Initialization Completed with {@Count} Domains.", Filter.Count);
             }
             catch (Exception Error)
             {
@@ -124,20 +116,6 @@ namespace Texnomic.DNS.Servers.Middlewares
             return Lists;
         }
 
-        private static bool ResultPredicate(IRestResponse Response)
-        {
-            return Response.ErrorException != null;
-        }
-        private async Task<string> DownloadAsync(string URL)
-        {
-            var Request = new RestRequest(URL);
-
-            var Response = await RetryPolicy.ExecuteAsync(() => RestClient.ExecuteGetTaskAsync<string>(Request));
-
-            if (Response.ErrorException != null) throw Response.ErrorException;
-
-            return Response.Data;
-        }
         private static string[] Parse(string File)
         {
             return File.Split('\n', StringSplitOptions.RemoveEmptyEntries)

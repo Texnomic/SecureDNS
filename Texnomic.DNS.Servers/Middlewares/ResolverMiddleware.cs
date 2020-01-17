@@ -88,9 +88,13 @@ namespace Texnomic.DNS.Servers.Middlewares
 
             foreach (var Question in Message.Questions)
             {
-                var Result = MemoryCache.TryGetValue<Answer>($"{Question.Domain.Name}:{Question.Type}", out var Answer);
+                var FoundType = MemoryCache.TryGetValue<Answer>($"{Question.Domain.Name}:{Question.Type}", out var TypeAnswer);
 
-                if (Result) Answers.Add(Answer);
+                if (FoundType) { Answers.Add(TypeAnswer); continue; }
+
+                var FoundCNAME = MemoryCache.TryGetValue<Answer>($"{Question.Domain.Name}:{RecordType.CNAME}", out var CNameAnswer);
+
+                if (FoundCNAME) Answers.Add(CNameAnswer);
             }
 
             return Answers;
