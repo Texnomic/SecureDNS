@@ -18,7 +18,7 @@ namespace Texnomic.DNS.Servers.ResponsibilityChain
             Finally(FinalCheck);
         }
 
-        public async Task<IMessage> FinalCheck(IMessage Message)
+        private static async Task<IMessage> FinalCheck(IMessage Message)
         {
             if (Message.MessageType != MessageType.Response)
                 throw new NotImplementedException("Responsibility Chain Fall-throw!");

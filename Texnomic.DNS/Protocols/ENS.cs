@@ -127,7 +127,7 @@ namespace Texnomic.DNS.Protocols
 
         public async Task<IMessage> ResolveAsync(IMessage Query)
         {
-            var (Registrant, TimeToLive, Resolver, Contract) = await ResolveAsync(Query.Questions.First().Name);
+            var (Registrant, TimeToLive, Resolver, Contract) = await ResolveAsync(Query.Questions[0].Domain.Name);
 
             Query.MessageType = MessageType.Response;
 

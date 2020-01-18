@@ -16,12 +16,15 @@ using Texnomic.DNS.Servers;
 using Attribute = Terminal.Gui.Attribute;
 using Console = Colorful.Console;
 using Timer = System.Timers.Timer;
+using Texnomic.DNS.Servers.Options;
 
 namespace Texnomic.SecureDNS.Terminal
 {
     public class TerminalGUI : IHostedService, IDisposable
     {
-        private readonly TerminalOptions Options;
+        private readonly IOptionsMonitor<TerminalOptions> Options;
+
+        private readonly IOptionsMonitor<ProxyServerOptions> ServerOptions;
 
         private readonly ProxyServer Server;
 
@@ -29,11 +32,13 @@ namespace Texnomic.SecureDNS.Terminal
 
         private readonly CancellationTokenSource CancellationTokenSource;
 
-        public TerminalGUI(IOptionsMonitor<TerminalOptions> TerminalOptions, ProxyServer ProxyServer)
+        public TerminalGUI(IOptionsMonitor<TerminalOptions> TerminalOptions, IOptionsMonitor<ProxyServerOptions> ProxyServerOptions, ProxyServer ProxyServer)
         {
             Console.ReplaceAllColorsWithDefaults();
 
-            Options = TerminalOptions.CurrentValue;
+            Options = TerminalOptions;
+
+            ServerOptions = ProxyServerOptions;
 
             Server = ProxyServer;
 
@@ -73,29 +78,12 @@ namespace Texnomic.SecureDNS.Terminal
                 Y = 2,
             };
 
-            var ServerBindingText = new TextField(Options.ServerIPEndPoint)
+            var ServerBindingText = new TextField(ServerOptions.CurrentValue.IPEndPoint.ToString())
             {
                 X = Pos.Right(ServerBindingLabel) + 2,
                 Y = Pos.Top(ServerBindingLabel),
                 Width = 30
             };
-
-            ServerBindingText.Changed += (Sender, Args) => CheckIPEndPoint(ServerBindingText);
-
-            var SeqEndPointLabel = new Label("Seq EndPoint: ")
-            {
-                X = Pos.Left(ServerBindingLabel),
-                Y = Pos.Top(ServerBindingLabel) + 2,
-            };
-
-            var SeqEndPointText = new TextField(Options.SeqUriEndPoint)
-            {
-                X = Pos.Right(SeqEndPointLabel) + 4,
-                Y = Pos.Top(SeqEndPointLabel),
-                Width = 30,
-            };
-
-            SeqEndPointText.Changed += (Sender, Args) => CheckUri(SeqEndPointText);
 
             var StartButton = new Button("Start Server", true)
             {
@@ -122,10 +110,10 @@ namespace Texnomic.SecureDNS.Terminal
                     new MenuItem ("Quit", "System", Application.RequestStop),
                 }),
 
-                new MenuBarItem ("Seq", new  []
-                {
-                    new MenuItem ("Browse", "", () => Browse(SeqEndPointText.Text.ToString())),
-                }),
+                //new MenuBarItem ("Seq", new  []
+                //{
+                //    new MenuItem ("Browse", "", () => Browse(SeqEndPointText.Text.ToString())),
+                //}),
 
                 new MenuBarItem("About", new[]
                 {
@@ -138,8 +126,8 @@ namespace Texnomic.SecureDNS.Terminal
 
             var StatusListView = new ListView()
             {
-                X = Pos.Left(SeqEndPointLabel),
-                Y = Pos.Top(SeqEndPointLabel) + 5,
+                X = Pos.Left(ServerBindingLabel),
+                Y = Pos.Top(ServerBindingLabel) + 5,
                 Width = 40,
                 Height = 15,
             };
@@ -148,8 +136,6 @@ namespace Texnomic.SecureDNS.Terminal
 
             Window.Add(ServerBindingLabel,
                 ServerBindingText,
-                SeqEndPointLabel,
-                SeqEndPointText,
                 StartButton,
                 StopButton,
                 StatusListView,
@@ -185,7 +171,7 @@ namespace Texnomic.SecureDNS.Terminal
         {
             try
             {
-                var Available = CheckPort(IPEndPoint.Parse(Options.ServerIPEndPoint).Port);
+                var Available = CheckPort(ServerOptions.CurrentValue.IPEndPoint.Port);
 
                 if (Available)
                 {
@@ -195,7 +181,7 @@ namespace Texnomic.SecureDNS.Terminal
                 }
                 else
                 {
-                    MessageBox.ErrorQuery(80, 7, "Error", $"Port {IPEndPoint.Parse(Options.ServerIPEndPoint).Port} Already Used.", "OK");
+                    MessageBox.ErrorQuery(80, 7, "Error", $"Port {ServerOptions.CurrentValue.IPEndPoint.Port} Already Used.", "OK");
                 }
             }
             catch (Exception Error)
@@ -237,28 +223,6 @@ namespace Texnomic.SecureDNS.Terminal
                                      .GetActiveUdpListeners()
                                      .All(Connection => Connection.Port != Port);
         }
-
-        private void CheckIPEndPoint(TextField TextField)
-        {
-            var IsValid = IPEndPoint.TryParse(TextField.Text.ToString(), out var Result);
-
-            TextField.ColorScheme = IsValid ? SuccessColorScheme : FailureColorScheme;
-
-            Options.ServerIPEndPoint = IsValid ? Result.ToString() : Options.ServerIPEndPoint;
-        }
-
-        private void CheckUri(TextField TextField)
-        {
-            var IsValid = Uri.TryCreate(TextField.Text.ToString(), UriKind.Absolute, out var Result);
-
-            IsValid = IsValid && Result.Scheme == Uri.UriSchemeHttp;
-
-            TextField.ColorScheme = IsValid ? SuccessColorScheme : FailureColorScheme;
-
-            Options.SeqUriEndPoint = IsValid ? Result.ToString() : Options.SeqUriEndPoint;
-        }
-
-
 
 
         private bool IsDisposed;

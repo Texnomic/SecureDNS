@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Runtime.InteropServices;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Colorful;
@@ -40,6 +42,16 @@ namespace Texnomic.SecureDNS.Terminal
 
         private static TerminalOptions Options;
 
+        private static readonly string Stage = Environment.GetEnvironmentVariable("SecureDNS_ENVIRONMENT") ?? "Production";
+
+        private static readonly IConfiguration Configurations = new ConfigurationBuilder()
+                                                                    .SetBasePath(Directory.GetCurrentDirectory())
+                                                                    .AddJsonFile("AppSettings.json", false, true)
+                                                                    .AddJsonFile($"AppSettings.{Stage}.json", true, true)
+                                                                    .AddUserSecrets<Program>(true, true)
+                                                                    .AddEnvironmentVariables()
+                                                                    .Build();
+
         public static async Task Main(string[] Arguments)
         {
             Splash();
@@ -47,11 +59,6 @@ namespace Texnomic.SecureDNS.Terminal
             Parser.Default.ParseArguments<TerminalOptions>(Arguments)
                           .WithParsed(StartWithOptions)
                           .WithNotParsed(StartWithoutOptions);
-
-            Log.Logger = new LoggerConfiguration()
-                        .Destructure.UsingAttributes()
-                        .WriteTo.Seq(Options.SeqUriEndPoint, compact: true)
-                        .CreateLogger();
 
             BuildHost();
 
@@ -74,7 +81,7 @@ namespace Texnomic.SecureDNS.Terminal
                  .ConfigureAppConfiguration(ConfigureApp)
                  .ConfigureServices(ConfigureServices)
                  .ConfigureLogging(ConfigureLogging)
-                 .UseSerilog(Log.Logger);
+                 .UseSerilog(ConfigureLogger, writeToProviders: true);
 
             if (Options.Mode == OperatingMode.Daemon)
             {
@@ -111,25 +118,30 @@ namespace Texnomic.SecureDNS.Terminal
 
         private static void ConfigureApp(HostBuilderContext HostBuilderContext, IConfigurationBuilder Configuration)
         {
-            Configuration.AddEnvironmentVariables();
+            Configuration.AddConfiguration(Configurations);
         }
         private static void ConfigureLogging(HostBuilderContext HostBuilderContext, ILoggingBuilder Logging)
         {
             Logging.AddConsole();
         }
+        private static void ConfigureLogger(HostBuilderContext HostBuilderContext, LoggerConfiguration LoggerConfiguration)
+        {
+            LoggerConfiguration.ReadFrom.Configuration(Configurations);
+        }
         private static void ConfigureServices(HostBuilderContext HostBuilderContext, IServiceCollection Services)
         {
-            //Services.AddLogging(Options => Options.AddSerilog(Log.Logger));
+            Services.Configure<HostTableMiddlewareOptions>(Configurations.GetSection("HostTableMiddleware"));
+            Services.Configure<FilterMiddlewareOptions>(Configurations.GetSection("FilterMiddleware"));
+            Services.Configure<ProxyServerOptions>(Configurations.GetSection("ProxyServer"));
+
             Services.AddOptions();
-            Services.AddOptions<FilterMiddlewareOptions>();
             Services.AddOptions<ProxyResponsibilityChainOptions>();
             Services.AddOptions<HTTPsOptions>();
 
-            //Services.AddSingleton(Log.Logger);
             Services.AddSingleton(Options);
-            Services.AddSingleton(new ProxyServerOptions() { IPEndPoint = IPEndPoint.Parse(Options.ServerIPEndPoint) });
 
             Services.AddSingleton<MemoryCache>();
+            Services.AddSingleton<HostTableMiddleware>();
             Services.AddSingleton<FilterMiddleware>();
             Services.AddSingleton<ResolverMiddleware>();
             Services.AddSingleton<IProtocol, HTTPs>();

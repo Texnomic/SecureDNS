@@ -31,7 +31,7 @@ namespace Texnomic.DNS.Servers.Middlewares
 
             Filter = new FastHashSet<string>();
 
-            _ = InitializeAsync(Options.CurrentValue.Predicate);
+            _ = InitializeAsync(Options.CurrentValue.IDs);
         }
 
         public async Task<IMessage> Run(IMessage Message, Func<IMessage, Task<IMessage>> Next)
@@ -54,13 +54,13 @@ namespace Texnomic.DNS.Servers.Middlewares
             }
         }
 
-        public async Task InitializeAsync(Func<FilterList, bool> Predicate)
+        public async Task InitializeAsync(int[] IDs)
         {
             try
             {
                 Logger.Verbose("FilterLists Initialization Started.");
 
-                var Lists = await GetFilterListsAsync(Predicate);
+                var Lists = await GetFilterListsAsync(IDs);
 
                 Logger.Information("FilterLists Initialization Started with {@Count} Selected Lists.", string.Format("{0:n0}", Lists.Count));
 
@@ -103,13 +103,14 @@ namespace Texnomic.DNS.Servers.Middlewares
             }
         }
 
-        private static async Task<List<FilterList>> GetFilterListsAsync(Func<FilterList, bool> Predicate)
+        private static async Task<List<FilterList>> GetFilterListsAsync(int[] IDs)
         {
             var Client = new FilterListsClient();
 
             var Lists = await Client.GetListsAsync();
 
-            Lists = Lists.Where(Predicate)
+            Lists = Lists.Where(List => List.Syntax == Syntax.Hosts)
+                         .Where(List => IDs.Contains(List.ID))           
                          .ToList();
 
             return Lists;

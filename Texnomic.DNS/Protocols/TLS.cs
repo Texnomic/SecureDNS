@@ -19,7 +19,7 @@ namespace Texnomic.DNS.Protocols
     public class TLS : IProtocol
     {
         private readonly BinarySerializer BinarySerializer;
-        private readonly TLSOptions Options;
+        private readonly IOptionsMonitor<TLSOptions> Options;
         private readonly TcpClient TcpClient;
         private readonly SslStream SslStream;
         private readonly PipeReader PipeReader;
@@ -27,7 +27,7 @@ namespace Texnomic.DNS.Protocols
 
         public TLS(IOptionsMonitor<TLSOptions> TLSOptions)
         {
-            Options = TLSOptions.CurrentValue;
+            Options = TLSOptions;
 
             BinarySerializer = new BinarySerializer();
 
@@ -35,8 +35,8 @@ namespace Texnomic.DNS.Protocols
 
             SslStream = new SslStream(TcpClient.GetStream(), true, ValidateServerCertificate)
             {
-                ReadTimeout = Options.Timeout,
-                WriteTimeout = Options.Timeout
+                ReadTimeout = Options.CurrentValue.Timeout,
+                WriteTimeout = Options.CurrentValue.Timeout
             };
 
             PipeReader = SslStream.UsePipeReader();
@@ -46,9 +46,9 @@ namespace Texnomic.DNS.Protocols
 
         private async Task InitializeAsync()
         {
-            await TcpClient.ConnectAsync(Options.Host, Options.Port);
+            await TcpClient.ConnectAsync(Options.CurrentValue.Host, Options.CurrentValue.Port);
 
-            await SslStream.AuthenticateAsClientAsync(Options.Host);
+            await SslStream.AuthenticateAsClientAsync(Options.CurrentValue.Host);
         }
 
         public byte[] Resolve(byte[] Query)
@@ -77,7 +77,7 @@ namespace Texnomic.DNS.Protocols
 
             var Task = PipeReader.ReadAsync().AsTask();
 
-            Task.Wait(Options.Timeout);
+            Task.Wait(Options.CurrentValue.Timeout);
 
             if (Task.IsCompleted)
             {
@@ -119,7 +119,7 @@ namespace Texnomic.DNS.Protocols
 
             var Task = PipeReader.ReadAsync().AsTask();
 
-            Task.Wait(Options.Timeout);
+            Task.Wait(Options.CurrentValue.Timeout);
 
             if (Task.IsCompleted)
             {
@@ -148,7 +148,7 @@ namespace Texnomic.DNS.Protocols
 
         private bool ValidateServerCertificate(object Sender, X509Certificate Certificate, X509Chain Chain, SslPolicyErrors SslPolicyErrors)
         {
-            return Options.PublicKey == null ? SslPolicyErrors == SslPolicyErrors.None : SslPolicyErrors == SslPolicyErrors.None && Certificate.GetPublicKeyString() == Options.PublicKey;
+            return Options.CurrentValue.PublicKey == null ? SslPolicyErrors == SslPolicyErrors.None : SslPolicyErrors == SslPolicyErrors.None && Certificate.GetPublicKeyString() == Options.CurrentValue.PublicKey;
         }
 
         private bool IsDisposed;

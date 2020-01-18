@@ -17,15 +17,6 @@ namespace Texnomic.DNS.Models
         [JsonIgnore]
         public IDomain Domain { get; set; }
 
-        [Ignore]
-        [NotLogged]
-        [JsonPropertyName("name")]
-        public string Name
-        {
-            get => Domain.Name;
-            set => Domain = new Domain(value);
-        }
-
         [FieldOrder(1)]
         [FieldBitLength(16)]
         [FieldEndianness(Endianness.Big)]

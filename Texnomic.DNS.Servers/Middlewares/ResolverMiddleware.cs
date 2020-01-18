@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
-using BinarySerialization;
 using Microsoft.Extensions.Caching.Memory;
 using PipelineNet.Middleware;
 using Serilog;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Models;
-using Texnomic.DNS.Records;
 
 namespace Texnomic.DNS.Servers.Middlewares
 {
@@ -19,7 +16,6 @@ namespace Texnomic.DNS.Servers.Middlewares
         private readonly IProtocol Protocol;
         private readonly ILogger Logger;
         private readonly MemoryCache MemoryCache;
-        private readonly BinarySerializer BinarySerializer;
         private readonly Timer Timer;
 
         public ResolverMiddleware(IProtocol Protocol, MemoryCache MemoryCache, ILogger Logger)
@@ -27,7 +23,6 @@ namespace Texnomic.DNS.Servers.Middlewares
             this.Protocol = Protocol;
             this.Logger = Logger;
             this.MemoryCache = MemoryCache;
-            BinarySerializer = new BinarySerializer();
             Timer = new Timer(60 * 60 * 1000);
             Timer.Elapsed += Timer_Elapsed;
             Timer.Start();

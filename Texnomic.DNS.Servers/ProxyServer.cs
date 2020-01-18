@@ -28,7 +28,7 @@ namespace Texnomic.DNS.Servers
     {
         private readonly ILogger Logger;
         private readonly List<Task> Workers;
-        private readonly ProxyServerOptions Options;
+        private readonly IOptionsMonitor<ProxyServerOptions> Options;
         private readonly BinarySerializer BinarySerializer;
         private readonly IAsyncResponsibilityChain<IMessage, IMessage> ResponsibilityChain;
         private readonly BufferBlock<(IMessage, IPEndPoint)> IncomingQueue;
@@ -47,7 +47,7 @@ namespace Texnomic.DNS.Servers
 
         public ProxyServer(IAsyncResponsibilityChain<IMessage, IMessage> ResponsibilityChain, ILogger Logger, IOptionsMonitor<ProxyServerOptions> ProxyServerOptions)
         {
-            Options = ProxyServerOptions.CurrentValue;
+            Options = ProxyServerOptions;
 
             this.ResponsibilityChain = ResponsibilityChain;
 
@@ -74,16 +74,16 @@ namespace Texnomic.DNS.Servers
         {
             CancellationToken = Token;
 
-            UdpClient.Client.Bind(Options.IPEndPoint);
+            UdpClient.Client.Bind(Options.CurrentValue.IPEndPoint);
 
-            for (var I = 0; I < Options.Threads; I++)
+            for (var I = 0; I < Options.CurrentValue.Threads; I++)
             {
                 Workers.Add(Task.Factory.StartNew(ReceiveAsync, CancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default).Unwrap());
                 Workers.Add(Task.Factory.StartNew(ResolveAsync, CancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default).Unwrap());
                 Workers.Add(Task.Factory.StartNew(SendAsync, CancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default).Unwrap());
             }
 
-            Logger?.Information("Server Started with {@Threads} Threads. Listening On {@IPEndPoint}", Options.Threads, Options.IPEndPoint.ToString());
+            Logger?.Information("Server Started with {@Threads} Threads. Listening On {@IPEndPoint}", Options.CurrentValue.Threads, Options.CurrentValue.IPEndPoint.ToString());
 
             Started?.Invoke(this, EventArgs.Empty);
 

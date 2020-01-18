@@ -20,7 +20,7 @@ namespace Texnomic.DNS.Protocols
     /// </summary>
     public class HTTPs : IProtocol
     {
-        private readonly HTTPsOptions Options;
+        private readonly IOptionsMonitor<HTTPsOptions> Options;
         private readonly RestClient RestClient;
         private readonly BinarySerializer BinarySerializer;
         private readonly AsyncRetryPolicy<IRestResponse> RetryPolicy;
@@ -28,7 +28,7 @@ namespace Texnomic.DNS.Protocols
 
         public HTTPs(IOptionsMonitor<HTTPsOptions> HTTPsOptions)
         {
-            Options = HTTPsOptions.CurrentValue;
+            Options = HTTPsOptions;
 
             Random = new Random();
 
@@ -36,18 +36,18 @@ namespace Texnomic.DNS.Protocols
 
             BinarySerializer = new BinarySerializer();
 
-            RestClient = new RestClient(Options.Uri);
+            RestClient = new RestClient();
 
             RestClient.AddDefaultHeader("Cache-Control", "no-cache");
 
             RestClient.AddDefaultHeader("Accept", "application/dns-message");
 
-            RestClient.Proxy = Options.WebProxy;
+            RestClient.Proxy = Options.CurrentValue.WebProxy;
 
-            RestClient.FollowRedirects = Options.AllowRedirects;
+            RestClient.FollowRedirects = Options.CurrentValue.AllowRedirects;
 
             RetryPolicy = Policy.HandleResult<IRestResponse>(ResultPredicate)
-                                .RetryAsync(Options.Retries);
+                                .RetryAsync(Options.CurrentValue.Retries);
         }
 
         private static bool ResultPredicate(IRestResponse Response)
@@ -82,7 +82,7 @@ namespace Texnomic.DNS.Protocols
 
         public async Task<byte[]> ResolveAsync(byte[] Query)
         {
-            var Request = new RestRequest("dns-query");
+            var Request = new RestRequest($"{Options.CurrentValue.Uri}/dns-query");
 
             Request.AddParameter("application/dns-message", Query, "application/dns-message", ParameterType.RequestBody);
 
@@ -104,7 +104,7 @@ namespace Texnomic.DNS.Protocols
 
         private bool ValidateServerCertificate(object Sender, X509Certificate Certificate, X509Chain Chain, SslPolicyErrors SslPolicyErrors)
         {
-            return Options.PublicKey == null ? SslPolicyErrors == SslPolicyErrors.None : SslPolicyErrors == SslPolicyErrors.None && Certificate.GetPublicKeyString() == Options.PublicKey;
+            return Options.CurrentValue.PublicKey == null ? SslPolicyErrors == SslPolicyErrors.None : SslPolicyErrors == SslPolicyErrors.None && Certificate.GetPublicKeyString() == Options.CurrentValue.PublicKey;
         }
 
 

@@ -8,9 +8,6 @@ namespace Texnomic.DNS.Abstractions
         [FieldOrder(0)]
         IDomain Domain { get; set; }
 
-        [Ignore]
-        string Name { get; set; }
-
         [FieldOrder(1)]
         RecordType Type { get; set; }
 

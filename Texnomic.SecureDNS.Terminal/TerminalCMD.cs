@@ -12,25 +12,20 @@ namespace Texnomic.SecureDNS.Terminal
 {
     public class TerminalCMD : IHostedService, IDisposable
     {
-        private readonly TerminalOptions Options;
+        private readonly IOptionsMonitor<TerminalOptions> Options;
 
         private readonly ProxyServer Server;
 
 
         public TerminalCMD(IOptionsMonitor<TerminalOptions> TerminalOptions, ProxyServer ProxyServer)
         {
-            Options = TerminalOptions.CurrentValue;
+            Options = TerminalOptions;
 
             Server = ProxyServer;
         }
 
         public async Task StartAsync(CancellationToken CancellationToken)
         {
-            Log.Logger = new LoggerConfiguration()
-                            .Destructure.UsingAttributes()
-                            .WriteTo.Seq(Options.SeqUriEndPoint, compact: true)
-                            .CreateLogger();
-
             Server.Started += (Sender, Args) => Console.WriteLine("Server Started.");
             Server.Stopped += (Sender, Args) => Console.WriteLine("Server Stopped.");
             Server.Errored += (Sender, Args) => Console.WriteLine($"Server Error: {Args.Error.Message}.");
