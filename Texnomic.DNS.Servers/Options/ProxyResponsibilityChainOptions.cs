@@ -1,11 +1,24 @@
-﻿using System;
+﻿using PipelineNet.Middleware;
+using System;
 using System.Collections.Generic;
-using Texnomic.DNS.Servers.Middlewares;
+using System.Linq;
+using System.Reflection;
+using Texnomic.DNS.Abstractions;
 
 namespace Texnomic.DNS.Servers.Options
 {
     public class ProxyResponsibilityChainOptions
     {
-        public List<Type> Middlewares { get; set; } = new List<Type>() { typeof(HostTableMiddleware), typeof(FilterMiddleware), typeof(ResolverMiddleware) };
+        public List<string> Middlewares { get; set; }
+
+        public List<Type> GetMiddlewares()
+        {
+            return Middlewares.Select(Middleware => Assembly.GetExecutingAssembly()
+                                                            .GetTypes()
+                                                            .Where(Type => Type.GetInterfaces()
+                                                                               .Contains(typeof(IAsyncMiddleware<IMessage, IMessage>)))
+                                                            .Single(Type => Type.Name == Middleware))
+                                                            .ToList();
+        }
     }
 }

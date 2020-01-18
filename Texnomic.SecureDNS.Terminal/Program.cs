@@ -112,8 +112,6 @@ namespace Texnomic.SecureDNS.Terminal
             Console.WriteLine(" > Loading...");
 
             Console.WriteLine("");
-
-            Thread.Sleep(1500);
         }
 
         private static void ConfigureApp(HostBuilderContext HostBuilderContext, IConfigurationBuilder Configuration)
@@ -130,19 +128,18 @@ namespace Texnomic.SecureDNS.Terminal
         }
         private static void ConfigureServices(HostBuilderContext HostBuilderContext, IServiceCollection Services)
         {
-            Services.Configure<HostTableMiddlewareOptions>(Configurations.GetSection("HostTableMiddleware"));
-            Services.Configure<FilterMiddlewareOptions>(Configurations.GetSection("FilterMiddleware"));
-            Services.Configure<ProxyServerOptions>(Configurations.GetSection("ProxyServer"));
-
-            Services.AddOptions();
-            Services.AddOptions<ProxyResponsibilityChainOptions>();
-            Services.AddOptions<HTTPsOptions>();
+            Services.Configure<ProxyResponsibilityChainOptions>(Configurations.GetSection("Proxy Responsibility Chain"));
+            Services.Configure<HostTableMiddlewareOptions>(Configurations.GetSection("HostTable Middleware"));
+            Services.Configure<FilterListsMiddlewareOptions>(Configurations.GetSection("FilterLists Middleware"));
+            Services.Configure<ProxyServerOptions>(Configurations.GetSection("Proxy Server"));
+            Services.Configure<HTTPsOptions>(Configurations.GetSection("HTTPs Protocol"));
+            Services.Configure<TLSOptions>(Configurations.GetSection("TLS Protocol"));
 
             Services.AddSingleton(Options);
 
             Services.AddSingleton<MemoryCache>();
             Services.AddSingleton<HostTableMiddleware>();
-            Services.AddSingleton<FilterMiddleware>();
+            Services.AddSingleton<FilterListsMiddleware>();
             Services.AddSingleton<ResolverMiddleware>();
             Services.AddSingleton<IProtocol, HTTPs>();
             Services.AddSingleton<IMiddlewareResolver, ServerMiddlewareActivator>();

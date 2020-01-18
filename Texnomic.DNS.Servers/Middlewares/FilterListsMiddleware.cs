@@ -17,13 +17,13 @@ using Texnomic.FilterLists.Models;
 
 namespace Texnomic.DNS.Servers.Middlewares
 {
-    public class FilterMiddleware : IAsyncMiddleware<IMessage, IMessage>
+    public class FilterListsMiddleware : IAsyncMiddleware<IMessage, IMessage>
     {
         private readonly ILogger Logger;
         private readonly WebClient WebClient;
         private readonly FastHashSet<string> Filter;
 
-        public FilterMiddleware(IOptionsMonitor<FilterMiddlewareOptions> Options, ILogger Logger) : base()
+        public FilterListsMiddleware(IOptionsMonitor<FilterListsMiddlewareOptions> Options, ILogger Logger) : base()
         {
             this.Logger = Logger;
 
@@ -32,6 +32,17 @@ namespace Texnomic.DNS.Servers.Middlewares
             Filter = new FastHashSet<string>();
 
             _ = InitializeAsync(Options.CurrentValue.IDs);
+        }
+
+        private void OptionsOnChange(FilterListsMiddlewareOptions Options)
+        {
+            Filter.Clear();
+
+            Filter.TrimExcess();
+
+            _ = InitializeAsync(Options.IDs);
+
+            Logger.Information("FilterLists {@IDs} Updates Applied.", Options.IDs);
         }
 
         public async Task<IMessage> Run(IMessage Message, Func<IMessage, Task<IMessage>> Next)
@@ -90,6 +101,8 @@ namespace Texnomic.DNS.Servers.Middlewares
                         Logger.Error("{@Error} While Downloading {@FilterList}.", Error, List);
                     }
                 }
+
+                Filter.TrimExcess();
 
                 File = null;
                 Domains = null;

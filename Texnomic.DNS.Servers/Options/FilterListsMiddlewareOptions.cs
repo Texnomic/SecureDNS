@@ -1,6 +1,6 @@
 ﻿namespace Texnomic.DNS.Servers.Options
 {
-    public class FilterMiddlewareOptions
+    public class FilterListsMiddlewareOptions
     {
         public int[] IDs { get; set; }
     }

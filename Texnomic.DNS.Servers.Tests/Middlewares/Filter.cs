@@ -11,7 +11,7 @@ namespace Texnomic.DNS.Servers.Tests.Middlewares
     public class Filter
     {
         private Tags[] FilterTags;
-        private FilterMiddleware FilterMiddleware;
+        private FilterListsMiddleware FilterMiddleware;
 
         [TestInitialize]
         public void Initialize()
@@ -28,7 +28,7 @@ namespace Texnomic.DNS.Servers.Tests.Middlewares
                 Tags.Crypto,
             };
 
-            FilterMiddleware = new FilterMiddleware(FilterTags, Log.Logger);
+            FilterMiddleware = new FilterListsMiddleware(FilterTags, Log.Logger);
         }
 
         [TestMethod]

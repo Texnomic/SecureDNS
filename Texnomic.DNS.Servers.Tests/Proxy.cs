@@ -43,14 +43,14 @@ namespace Texnomic.DNS.Servers.Tests
             var ServiceCollection = new ServiceCollection();
             ServiceCollection.AddSingleton(Log.Logger);
             ServiceCollection.AddSingleton(FilterTags);
-            ServiceCollection.AddSingleton<FilterMiddleware>();
+            ServiceCollection.AddSingleton<FilterListsMiddleware>();
             ServiceCollection.AddSingleton<GoogleHTTPsMiddleware>();
 
             var ServerMiddlewareActivator = new ServerMiddlewareActivator(ServiceCollection.BuildServiceProvider());
 
             var Middlewares = new List<Type>()
             {
-                typeof(FilterMiddleware),
+                typeof(FilterListsMiddleware),
                 typeof(GoogleHTTPsMiddleware),
             };
 

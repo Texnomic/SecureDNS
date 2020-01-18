@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using BinarySerialization;
+using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
-using Texnomic.DNS.Records;
 
 namespace Texnomic.DNS.Factories
 {
@@ -18,8 +18,8 @@ namespace Texnomic.DNS.Factories
         {
             TypesDictionary = Assembly.GetExecutingAssembly()
                                       .GetTypes()
-                                      .Where(Type => Type.IsClass && Type.Namespace == "Texnomic.DNS.Records")
-                                      .ToDictionary(Type => (RecordType) Enum.Parse(typeof(RecordType), Type.Name));
+                                      .Where(Type => Type.GetInterfaces().Contains(typeof(IRecord)))
+                                      .ToDictionary(Type => (RecordType)Enum.Parse(typeof(RecordType), Type.Name));
 
             KeysDictionary = TypesDictionary.ToDictionary(Pair => Pair.Value, Pair => Pair.Key);
         }

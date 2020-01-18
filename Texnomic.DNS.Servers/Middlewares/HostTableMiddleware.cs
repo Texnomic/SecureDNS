@@ -17,20 +17,22 @@ namespace Texnomic.DNS.Servers.Middlewares
     public class HostTableMiddleware : IAsyncMiddleware<IMessage, IMessage>
     {
         private readonly ILogger Logger;
-        private readonly IOptionsMonitor<HostTableMiddlewareOptions> Options;
         private Dictionary<string, IPAddress> HostTable;
 
-        public HostTableMiddleware(IOptionsMonitor<HostTableMiddlewareOptions> HostTableOptions, ILogger Logger)
+        public HostTableMiddleware(IOptionsMonitor<HostTableMiddlewareOptions> Options, ILogger Logger)
         {
-            Options = HostTableOptions;
             this.Logger = Logger;
-            HostTableOptions.OnChange(OptionsOnChange);
+
+            Options.OnChange(OptionsOnChange);
+
             HostTable = Options.CurrentValue.HostTable.ToDictionary(HT => HT.Key, HT => IPAddress.Parse(HT.Value));
         }
 
         private void OptionsOnChange(HostTableMiddlewareOptions Options)
         {
             HostTable = Options.HostTable.ToDictionary(HT => HT.Key, HT => IPAddress.Parse(HT.Value));
+
+            Logger.Information("Host Table {@HostTable} Updates Applied.", HostTable);
         }
 
         public async Task<IMessage> Run(IMessage Message, Func<IMessage, Task<IMessage>> Next)

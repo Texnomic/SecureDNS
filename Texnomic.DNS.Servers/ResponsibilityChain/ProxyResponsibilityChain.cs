@@ -13,7 +13,7 @@ namespace Texnomic.DNS.Servers.ResponsibilityChain
     {
         public ProxyResponsibilityChain(IOptionsMonitor<ProxyResponsibilityChainOptions> Options, IMiddlewareResolver MiddlewareResolver) : base(MiddlewareResolver)
         {
-            Options.CurrentValue.Middlewares.ForEach(Middleware => Chain(Middleware));
+            Options.CurrentValue.GetMiddlewares().ForEach(Middleware => Chain(Middleware));
 
             Finally(FinalCheck);
         }

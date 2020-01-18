@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Texnomic.DNS.Options
+﻿namespace Texnomic.DNS.Options
 {
     public class TLSOptions
     {
