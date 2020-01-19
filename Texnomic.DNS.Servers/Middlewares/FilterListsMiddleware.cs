@@ -31,6 +31,8 @@ namespace Texnomic.DNS.Servers.Middlewares
 
             Filter = new FastHashSet<string>();
 
+            Options.OnChange(OptionsOnChange);
+
             _ = InitializeAsync(Options.CurrentValue.IDs);
         }
 

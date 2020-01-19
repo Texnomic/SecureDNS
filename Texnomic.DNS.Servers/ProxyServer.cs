@@ -43,7 +43,7 @@ namespace Texnomic.DNS.Servers
 
         private CancellationToken CancellationToken;
 
-        private readonly UdpClient UdpClient;
+        private UdpClient UdpClient;
 
         public ProxyServer(IAsyncResponsibilityChain<IMessage, IMessage> ResponsibilityChain, ILogger Logger, IOptionsMonitor<ProxyServerOptions> ProxyServerOptions)
         {
@@ -56,8 +56,6 @@ namespace Texnomic.DNS.Servers
             BinarySerializer = new BinarySerializer();
 
             Workers = new List<Task>();
-
-            UdpClient = new UdpClient();
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
@@ -73,6 +71,8 @@ namespace Texnomic.DNS.Servers
         public async Task StartAsync(CancellationToken Token)
         {
             CancellationToken = Token;
+
+            UdpClient = new UdpClient();
 
             UdpClient.Client.Bind(Options.CurrentValue.IPEndPoint);
 
@@ -97,6 +97,8 @@ namespace Texnomic.DNS.Servers
 
         public async Task StopAsync(CancellationToken Token)
         {
+            UdpClient.Close();
+
             await Task.WhenAll(Workers);
 
             IncomingQueue.Complete();

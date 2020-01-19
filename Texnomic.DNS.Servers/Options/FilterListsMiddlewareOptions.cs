@@ -2,6 +2,9 @@
 {
     public class FilterListsMiddlewareOptions
     {
-        public int[] IDs { get; set; }
+        public int[] IDs { get; set; } = new int[]
+        {
+            10, 685
+        };
     }
 }

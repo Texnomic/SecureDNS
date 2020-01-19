@@ -1,33 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Runtime.InteropServices;
-using System.Text.Json;
-using System.Threading;
 using System.Threading.Tasks;
 using Colorful;
-using CommandLine;
-using Destructurama;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using PipelineNet.ChainsOfResponsibility;
-using PipelineNet.Middleware;
 using PipelineNet.MiddlewareResolver;
 using Serilog;
 using Texnomic.DNS.Abstractions;
-using Texnomic.DNS.Models;
 using Texnomic.DNS.Options;
 using Texnomic.DNS.Protocols;
 using Texnomic.DNS.Servers;
 using Texnomic.DNS.Servers.Middlewares;
 using Texnomic.DNS.Servers.Options;
 using Texnomic.DNS.Servers.ResponsibilityChain;
-using Texnomic.FilterLists.Enums;
 using Texnomic.SecureDNS.Terminal.Enums;
 using Texnomic.SecureDNS.Terminal.Options;
 using Texnomic.SecureDNS.Terminal.Properties;
@@ -39,8 +30,6 @@ namespace Texnomic.SecureDNS.Terminal
     internal class Program
     {
         private static IHostBuilder HostBuilder;
-
-        private static TerminalOptions Options;
 
         private static readonly string Stage = Environment.GetEnvironmentVariable("SecureDNS_ENVIRONMENT") ?? "Production";
 
@@ -56,23 +45,9 @@ namespace Texnomic.SecureDNS.Terminal
         {
             Splash();
 
-            Parser.Default.ParseArguments<TerminalOptions>(Arguments)
-                          .WithParsed(StartWithOptions)
-                          .WithNotParsed(StartWithoutOptions);
-
             BuildHost();
 
             await HostBuilder.RunConsoleAsync();
-        }
-
-        private static void StartWithOptions(TerminalOptions TerminalOptions)
-        {
-            Options = TerminalOptions;
-        }
-
-        private static void StartWithoutOptions(IEnumerable<Error> Errors)
-        {
-            Options = new TerminalOptions();
         }
 
         private static void BuildHost()
@@ -83,7 +58,9 @@ namespace Texnomic.SecureDNS.Terminal
                  .ConfigureLogging(ConfigureLogging)
                  .UseSerilog(ConfigureLogger, writeToProviders: true);
 
-            if (Options.Mode == OperatingMode.Daemon)
+            var Options = Configurations.GetSection("Terminal Options").Get<TerminalOptions>();
+
+            if (Options.Mode == Mode.Daemon)
             {
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
@@ -108,10 +85,6 @@ namespace Texnomic.SecureDNS.Terminal
             Console.WriteWithGradient(Speed.ToAscii(" SecureDNS").ConcreteValue.ToArray(), System.Drawing.Color.Yellow, System.Drawing.Color.Fuchsia, 14);
 
             Console.WriteLine("");
-
-            Console.WriteLine(" > Loading...");
-
-            Console.WriteLine("");
         }
 
         private static void ConfigureApp(HostBuilderContext HostBuilderContext, IConfigurationBuilder Configuration)
@@ -134,8 +107,7 @@ namespace Texnomic.SecureDNS.Terminal
             Services.Configure<ProxyServerOptions>(Configurations.GetSection("Proxy Server"));
             Services.Configure<HTTPsOptions>(Configurations.GetSection("HTTPs Protocol"));
             Services.Configure<TLSOptions>(Configurations.GetSection("TLS Protocol"));
-
-            Services.AddSingleton(Options);
+            Services.Configure<TerminalOptions>(Configurations.GetSection("Terminal Options"));
 
             Services.AddSingleton<MemoryCache>();
             Services.AddSingleton<HostTableMiddleware>();
@@ -145,19 +117,21 @@ namespace Texnomic.SecureDNS.Terminal
             Services.AddSingleton<IMiddlewareResolver, ServerMiddlewareActivator>();
             Services.AddSingleton<IAsyncResponsibilityChain<IMessage, IMessage>, ProxyResponsibilityChain>();
 
-            if (Options.Mode == OperatingMode.TerminalGUI)
+            var Options = Configurations.GetSection("Terminal Options").Get<TerminalOptions>();
+
+            if (Options.Mode == Mode.GUI)
             {
                 Services.AddSingleton<ProxyServer>();
-                Services.AddSingleton<IHostedService, TerminalGUI>();
+                Services.AddSingleton<IHostedService, GUI>();
             }
 
-            if (Options.Mode == OperatingMode.TerminalCMD)
+            if (Options.Mode == Mode.CLI)
             {
                 Services.AddSingleton<ProxyServer>();
-                Services.AddSingleton<IHostedService, TerminalCMD>();
+                Services.AddSingleton<IHostedService, CLI>();
             }
 
-            if (Options.Mode == OperatingMode.Daemon)
+            if (Options.Mode == Mode.Daemon)
             {
                 Services.AddSingleton<IHostedService, ProxyServer>();
             }

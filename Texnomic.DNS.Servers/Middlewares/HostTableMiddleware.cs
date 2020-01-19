@@ -17,11 +17,14 @@ namespace Texnomic.DNS.Servers.Middlewares
     public class HostTableMiddleware : IAsyncMiddleware<IMessage, IMessage>
     {
         private readonly ILogger Logger;
+        private readonly IOptionsMonitor<HostTableMiddlewareOptions> Options;
         private Dictionary<string, IPAddress> HostTable;
 
         public HostTableMiddleware(IOptionsMonitor<HostTableMiddlewareOptions> Options, ILogger Logger)
         {
             this.Logger = Logger;
+
+            this.Options = Options;
 
             Options.OnChange(OptionsOnChange);
 
@@ -63,7 +66,7 @@ namespace Texnomic.DNS.Servers.Middlewares
                           {
                               TimeToLive = new TimeToLive()
                               {
-                                  Value = TimeSpan.FromSeconds(30)
+                                  Value = TimeSpan.FromSeconds(Options.CurrentValue.TimeToLive)
                               },
 
                               Domain = new Domain(Message.Questions[0].Domain.Name),

@@ -1,10 +1,10 @@
 ﻿
 namespace Texnomic.SecureDNS.Terminal.Enums
 {
-    public enum OperatingMode
+    public enum Mode
     {
-        TerminalCMD,
-        TerminalGUI,
+        CLI,
+        GUI,
         Daemon
     }
 }

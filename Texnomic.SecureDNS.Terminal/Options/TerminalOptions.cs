@@ -5,7 +5,7 @@ namespace Texnomic.SecureDNS.Terminal.Options
 {
     public class TerminalOptions
     {
-        [Option('m', "mode", Required = false, Default = OperatingMode.TerminalGUI, HelpText = "Proxy Server Operating Mode.")]
-        public OperatingMode Mode { get; set; } = OperatingMode.TerminalGUI;
+        [Option('m', "mode", Required = false, Default = Mode.GUI, HelpText = "Proxy Server Operating Mode.")]
+        public Mode Mode { get; set; } = Mode.GUI;
     }
 }

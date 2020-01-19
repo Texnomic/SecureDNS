@@ -20,7 +20,7 @@ using Texnomic.DNS.Servers.Options;
 
 namespace Texnomic.SecureDNS.Terminal
 {
-    public class TerminalGUI : IHostedService, IDisposable
+    public class GUI : IHostedService, IDisposable
     {
         private readonly IOptionsMonitor<TerminalOptions> Options;
 
@@ -32,7 +32,7 @@ namespace Texnomic.SecureDNS.Terminal
 
         private readonly CancellationTokenSource CancellationTokenSource;
 
-        public TerminalGUI(IOptionsMonitor<TerminalOptions> TerminalOptions, IOptionsMonitor<ProxyServerOptions> ProxyServerOptions, ProxyServer ProxyServer)
+        public GUI(IOptionsMonitor<TerminalOptions> TerminalOptions, IOptionsMonitor<ProxyServerOptions> ProxyServerOptions, ProxyServer ProxyServer)
         {
             Console.ReplaceAllColorsWithDefaults();
 
@@ -247,7 +247,7 @@ namespace Texnomic.SecureDNS.Terminal
             IsDisposed = true;
         }
 
-        ~TerminalGUI()
+        ~GUI()
         {
             Dispose(false);
         }

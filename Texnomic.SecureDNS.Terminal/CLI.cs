@@ -1,23 +1,23 @@
-﻿using Destructurama;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-using Serilog;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Texnomic.DNS.Servers;
 using Texnomic.SecureDNS.Terminal.Options;
 
+using Console = Colorful.Console;
+
 namespace Texnomic.SecureDNS.Terminal
 {
-    public class TerminalCMD : IHostedService, IDisposable
+    public class CLI : IHostedService, IDisposable
     {
         private readonly IOptionsMonitor<TerminalOptions> Options;
 
         private readonly ProxyServer Server;
 
 
-        public TerminalCMD(IOptionsMonitor<TerminalOptions> TerminalOptions, ProxyServer ProxyServer)
+        public CLI(IOptionsMonitor<TerminalOptions> TerminalOptions, ProxyServer ProxyServer)
         {
             Options = TerminalOptions;
 
@@ -26,9 +26,8 @@ namespace Texnomic.SecureDNS.Terminal
 
         public async Task StartAsync(CancellationToken CancellationToken)
         {
-            Server.Started += (Sender, Args) => Console.WriteLine("Server Started.");
-            Server.Stopped += (Sender, Args) => Console.WriteLine("Server Stopped.");
-            Server.Errored += (Sender, Args) => Console.WriteLine($"Server Error: {Args.Error.Message}.");
+            Server.Started += (Sender, Args) => Console.WriteLine(" Server Started.\n\r");
+            Server.Stopped += (Sender, Args) => Console.WriteLine("\n\r Server Stopped.");
 
             await Server.StartAsync(CancellationToken);
         }
@@ -60,7 +59,7 @@ namespace Texnomic.SecureDNS.Terminal
             IsDisposed = true;
         }
 
-        ~TerminalCMD()
+        ~CLI()
         {
             Dispose(false);
         }
