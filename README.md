@@ -23,8 +23,8 @@ The SecureDNS Server is implemented using modern [Clean-Architecture Patterns](h
 The [v0.1 Alpha Release](https://github.com/Texnomic/SecureDNS/releases/tag/v0.1-alpha) is now available for early adopters.
 
 ## Protocols
-- [x] [DNS Over Blockchain](https://readthedocs.org/projects/ens/downloads/pdf/latest/)
-- [x] [DNS Over UDP](https://tools.ietf.org/html/rfc1035)
+- [x] [DNS Over Blockchain (ENS)](https://ens.domains/)
+- [ ] [DNS Over Blockchain (HandShake)](https://handshake.org/)
 - [ ] [DNS Over TCP](https://tools.ietf.org/html/rfc1035)
 - [x] [DNS Over TLS](https://tools.ietf.org/html/rfc7858)
 - [x] [DNS Over HTTP/S](https://tools.ietf.org/html/rfc8484)

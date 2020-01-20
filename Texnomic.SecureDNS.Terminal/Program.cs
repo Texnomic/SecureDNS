@@ -113,11 +113,20 @@ namespace Texnomic.SecureDNS.Terminal
             Services.AddSingleton<HostTableMiddleware>();
             Services.AddSingleton<FilterListsMiddleware>();
             Services.AddSingleton<ResolverMiddleware>();
-            Services.AddSingleton<IProtocol, HTTPs>();
             Services.AddSingleton<IMiddlewareResolver, ServerMiddlewareActivator>();
             Services.AddSingleton<IAsyncResponsibilityChain<IMessage, IMessage>, ProxyResponsibilityChain>();
 
             var Options = Configurations.GetSection("Terminal Options").Get<TerminalOptions>();
+
+            if(Options.Protocol == Protocol.HTTPs)
+            {
+                Services.AddSingleton<IProtocol, HTTPs>();
+            }
+
+            if (Options.Protocol == Protocol.TLS)
+            {
+                Services.AddSingleton<IProtocol, TLS>();
+            }
 
             if (Options.Mode == Mode.GUI)
             {

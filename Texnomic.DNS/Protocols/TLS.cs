@@ -20,9 +20,10 @@ namespace Texnomic.DNS.Protocols
         private readonly BinarySerializer BinarySerializer;
         private readonly IOptionsMonitor<TLSOptions> Options;
         private readonly TcpClient TcpClient;
-        private readonly SslStream SslStream;
-        private readonly PipeReader PipeReader;
-        private readonly PipeWriter PipeWriter;
+
+        private SslStream SslStream;
+        private PipeReader PipeReader;
+        private PipeWriter PipeWriter;
 
         public TLS(IOptionsMonitor<TLSOptions> TLSOptions)
         {
@@ -31,6 +32,11 @@ namespace Texnomic.DNS.Protocols
             BinarySerializer = new BinarySerializer();
 
             TcpClient = new TcpClient();
+        }
+
+        private async Task InitializeAsync()
+        {
+            await TcpClient.ConnectAsync(Options.CurrentValue.Host, Options.CurrentValue.Port);
 
             SslStream = new SslStream(TcpClient.GetStream(), true, ValidateServerCertificate)
             {
@@ -38,16 +44,11 @@ namespace Texnomic.DNS.Protocols
                 WriteTimeout = Options.CurrentValue.Timeout
             };
 
+            await SslStream.AuthenticateAsClientAsync(Options.CurrentValue.Host);
+
             PipeReader = SslStream.UsePipeReader();
 
             PipeWriter = SslStream.UsePipeWriter();
-        }
-
-        private async Task InitializeAsync()
-        {
-            await TcpClient.ConnectAsync(Options.CurrentValue.Host, Options.CurrentValue.Port);
-
-            await SslStream.AuthenticateAsClientAsync(Options.CurrentValue.Host);
         }
 
         public byte[] Resolve(byte[] Query)

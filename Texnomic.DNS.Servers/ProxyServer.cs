@@ -57,12 +57,6 @@ namespace Texnomic.DNS.Servers
 
             Workers = new List<Task>();
 
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                //https://stackoverflow.com/questions/5199026/c-sharp-async-udp-listener-socketexception
-                UdpClient.Client.IOControl(-1744830452, new byte[4], null);
-            }
-
             IncomingQueue = new BufferBlock<(IMessage, IPEndPoint)>();
 
             OutgoingQueue = new BufferBlock<(IMessage, IPEndPoint)>();
@@ -73,6 +67,12 @@ namespace Texnomic.DNS.Servers
             CancellationToken = Token;
 
             UdpClient = new UdpClient();
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                //https://stackoverflow.com/questions/5199026/c-sharp-async-udp-listener-socketexception
+                UdpClient.Client.IOControl(-1744830452, new byte[4], null);
+            }
 
             UdpClient.Client.Bind(Options.CurrentValue.IPEndPoint);
 
