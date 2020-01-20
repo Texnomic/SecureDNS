@@ -1,5 +1,4 @@
-﻿using CommandLine;
-using Texnomic.SecureDNS.Terminal.Enums;
+﻿using Texnomic.SecureDNS.Terminal.Enums;
 
 namespace Texnomic.SecureDNS.Terminal.Options
 {
