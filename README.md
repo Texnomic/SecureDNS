@@ -20,7 +20,7 @@ The SecureDNS Server is implemented using modern [Clean-Architecture Patterns](h
 11. [Supported-By](#Supported-By)
 
 ## Releases
-The [v0.1 Alpha Release](https://github.com/Texnomic/SecureDNS/releases/tag/v0.1-alpha) is now available for early adopters.
+The [v0.2 Alpha Release](https://github.com/Texnomic/SecureDNS/releases/tag/v0.2-alpha) is now available.
 
 ## Protocols
 - [x] [DNS Over Blockchain (ENS)](https://ens.domains/)
@@ -36,10 +36,7 @@ The [v0.1 Alpha Release](https://github.com/Texnomic/SecureDNS/releases/tag/v0.1
 3. [FilterLists](https://github.com/collinbarrett/FilterLists)
 4. [IANA Root Files](https://www.iana.org/domains/root/files)
 5. [ICANN Zone Data Service](https://czds.icann.org/home)
-6. Public DNS Resolvers:
-   - [x] Google
-   - [x] Cloudflare
-   - [x] Quad9
+6. Any Standard-Compliant Public `DoH` or `DoT` Resolvers.
 
 ## Records
 | Type | Code | Supported | Description | 
