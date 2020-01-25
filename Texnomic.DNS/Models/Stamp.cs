@@ -212,5 +212,47 @@ namespace Texnomic.DNS.Models
         [SerializeWhen(nameof(Protocol), StampProtocol.DoH)]
         [FieldLength(nameof(PathLength))]
         public string Path { get; set; }
+
+
+        /// <summary>
+        /// source: https://gist.github.com/igorushko/cccef0561aea7e46ae52bc62270b2b61
+        /// </summary>
+        private static string Encode(byte[] arg)
+        {
+            if (arg == null) throw new ArgumentNullException("arg");
+
+            var s = Convert.ToBase64String(arg);
+            return s
+                .Replace("=", "")
+                .Replace("/", "_")
+                .Replace("+", "-");
+        }
+
+        /// <summary>
+        /// source: https://gist.github.com/igorushko/cccef0561aea7e46ae52bc62270b2b61
+        /// </summary>
+        private static string ToBase64(string arg)
+        {
+            if (arg == null) throw new ArgumentNullException("arg");
+
+            var s = arg
+                .PadRight(arg.Length + (4 - arg.Length % 4) % 4, '=')
+                .Replace("_", "/")
+                .Replace("-", "+");
+
+            return s;
+        }
+
+        /// <summary>
+        /// source: https://gist.github.com/igorushko/cccef0561aea7e46ae52bc62270b2b61
+        /// </summary>
+        private static byte[] Decode(string arg)
+        {
+            var decrypted = ToBase64(arg);
+
+            return Convert.FromBase64String(decrypted);
+        }
     }
+
+
 }
