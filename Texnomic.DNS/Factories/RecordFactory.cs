@@ -19,7 +19,7 @@ namespace Texnomic.DNS.Factories
             TypesDictionary = Assembly.GetExecutingAssembly()
                                       .GetTypes()
                                       .Where(Type => Type.GetInterfaces().Contains(typeof(IRecord)))
-                                      .ToDictionary(Type => (RecordType)Enum.Parse(typeof(RecordType), Type.Name));
+                                      .ToDictionary(Type => Enum.Parse<RecordType>(Type.Name));
 
             KeysDictionary = TypesDictionary.ToDictionary(Pair => Pair.Value, Pair => Pair.Key);
         }

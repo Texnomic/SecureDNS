@@ -27,38 +27,38 @@ namespace Texnomic.DNS.Servers.Tests
             //Stop-Service -DisplayName 'Internet Connection Sharing (ICS)'
             //Resolve-DnsName -Name mail.google.com -Server 127.0.0.1 -Type A
 
-            Log.Logger = new LoggerConfiguration()
-                            .Destructure.UsingAttributes()
-                            .WriteTo.Seq("http://127.0.0.1:5341", compact: true)
-                            .CreateLogger();
+            //Log.Logger = new LoggerConfiguration()
+            //                .Destructure.UsingAttributes()
+            //                .WriteTo.Seq("http://127.0.0.1:5341", compact: true)
+            //                .CreateLogger();
 
 
-            var FilterTags = new Tags[]
-            {
-                Tags.Malware,
-                Tags.Phishing,
-                Tags.Crypto,
-            };
+            //var FilterTags = new Tags[]
+            //{
+            //    Tags.Malware,
+            //    Tags.Phishing,
+            //    Tags.Crypto,
+            //};
 
-            var ServiceCollection = new ServiceCollection();
-            ServiceCollection.AddSingleton(Log.Logger);
-            ServiceCollection.AddSingleton(FilterTags);
-            ServiceCollection.AddSingleton<FilterListsMiddleware>();
-            ServiceCollection.AddSingleton<GoogleHTTPsMiddleware>();
+            //var ServiceCollection = new ServiceCollection();
+            //ServiceCollection.AddSingleton(Log.Logger);
+            //ServiceCollection.AddSingleton(FilterTags);
+            //ServiceCollection.AddSingleton<FilterListsMiddleware>();
+            //ServiceCollection.AddSingleton<GoogleHTTPsMiddleware>();
 
-            var ServerMiddlewareActivator = new ServerMiddlewareActivator(ServiceCollection.BuildServiceProvider());
+            //var ServerMiddlewareActivator = new ServerMiddlewareActivator(ServiceCollection.BuildServiceProvider());
 
-            var Middlewares = new List<Type>()
-            {
-                typeof(FilterListsMiddleware),
-                typeof(GoogleHTTPsMiddleware),
-            };
+            //var Middlewares = new List<Type>()
+            //{
+            //    typeof(FilterListsMiddleware),
+            //    typeof(GoogleHTTPsMiddleware),
+            //};
 
-            var ServerResponsibilityChain = new ProxyResponsibilityChain(Middlewares, ServerMiddlewareActivator);
+            //var ServerResponsibilityChain = new ProxyResponsibilityChain(Middlewares, ServerMiddlewareActivator);
 
-            CancellationTokenSource = new CancellationTokenSource();
+            //CancellationTokenSource = new CancellationTokenSource();
 
-            ProxyServer = new ProxyServer(ServerResponsibilityChain, Log.Logger, IPEndPoint.Parse("0.0.0.0:53"));
+            //ProxyServer = new ProxyServer(ServerResponsibilityChain, Log.Logger, IPEndPoint.Parse("0.0.0.0:53"));
         }
 
         [TestMethod]

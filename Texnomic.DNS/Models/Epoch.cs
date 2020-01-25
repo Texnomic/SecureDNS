@@ -14,7 +14,7 @@ namespace Texnomic.DNS.Models
         {
             var Buffer = new byte[4];
             Stream.Read(Buffer);
-            Array.Reverse(Buffer);
+            if (Endianness == Endianness.Big) Array.Reverse(Buffer);
             var Seconds = BitConverter.ToUInt32(Buffer);
             Value = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddSeconds(Seconds);
         }
@@ -23,7 +23,7 @@ namespace Texnomic.DNS.Models
         {
             var Seconds = Value.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
             var Bytes = BitConverter.GetBytes((uint)Seconds);
-            Array.Reverse(Bytes);
+            if (Endianness == Endianness.Big) Array.Reverse(Bytes);
             Stream.Write(Bytes);
         }
 

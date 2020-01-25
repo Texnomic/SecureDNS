@@ -24,24 +24,24 @@ namespace Texnomic.DNS.Tests.Providers.HTTPS
         [TestInitialize]
         public void Initialize()
         {
-            ID = (ushort)new Random().Next();
+            //ID = (ushort)new Random().Next();
 
-            Resolver = new HTTPs(new Uri("https://dns.quad9.net"), 5053, "047D8BD71D03850D1825B3341C29A127D4AC0125488AA0F1EA02B9D8512C086AAC7256ECFA3DA6A09F4909558EACFEB973175C02FB78CC2491946F4323890E1D66");
+            //Resolver = new HTTPs(new Uri("https://dns.quad9.net"), 5053, "047D8BD71D03850D1825B3341C29A127D4AC0125488AA0F1EA02B9D8512C086AAC7256ECFA3DA6A09F4909558EACFEB973175C02FB78CC2491946F4323890E1D66");
 
-            RequestMessage = new Message()
-            {
-                ID = ID,
-                RecursionDesired = true,
-                Questions = new List<IQuestion>()
-                {
-                    new Question()
-                    {
-                        Domain = Domain.FromString("facebook.com"),
-                        Class = RecordClass.Internet,
-                        Type = RecordType.A
-                    }
-                }
-            };
+            //RequestMessage = new Message()
+            //{
+            //    ID = ID,
+            //    RecursionDesired = true,
+            //    Questions = new List<IQuestion>()
+            //    {
+            //        new Question()
+            //        {
+            //            Domain = Domain.FromString("facebook.com"),
+            //            Class = RecordClass.Internet,
+            //            Type = RecordType.A
+            //        }
+            //    }
+            //};
         }
 
         [TestMethod]

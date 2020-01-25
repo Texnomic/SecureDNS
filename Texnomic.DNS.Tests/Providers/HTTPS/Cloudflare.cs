@@ -23,24 +23,24 @@ namespace Texnomic.DNS.Tests.Providers.HTTPS
         [TestInitialize]
         public void Initialize()
         {
-            ID = (ushort)new Random().Next();
+            //ID = (ushort)new Random().Next();
 
-            Resolver = new HTTPs(new Uri("https://cloudflare-dns.com/"), "04C520708C204250281E7D44417C3079291C635E1D449BC5F7713A2BDED2A2A4B16C3D6AC877B8CB8F2E5053FDF418267F6137EDFFC2BEE90B5DB97EE1DF1CE274");
+            //Resolver = new HTTPs(new Uri("https://cloudflare-dns.com/"), "04C520708C204250281E7D44417C3079291C635E1D449BC5F7713A2BDED2A2A4B16C3D6AC877B8CB8F2E5053FDF418267F6137EDFFC2BEE90B5DB97EE1DF1CE274");
 
-            RequestMessage = new Message()
-            {
-                ID = ID,
-                RecursionDesired = true,
-                Questions = new List<IQuestion>()
-                {
-                    new Question()
-                    {
-                        Domain = Domain.FromString("facebook.com"),
-                        Class = RecordClass.Internet,
-                        Type = RecordType.A
-                    }
-                }
-            };
+            //RequestMessage = new Message()
+            //{
+            //    ID = ID,
+            //    RecursionDesired = true,
+            //    Questions = new List<IQuestion>()
+            //    {
+            //        new Question()
+            //        {
+            //            Domain = Domain.FromString("facebook.com"),
+            //            Class = RecordClass.Internet,
+            //            Type = RecordType.A
+            //        }
+            //    }
+            //};
         }
 
         [TestMethod]

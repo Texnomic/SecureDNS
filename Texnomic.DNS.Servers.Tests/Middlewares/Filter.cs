@@ -10,31 +10,31 @@ namespace Texnomic.DNS.Servers.Tests.Middlewares
     [TestClass]
     public class Filter
     {
-        private Tags[] FilterTags;
-        private FilterListsMiddleware FilterMiddleware;
+        //private Tags[] FilterTags;
+        //private FilterListsMiddleware FilterMiddleware;
 
-        [TestInitialize]
-        public void Initialize()
-        {
-            Log.Logger = new LoggerConfiguration()
-                           .Destructure.UsingAttributes()
-                           .WriteTo.Seq("http://127.0.0.1:5341", compact: true)
-                           .CreateLogger();
+        //[TestInitialize]
+        //public void Initialize()
+        //{
+        //    Log.Logger = new LoggerConfiguration()
+        //                   .Destructure.UsingAttributes()
+        //                   .WriteTo.Seq("http://127.0.0.1:5341", compact: true)
+        //                   .CreateLogger();
 
-            FilterTags = new Tags[]
-            {
-                Tags.Malware,
-                Tags.Phishing,
-                Tags.Crypto,
-            };
+        //    FilterTags = new Tags[]
+        //    {
+        //        Tags.Malware,
+        //        Tags.Phishing,
+        //        Tags.Crypto,
+        //    };
 
-            FilterMiddleware = new FilterListsMiddleware(FilterTags, Log.Logger);
-        }
+        //    FilterMiddleware = new FilterListsMiddleware(FilterTags, Log.Logger);
+        //}
 
-        [TestMethod]
-        public async Task InitializeAsync()
-        {
-            await FilterMiddleware.InitializeAsync(FilterTags);
-        }
+        //[TestMethod]
+        //public async Task InitializeAsync()
+        //{
+        //    await FilterMiddleware.InitializeAsync(FilterTags);
+        //}
     }
 }
