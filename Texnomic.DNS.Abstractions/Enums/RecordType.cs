@@ -264,7 +264,7 @@ namespace Texnomic.DNS.Abstractions.Enums
         MAILA = 254,
 
         /// <summary> All cached records </summary>
-        STAR = 255,
+        Any = 255,
 
         /// <summary> Uniform Resource Identifier </summary>
         URI = 256,
