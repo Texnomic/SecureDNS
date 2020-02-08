@@ -1,7 +1,5 @@
 ﻿using BinarySerialization;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Texnomic.DNS.Extensions;
@@ -9,11 +7,11 @@ using Texnomic.DNS.Models;
 
 namespace Texnomic.DNS.Converters
 {
-    public class StampConveter : JsonConverter<Stamp>
+    public class StampConverter : JsonConverter<Stamp>
     {
         private readonly BinarySerializer BinarySerializer;
 
-        public StampConveter()
+        public StampConverter()
         {
             BinarySerializer = new BinarySerializer();
         }
@@ -38,44 +36,25 @@ namespace Texnomic.DNS.Converters
             Writer.WriteStringValue($"sdns://{Stamp}");
         }
 
-
-        /// <summary>
-        /// source: https://gist.github.com/igorushko/cccef0561aea7e46ae52bc62270b2b61
-        /// </summary>
-        private static string Encode(byte[] arg)
+        private static string Encode(byte[] Stamp)
         {
-            if (arg == null) throw new ArgumentNullException("arg");
-
-            var s = Convert.ToBase64String(arg);
-            return s
+            return Convert.ToBase64String(Stamp)
                 .Replace("=", "")
                 .Replace("/", "_")
                 .Replace("+", "-");
         }
 
-        /// <summary>
-        /// source: https://gist.github.com/igorushko/cccef0561aea7e46ae52bc62270b2b61
-        /// </summary>
-        private static string ToBase64(string arg)
+        private static string ToBase64(string Stamp)
         {
-            if (arg == null) throw new ArgumentNullException("arg");
-
-            var s = arg
-                .PadRight(arg.Length + (4 - arg.Length % 4) % 4, '=')
+            return Stamp
+                .PadRight(Stamp.Length + (4 - Stamp.Length % 4) % 4, '=')
                 .Replace("_", "/")
                 .Replace("-", "+");
-
-            return s;
         }
 
-        /// <summary>
-        /// source: https://gist.github.com/igorushko/cccef0561aea7e46ae52bc62270b2b61
-        /// </summary>
-        private static byte[] Decode(string arg)
+        private static byte[] Decode(string Stamp)
         {
-            var decrypted = ToBase64(arg);
-
-            return Convert.FromBase64String(decrypted);
+            return Convert.FromBase64String(ToBase64(Stamp));
         }
     }
 }

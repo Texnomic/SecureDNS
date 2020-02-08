@@ -14,9 +14,14 @@ namespace BitStreams
     {
         private long Offset { get; set; }
         private int Bit { get; set; }
-        private bool MSB { get; set; }
+        private bool MostSignificantBit { get; set; }
         private Stream Stream;
-        private Encoding Encoding;
+
+        /// <summary>
+        /// Get the <see cref="System.Text.Encoding"/> used for chars and strings
+        /// </summary>
+        /// <returns><see cref="System.Text.Encoding"/> used</returns>
+        public Encoding Encoding { get; set; }
 
         /// <summary>
         /// Allows the <see cref="BitStream"/> auto increase in size when needed
@@ -44,12 +49,12 @@ namespace BitStreams
         /// Creates a <see cref="BitStream"/> using a Stream
         /// </summary>
         /// <param name="Stream">Stream to use</param>
-        /// <param name="MSB">true if Most Significant Bit will be used, if false LSB will be used</param>
-        public BitStream(Stream Stream, bool MSB = false)
+        /// <param name="MostSignificantBit">true if Most Significant Bit will be used, if false LSB will be used</param>
+        public BitStream(Stream Stream, bool MostSignificantBit = false)
         {
-            this.Stream = new MemoryStream();
-            Stream.CopyTo(this.Stream);
-            this.MSB = MSB;
+            this.Stream = Stream;
+            this.MostSignificantBit = MostSignificantBit;
+
             Offset = 0;
             Bit = 0;
             Encoding = Encoding.UTF8;
@@ -59,31 +64,28 @@ namespace BitStreams
         /// <summary>
         /// Creates a <see cref="BitStream"/> using a Stream
         /// </summary>
-        /// <param name="stream">Stream to use</param>
-        /// <param name="encoding">Encoding to use with chars</param>
-        /// <param name="MSB">true if Most Significant Bit will be used, if false LSB will be used</param>
-        public BitStream(Stream stream, Encoding encoding, bool MSB = false)
+        /// <param name="Stream">Stream to use</param>
+        /// <param name="Encoding">Encoding to use with chars</param>
+        /// <param name="MostSignificantBit">true if Most Significant Bit will be used, if false LSB will be used</param>
+        public BitStream(Stream Stream, Encoding Encoding, bool MostSignificantBit = false)
         {
-            this.Stream = new MemoryStream();
-            stream.CopyTo(this.Stream);
-            this.MSB = MSB;
+            this.Stream = Stream;
+            this.MostSignificantBit = MostSignificantBit;
             Offset = 0;
             Bit = 0;
-            this.Encoding = encoding;
+            this.Encoding = Encoding;
             AutoIncreaseStream = false;
         }
 
         /// <summary>
         /// Creates a <see cref="BitStream"/> using a byte[]
         /// </summary>
-        /// <param name="buffer">byte[] to use</param>
-        /// <param name="MSB">true if Most Significant Bit will be used, if false LSB will be used</param>
-        public BitStream(byte[] buffer, bool MSB = false)
+        /// <param name="Buffer">byte[] to use</param>
+        /// <param name="MostSignificantBit">true if Most Significant Bit will be used, if false LSB will be used</param>
+        public BitStream(byte[] Buffer, bool MostSignificantBit = false)
         {
-            this.Stream = new MemoryStream();
-            MemoryStream m = new MemoryStream(buffer);
-            m.CopyTo(this.Stream);
-            this.MSB = MSB;
+            Stream = new MemoryStream(Buffer);
+            this.MostSignificantBit = MostSignificantBit;
             Offset = 0;
             Bit = 0;
             Encoding = Encoding.UTF8;
@@ -93,40 +95,17 @@ namespace BitStreams
         /// <summary>
         /// Creates a <see cref="BitStream"/> using a byte[]
         /// </summary>
-        /// <param name="buffer">byte[] to use</param>
-        /// <param name="encoding">Encoding to use with chars</param>
-        /// <param name="MSB">true if Most Significant Bit will be used, if false LSB will be used</param>
-        public BitStream(byte[] buffer, Encoding encoding, bool MSB = false)
+        /// <param name="Buffer">byte[] to use</param>
+        /// <param name="Encoding">Encoding to use with chars</param>
+        /// <param name="MostSignificantBit">true if Most Significant Bit will be used, if false LSB will be used</param>
+        public BitStream(byte[] Buffer, Encoding Encoding, bool MostSignificantBit = false)
         {
-            this.Stream = new MemoryStream();
-            MemoryStream m = new MemoryStream(buffer);
-            m.CopyTo(this.Stream);
-            this.MSB = MSB;
+            this.Stream =  new MemoryStream(Buffer);
+            this.MostSignificantBit = MostSignificantBit;
             Offset = 0;
             Bit = 0;
-            this.Encoding = encoding;
+            this.Encoding = Encoding;
             AutoIncreaseStream = false;
-        }
-
-        /// <summary>
-        /// Creates a <see cref="BitStream"/> using a byte[]
-        /// </summary>
-        /// <param name="buffer">byte[] to use</param>
-        /// <param name="MSB">true if Most Significant Bit will be used, if false LSB will be used</param>
-        public static BitStream Create(byte[] buffer, bool MSB = false)
-        {
-            return new BitStream(buffer, MSB);
-        }
-
-        /// <summary>
-        /// Creates a <see cref="BitStream"/> using a byte[]
-        /// </summary>
-        /// <param name="buffer">byte[] to use</param>
-        /// <param name="encoding">Encoding to use with chars/param>
-        /// <param name="MSB">true if Most Significant Bit will be used, if false LSB will be used</param>
-        public static BitStream Create(byte[] buffer, Encoding encoding, bool MSB = false)
-        {
-            return new BitStream(buffer, encoding, MSB);
         }
 
         /// <summary>
@@ -199,7 +178,7 @@ namespace BitStreams
             }
             if (bit >= 8)
             {
-                int n = (int)(bit / 8);
+                var n = (int)(bit / 8);
                 this.Offset += n;
                 this.Bit = bit % 8;
             }
@@ -254,46 +233,26 @@ namespace BitStreams
         public byte[] GetStreamData()
         {
             Stream.Seek(0, SeekOrigin.Begin);
-            MemoryStream s = new MemoryStream();
+            var s = new MemoryStream();
             Stream.CopyTo(s);
             Seek(Offset, Bit);
             return s.ToArray();
         }
 
-        /// <summary>
-        /// Get the <see cref="System.Text.Encoding"/> used for chars and strings
-        /// </summary>
-        /// <returns><see cref="System.Text.Encoding"/> used</returns>
-        public Encoding GetEncoding()
-        {
-            return Encoding;
-        }
-
-        /// <summary>
-        /// Set the <see cref="System.Text.Encoding"/> that will be used for chars and strings
-        /// </summary>
-        /// <param name="encoding"><see cref="System.Text.Encoding"/> to use</param>
-        public void SetEncoding(Encoding encoding)
-        {
-            this.Encoding = encoding;
-        }
 
         /// <summary>
         /// Changes the length of the stream, if new length is less than current length stream data will be truncated
         /// </summary>
-        /// <param name="length">New stream length</param>
+        /// <param name="Length">New stream length</param>
         /// <returns>return true if stream changed length, false if it wasn't possible</returns>
-        public bool ChangeLength(long length)
+        public bool ChangeLength(long Length)
         {
-            if (Stream.CanSeek && Stream.CanWrite)
-            {
-                Stream.SetLength(length);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            if (!Stream.CanSeek || !Stream.CanWrite) return false;
+
+            Stream.SetLength(Length);
+
+            return true;
+
         }
 
         /// <summary>
@@ -303,11 +262,11 @@ namespace BitStreams
         /// <param name="length">Length of the new <see cref="BitStream"/></param>
         public void CutStream(long offset, long length)
         {
-            byte[] data = GetStreamData();
-            byte[] buffer = new byte[length];
+            var data = GetStreamData();
+            var buffer = new byte[length];
             Array.Copy(data, offset, buffer, 0, length);
             this.Stream = new MemoryStream();
-            MemoryStream m = new MemoryStream(buffer);
+            var m = new MemoryStream(buffer);
             this.Stream = new MemoryStream();
             m.CopyTo(this.Stream);
             this.Offset = 0;
@@ -361,8 +320,8 @@ namespace BitStreams
         /// <returns><see cref="BufferedStream"/> containing current <see cref="BitStream"/> data</returns>
         public BufferedStream CloneAsBufferedStream()
         {
-            BufferedStream bs = new BufferedStream(Stream);
-            StreamWriter sw = new StreamWriter(bs);
+            var bs = new BufferedStream(Stream);
+            var sw = new StreamWriter(bs);
             sw.Write(GetStreamData());
             bs.Seek(0, SeekOrigin.Begin);
             return bs;
@@ -376,8 +335,8 @@ namespace BitStreams
         /// <returns>true if <see cref="BitStream"/> will be inside the stream length</returns>
         private bool ValidPositionWhen(int bits)
         {
-            long o = Offset;
-            int b = Bit;
+            var o = Offset;
+            var b = Bit;
             b = (b + 1) % 8;
             if (b == 0)
             {
@@ -403,7 +362,7 @@ namespace BitStreams
             }
             Stream.Seek(Offset, SeekOrigin.Begin);
             byte value;
-            if (!MSB)
+            if (!MostSignificantBit)
             {
                 value = (byte)((Stream.ReadByte() >> (Bit)) & 1);
             }
@@ -423,8 +382,8 @@ namespace BitStreams
         /// <returns><see cref="BitStreams.Bit"/>[] containing read bits</returns>
         public Bit[] ReadBits(int length)
         {
-            Bit[] bits = new Bit[length];
-            for(int i=0;i< length; i++)
+            var bits = new Bit[length];
+            for(var i=0;i< length; i++)
             {
                 bits[i] = ReadBit();
             }
@@ -438,9 +397,9 @@ namespace BitStreams
         public void WriteBit(Bit data)
         {
             Stream.Seek(Offset, SeekOrigin.Begin);
-            byte value = (byte)Stream.ReadByte();
+            var value = (byte)Stream.ReadByte();
             Stream.Seek(Offset, SeekOrigin.Begin);
-            if (!MSB)
+            if (!MostSignificantBit)
             {
                 value &= (byte)~(1 << Bit);
                 value |= (byte)(data << Bit);
@@ -482,7 +441,7 @@ namespace BitStreams
         /// <param name="bits"><see cref="BitStreams.Bit"/>[] to write</param>
         public void WriteBits(ICollection<Bit> bits)
         {
-            foreach(Bit b in bits)
+            foreach(var b in bits)
             {
                 WriteBit(b);
             }            
@@ -495,9 +454,9 @@ namespace BitStreams
         /// <param name="length">Number of bits to write</param>
         public void WriteBits(ICollection<Bit> bits, int length)
         {
-            Bit[] b = new Bit[bits.Count];
+            var b = new Bit[bits.Count];
             bits.CopyTo(b, 0);
-            for (int i=0;i< length;i++)
+            for (var i=0;i< length;i++)
             {
                 WriteBit(b[i]);
             }
@@ -511,7 +470,7 @@ namespace BitStreams
         /// <param name="length">Number of bits to write</param>
         public void WriteBits(Bit[] bits, int offset, int length)
         {
-            for (int i = offset; i < length; i++)
+            for (var i = offset; i < length; i++)
             {
                 WriteBit(bits[i]);
             }
@@ -533,13 +492,13 @@ namespace BitStreams
             {
                 length *= 8;
             }
-            List<byte> data = new List<byte>();
+            var data = new List<byte>();
             for (long i = 0; i < length;)
             {
                 byte value = 0;
-                for (int p = 0; p < 8 && i < length; i++, p++)
+                for (var p = 0; p < 8 && i < length; i++, p++)
                 {
-                    if (!MSB)
+                    if (!MostSignificantBit)
                     {
                         value |= (byte)(ReadBit() << p);
                     }
@@ -623,7 +582,7 @@ namespace BitStreams
         /// <param name="length">Length of the string to read</param>
         public string ReadString(int length)
         {
-            int bitsPerChar = Encoding.GetByteCount(" ") * 8;
+            var bitsPerChar = Encoding.GetByteCount(" ") * 8;
             return Encoding.GetString(ReadBytes(bitsPerChar*length));
         }
 
@@ -632,7 +591,7 @@ namespace BitStreams
         /// </summary>
         public short ReadInt16()
         {
-            short value = BitConverter.ToInt16(ReadBytes(16), 0);
+            var value = BitConverter.ToInt16(ReadBytes(16), 0);
             return value;
         }
 
@@ -641,7 +600,7 @@ namespace BitStreams
         /// </summary>
         public Int24 ReadInt24()
         {
-            byte[] bytes = ReadBytes(24);
+            var bytes = ReadBytes(24);
             Array.Resize(ref bytes, 4);
             Int24 value = BitConverter.ToInt32(bytes, 0);
             return value;
@@ -652,7 +611,7 @@ namespace BitStreams
         /// </summary>
         public int ReadInt32()
         {
-            int value = BitConverter.ToInt32(ReadBytes(32), 0);
+            var value = BitConverter.ToInt32(ReadBytes(32), 0);
             return value;
         }
 
@@ -661,7 +620,7 @@ namespace BitStreams
         /// </summary>
         public Int48 ReadInt48()
         {
-            byte[] bytes = ReadBytes(48);
+            var bytes = ReadBytes(48);
             Array.Resize(ref bytes, 8);
             Int48 value = BitConverter.ToInt64(bytes, 0);
             return value;
@@ -672,7 +631,7 @@ namespace BitStreams
         /// </summary>
         public long ReadInt64()
         {
-            long value = BitConverter.ToInt64(ReadBytes(64), 0);
+            var value = BitConverter.ToInt64(ReadBytes(64), 0);
             return value;
         }
 
@@ -681,7 +640,7 @@ namespace BitStreams
         /// </summary>
         public ushort ReadUInt16()
         {
-            ushort value = BitConverter.ToUInt16(ReadBytes(16), 0);
+            var value = BitConverter.ToUInt16(ReadBytes(16), 0);
             return value;
         }
 
@@ -690,7 +649,7 @@ namespace BitStreams
         /// </summary>
         public UInt24 ReadUInt24()
         {
-            byte[] bytes = ReadBytes(24);
+            var bytes = ReadBytes(24);
             Array.Resize(ref bytes, 4);
             UInt24 value = BitConverter.ToUInt32(bytes, 0);
             return value;
@@ -701,7 +660,7 @@ namespace BitStreams
         /// </summary>
         public uint ReadUInt32()
         {
-            uint value = BitConverter.ToUInt32(ReadBytes(32), 0);
+            var value = BitConverter.ToUInt32(ReadBytes(32), 0);
             return value;
         }
 
@@ -710,7 +669,7 @@ namespace BitStreams
         /// </summary>
         public UInt48 ReadUInt48()
         {
-            byte[] bytes = ReadBytes(48);
+            var bytes = ReadBytes(48);
             Array.Resize(ref bytes, 8);
             UInt48 value = BitConverter.ToUInt64(bytes, 0);
             return value;
@@ -721,7 +680,7 @@ namespace BitStreams
         /// </summary>
         public ulong ReadUInt64()
         {
-            ulong value = BitConverter.ToUInt64(ReadBytes(64), 0);
+            var value = BitConverter.ToUInt64(ReadBytes(64), 0);
             return value;
         }
 
@@ -741,13 +700,13 @@ namespace BitStreams
             {
                 length *= 8;
             }
-            int position = 0;
+            var position = 0;
             for (long i = 0; i < length;)
             {
                 byte value = 0;
-                for (int p = 0; p < 8 && i < length; i++, p++)
+                for (var p = 0; p < 8 && i < length; i++, p++)
                 {
-                    if (!MSB)
+                    if (!MostSignificantBit)
                     {
                         value = (byte)((data[position] >> p) & 1);
                     }
@@ -822,7 +781,7 @@ namespace BitStreams
         /// </summary>
         public void WriteChar(char value)
         {
-            byte[] bytes = Encoding.GetBytes(new char[] { value }, 0, 1);
+            var bytes = Encoding.GetBytes(new char[] { value }, 0, 1);
             WriteBytes(bytes, bytes.Length*8);
         }
 
@@ -831,7 +790,7 @@ namespace BitStreams
         /// </summary>
         public void WriteString(string value)
         {
-            byte[] bytes = Encoding.GetBytes(value);
+            var bytes = Encoding.GetBytes(value);
             WriteBytes(bytes, bytes.Length * 8);
         }
 
@@ -933,7 +892,7 @@ namespace BitStreams
             Seek(Offset, 0);
             if (bits != 0 && bits <= 7)
             {
-                byte value = (byte)Stream.ReadByte();
+                var value = (byte)Stream.ReadByte();
                 if (leftShift)
                 {
                     value = (byte)(value << bits);
@@ -963,7 +922,7 @@ namespace BitStreams
             Seek(Offset, Bit);
             if (bits != 0 && bits <= 7)
             {
-                byte value = ReadByte();
+                var value = ReadByte();
                 if (leftShift)
                 {
                     value = (byte)(value << bits);
@@ -993,7 +952,7 @@ namespace BitStreams
             Seek(Offset, 0);
             if (bits != 0 && bits <= 7)
             {
-                byte value = (byte)Stream.ReadByte();
+                var value = (byte)Stream.ReadByte();
                 if (leftShift)
                 {
                     value = (byte)(value << bits | value >> (8 - bits));
@@ -1023,7 +982,7 @@ namespace BitStreams
             Seek(Offset, Bit);
             if (bits != 0 && bits <= 7)
             {
-                byte value = ReadByte();
+                var value = ReadByte();
                 if (leftShift)
                 {
                     value = (byte)(value << bits | value >> (8 - bits));
@@ -1054,7 +1013,7 @@ namespace BitStreams
                 throw new IOException("Cannot read in an offset bigger than the length of the stream");
             }
             Seek(Offset, Bit);
-            byte value = ReadByte();
+            var value = ReadByte();
             Offset--;
             Seek(Offset, Bit);
             WriteByte((byte)(value & x));
@@ -1071,7 +1030,7 @@ namespace BitStreams
                 throw new IOException("Cannot read in an offset bigger than the length of the stream");
             }
             Seek(Offset, Bit);
-            byte value = ReadByte();
+            var value = ReadByte();
             Offset--;
             Seek(Offset, Bit);
             WriteByte((byte)(value | x));
@@ -1088,7 +1047,7 @@ namespace BitStreams
                 throw new IOException("Cannot read in an offset bigger than the length of the stream");
             }
             Seek(Offset, Bit);
-            byte value = ReadByte();
+            var value = ReadByte();
             Offset--;
             Seek(Offset, Bit);
             WriteByte((byte)(value ^ x));
@@ -1104,7 +1063,7 @@ namespace BitStreams
                 throw new IOException("Cannot read in an offset bigger than the length of the stream");
             }
             Seek(Offset, Bit);
-            byte value = ReadByte();
+            var value = ReadByte();
             Offset--;
             Seek(Offset, Bit);
             WriteByte((byte)(~value));
@@ -1121,7 +1080,7 @@ namespace BitStreams
                 throw new IOException("Cannot read in an offset bigger than the length of the stream");
             }
             Seek(Offset, Bit);
-            Bit value = ReadBit();
+            var value = ReadBit();
             ReturnBit();
             WriteBit(x & value);
         }
@@ -1137,7 +1096,7 @@ namespace BitStreams
                 throw new IOException("Cannot read in an offset bigger than the length of the stream");
             }
             Seek(Offset, Bit);
-            Bit value = ReadBit();
+            var value = ReadBit();
             ReturnBit();
             WriteBit(x | value);
         }
@@ -1153,7 +1112,7 @@ namespace BitStreams
                 throw new IOException("Cannot read in an offset bigger than the length of the stream");
             }
             Seek(Offset, Bit);
-            Bit value = ReadBit();
+            var value = ReadBit();
             ReturnBit();
             WriteBit(x ^ value);
         }
@@ -1168,7 +1127,7 @@ namespace BitStreams
                 throw new IOException("Cannot read in an offset bigger than the length of the stream");
             }
             Seek(Offset, Bit);
-            Bit value = ReadBit();
+            var value = ReadBit();
             ReturnBit();
             WriteBit(~value);
         }
@@ -1183,7 +1142,7 @@ namespace BitStreams
                 throw new IOException("Cannot read in an offset bigger than the length of the stream");
             }
             Seek(Offset, 0);
-            byte value = ReadByte();
+            var value = ReadByte();
             Offset--;
             Seek(Offset, 0);
             WriteByte(value.ReverseBits());

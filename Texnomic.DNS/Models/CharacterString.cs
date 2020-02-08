@@ -9,18 +9,17 @@ namespace Texnomic.DNS.Models
     /// </summary>
     public class CharacterString : ICharacterString
     {
-        [FieldOrder(0)]
-        [FieldBitLength(8)]
-        [FieldEndianness(Endianness.Big)]
+        [FieldOrder(0), FieldBitLength(8), FieldEndianness(Endianness.Big)]
         public byte Length { get; set; }
 
-        [FieldOrder(2)]
-        [FieldLength(nameof(Length))]
-        public string Text { get; set; }
+        [FieldOrder(2), FieldLength(nameof(Length))]
+        public string Value { get; set; }
 
-        public override string ToString()
+        public static implicit operator string(CharacterString CharacterString)
         {
-            return Text;
+            return CharacterString.Value;
         }
+
+        public override string ToString() => Value;
     }
 }

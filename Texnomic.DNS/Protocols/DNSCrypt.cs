@@ -1,6 +1,5 @@
 ﻿using BinarySerialization;
 using Microsoft.Extensions.Options;
-using Nethereum.Hex.HexConvertors.Extensions;
 using NSec.Cryptography;
 using System;
 using System.Collections.Generic;
@@ -38,7 +37,7 @@ namespace Texnomic.DNS.Protocols
 
         public async ValueTask Initialize()
         {
-            IPEndPoint = IPEndPoint.Parse(Options.CurrentValue.Stamp.Hostname);
+            IPEndPoint = IPEndPoint.Parse(Options.CurrentValue.Stamp.DNSCrypt.Address);
 
             Client = new UdpClient
             {
@@ -62,7 +61,7 @@ namespace Texnomic.DNS.Protocols
                     {
                         Type = RecordType.TXT,
                         Class = RecordClass.Internet,
-                        Domain = new Domain(Options.CurrentValue.Stamp.ProviderName)
+                        Domain = new Domain(Options.CurrentValue.Stamp.DNSCrypt.ProviderName)
                     }
                 }
             };
@@ -73,7 +72,7 @@ namespace Texnomic.DNS.Protocols
 
             var Algorithm = new Ed25519();
 
-            var PKey = PublicKey.Import(Algorithm, Options.CurrentValue.Stamp.PublicKey, KeyBlobFormat.RawPublicKey);
+            var PKey = PublicKey.Import(Algorithm, Options.CurrentValue.Stamp.DNSCrypt.PublicKeys[0], KeyBlobFormat.RawPublicKey);
 
             var RecordBytes = await BinarySerializer.SerializeAsync(Record);
 

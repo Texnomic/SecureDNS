@@ -39,6 +39,11 @@ namespace Texnomic.DNS.Models
                     }));
         }
 
+        public static implicit operator string(Domain Domain)
+        {
+            return Domain.ToString();
+        }
+
         public override string ToString()
         {
             return string.Join('.', Labels.Select(Label => Label.Text));
@@ -109,8 +114,9 @@ namespace Texnomic.DNS.Models
                         }
                     case LabelType.Extended:
                     case LabelType.Unallocated:
-                    default:
                         throw new NotImplementedException(Enum.GetName(typeof(LabelType), LabelType));
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(LabelType));
                 }
             }
         }

@@ -11,6 +11,6 @@ namespace Texnomic.DNS.Abstractions
 
         [FieldOrder(2)]
         [FieldLength(nameof(Length))]
-        string Text { get; set; }
+        string Value { get; set; }
     }
 }

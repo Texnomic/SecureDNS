@@ -1,256 +1,95 @@
 ﻿using BinarySerialization;
 using System;
-using System.Text;
+using System.Threading.Tasks;
 using Texnomic.DNS.Abstractions.Enums;
+using Texnomic.DNS.Extensions;
 
 namespace Texnomic.DNS.Models
 {
     public class Stamp
     {
-        public Stamp()
-        {
-
-        }
-
-        public Stamp(string Stamp)
-        {
-            if (!Stamp.StartsWith("sdns://")) throw new ArgumentException("Stamp Uri Must Start With SDNS://");
-
-            var StampBytes = Decode(Stamp[7..]);
-
-            Protocol = (StampProtocol)StampBytes[0];
-
-            switch (Protocol)
-            {
-                case StampProtocol.DnsCrypt:
-                    ParseDnsCrypt(ref StampBytes);
-                    break;
-
-                case StampProtocol.DoH:
-                    ParseDoH(ref StampBytes);
-                    break;
-
-                case StampProtocol.DNSCryptRelay:
-                    ParseDnsCryptReply(ref StampBytes);
-                    break;
-
-                case StampProtocol.Plain:
-                case StampProtocol.TLS:
-                case StampProtocol.Unknown:
-                default:
-                    break;
-            }
-        }
-
-        private void ParseDnsCrypt(ref byte[] StampBytes)
-        {
-            //Too Short
-            if (StampBytes.Length < 66) return;
-
-            DnsSec = Convert.ToBoolean((StampBytes[1] >> 0) & 1);
-
-            NoLog = Convert.ToBoolean((StampBytes[1] >> 1) & 1);
-
-            NoFilter = Convert.ToBoolean((StampBytes[1] >> 2) & 1);
-
-            var Pointer = 9;
-
-            var HostnameLength = StampBytes[Pointer++];
-
-            Hostname = Encoding.UTF8.GetString(StampBytes[Pointer..(Pointer + HostnameLength)]);
-
-            Pointer += HostnameLength;
-
-            var PublicLeyLength = StampBytes[Pointer++];
-
-            PublicKey = StampBytes[Pointer..(Pointer + PublicLeyLength)];
-
-            Pointer += PublicLeyLength;
-
-            var ProviderNameLength = StampBytes[Pointer++];
-
-            ProviderName = Encoding.UTF8.GetString(StampBytes[Pointer..(Pointer + ProviderNameLength)]);
-        }
-
-        private void ParseDoH(ref byte[] StampBytes)
-        {
-            //Too Short
-            if (StampBytes.Length < 22) return;
-
-            DnsSec = Convert.ToBoolean((StampBytes[1] >> 0) & 1);
-
-            NoLog = Convert.ToBoolean((StampBytes[1] >> 1) & 1);
-
-            NoFilter = Convert.ToBoolean((StampBytes[1] >> 2) & 1);
-
-            var Pointer = 9;
-
-            var AddressLength = StampBytes[Pointer++];
-
-            Address = Encoding.UTF8.GetString(StampBytes[Pointer..(Pointer + AddressLength)]);
-
-            Pointer += AddressLength;
-
-            var HashLength = StampBytes[Pointer++];
-
-            Hash = StampBytes[Pointer..(Pointer + HashLength)];
-
-            Pointer += HashLength;
-
-            var HostnameLength = StampBytes[Pointer++];
-
-            Hostname = Encoding.UTF8.GetString(StampBytes[Pointer..(Pointer + HostnameLength)]);
-
-            Pointer += HostnameLength;
-
-            var PathLength = StampBytes[Pointer++];
-
-            Path = Encoding.UTF8.GetString(StampBytes[Pointer..(Pointer + PathLength)]);
-        }
-
-        private void ParseDnsCryptReply(ref byte[] StampBytes)
-        {
-            //Too Short
-            if (StampBytes.Length < 13) return;
-
-            var Pointer = 1;
-
-            var AddressLength = StampBytes[Pointer++];
-
-            Address = Encoding.UTF8.GetString(StampBytes[Pointer..(Pointer + AddressLength)]);
-        }
-
-
         [FieldOrder(0), FieldBitLength(8)]
         public StampProtocol Protocol { get; set; }
 
         [FieldOrder(1)]
         [SerializeWhen(nameof(Protocol), StampProtocol.DnsCrypt)]
-        [SerializeWhen(nameof(Protocol), StampProtocol.DoH)]
-        [FieldBitLength(1)]
-        public bool DnsSec { get; set; }
+        public DNSCryptStamp DNSCrypt { get; set; }
 
         [FieldOrder(2)]
-        [SerializeWhen(nameof(Protocol), StampProtocol.DnsCrypt)]
         [SerializeWhen(nameof(Protocol), StampProtocol.DoH)]
-        [FieldBitLength(1)]
-        public bool NoLog { get; set; }
+        public DoHStamp DoH { get; set; }
 
         [FieldOrder(3)]
-        [SerializeWhen(nameof(Protocol), StampProtocol.DnsCrypt)]
-        [SerializeWhen(nameof(Protocol), StampProtocol.DoH)]
-        [FieldBitLength(1)]
-        public bool NoFilter { get; set; }
+        [SerializeWhen(nameof(Protocol), StampProtocol.DoT)]
+        public DoTStamp DoT { get; set; }
 
         [FieldOrder(4)]
-        [SerializeWhen(nameof(Protocol), StampProtocol.DnsCrypt)]
-        [SerializeWhen(nameof(Protocol), StampProtocol.DoH)]
-        [FieldBitLength(5)]
-        public byte Flags { get; set; }
+        [SerializeWhen(nameof(Protocol), StampProtocol.DoU)]
+        public PlainStamp DoU { get; set; }
 
         [FieldOrder(5)]
-        [SerializeWhen(nameof(Protocol), StampProtocol.DnsCrypt)]
-        [SerializeWhen(nameof(Protocol), StampProtocol.DoH)]
-        [FieldBitLength(8)]
-        public int HostnameLength { get; set; }
-
-        [FieldOrder(6)]
-        [SerializeWhen(nameof(Protocol), StampProtocol.DnsCrypt)]
-        [SerializeWhen(nameof(Protocol), StampProtocol.DoH)]
-        [FieldLength(nameof(HostnameLength))]
-        public string Hostname { get; set; }
-
-        [FieldOrder(7)]
-        [SerializeWhen(nameof(Protocol), StampProtocol.DnsCrypt)]
-        [FieldBitLength(8)]
-        public int PublicKeyLength { get; set; }
-
-        [FieldOrder(8)]
-        [SerializeWhen(nameof(Protocol), StampProtocol.DnsCrypt)]
-        [FieldLength(nameof(PublicKeyLength))]
-        public byte[] PublicKey { get; set; }
-
-        [FieldOrder(9)]
-        [SerializeWhen(nameof(Protocol), StampProtocol.DnsCrypt)]
-        [FieldBitLength(8)]
-        public int ProviderNameLength { get; set; }
-
-        [FieldOrder(10)]
-        [SerializeWhen(nameof(Protocol), StampProtocol.DnsCrypt)]
-        [FieldLength(nameof(ProviderNameLength))]
-        public string ProviderName { get; set; }
-
-        [FieldOrder(11)]
         [SerializeWhen(nameof(Protocol), StampProtocol.DNSCryptRelay)]
-        [SerializeWhen(nameof(Protocol), StampProtocol.DoH)]
-        [FieldBitLength(8)]
-        public int AddressLength { get; set; }
+        public DNSCryptRelayStamp DNSCryptRelay { get; set; }
 
-        [FieldOrder(12)]
-        [SerializeWhen(nameof(Protocol), StampProtocol.DNSCryptRelay)]
-        [SerializeWhen(nameof(Protocol), StampProtocol.DoH)]
-        [FieldLength(nameof(AddressLength))]
-        public string Address { get; set; }
-
-
-        [FieldOrder(11)]
-        [SerializeWhen(nameof(Protocol), StampProtocol.DoH)]
-        [FieldBitLength(8)]
-        public int HashLength { get; set; }
-
-        [FieldOrder(12)]
-        [SerializeWhen(nameof(Protocol), StampProtocol.DoH)]
-        [FieldLength(nameof(HashLength))]
-        public byte[] Hash { get; set; }
-
-        [FieldOrder(11)]
-        [SerializeWhen(nameof(Protocol), StampProtocol.DoH)]
-        [FieldBitLength(8)]
-        public int PathLength { get; set; }
-
-        [FieldOrder(12)]
-        [SerializeWhen(nameof(Protocol), StampProtocol.DoH)]
-        [FieldLength(nameof(PathLength))]
-        public string Path { get; set; }
-
-
-        /// <summary>
-        /// source: https://gist.github.com/igorushko/cccef0561aea7e46ae52bc62270b2b61
-        /// </summary>
-        private static string Encode(byte[] arg)
+        public static Stamp FromString(string Stamp)
         {
-            if (arg == null) throw new ArgumentNullException("arg");
+            var Bytes = Decode(Stamp[7..]);
 
-            var s = Convert.ToBase64String(arg);
-            return s
+            var BinarySerializer = new BinarySerializer();
+
+            return BinarySerializer.Deserialize<Stamp>(Bytes);
+        }
+
+        public static async Task<Stamp> FromStringAsync(string Stamp)
+        {
+            var Bytes = Decode(Stamp[7..]);
+
+            var BinarySerializer = new BinarySerializer();
+
+            return await BinarySerializer.DeserializeAsync<Stamp>(Bytes);
+        }
+
+        public override string ToString()
+        {
+            var BinarySerializer = new BinarySerializer();
+
+            var Bytes = BinarySerializer.Serialize(this);
+
+            var Stamp = Encode(Bytes);
+
+            return string.Concat("sdns://", Stamp);
+        }
+
+        public async Task<string> ToStringAsync()
+        {
+            var BinarySerializer = new BinarySerializer();
+
+            var Bytes = await BinarySerializer.SerializeAsync(this);
+
+            var Stamp = Encode(Bytes);
+
+            return string.Concat("sdns://", Stamp);
+        }
+
+        private static string Encode(byte[] Stamp)
+        {
+            return Convert.ToBase64String(Stamp)
                 .Replace("=", "")
                 .Replace("/", "_")
                 .Replace("+", "-");
         }
 
-        /// <summary>
-        /// source: https://gist.github.com/igorushko/cccef0561aea7e46ae52bc62270b2b61
-        /// </summary>
-        private static string ToBase64(string arg)
+        private static string ToBase64(string Stamp)
         {
-            if (arg == null) throw new ArgumentNullException("arg");
-
-            var s = arg
-                .PadRight(arg.Length + (4 - arg.Length % 4) % 4, '=')
+            return Stamp
+                .PadRight(Stamp.Length + (4 - Stamp.Length % 4) % 4, '=')
                 .Replace("_", "/")
                 .Replace("-", "+");
-
-            return s;
         }
 
-        /// <summary>
-        /// source: https://gist.github.com/igorushko/cccef0561aea7e46ae52bc62270b2b61
-        /// </summary>
-        private static byte[] Decode(string arg)
+        private static byte[] Decode(string Stamp)
         {
-            var decrypted = ToBase64(arg);
-
-            return Convert.FromBase64String(decrypted);
+            return Convert.FromBase64String(ToBase64(Stamp));
         }
     }
 
