@@ -2,9 +2,9 @@
 
 Building a Secure, Modern, Cross-Platform & Cross-Architecture DNS Server Using C# 8.0 & .NET Core 3.1.
 
-The SecureDNS Server implements **all secure DNS Communication Protocols regardless of being standardized or not** while maintaining backward compatibility with the classic unsecure DNS Over UDP Protocol via Reverse Proxy.
+SecureDNS Project aims to implements all *secure* DNS Protocols regardless of being standardized or widely adopted; while maintaining backward compatibility with *unsecure* DNS Over UDP Protocol via Reverse Proxy.
 
-The SecureDNS Server is implemented using modern [Clean-Architecture Patterns](https://www.amazon.com/Clean-Architecture-Craftsmans-Software-Structure/dp/0134494164).
+SecureDNS Project is implemented using modern [Clean-Architecture](https://www.amazon.com/Clean-Architecture-Craftsmans-Software-Structure/dp/0134494164) Patterns.
 
 # Table Of Content
 1. [Releases](#Releases)

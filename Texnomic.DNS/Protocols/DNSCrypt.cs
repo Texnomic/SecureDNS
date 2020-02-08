@@ -49,7 +49,7 @@ namespace Texnomic.DNS.Protocols
                 }
             };
 
-            var QueryMessag = new Message()
+            var QueryMessage = new Message()
             {
                 ID = (ushort)Random.Next(),
                 MessageType = MessageType.Query,
@@ -67,9 +67,9 @@ namespace Texnomic.DNS.Protocols
                 }
             };
 
-            var AnswerMessage = await ResolveAsync(QueryMessag);
+            var AnswerMessage = await ResolveAsync(QueryMessage);
 
-            var Record = AnswerMessage.Answers[0].Record as TXT;
+            var Record = (TXT)AnswerMessage.Answers[0].Record;
 
             var Algorithm = new Ed25519();
 
@@ -77,9 +77,8 @@ namespace Texnomic.DNS.Protocols
 
             var RecordBytes = await BinarySerializer.SerializeAsync(Record);
 
-            var Valid = Algorithm.Verify(PKey, RecordBytes.Skip(73).ToArray(), Record.Signature);
+            var Valid = Algorithm.Verify(PKey, RecordBytes.Skip(73).ToArray(), Record.Certificate.Signature);
 
-            
         }
 
         
