@@ -1,11 +1,12 @@
 ﻿using BinarySerialization;
+using Texnomic.DNS.Abstractions;
 
 namespace Texnomic.DNS.Models
 {
     /// <summary>
     /// <see cref="https://github.com/DNSCrypt/dnscrypt-proxy/wiki/stamps#plain-dns-stamps"/>
     /// </summary>
-    public class PlainStamp
+    public class DoUStamp : IStamp
     {
         [FieldOrder(0), FieldBitLength(8)] 
         public bool DnsSec { get; set; }

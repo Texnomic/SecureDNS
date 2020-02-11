@@ -17,7 +17,7 @@ namespace Texnomic.DNS.Models
 
         public static implicit operator string(PrefixedString PrefixedString)
         {
-            return PrefixedString.Value;
+            return PrefixedString?.Value;
         }
 
         public override string ToString() => Value;

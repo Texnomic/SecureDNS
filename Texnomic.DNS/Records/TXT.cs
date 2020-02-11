@@ -18,6 +18,7 @@ namespace Texnomic.DNS.Records
         [FieldOrder(0)]
         public string Text { get; set; }
 
+        [FieldOrder(1)]
         [SerializeWhen(nameof(Text), "|DNSC")]
         public Certificate Certificate { get; set; }
     }

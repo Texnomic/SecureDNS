@@ -30,6 +30,7 @@ namespace Texnomic.DNS.Models
         public Domain(string Domain)
         {
             Labels = new List<ILabel>();
+
             Labels.AddRange(Domain.Split('.')
                     .Select(Label => new Label
                     {
@@ -41,7 +42,12 @@ namespace Texnomic.DNS.Models
 
         public static implicit operator string(Domain Domain)
         {
-            return Domain.ToString();
+            return Domain?.ToString();
+        }
+
+        public static implicit operator Domain(string Domain)
+        {
+            return new Domain(Domain);
         }
 
         public override string ToString()

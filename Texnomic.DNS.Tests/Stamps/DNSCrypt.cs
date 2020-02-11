@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Texnomic.DNS.Models;
 
 namespace Texnomic.DNS.Tests.Stamps
 {
@@ -14,6 +15,8 @@ namespace Texnomic.DNS.Tests.Stamps
             var Stamp =  await Models.Stamp.FromStringAsync(StampEncoded);
 
             Assert.IsNotNull(Stamp);
+            Assert.IsNotNull(Stamp.Value);
+            Assert.IsInstanceOfType(Stamp.Value, typeof(DNSCryptStamp));
         }
 
     }

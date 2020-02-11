@@ -5,7 +5,7 @@ namespace Texnomic.DNS.Models
     /// <summary>
     /// <see cref="https://github.com/DNSCrypt/dnscrypt-proxy/wiki/stamps#dns-over-tls-stamps"/>
     /// </summary>
-    public class DoTStamp: PlainStamp
+    public class DoTStamp: DoUStamp
     {
         [FieldOrder(0)]
         public PrefixedArray<PrefixedByteArray> Hash { get; set; }

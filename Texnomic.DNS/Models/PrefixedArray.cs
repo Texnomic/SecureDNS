@@ -8,11 +8,16 @@ namespace Texnomic.DNS.Models
     public class PrefixedArray<T>
     {
         [FieldOrder(0), FieldBitLength(8), FieldEndianness(Endianness.Little)]
-        public byte Length { get; set; }
+        public byte Count { get; set; }
 
-        [FieldOrder(2), FieldCount(nameof(Length))]
+        [FieldOrder(2), FieldCount(nameof(Count))]
         public T[] Value { get; set; }
 
-        public T this[int Index] => Value[Index];
+        [Ignore]
+        public T this[int Index]
+        {
+            get => Value[Index];
+            set => Value[Index] = value;
+        }
     }
 }

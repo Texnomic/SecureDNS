@@ -1,8 +1,10 @@
 ﻿using BinarySerialization;
 using System;
 using System.Threading.Tasks;
+using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Extensions;
+using Texnomic.DNS.Factories;
 
 namespace Texnomic.DNS.Models
 {
@@ -12,24 +14,8 @@ namespace Texnomic.DNS.Models
         public StampProtocol Protocol { get; set; }
 
         [FieldOrder(1)]
-        [SerializeWhen(nameof(Protocol), StampProtocol.DnsCrypt)]
-        public DNSCryptStamp DNSCrypt { get; set; }
-
-        [FieldOrder(2)]
-        [SerializeWhen(nameof(Protocol), StampProtocol.DoH)]
-        public DoHStamp DoH { get; set; }
-
-        [FieldOrder(3)]
-        [SerializeWhen(nameof(Protocol), StampProtocol.DoT)]
-        public DoTStamp DoT { get; set; }
-
-        [FieldOrder(4)]
-        [SerializeWhen(nameof(Protocol), StampProtocol.DoU)]
-        public PlainStamp DoU { get; set; }
-
-        [FieldOrder(5)]
-        [SerializeWhen(nameof(Protocol), StampProtocol.DNSCryptRelay)]
-        public DNSCryptRelayStamp DNSCryptRelay { get; set; }
+        [SubtypeFactory(nameof(Protocol), typeof(StampFactory))]
+        public IStamp Value { get; set; }
 
         public static Stamp FromString(string Stamp)
         {
