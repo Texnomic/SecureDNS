@@ -10,7 +10,7 @@ namespace Texnomic.FilterLists
     public class FilterListsClient
     {
         private readonly RestClient RestClient;
-        private AsyncRetryPolicy<IRestResponse<List<FilterList>>> RetryPolicy;
+        private readonly AsyncRetryPolicy<IRestResponse<List<FilterList>>> RetryPolicy;
 
         public FilterListsClient()
         {
@@ -31,7 +31,7 @@ namespace Texnomic.FilterLists
 
             RestClient.UseSerializer<NewtonsoftJsonSerializer>();
 
-            var Response = await RetryPolicy.ExecuteAsync(() => RestClient.ExecuteGetTaskAsync<List<FilterList>>(RestRequest));
+            var Response = await RetryPolicy.ExecuteAsync(() => RestClient.ExecuteGetAsync<List<FilterList>>(RestRequest));
 
             if (Response.ErrorException != null) throw Response.ErrorException;
 

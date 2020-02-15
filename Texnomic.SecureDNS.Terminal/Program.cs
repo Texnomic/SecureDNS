@@ -105,6 +105,7 @@ namespace Texnomic.SecureDNS.Terminal
             Services.Configure<HostTableMiddlewareOptions>(Configurations.GetSection("HostTable Middleware"));
             Services.Configure<FilterListsMiddlewareOptions>(Configurations.GetSection("FilterLists Middleware"));
             Services.Configure<ProxyServerOptions>(Configurations.GetSection("Proxy Server"));
+            Services.Configure<ENSOptions>(Configurations.GetSection("ENS Protocol"));
             Services.Configure<HTTPsOptions>(Configurations.GetSection("HTTPs Protocol"));
             Services.Configure<TLSOptions>(Configurations.GetSection("TLS Protocol"));
             Services.Configure<TerminalOptions>(Configurations.GetSection("Terminal Options"));
@@ -112,6 +113,7 @@ namespace Texnomic.SecureDNS.Terminal
             Services.AddSingleton<MemoryCache>();
             Services.AddSingleton<HostTableMiddleware>();
             Services.AddSingleton<FilterListsMiddleware>();
+            Services.AddSingleton<ENSMiddleware>();
             Services.AddSingleton<ResolverMiddleware>();
             Services.AddSingleton<IMiddlewareResolver, ServerMiddlewareActivator>();
             Services.AddSingleton<IAsyncResponsibilityChain<IMessage, IMessage>, ProxyResponsibilityChain>();

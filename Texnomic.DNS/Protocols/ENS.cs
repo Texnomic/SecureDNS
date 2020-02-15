@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BinarySerialization;
+using Microsoft.Extensions.Options;
 using Nethereum.ENS;
 using Nethereum.ENS.ENSRegistry.ContractDefinition;
 using Nethereum.Hex.HexConvertors.Extensions;
+using Nethereum.RLP;
 using Texnomic.DNS.Models;
 using Nethereum.Web3;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Extensions;
+using Texnomic.DNS.Options;
 using Texnomic.DNS.Records;
 using Texnomic.ENS.BaseRegistrar;
 using Texnomic.ENS.BaseRegistrar.ContractDefinition;
@@ -26,56 +29,64 @@ namespace Texnomic.DNS.Protocols
         private readonly ENSRegistryService ENSRegistryService;
         private readonly BaseRegistrarService BaseRegistrarService;
         private readonly BinarySerializer BinarySerializer;
-        public const string BaseRegistrar = "0xFaC7BEA255a6990f749363002136aF6556b31e04";
-        public const string MainnetRegistryAddress = "0x314159265dd8dbb310642f98f50c066173c1259b";
-        public const string RopstenRegistryAddress = "0x112234455c3a32fd11230c42e7bccd4a84e02010";
-        public const string RinkebyRegistryAddress = "0xe7410170f87102df0055eb195163a03b7f2bff4a";
-        public const string GoerliRegistryAddress = "0x112234455c3a32fd11230c42e7bccd4a84e02010";
+        private const string BaseRegistrar = "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85";
+        private const string RegistryAddress = "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e";
 
-        public ENS(Uri Web3Uri, string RegistryAddress)
+        public ENS(IOptionsMonitor<ENSOptions> ENSOptions)
         {
-            Web3 = new Web3(Web3Uri.ToString());
+            Web3 = new Web3(ENSOptions.CurrentValue.Web3.ToString());
             EnsUtil = new EnsUtil();
             ENSRegistryService = new ENSRegistryService(Web3, RegistryAddress);
             BaseRegistrarService = new BaseRegistrarService(Web3, BaseRegistrar);
             BinarySerializer = new BinarySerializer();
         }
 
-        public async ValueTask<(string Registrant, ulong TimeToLive, string Resolver, string Contract)> ResolveAsync(string Domain)
+        private async ValueTask<bool> IsAvailable(string Domain)
         {
-            if (!Domain.EndsWith(".eth", StringComparison.InvariantCultureIgnoreCase))
-                throw new NotImplementedException($"Only .ETH Top-Level Domain is Supported.");
+            var Label = Domain.Split('.')[0];
 
-            var NameHashString = EnsUtil.GetNameHash(Domain);
+            var LabelHash = EnsUtil.GetLabelHash(Label);
 
-            var NameHashBytes = NameHashString.HexToByteArray();
+            var LabelHashBigInteger = LabelHash.HexToBigInteger(false);
 
-            var TimeToLive = await GetTimeToLiveAsync(NameHashBytes);
+            var AvailableFunction = new AvailableFunction()
+            {
+                Id = LabelHashBigInteger
+            };
 
+            return await BaseRegistrarService.AvailableQueryAsync(AvailableFunction);
+        }
+
+        private async ValueTask<string> GetAddress(string Resolver, byte[] NameHashBytes)
+        {
+            var ResolverService = new PublicResolverService(Web3, Resolver);
+
+            //and get the address from the resolver
+            return await ResolverService.AddrQueryAsync(NameHashBytes);
+        }
+
+        private async ValueTask<string> GetRegistrantAddress(byte[] NameHashBytes)
+        {
+            var OwnerFunction = new OwnerFunction()
+            {
+                Node = NameHashBytes
+            };
+
+            return await ENSRegistryService.OwnerQueryAsync(OwnerFunction);
+        }
+
+        private async ValueTask<string> GetResolverAddress(byte[] NameHashBytes)
+        {
             var ResolverFunction = new ResolverFunction()
             {
                 Node = NameHashBytes
             };
 
             //get the resolver address from ENS
-            var Resolver = await ENSRegistryService.ResolverQueryAsync(ResolverFunction);
-
-            var OwnerFunction = new OwnerFunction()
-            {
-                Node = NameHashBytes
-            };
-
-            var Registrant = await ENSRegistryService.OwnerQueryAsync(OwnerFunction);
-
-            var ResolverService = new PublicResolverService(Web3, Resolver);
-
-            //and get the address from the resolver
-            var Contract = await ResolverService.AddrQueryAsync(NameHashBytes);
-
-            return (Registrant, TimeToLive, Resolver, Contract);
+            return await ENSRegistryService.ResolverQueryAsync(ResolverFunction);
         }
 
-        public async ValueTask<DateTime> GetDomainExpiryAsync(string Domain)
+        private async ValueTask<DateTime> GetExpiryAsync(string Domain)
         {
             var Label = Domain.Split('.')[0];
 
@@ -94,7 +105,6 @@ namespace Texnomic.DNS.Protocols
 
             return DateTime;
         }
-
 
         private async Task<ulong> GetTimeToLiveAsync(byte[] NameHashBytes)
         {
@@ -127,33 +137,72 @@ namespace Texnomic.DNS.Protocols
 
         public async Task<IMessage> ResolveAsync(IMessage Query)
         {
-            var (Registrant, TimeToLive, Resolver, Contract) = await ResolveAsync(Query.Questions[0].Domain.Name);
+            if (!Query.Questions[0].Domain.Name.EndsWith(".eth", StringComparison.InvariantCultureIgnoreCase))
+                throw new NotImplementedException($"Only .ETH Top-Level Domain is Supported.");
 
-            Query.MessageType = MessageType.Response;
+            var Available = await IsAvailable(Query.Questions[0].Domain.Name);
 
-            Query.Answers = new List<IAnswer>()
+            //Checking domain availability as a workaround for missing function RecordExists in ENSRegistryService
+            if (Available)
             {
-                new Answer()
+                return new Message()
                 {
-                    TimeToLive = new TimeToLive()
-                    {
-                        Value = TimeSpan.FromSeconds(TimeToLive)
-                    },
+                    ID = Query.ID,
+                    MessageType = MessageType.Response,
+                    ResponseCode = ResponseCode.NonExistentDoman,
+                    Questions = Query.Questions
+                };
+            }
 
-                    Length = (ushort)(Resolver.Length + Registrant.Length),
+            var NameHashString = EnsUtil.GetNameHash(Query.Questions[0].Domain.Name);
 
-                    Domain = (Domain)Query.Questions.First().Domain,
+            var NameHashBytes = NameHashString.HexToByteArray();
 
-                    Record = new ETH()
-                    {
-                        Resolver = Resolver,
-                        Registrant = Registrant,
-                        Contract = Contract
-                    },
+            var Resolver = await GetResolverAddress(NameHashBytes);
+
+            var Registrant = await GetRegistrantAddress(NameHashBytes);
+
+            var Contract = await GetAddress(Resolver, NameHashBytes);
+
+            var TimeToLive = await GetTimeToLiveAsync(NameHashBytes);
+
+            var Expiry = await GetExpiryAsync(Query.Questions[0].Domain.Name);
+
+            var TXT = new TXT()
+            {
+                Text = new CharacterString()
+                {
+                    Value = Contract
                 }
             };
 
-            return Query;
+            return new Message()
+            {
+                ID = Query.ID,
+                MessageType = MessageType.Response,
+                ResponseCode = ResponseCode.NoError,
+                Questions = Query.Questions,
+                Answers = new List<IAnswer>()
+                {
+                    new Answer()
+                    {
+                        Class = RecordClass.Internet,
+
+                        Type = RecordType.TXT,
+
+                        TimeToLive = new TimeToLive()
+                        {
+                            Value = TimeSpan.FromSeconds(TimeToLive)
+                        },
+
+                        Domain = Query.Questions[0].Domain,
+
+                        Length =  TXT.Text.Length,
+
+                        Record = TXT
+                    }
+                }
+            };
         }
 
         private bool IsDisposed;

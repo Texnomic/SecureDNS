@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BinarySerialization;
+using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Models;
 using Texnomic.DNS.Extensions;
+using Texnomic.DNS.Options;
 
 namespace Texnomic.DNS.Tests.Resolvers
 {
@@ -25,8 +28,11 @@ namespace Texnomic.DNS.Tests.Resolvers
         {
             BinarySerializer = new BinarySerializer();
 
-            //Resolver = new Protocols.ENS(new Uri("https://mainnet.infura.io/v3/7238211010344719ad14a89db874158c"), Protocols.ENS.MainnetRegistryAddress);
-            Resolver = new Protocols.ENS(new Uri("https://cloudflare-eth.com/"), Protocols.ENS.MainnetRegistryAddress);
+            var ENSOptions = new ENSOptions();
+
+            var ENSOptionsMonitor = Mock.Of<IOptionsMonitor<ENSOptions>>(Options => Options.CurrentValue == ENSOptions);
+
+            Resolver = new Protocols.ENS(ENSOptionsMonitor);
 
             ID = (ushort)new Random().Next();
 
@@ -40,7 +46,7 @@ namespace Texnomic.DNS.Tests.Resolvers
                     {
                         Domain = Domain.FromString("texnomic.eth"),
                         Class = RecordClass.Internet,
-                        Type = RecordType.ETH
+                        Type = RecordType.TXT
                     }
                 }
             };
@@ -72,7 +78,7 @@ namespace Texnomic.DNS.Tests.Resolvers
             Assert.AreEqual(ID, ResponseMessage.ID);
             Assert.IsNotNull(ResponseMessage.Questions);
             Assert.IsNotNull(ResponseMessage.Answers);
-            Assert.IsInstanceOfType(ResponseMessage.Answers.First().Record, typeof(DNS.Records.ETH));
+            Assert.IsInstanceOfType(ResponseMessage.Answers.First().Record, typeof(DNS.Records.TXT));
         }
     }
 }

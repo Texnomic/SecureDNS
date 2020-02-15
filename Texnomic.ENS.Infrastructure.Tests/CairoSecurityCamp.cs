@@ -122,7 +122,7 @@ namespace Texnomic.ENS.Infrastructure.Tests
         {
             var Answer = new Answer()
             {
-                Domain = new Domain($"{Domain}.eth"),
+                Domain = DNS.Models.Domain.FromString($"{Domain}.eth"),
 
                 Type = RecordType.A,
 
@@ -182,7 +182,7 @@ namespace Texnomic.ENS.Infrastructure.Tests
 
         public async Task<bool> HasRecord()
         {
-            var Name = Encoding.ASCII.GetString(new Domain($"{Domain}.eth").ToArray());
+            var Name = Encoding.ASCII.GetString(DNS.Models.Domain.FromString($"{Domain}.eth").ToArray());
 
             var HasDNSRecordsFunction = new HasDNSRecordsFunction()
             {
@@ -196,7 +196,7 @@ namespace Texnomic.ENS.Infrastructure.Tests
 
         public async Task<Answer> GetARecord()
         {
-            var Name = Encoding.ASCII.GetString(new Domain($"{Domain}.eth").ToArray());
+            var Name = Encoding.ASCII.GetString(DNS.Models.Domain.FromString($"{Domain}.eth").ToArray());
 
             var DNSRecordFunction = new DnsRecordFunction()
             {

@@ -16,7 +16,7 @@ namespace Texnomic.DNS.Records
     public class TXT : IRecord
     {
         [FieldOrder(0)]
-        public string Text { get; set; }
+        public CharacterString Text { get; set; }
 
         [FieldOrder(1)]
         [SerializeWhen(nameof(Text), "|DNSC")]

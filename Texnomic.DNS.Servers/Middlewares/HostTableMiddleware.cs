@@ -57,7 +57,7 @@ namespace Texnomic.DNS.Servers.Middlewares
                             {
                                 Type = RecordType.A,
                                 Class = RecordClass.Internet,
-                                Domain = new Domain(Message.Questions[0].Domain.Name)
+                                Domain = Domain.FromString(Message.Questions[0].Domain.Name)
                             }
                         },
                         Answers = new List<IAnswer>()
@@ -69,7 +69,7 @@ namespace Texnomic.DNS.Servers.Middlewares
                                   Value = TimeSpan.FromSeconds(Options.CurrentValue.TimeToLive)
                               },
 
-                              Domain = new Domain(Message.Questions[0].Domain.Name),
+                              Domain = Domain.FromString(Message.Questions[0].Domain.Name),
 
                               Length = 32,
 
