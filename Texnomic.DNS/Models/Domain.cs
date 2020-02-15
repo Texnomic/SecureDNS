@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BitStreams;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Extensions;
@@ -14,57 +15,21 @@ namespace Texnomic.DNS.Models
     public class Domain : IBinarySerializable, IDomain
     {
         [Ignore]
-        public List<ILabel> Labels { get; }
+        public List<ILabel> Labels { get; private set; }
 
         [Ignore]
         public string Name => ToString();
 
-        /// <summary>
-        /// Empty Constructor for Serialization
-        /// </summary>
         public Domain()
         {
             Labels = new List<ILabel>();
-        }
-
-        public Domain(string Domain)
-        {
-            Labels = new List<ILabel>();
-
-            Labels.AddRange(Domain.Split('.')
-                    .Select(Label => new Label
-                    {
-                        Type = LabelType.Normal,
-                        Count = (ushort)Label.Length,
-                        Text = Label
-                    }));
-        }
-
-        public static implicit operator string(Domain Domain)
-        {
-            return Domain?.ToString();
-        }
-
-        public static implicit operator Domain(string Domain)
-        {
-            return new Domain(Domain);
-        }
-
-        public override string ToString()
-        {
-            return string.Join('.', Labels.Select(Label => Label.Text));
-        }
-
-        public static Domain FromString(string Domain)
-        {
-            return new Domain(Domain);
         }
 
         public void Serialize(Stream Stream, Endianness Endianness, BinarySerializationContext Context)
         {
             const byte NullOctet = 0b00000000;
 
-            var Domain = Context.Value as Domain;
+            var Domain = (Domain)Context.Value;
 
             foreach (var Label in Domain.Labels)
             {
@@ -84,27 +49,35 @@ namespace Texnomic.DNS.Models
 
         public void Deserialize(Stream Stream, Endianness Endianness, BinarySerializationContext Context)
         {
+            var BoundedStream = (BoundedStream)Stream;
+
+            var BitStream = new BitStream(BoundedStream, true);
+
             while (true)
             {
-                var Byte = (byte)Stream.ReadByte();
-
-                if (Byte == 0) return;
-
-                var LabelType = GetLabelType(Byte);
+                var LabelType = (LabelType)(BitStream.ReadByte(2) >> 6);
 
                 switch (LabelType)
                 {
                     case LabelType.Normal:
                         {
-                            var LabelLength = GetLabelLength(Byte);
+                            var Length = BitStream.ReadByte(6) >> 2; //Compensate for MSB
 
-                            GetLabel(Stream, LabelLength);
+                            if (Length == 0) return;
+
+                            Labels.Add(new Label
+                            {
+                                Type = LabelType.Normal,
+                                Count = (ushort)Length,
+                                Offset = BoundedStream.GlobalPosition.TotalByteCount - 1,
+                                Text = BitStream.ReadString(Length),
+                            });
 
                             continue;
                         }
                     case LabelType.Compressed:
                         {
-                            var Pointer = GetPointer(Byte, Stream.ReadByte());
+                            var Pointer = BitStream.ReadByte(6) + BitStream.ReadByte();
 
                             var Message = Context.FindAncestor<Message>();
 
@@ -127,46 +100,6 @@ namespace Texnomic.DNS.Models
             }
         }
 
-        private int GetLabelLength(byte Byte)
-        {
-            const byte LengthMask = 0b11000000;
-            return Byte & ~LengthMask;
-        }
-        private int GetPointer(int FirstByte, int SecondByte)
-        {
-            const byte PointerMask = 0b11000000;
-            return (FirstByte & ~PointerMask) + SecondByte;
-        }
-        private void GetLabel(Stream Stream, int Length)
-        {
-            var Offset = ((BoundedStream)Stream).GlobalPosition.TotalByteCount - 1;
-
-            var Buffer = new byte[Length];
-
-            Stream.Read(Buffer);
-
-            var String = Encoding.ASCII.GetString(Buffer);
-
-            var Label = new Label
-            {
-                Type = LabelType.Normal,
-                Text = String,
-                Offset = Offset,
-                Count = (ushort)String.Length,
-            };
-
-            Labels.Add(Label);
-        }
-        private LabelType GetLabelType(byte Byte)
-        {
-            const byte LabelMask = 0b00111111;
-
-            var Flag = (Byte & ~LabelMask) >> 6;
-
-            return (LabelType)Flag;
-        }
-
-
         public byte[] ToArray()
         {
             var Serializer = new BinarySerializer();
@@ -177,6 +110,40 @@ namespace Texnomic.DNS.Models
         {
             var Serializer = new BinarySerializer();
             return await Serializer.SerializeAsync(this);
+        }
+
+        public static implicit operator string(Domain Domain)
+        {
+            return Domain?.ToString();
+        }
+
+        public static implicit operator Domain(string FQDN)
+        {
+            return FromString(FQDN);
+        }
+
+        public override string ToString()
+        {
+            return string.Join('.', Labels.Select(Label => Label.Text));
+        }
+
+        public static Domain FromString(string FQDN)
+        {
+            var Domain = new Domain
+            {
+                Labels = new List<ILabel>()
+            };
+
+            Domain.Labels.AddRange(
+                FQDN.Split('.')
+                    .Select(Label => new Label
+                    {
+                        Type = LabelType.Normal,
+                        Count = (ushort)Label.Length,
+                        Text = Label
+                    }));
+
+            return Domain;
         }
     }
 }

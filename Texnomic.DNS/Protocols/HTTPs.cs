@@ -73,7 +73,7 @@ namespace Texnomic.DNS.Protocols
             //Random Number to avoid Cache Servers
             var Request = new RestRequest($"dns-query?dns={Message}&r={Random.Next(0, 99999999)}");
 
-            var Response = await RetryPolicy.ExecuteAsync(() => RestClient.ExecuteGetTaskAsync(Request));
+            var Response = await RetryPolicy.ExecuteAsync(() => RestClient.ExecuteGetAsync(Request));
 
             if (Response.ErrorException != null) throw Response.ErrorException;
 
@@ -86,7 +86,7 @@ namespace Texnomic.DNS.Protocols
 
             Request.AddParameter("application/dns-message", Query, "application/dns-message", ParameterType.RequestBody);
 
-            var Response = await RetryPolicy.ExecuteAsync(() => RestClient.ExecutePostTaskAsync(Request));
+            var Response = await RetryPolicy.ExecuteAsync(() => RestClient.ExecutePostAsync(Request));
 
             if (Response.ErrorException != null) throw Response.ErrorException;
 

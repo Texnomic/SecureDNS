@@ -2,6 +2,7 @@
 using Nerdbank.Streams;
 using System.Buffers;
 using System.IO.Pipelines;
+using System.Linq;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
@@ -61,17 +62,13 @@ namespace Texnomic.DNS.Protocols
             return Async.RunSync(() => ResolveAsync(Query));
         }
 
-        public async Task<byte[]> ResolveAsync(byte[] Request)
+        public async Task<byte[]> ResolveAsync(byte[] Query)
         {
             if (!TcpClient.Connected || !SslStream.CanWrite) await InitializeAsync();
 
-            var Length = BitConverter.GetBytes((ushort)Request.Length);
+            Query = PrefixLength(ref Query);
 
-            Array.Reverse(Length);
-
-            await PipeWriter.WriteAsync(Length);
-
-            await PipeWriter.WriteAsync(Request);
+            await PipeWriter.WriteAsync(Query);
 
             PipeWriter.Complete();
 
@@ -91,27 +88,24 @@ namespace Texnomic.DNS.Protocols
 
                 return Buffer.ToArray();
             }
-            else
-            {
-                PipeReader.CancelPendingRead();
 
-                PipeReader.Complete();
+            PipeReader.CancelPendingRead();
 
-                throw new TimeoutException();
-            }
+            PipeReader.Complete();
+
+            throw new TimeoutException();
         }
 
-        public async Task<IMessage> ResolveAsync(IMessage Request)
+        public async Task<IMessage> ResolveAsync(IMessage Query)
         {
             if (!TcpClient.Connected || !SslStream.CanWrite) await InitializeAsync();
 
-            var Bytes = await BinarySerializer.SerializeAsync(Request);
+            Query.Length = (ushort)await BinarySerializer.SizeOfAsync(Query);
 
-            var Length = BitConverter.GetBytes((ushort)Bytes.Length);
+            //Must be set AFTER SizeOfAsync to avoid length field being included in count.
+            Query.Prefixed = true; 
 
-            Array.Reverse(Length);
-
-            await PipeWriter.WriteAsync(Length);
+            var Bytes = await BinarySerializer.SerializeAsync(Query);
 
             await PipeWriter.WriteAsync(Bytes);
 
@@ -135,20 +129,33 @@ namespace Texnomic.DNS.Protocols
 
                 return Response;
             }
-            else
-            {
-                PipeReader.CancelPendingRead();
 
-                PipeReader.Complete();
+            PipeReader.CancelPendingRead();
 
-                throw new TimeoutException();
-            }
+            PipeReader.Complete();
+
+            throw new TimeoutException();
         }
 
 
         private bool ValidateServerCertificate(object Sender, X509Certificate Certificate, X509Chain Chain, SslPolicyErrors SslPolicyErrors)
         {
             return string.IsNullOrEmpty(Options.CurrentValue.PublicKey) ? SslPolicyErrors == SslPolicyErrors.None : SslPolicyErrors == SslPolicyErrors.None && Certificate.GetPublicKeyString() == Options.CurrentValue.PublicKey;
+        }
+
+        private static byte[] PrefixLength(ref byte[] Query)
+        {
+            var Length = BitConverter.GetBytes((ushort)Query.Length);
+
+            Array.Reverse(Length);
+
+            var Buffer = new byte[Query.Length + 2];
+
+            Array.Copy(Length, Buffer, 2);
+
+            Array.Copy(Query, 0, Buffer, 2, Query.Length);
+
+            return Buffer;
         }
 
         private bool IsDisposed;

@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Models;
+using Texnomic.DNS.Options;
 using Texnomic.DNS.Protocols;
 
 namespace Texnomic.DNS.Tests.Records
@@ -25,11 +28,22 @@ namespace Texnomic.DNS.Tests.Records
         {
             ID = (ushort)new Random().Next();
 
-            Resolver = new UDP(IPAddress.Parse("8.8.8.8"));
+            //Note: RRSIG Only works over TCP/TLS !!
+
+            var TLSOptions = new TLSOptions()
+            {
+                Host = "8.8.4.4",
+                Timeout = 4000,
+            };
+
+            var TLSOptionsMonitor = Mock.Of<IOptionsMonitor<TLSOptions>>(Options => Options.CurrentValue == TLSOptions);
+
+            Resolver = new TLS(TLSOptionsMonitor);
 
             RequestMessage = new Message()
             {
                 ID = ID,
+                Truncated = false,
                 RecursionDesired = true,
                 Questions =new List<IQuestion>()
                 {
@@ -51,7 +65,7 @@ namespace Texnomic.DNS.Tests.Records
             Assert.AreEqual(ID, ResponseMessage.ID);
             Assert.IsNotNull(ResponseMessage.Questions);
             Assert.IsNotNull(ResponseMessage.Answers);
-            Assert.IsInstanceOfType(ResponseMessage.Answers.First().Record, typeof(DNS.Records.RRSIG));
+            Assert.IsInstanceOfType(ResponseMessage.Answers[0].Record, typeof(DNS.Records.RRSIG));
         }
     }
 }

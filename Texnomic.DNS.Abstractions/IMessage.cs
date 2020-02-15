@@ -6,6 +6,10 @@ namespace Texnomic.DNS.Abstractions
 {
     public interface IMessage
     {
+        bool Prefixed { get; set; }
+
+        ushort Length { get; set; }
+
         ushort ID { get; set; }
 
         MessageType MessageType { get; set; }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -51,7 +50,7 @@ namespace Texnomic.DNS.Tests.Records
             Assert.AreEqual(ID, ResponseMessage.ID);
             Assert.IsNotNull(ResponseMessage.Questions);
             Assert.IsNotNull(ResponseMessage.Answers);
-            Assert.IsInstanceOfType(ResponseMessage.Answers.First().Record, typeof(DNS.Records.A));
+            Assert.IsInstanceOfType(ResponseMessage.Answers[0].Record, typeof(DNS.Records.A));
         }
     }
 }

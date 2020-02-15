@@ -131,18 +131,18 @@ namespace Texnomic.SecureDNS.Terminal
             if (Options.Mode == Mode.GUI)
             {
                 Services.AddSingleton<ProxyServer>();
-                Services.AddSingleton<IHostedService, GUI>();
+                Services.AddHostedService<GUI>();
             }
 
             if (Options.Mode == Mode.CLI)
             {
                 Services.AddSingleton<ProxyServer>();
-                Services.AddSingleton<IHostedService, CLI>();
+                Services.AddHostedService<CLI>();
             }
 
             if (Options.Mode == Mode.Daemon)
             {
-                Services.AddSingleton<IHostedService, ProxyServer>();
+                Services.AddHostedService<ProxyServer>();
             }
         }
 

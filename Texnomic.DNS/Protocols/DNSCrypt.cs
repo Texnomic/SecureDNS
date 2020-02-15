@@ -73,7 +73,7 @@ namespace Texnomic.DNS.Protocols
                     {
                         Type = RecordType.TXT,
                         Class = RecordClass.Internet,
-                        Domain = new Domain(Stamp.ProviderName)
+                        Domain = Domain.FromString(Stamp.ProviderName)
                     }
                 }
             };

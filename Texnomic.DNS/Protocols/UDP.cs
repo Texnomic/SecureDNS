@@ -11,7 +11,7 @@ namespace Texnomic.DNS.Protocols
 {
     public class UDP : IProtocol
     {
-        private IPEndPoint IPEndPoint;
+        private readonly IPEndPoint IPEndPoint;
         private readonly UdpClient Client;
         private readonly BinarySerializer BinarySerializer;
         private const int Timeout = 2000;
@@ -32,24 +32,18 @@ namespace Texnomic.DNS.Protocols
 
         public byte[] Resolve(byte[] Query)
         {
-            Client.Send(Query, Query.Length, IPEndPoint);
-
-            return Client.Receive(ref IPEndPoint);
+            return Async.RunSync(() => ResolveAsync(Query));
         }
 
         public IMessage Resolve(IMessage Query)
         {
-            var Buffer = BinarySerializer.Serialize(Query);
-
-            Client.Send(Buffer, Buffer.Length, IPEndPoint);
-
-            Buffer = Client.Receive(ref IPEndPoint);
-
-            return BinarySerializer.Deserialize<Message>(Buffer);
+            return Async.RunSync(() => ResolveAsync(Query));
         }
 
         public async Task<byte[]> ResolveAsync(byte[] Query)
         {
+            //Query = PrefixLength(ref Query);
+
             await Client.SendAsync(Query, Query.Length, IPEndPoint);
 
             var Task = Client.ReceiveAsync();
@@ -65,6 +59,8 @@ namespace Texnomic.DNS.Protocols
         {
             var Buffer = await BinarySerializer.SerializeAsync(Query);
 
+            //Buffer = PrefixLength(ref Buffer);
+
             await Client.SendAsync(Buffer, Buffer.Length, IPEndPoint);
 
             var Task = Client.ReceiveAsync();
@@ -74,6 +70,21 @@ namespace Texnomic.DNS.Protocols
             var Result = Task.IsCompleted ? Task.Result : throw new TimeoutException();
 
             return await BinarySerializer.DeserializeAsync<Message>(Result.Buffer);
+        }
+
+        private static byte[] PrefixLength(ref byte[] Query)
+        {
+            var Length = BitConverter.GetBytes((ushort)Query.Length);
+
+            Array.Reverse(Length);
+
+            var Buffer = new byte[Query.Length + 2];
+
+            Array.Copy(Length, Buffer, 2);
+
+            Array.Copy(Query, 0, Buffer, 2, Query.Length);
+
+            return Buffer;
         }
 
         private bool IsDisposed;

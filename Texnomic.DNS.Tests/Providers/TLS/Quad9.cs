@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Protocols;
 using Texnomic.DNS.Models;
+using Texnomic.DNS.Options;
 
 namespace Texnomic.DNS.Tests.Providers.TLS
 {
@@ -23,24 +26,31 @@ namespace Texnomic.DNS.Tests.Providers.TLS
         [TestInitialize]
         public void Initialize()
         {
-            //ID = (ushort) new Random().Next();
+            ID = (ushort)new Random().Next();
 
-            //Resolver = new Protocols.TLS(IPAddress.Parse("9.9.9.9"), "047D8BD71D03850D1825B3341C29A127D4AC0125488AA0F1EA02B9D8512C086AAC7256ECFA3DA6A09F4909558EACFEB973175C02FB78CC2491946F4323890E1D66");
+            var TLSOptions = new TLSOptions()
+            {
+                Host = "9.9.9.9"
+            };
 
-            //RequestMessage = new Message()
-            //{
-            //    ID = ID,
-            //    RecursionDesired = true,
-            //    Questions = new List<IQuestion>()
-            //    {
-            //        new Question()
-            //        {
-            //            Domain = Domain.FromString("google.com"),
-            //            Class = RecordClass.Internet,
-            //            Type = RecordType.A
-            //        }
-            //    }
-            //};
+            var TLSOptionsMonitor = Mock.Of<IOptionsMonitor<TLSOptions>>(Options => Options.CurrentValue == TLSOptions);
+
+            Resolver = new Protocols.TLS(TLSOptionsMonitor);
+
+            RequestMessage = new Message()
+            {
+                ID = ID,
+                RecursionDesired = true,
+                Questions = new List<IQuestion>()
+                {
+                    new Question()
+                    {
+                        Domain = Domain.FromString("google.com"),
+                        Class = RecordClass.Internet,
+                        Type = RecordType.A
+                    }
+                }
+            };
         }
 
         [TestMethod]
