@@ -1,4 +1,5 @@
-﻿using BinarySerialization;
+﻿using System.Runtime.ConstrainedExecution;
+using BinarySerialization;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Models;
 
@@ -15,11 +16,18 @@ namespace Texnomic.DNS.Records
     /// </summary>
     public class TXT : IRecord
     {
-        [FieldOrder(0)]
-        public CharacterString Text { get; set; }
+        [FieldOrder(0), FieldBitLength(8), FieldEndianness(Endianness.Big)]
+        public byte Length { get; set; }
 
-        [FieldOrder(1)]
-        [SerializeWhen(nameof(Text), "|DNSC")]
+        [FieldOrder(1), FieldOffset(1), FieldBitLength(32)]
+        public string Magic { get; set; }
+
+        [FieldOrder(2), FieldOffset(1), FieldLength(nameof(Length))]
+        [SerializeWhenNot(nameof(Magic), "DNSC")]
+        public string Text { get; set; }
+
+        [FieldOrder(3), FieldOffset(1), FieldLength(nameof(Length))]
+        [SerializeWhen(nameof(Magic), "DNSC")]
         public Certificate Certificate { get; set; }
     }
 }

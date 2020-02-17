@@ -6,12 +6,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BitStreams;
+using Destructurama.Attributed;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Extensions;
 
 namespace Texnomic.DNS.Models
 {
+    [LogAsScalar(true)]
     public class Domain : IBinarySerializable, IDomain
     {
         [Ignore]

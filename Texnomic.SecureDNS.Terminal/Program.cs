@@ -4,6 +4,8 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Colorful;
+using Common.Logging;
+using Common.Logging.Serilog;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -115,6 +117,7 @@ namespace Texnomic.SecureDNS.Terminal
             Services.AddSingleton<FilterListsMiddleware>();
             Services.AddSingleton<ENSMiddleware>();
             Services.AddSingleton<ResolverMiddleware>();
+            Services.AddSingleton<ILog, SerilogCommonLogger>();
             Services.AddSingleton<IMiddlewareResolver, ServerMiddlewareActivator>();
             Services.AddSingleton<IAsyncResponsibilityChain<IMessage, IMessage>, ProxyResponsibilityChain>();
 

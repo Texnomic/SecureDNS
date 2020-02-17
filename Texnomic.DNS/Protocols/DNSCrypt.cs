@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
@@ -24,10 +26,11 @@ namespace Texnomic.DNS.Protocols
         private IPEndPoint IPEndPoint;
         private UdpClient Client;
 
-        private Key ClientKey;
         private Certificate ServerCertificate;
-        private SharedSecret SharedSecret;
-        private Key SharedKey;
+
+        private byte[] ClientPublicKey;
+        private byte[] ClientPrivateKey;
+        private byte[] SharedKey;
 
         private DNSCryptStamp Stamp;
 
@@ -112,57 +115,54 @@ namespace Texnomic.DNS.Protocols
 
         private async ValueTask<bool> VerifyServer(IMessage Message)
         {
-            var Record = (TXT)Message.Answers[0].Record;
+            var Record = (TXT) Message.Answers[0].Record;
 
             ServerCertificate = Record.Certificate;
 
-            var ServerPublicKey = PublicKey.Import(SignatureAlgorithm.Ed25519, Stamp.PublicKey, KeyBlobFormat.RawPublicKey);
+            var Bytes = await BinarySerializer.SerializeAsync(ServerCertificate);
 
-            var RecordBytes = await BinarySerializer.SerializeAsync(Record);
-
-            return SignatureAlgorithm.Ed25519.Verify(ServerPublicKey, RecordBytes.Skip(73).ToArray(), Record.Certificate.Signature);
+            return //Stamp.PublicKey.Value == ServerCertificate.PublicKey && 
+                   Chaos.NaCl.Ed25519.Verify(ServerCertificate.Signature, Bytes.Skip(72).ToArray(), ServerCertificate.PublicKey);
         }
 
         private void CreateKeys()
         {
-            var ServerPublicKey = PublicKey.Import(KeyAgreementAlgorithm.X25519, Stamp.PublicKey, KeyBlobFormat.RawPublicKey);
+            var KeyCreationParameters = new KeyCreationParameters()
+            {
+                ExportPolicy = KeyExportPolicies.AllowPlaintextExport
+            };
 
-            ClientKey = RandomGenerator.Default.GenerateKey(KeyAgreementAlgorithm.X25519);
+            var ClientKeys = RandomGenerator.Default.GenerateKey(KeyAgreementAlgorithm.X25519, KeyCreationParameters);
 
-            SharedSecret = KeyAgreementAlgorithm.X25519.Agree(ClientKey, ServerPublicKey);
+            ClientPublicKey = ClientKeys.Export(KeyBlobFormat.RawPublicKey);
 
-            SharedKey = KeyDerivationAlgorithm.HkdfSha256.DeriveKey(SharedSecret, null, null, AeadAlgorithm.ChaCha20Poly1305);
+            ClientPrivateKey = ClientKeys.Export(KeyBlobFormat.RawPrivateKey);
+
+            SharedKey = Chaos.NaCl.MontgomeryCurve25519.KeyExchange(ServerCertificate.PublicKey, ClientPrivateKey);
         }
 
         /// <summary>
         /// <dnscrypt-query> ::= <client-magic> <client-pk> <client-nonce> <encrypted-query>
         /// </summary>
         /// <returns></returns>
-        private byte[] CreateDNSCryptQuery(ReadOnlySpan<byte> Query)
+        private byte[] CreateDNSCryptQuery(byte[] Query)
         {
-            var QueryNonce = GenerateQueryNonce();
+            var ClientNonce = RandomGenerator.Default.GenerateBytes(12);
 
             return ServerCertificate.ClientMagic
-                                    .Concat(ClientKey.Export(KeyBlobFormat.RawPublicKey))
-                                    .Concat(QueryNonce.ToArray())
-                                    .Concat(CreateEncryptedQuery(QueryNonce, Query))
+                                    .Concat(ClientPublicKey)
+                                    .Concat(ClientNonce)
+                                    .Concat(CreateEncryptedQuery(ClientNonce, Query))
                                     .ToArray();
         }
 
-        /// <summary>
-        /// <encrypted-query> ::= AE(<shared-key> <client-nonce> <client-nonce-pad>, <client-query> <client-query-pad>)
-        /// AE ::= the authenticated encryption algorithm.
-        /// </summary>
-        /// <returns></returns>
-        private IEnumerable<byte> CreateEncryptedQuery(Nonce QueryNonce, ReadOnlySpan<byte> Query)
+        private IEnumerable<byte> CreateEncryptedQuery(byte[] ClientNonce, byte[] Query)
         {
-            return AeadAlgorithm.ChaCha20Poly1305.Encrypt(SharedKey, QueryNonce, null,
-                SharedKey.Export(KeyBlobFormat.RawPublicKey)
-                            .Concat(QueryNonce.ToArray())
-                            .Concat(GenerateQueryNoncePad())
-                            .Concat(Query.ToArray())
-                            .Concat(GenerateQueryPad(Query.Length))
-                            .ToArray());
+            var ClientNoncePad = GenerateQueryNoncePad(12);
+
+            var Message = Query.Concat(GenerateQueryPad(Query.Length)).ToArray();
+
+            return Chaos.NaCl.XSalsa20Poly1305.Encrypt(Message, SharedKey, ClientNonce.Concat(ClientNoncePad).ToArray());
         }
 
         /// <summary>
@@ -227,7 +227,7 @@ namespace Texnomic.DNS.Protocols
         /// <client-nonce-pad> is filled with NUL bytes.
         /// </summary>
         /// <returns></returns>
-        private static IEnumerable<byte> GenerateQueryNoncePad(int Length = 12)
+        private static IEnumerable<byte> GenerateQueryNoncePad(int Length)
         {
             return new byte[Length];
         }

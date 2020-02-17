@@ -32,7 +32,7 @@ namespace Texnomic.DNS.Tests.Resolvers
 
             var ENSOptionsMonitor = Mock.Of<IOptionsMonitor<ENSOptions>>(Options => Options.CurrentValue == ENSOptions);
 
-            Resolver = new Protocols.ENS(ENSOptionsMonitor);
+            Resolver = new Protocols.ENS(ENSOptionsMonitor, null);
 
             ID = (ushort)new Random().Next();
 

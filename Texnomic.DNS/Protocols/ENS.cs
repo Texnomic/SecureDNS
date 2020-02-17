@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BinarySerialization;
+using Common.Logging;
+using Common.Logging.Serilog;
 using Microsoft.Extensions.Options;
 using Nethereum.ENS;
 using Nethereum.ENS.ENSRegistry.ContractDefinition;
@@ -10,6 +12,8 @@ using Nethereum.Hex.HexConvertors.Extensions;
 using Nethereum.RLP;
 using Texnomic.DNS.Models;
 using Nethereum.Web3;
+using Serilog;
+using Serilog.Core;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Extensions;
@@ -26,18 +30,18 @@ namespace Texnomic.DNS.Protocols
     {
         private readonly Web3 Web3;
         private readonly EnsUtil EnsUtil;
+        private readonly ENSService ENSService;
         private readonly ENSRegistryService ENSRegistryService;
         private readonly BaseRegistrarService BaseRegistrarService;
         private readonly BinarySerializer BinarySerializer;
-        private const string BaseRegistrar = "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85";
-        private const string RegistryAddress = "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e";
 
-        public ENS(IOptionsMonitor<ENSOptions> ENSOptions)
+        public ENS(IOptionsMonitor<ENSOptions> ENSOptions, ILog Log)
         {
-            Web3 = new Web3(ENSOptions.CurrentValue.Web3.ToString());
+            Web3 = new Web3(ENSOptions.CurrentValue.Web3.ToString(), Log);
             EnsUtil = new EnsUtil();
-            ENSRegistryService = new ENSRegistryService(Web3, RegistryAddress);
-            BaseRegistrarService = new BaseRegistrarService(Web3, BaseRegistrar);
+            ENSService = new ENSService(Web3);
+            ENSRegistryService = new ENSRegistryService(Web3, ENSService.EnsRegistryAddress);
+            BaseRegistrarService = new BaseRegistrarService(Web3, "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85");
             BinarySerializer = new BinarySerializer();
         }
 
@@ -57,16 +61,17 @@ namespace Texnomic.DNS.Protocols
             return await BaseRegistrarService.AvailableQueryAsync(AvailableFunction);
         }
 
-        private async ValueTask<string> GetAddress(string Resolver, byte[] NameHashBytes)
+        private async ValueTask<string> GetContractAddress(string Domain)
         {
-            var ResolverService = new PublicResolverService(Web3, Resolver);
-
-            //and get the address from the resolver
-            return await ResolverService.AddrQueryAsync(NameHashBytes);
+            return await ENSService.ResolveAddressAsync(Domain);
         }
 
-        private async ValueTask<string> GetRegistrantAddress(byte[] NameHashBytes)
+        private async ValueTask<string> GetRegistrantAddress(string Domain)
         {
+            var NameHashString = EnsUtil.GetNameHash(Domain);
+
+            var NameHashBytes = NameHashString.HexToByteArray();
+
             var OwnerFunction = new OwnerFunction()
             {
                 Node = NameHashBytes
@@ -75,18 +80,14 @@ namespace Texnomic.DNS.Protocols
             return await ENSRegistryService.OwnerQueryAsync(OwnerFunction);
         }
 
-        private async ValueTask<string> GetResolverAddress(byte[] NameHashBytes)
+        private async ValueTask<string> GetResolverAddress(string Domain)
         {
-            var ResolverFunction = new ResolverFunction()
-            {
-                Node = NameHashBytes
-            };
+            var ResolverContract = await ENSService.GetResolverAsync(Domain);
 
-            //get the resolver address from ENS
-            return await ENSRegistryService.ResolverQueryAsync(ResolverFunction);
+            return ResolverContract.ContractHandler.ContractAddress;
         }
 
-        private async ValueTask<DateTime> GetExpiryAsync(string Domain)
+        private async ValueTask<DateTime> GetExpiryDateTimeAsync(string Domain)
         {
             var Label = Domain.Split('.')[0];
 
@@ -106,8 +107,12 @@ namespace Texnomic.DNS.Protocols
             return DateTime;
         }
 
-        private async Task<ulong> GetTimeToLiveAsync(byte[] NameHashBytes)
+        private async Task<ulong> GetTimeToLiveAsync(string Domain)
         {
+            var NameHashString = EnsUtil.GetNameHash(Domain);
+
+            var NameHashBytes = NameHashString.HexToByteArray();
+
             var TtlFunction = new TtlFunction()
             {
                 Node = NameHashBytes
@@ -154,27 +159,17 @@ namespace Texnomic.DNS.Protocols
                 };
             }
 
-            var NameHashString = EnsUtil.GetNameHash(Query.Questions[0].Domain.Name);
 
-            var NameHashBytes = NameHashString.HexToByteArray();
+            var Resolver = new TXT() { Text = $"Resolver={await GetResolverAddress(Query.Questions[0].Domain.Name)}" };
 
-            var Resolver = await GetResolverAddress(NameHashBytes);
+            var Registrant = new TXT() { Text = $"Registrant={await GetRegistrantAddress(Query.Questions[0].Domain.Name)}" };
 
-            var Registrant = await GetRegistrantAddress(NameHashBytes);
+            var Address = new TXT() { Text = $"Address={await GetContractAddress(Query.Questions[0].Domain.Name)}" };
 
-            var Contract = await GetAddress(Resolver, NameHashBytes);
+            var Expiry = new TXT() {Text = $"Expiry={await GetExpiryDateTimeAsync(Query.Questions[0].Domain.Name)}"};
 
-            var TimeToLive = await GetTimeToLiveAsync(NameHashBytes);
+            var TimeToLive = await GetTimeToLiveAsync(Query.Questions[0].Domain.Name);
 
-            var Expiry = await GetExpiryAsync(Query.Questions[0].Domain.Name);
-
-            var TXT = new TXT()
-            {
-                Text = new CharacterString()
-                {
-                    Value = Contract
-                }
-            };
 
             return new Message()
             {
@@ -197,10 +192,64 @@ namespace Texnomic.DNS.Protocols
 
                         Domain = Query.Questions[0].Domain,
 
-                        Length =  TXT.Text.Length,
+                        Length = (ushort)Address.Text.Length,
 
-                        Record = TXT
-                    }
+                        Record = Address
+                    },
+
+                    new Answer()
+                    {
+                        Class = RecordClass.Internet,
+
+                        Type = RecordType.TXT,
+
+                        TimeToLive = new TimeToLive()
+                        {
+                            Value = TimeSpan.FromSeconds(TimeToLive)
+                        },
+
+                        Domain = Query.Questions[0].Domain,
+
+                        Length = (ushort) Resolver.Text.Length,
+
+                        Record = Resolver
+                    },
+
+                    new Answer()
+                    {
+                        Class = RecordClass.Internet,
+
+                        Type = RecordType.TXT,
+
+                        TimeToLive = new TimeToLive()
+                        {
+                            Value = TimeSpan.FromSeconds(TimeToLive)
+                        },
+
+                        Domain = Query.Questions[0].Domain,
+
+                        Length = (ushort) Registrant.Text.Length,
+
+                        Record = Registrant
+                    },
+
+                    new Answer()
+                    {
+                        Class = RecordClass.Internet,
+
+                        Type = RecordType.TXT,
+
+                        TimeToLive = new TimeToLive()
+                        {
+                            Value = TimeSpan.FromSeconds(TimeToLive)
+                        },
+
+                        Domain = Query.Questions[0].Domain,
+
+                        Length = (ushort) Expiry.Text.Length,
+
+                        Record = Expiry
+                    },
                 }
             };
         }
