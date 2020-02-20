@@ -73,8 +73,7 @@ namespace Texnomic.DNS.Protocols
             IsInitialized = false;
         }
 
-
-        public async ValueTask Initialize()
+        protected override async ValueTask InitializeAsync()
         {
             var Query = new Message()
             {
@@ -115,7 +114,6 @@ namespace Texnomic.DNS.Protocols
 
             IsInitialized = true;
         }
-
 
         private async ValueTask<bool> VerifyServer(IMessage Message)
         {
@@ -174,9 +172,9 @@ namespace Texnomic.DNS.Protocols
             return Result;
         }
 
-        public override async Task<byte[]> ResolveAsync(byte[] Query)
+        public override async ValueTask<byte[]> ResolveAsync(byte[] Query)
         {
-            if (!IsInitialized) await Initialize();
+            if (!IsInitialized) await InitializeAsync();
 
             var ClientNonce = RandomGenerator.Default.GenerateBytes(12);
 

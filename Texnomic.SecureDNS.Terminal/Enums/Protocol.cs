@@ -2,7 +2,10 @@
 {
     public enum Protocol
     {
+        DNSCrypt,
         HTTPs,
-        TLS
+        TLS,
+        TCP,
+        UDP
     }
 }

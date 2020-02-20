@@ -44,7 +44,7 @@ namespace Texnomic.DNS.Protocols
             return Response.ErrorException != null;
         }
 
-        public override async Task<byte[]> ResolveAsync(byte[] Query)
+        public override async ValueTask<byte[]> ResolveAsync(byte[] Query)
         {
             var Request = new RestRequest($"{Options.CurrentValue.Uri}/dns-query");
 

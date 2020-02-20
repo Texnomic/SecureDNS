@@ -1,19 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using BinarySerialization;
 using Common.Logging;
-using Common.Logging.Serilog;
 using Microsoft.Extensions.Options;
 using Nethereum.ENS;
 using Nethereum.ENS.ENSRegistry.ContractDefinition;
 using Nethereum.Hex.HexConvertors.Extensions;
-using Nethereum.RLP;
 using Texnomic.DNS.Models;
 using Nethereum.Web3;
-using Serilog;
-using Serilog.Core;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Extensions;
@@ -26,14 +20,13 @@ using OwnerFunction = Nethereum.ENS.ENSRegistry.ContractDefinition.OwnerFunction
 
 namespace Texnomic.DNS.Protocols
 {
-    public class ENS : IProtocol
+    public class ENS : Protocol
     {
         private readonly Web3 Web3;
         private readonly EnsUtil EnsUtil;
         private readonly ENSService ENSService;
         private readonly ENSRegistryService ENSRegistryService;
         private readonly BaseRegistrarService BaseRegistrarService;
-        private readonly BinarySerializer BinarySerializer;
 
         public ENS(IOptionsMonitor<ENSOptions> ENSOptions, ILog Log)
         {
@@ -42,7 +35,6 @@ namespace Texnomic.DNS.Protocols
             ENSService = new ENSService(Web3);
             ENSRegistryService = new ENSRegistryService(Web3, ENSService.EnsRegistryAddress);
             BaseRegistrarService = new BaseRegistrarService(Web3, "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85");
-            BinarySerializer = new BinarySerializer();
         }
 
         private async ValueTask<bool> IsAvailable(string Domain)
@@ -121,17 +113,7 @@ namespace Texnomic.DNS.Protocols
             return await ENSRegistryService.TtlQueryAsync(TtlFunction);
         }
 
-        public byte[] Resolve(byte[] Query)
-        {
-            return Async.RunSync(() => ResolveAsync(Query));
-        }
-
-        public IMessage Resolve(IMessage Query)
-        {
-            return Async.RunSync(() => ResolveAsync(Query));
-        }
-
-        public async Task<byte[]> ResolveAsync(byte[] Query)
+        public override async ValueTask<byte[]> ResolveAsync(byte[] Query)
         {
             var Request = await BinarySerializer.DeserializeAsync<Message>(Query);
 
@@ -140,7 +122,7 @@ namespace Texnomic.DNS.Protocols
             return await BinarySerializer.SerializeAsync(Response);
         }
 
-        public async Task<IMessage> ResolveAsync(IMessage Query)
+        public override async ValueTask<IMessage> ResolveAsync(IMessage Query)
         {
             if (!Query.Questions[0].Domain.Name.EndsWith(".eth", StringComparison.InvariantCultureIgnoreCase))
                 throw new NotImplementedException($"Only .ETH Top-Level Domain is Supported.");
@@ -160,13 +142,37 @@ namespace Texnomic.DNS.Protocols
             }
 
 
-            var Resolver = new TXT() { Text = $"Resolver={await GetResolverAddress(Query.Questions[0].Domain.Name)}" };
+            var ResolverAddress = await GetResolverAddress(Query.Questions[0].Domain.Name);
 
-            var Registrant = new TXT() { Text = $"Registrant={await GetRegistrantAddress(Query.Questions[0].Domain.Name)}" };
+            var Resolver = new TXT()
+            {
+                Length = (byte)ResolverAddress.Length,
+                Text = $"Resolver={ResolverAddress}"
+            };
 
-            var Address = new TXT() { Text = $"Address={await GetContractAddress(Query.Questions[0].Domain.Name)}" };
+            var RegistrantAddress = await GetRegistrantAddress(Query.Questions[0].Domain.Name);
 
-            var Expiry = new TXT() {Text = $"Expiry={await GetExpiryDateTimeAsync(Query.Questions[0].Domain.Name)}"};
+            var Registrant = new TXT()
+            {
+                Length = (byte)RegistrantAddress.Length,
+                Text = $"Registrant={RegistrantAddress}"
+            };
+
+            var OwnerAddress = await GetContractAddress(Query.Questions[0].Domain.Name);
+
+            var Owner = new TXT()
+            {
+                Length = (byte)OwnerAddress.Length,
+                Text = $"Address={OwnerAddress}"
+            };
+
+            var ExpiryDateTime = await GetExpiryDateTimeAsync(Query.Questions[0].Domain.Name);
+
+            var Expiry = new TXT()
+            {
+                Length = (byte)ExpiryDateTime.ToString().Length,
+                Text = $"Expiry={ExpiryDateTime}"
+            };
 
             var TimeToLive = await GetTimeToLiveAsync(Query.Questions[0].Domain.Name);
 
@@ -192,9 +198,9 @@ namespace Texnomic.DNS.Protocols
 
                         Domain = Query.Questions[0].Domain,
 
-                        Length = (ushort)Address.Text.Length,
+                        Length = (ushort)(Owner.Length + 1),
 
-                        Record = Address
+                        Record = Owner
                     },
 
                     new Answer()
@@ -210,7 +216,7 @@ namespace Texnomic.DNS.Protocols
 
                         Domain = Query.Questions[0].Domain,
 
-                        Length = (ushort) Resolver.Text.Length,
+                        Length = (ushort) (Resolver.Text.Length + 1),
 
                         Record = Resolver
                     },
@@ -228,7 +234,7 @@ namespace Texnomic.DNS.Protocols
 
                         Domain = Query.Questions[0].Domain,
 
-                        Length = (ushort) Registrant.Text.Length,
+                        Length = (ushort) (Registrant.Text.Length + 1),
 
                         Record = Registrant
                     },
@@ -246,7 +252,7 @@ namespace Texnomic.DNS.Protocols
 
                         Domain = Query.Questions[0].Domain,
 
-                        Length = (ushort) Expiry.Text.Length,
+                        Length = (ushort)( Expiry.Text.Length + 1),
 
                         Record = Expiry
                     },
@@ -254,15 +260,7 @@ namespace Texnomic.DNS.Protocols
             };
         }
 
-        private bool IsDisposed;
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool Disposing)
+        protected override void Dispose(bool Disposing)
         {
             if (IsDisposed) return;
 
@@ -272,11 +270,6 @@ namespace Texnomic.DNS.Protocols
             }
 
             IsDisposed = true;
-        }
-
-        ~ENS()
-        {
-            Dispose(false);
         }
     }
 }

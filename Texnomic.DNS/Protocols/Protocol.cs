@@ -16,19 +16,29 @@ namespace Texnomic.DNS.Protocols
             BinarySerializer = new BinarySerializer();
         }
 
+        protected virtual void OptionsOnChange(IOptions Options)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected virtual ValueTask InitializeAsync()
+        {
+            throw new NotImplementedException();
+        }
+
         public byte[] Resolve(byte[] Query)
         {
-            return Async.RunSync(() => ResolveAsync(Query));
+            return Async.RunSync(() => ResolveAsync(Query).AsTask());
         }
 
         public IMessage Resolve(IMessage Query)
         {
-            return Async.RunSync(() => ResolveAsync(Query));
+            return Async.RunSync(() => ResolveAsync(Query).AsTask());
         }
 
-        public abstract Task<byte[]> ResolveAsync(byte[] Query);
+        public abstract ValueTask<byte[]> ResolveAsync(byte[] Query);
 
-        public async Task<IMessage> ResolveAsync(IMessage Query)
+        public virtual async ValueTask<IMessage> ResolveAsync(IMessage Query)
         {
             var SerializedQuery = await BinarySerializer.SerializeAsync(Query);
 

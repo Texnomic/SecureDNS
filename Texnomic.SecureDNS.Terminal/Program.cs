@@ -26,6 +26,7 @@ using Texnomic.SecureDNS.Terminal.Options;
 using Texnomic.SecureDNS.Terminal.Properties;
 
 using Console = Colorful.Console;
+using Protocol = Texnomic.SecureDNS.Terminal.Enums.Protocol;
 
 namespace Texnomic.SecureDNS.Terminal
 {
@@ -107,9 +108,12 @@ namespace Texnomic.SecureDNS.Terminal
             Services.Configure<HostTableMiddlewareOptions>(Configurations.GetSection("HostTable Middleware"));
             Services.Configure<FilterListsMiddlewareOptions>(Configurations.GetSection("FilterLists Middleware"));
             Services.Configure<ProxyServerOptions>(Configurations.GetSection("Proxy Server"));
+            Services.Configure<DNSCryptOptions>(Configurations.GetSection("DNSCrypt Protocol"));
             Services.Configure<ENSOptions>(Configurations.GetSection("ENS Protocol"));
             Services.Configure<HTTPsOptions>(Configurations.GetSection("HTTPs Protocol"));
             Services.Configure<TLSOptions>(Configurations.GetSection("TLS Protocol"));
+            Services.Configure<TCPOptions>(Configurations.GetSection("TCP Protocol"));
+            Services.Configure<UDPOptions>(Configurations.GetSection("UDP Protocol"));
             Services.Configure<TerminalOptions>(Configurations.GetSection("Terminal Options"));
 
             Services.AddSingleton<MemoryCache>();
@@ -123,31 +127,45 @@ namespace Texnomic.SecureDNS.Terminal
 
             var Options = Configurations.GetSection("Terminal Options").Get<TerminalOptions>();
 
-            if(Options.Protocol == Protocol.HTTPs)
+            switch (Options.Protocol)
             {
-                Services.AddSingleton<IProtocol, HTTPs>();
+                case Protocol.DNSCrypt:
+                    Services.AddSingleton<IProtocol, DNSCrypt>();
+                    break;
+                case Protocol.HTTPs:
+                    Services.AddSingleton<IProtocol, HTTPs>();
+                    break;
+                case Protocol.TLS:
+                    Services.AddSingleton<IProtocol, TLS>();
+                    break;
+                case Protocol.TCP:
+                    Services.AddSingleton<IProtocol, TCP>();
+                    break;
+                case Protocol.UDP:
+                    Services.AddSingleton<IProtocol, UDP>();
+                    break;
+                default:
+                    Services.AddSingleton<IProtocol, DNSCrypt>();
+                    break;
             }
 
-            if (Options.Protocol == Protocol.TLS)
+            switch (Options.Mode)
             {
-                Services.AddSingleton<IProtocol, TLS>();
-            }
-
-            if (Options.Mode == Mode.GUI)
-            {
-                Services.AddSingleton<ProxyServer>();
-                Services.AddHostedService<GUI>();
-            }
-
-            if (Options.Mode == Mode.CLI)
-            {
-                Services.AddSingleton<ProxyServer>();
-                Services.AddHostedService<CLI>();
-            }
-
-            if (Options.Mode == Mode.Daemon)
-            {
-                Services.AddHostedService<ProxyServer>();
+                case Mode.GUI:
+                    Services.AddSingleton<ProxyServer>();
+                    Services.AddHostedService<GUI>();
+                    break;
+                case Mode.CLI:
+                    Services.AddSingleton<ProxyServer>();
+                    Services.AddHostedService<CLI>();
+                    break;
+                case Mode.Daemon:
+                    Services.AddHostedService<ProxyServer>();
+                    break;
+                default:
+                    Services.AddSingleton<ProxyServer>();
+                    Services.AddHostedService<GUI>();
+                    break;
             }
         }
 

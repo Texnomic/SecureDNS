@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Net;
+using Texnomic.DNS.Abstractions;
 
 namespace Texnomic.DNS.Options
 {
-    public class HTTPsOptions
+    public class HTTPsOptions : IOptions
     {
         public int Retries { get; set; } = 3;
 

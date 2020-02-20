@@ -2,100 +2,50 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using BinarySerialization;
+using Microsoft.Extensions.Options;
 using Texnomic.DNS.Abstractions;
-using Texnomic.DNS.Extensions;
-using Texnomic.DNS.Models;
+using Texnomic.DNS.Options;
 
 namespace Texnomic.DNS.Protocols
 {
-    public class UDP : IProtocol
+    public class UDP : Protocol
     {
-        private readonly IPEndPoint IPEndPoint;
-        private readonly UdpClient Client;
-        private readonly BinarySerializer BinarySerializer;
-        private const int Timeout = 2000;
+        private readonly IOptionsMonitor<UDPOptions> Options;
 
-        public UDP(IPAddress IPAddress)
+        private UdpClient Client;
+
+        private IPEndPoint IPEndPoint;
+
+        public UDP(IOptionsMonitor<UDPOptions> UDPOptions)
         {
-            BinarySerializer = new BinarySerializer();
-            IPEndPoint = new IPEndPoint(IPAddress, 53);
+            Options = UDPOptions;
+
             Client = new UdpClient
             {
                 Client =
                 {
-                    SendTimeout = Timeout,
-                    ReceiveTimeout = Timeout
+                    SendTimeout = Options.CurrentValue.Timeout,
+                    ReceiveTimeout = Options.CurrentValue.Timeout
                 }
             };
+
+            IPEndPoint = new IPEndPoint(IPAddress.Parse(Options.CurrentValue.Host), Options.CurrentValue.Port);
         }
 
-        public byte[] Resolve(byte[] Query)
+        public override async ValueTask<byte[]> ResolveAsync(byte[] Query)
         {
-            return Async.RunSync(() => ResolveAsync(Query));
-        }
-
-        public IMessage Resolve(IMessage Query)
-        {
-            return Async.RunSync(() => ResolveAsync(Query));
-        }
-
-        public async Task<byte[]> ResolveAsync(byte[] Query)
-        {
-            //Query = PrefixLength(ref Query);
-
             await Client.SendAsync(Query, Query.Length, IPEndPoint);
 
             var Task = Client.ReceiveAsync();
 
-            Task.Wait(Timeout);
+            Task.Wait(Options.CurrentValue.Timeout);
 
             var Result = Task.IsCompleted ? Task.Result : throw new TimeoutException();
 
             return Result.Buffer;
         }
 
-        public async Task<IMessage> ResolveAsync(IMessage Query)
-        {
-            var Buffer = await BinarySerializer.SerializeAsync(Query);
-
-            //Buffer = PrefixLength(ref Buffer);
-
-            await Client.SendAsync(Buffer, Buffer.Length, IPEndPoint);
-
-            var Task = Client.ReceiveAsync();
-
-            Task.Wait(Timeout);
-
-            var Result = Task.IsCompleted ? Task.Result : throw new TimeoutException();
-
-            return await BinarySerializer.DeserializeAsync<Message>(Result.Buffer);
-        }
-
-        private static byte[] PrefixLength(ref byte[] Query)
-        {
-            var Length = BitConverter.GetBytes((ushort)Query.Length);
-
-            Array.Reverse(Length);
-
-            var Buffer = new byte[Query.Length + 2];
-
-            Array.Copy(Length, Buffer, 2);
-
-            Array.Copy(Query, 0, Buffer, 2, Query.Length);
-
-            return Buffer;
-        }
-
-        private bool IsDisposed;
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool Disposing)
+        protected override void Dispose(bool Disposing)
         {
             if (IsDisposed) return;
 
@@ -105,11 +55,6 @@ namespace Texnomic.DNS.Protocols
             }
 
             IsDisposed = true;
-        }
-
-        ~UDP()
-        {
-            Dispose(false);
         }
     }
 }

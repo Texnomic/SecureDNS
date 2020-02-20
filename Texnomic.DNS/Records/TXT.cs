@@ -1,5 +1,4 @@
-﻿using System.Runtime.ConstrainedExecution;
-using BinarySerialization;
+﻿using BinarySerialization;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Models;
 
@@ -16,7 +15,7 @@ namespace Texnomic.DNS.Records
     /// </summary>
     public class TXT : IRecord
     {
-        [FieldOrder(0), FieldBitLength(8), FieldEndianness(Endianness.Big)]
+        [FieldOrder(0), FieldBitLength(8), FieldOffset(0), FieldEndianness(Endianness.Big)]
         public byte Length { get; set; }
 
         [FieldOrder(1), FieldOffset(1), FieldBitLength(32)]

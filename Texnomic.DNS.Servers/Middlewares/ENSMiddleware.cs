@@ -1,6 +1,7 @@
 ﻿using PipelineNet.Middleware;
 using System;
 using System.Threading.Tasks;
+using Common.Logging;
 using Microsoft.Extensions.Options;
 using Serilog;
 using Texnomic.DNS.Abstractions;
@@ -13,11 +14,11 @@ namespace Texnomic.DNS.Servers.Middlewares
         private readonly ILogger Logger;
         private readonly Protocols.ENS ENS;
 
-        public ENSMiddleware(IOptionsMonitor<ENSOptions> Options, ILogger Logger) : base()
+        public ENSMiddleware(IOptionsMonitor<ENSOptions> Options, ILogger Logger, ILog Log) : base()
         {
             this.Logger = Logger;
 
-            ENS = new Protocols.ENS(Options);
+            ENS = new Protocols.ENS(Options, Log);
         }
 
         public async Task<IMessage> Run(IMessage Message, Func<IMessage, Task<IMessage>> Next)

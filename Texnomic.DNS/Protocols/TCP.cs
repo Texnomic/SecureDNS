@@ -3,27 +3,25 @@ using Nerdbank.Streams;
 using System.Buffers;
 using System.IO.Pipelines;
 using System.Linq;
-using System.Net.Security;
 using System.Net.Sockets;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Texnomic.DNS.Options;
 using Microsoft.Extensions.Options;
 
 namespace Texnomic.DNS.Protocols
 {
-    public class TLS : Protocol
+    public class TCP : Protocol
     {
-        private readonly IOptionsMonitor<TLSOptions> Options;
+        private readonly IOptionsMonitor<TCPOptions> Options;
         private readonly TcpClient TcpClient;
 
-        private SslStream SslStream;
+        private NetworkStream NetworkStream;
         private PipeReader PipeReader;
         private PipeWriter PipeWriter;
 
-        public TLS(IOptionsMonitor<TLSOptions> TLSOptions)
+        public TCP(IOptionsMonitor<TCPOptions> TCPOptions)
         {
-            Options = TLSOptions;
+            Options = TCPOptions;
 
             TcpClient = new TcpClient();
         }
@@ -32,22 +30,16 @@ namespace Texnomic.DNS.Protocols
         {
             await TcpClient.ConnectAsync(Options.CurrentValue.Host, Options.CurrentValue.Port);
 
-            SslStream = new SslStream(TcpClient.GetStream(), true, ValidateServerCertificate)
-            {
-                ReadTimeout = Options.CurrentValue.Timeout,
-                WriteTimeout = Options.CurrentValue.Timeout
-            };
+            NetworkStream = TcpClient.GetStream();
 
-            await SslStream.AuthenticateAsClientAsync(Options.CurrentValue.Host);
+            PipeReader = NetworkStream.UsePipeReader();
 
-            PipeReader = SslStream.UsePipeReader();
-
-            PipeWriter = SslStream.UsePipeWriter();
+            PipeWriter = NetworkStream.UsePipeWriter();
         }
 
         public override async ValueTask<byte[]> ResolveAsync(byte[] Query)
         {
-            if (!TcpClient.Connected || !SslStream.CanWrite) await InitializeAsync();
+            if (!TcpClient.Connected || !NetworkStream.CanWrite) await InitializeAsync();
 
             var QueryLength = BitConverter.GetBytes((ushort)Query.Length);
 
@@ -82,11 +74,6 @@ namespace Texnomic.DNS.Protocols
         }
 
 
-        private bool ValidateServerCertificate(object Sender, X509Certificate Certificate, X509Chain Chain, SslPolicyErrors SslPolicyErrors)
-        {
-            return string.IsNullOrEmpty(Options.CurrentValue.PublicKey) ? SslPolicyErrors == SslPolicyErrors.None : SslPolicyErrors == SslPolicyErrors.None && Certificate.GetPublicKeyString() == Options.CurrentValue.PublicKey;
-        }
-
         private static T[] Concat<T>(params T[][] Arrays)
         {
             var Result = new T[Arrays.Sum(A => A.Length)];
@@ -109,7 +96,7 @@ namespace Texnomic.DNS.Protocols
 
             if (Disposing)
             {
-                SslStream.Dispose();
+                NetworkStream.Dispose();
                 TcpClient.Dispose();
             }
 

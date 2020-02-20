@@ -18,7 +18,7 @@ namespace Texnomic.DNS.Tests.Providers.DNSCrypt
 
             var DNSCrypt = new Protocols.DNSCrypt(OptionsMonitor);
 
-            await DNSCrypt.Initialize();
+            //await DNSCrypt.Initialize();
         }
     }
 }

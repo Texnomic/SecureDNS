@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Models;
+using Texnomic.DNS.Options;
 using Texnomic.DNS.Protocols;
 
 namespace Texnomic.DNS.Tests.Records
@@ -24,7 +27,11 @@ namespace Texnomic.DNS.Tests.Records
         {
             ID = (ushort)new Random().Next();
 
-            Resolver = new UDP(IPAddress.Parse("8.8.8.8"));
+            var Options = new UDPOptions();
+
+            var OptionsMonitor = Mock.Of<IOptionsMonitor<UDPOptions>>(Opt => Opt.CurrentValue == Options);
+
+            Resolver = new UDP(OptionsMonitor);
 
             RequestMessage = new Message()
             {

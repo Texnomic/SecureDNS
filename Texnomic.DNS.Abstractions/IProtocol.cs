@@ -5,9 +5,9 @@ namespace Texnomic.DNS.Abstractions
 {
     public interface IProtocol : IDisposable
     {
-        Task<byte[]> ResolveAsync(byte[] Query);
+        ValueTask<byte[]> ResolveAsync(byte[] Query);
 
-        Task<IMessage> ResolveAsync(IMessage Query);
+        ValueTask<IMessage> ResolveAsync(IMessage Query);
 
         byte[] Resolve(byte[] Query);
 
