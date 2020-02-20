@@ -1,5 +1,4 @@
-﻿using BinarySerialization;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using NSec.Cryptography;
 using System;
 using System.Collections.Generic;
@@ -9,6 +8,8 @@ using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Chaos.NaCl;
+using Rebex.Security.Cryptography;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Extensions;
@@ -16,43 +17,39 @@ using Texnomic.DNS.Models;
 using Texnomic.DNS.Options;
 using Texnomic.DNS.Records;
 
+using Ed25519 = Rebex.Security.Cryptography.Ed25519;
+
 namespace Texnomic.DNS.Protocols
 {
     /// <summary>
     /// <see cref="https://github.com/DNSCrypt/dnscrypt-protocol/blob/master/DNSCRYPT-V2-PROTOCOL.txt"/>
     /// </summary>
-    public class DNSCrypt : IProtocol
+    public sealed class DNSCrypt : Protocol
     {
-        private IPEndPoint IPEndPoint;
-        private UdpClient Client;
+        private readonly IPEndPoint IPEndPoint;
 
-        private Certificate ServerCertificate;
+        private readonly UdpClient Client;
 
-        private byte[] ClientPublicKey;
-        private byte[] ClientPrivateKey;
+        private Certificate Certificate;
+
+        private readonly byte[] ClientPublicKey;
+        private readonly byte[] ClientPrivateKey;
+
         private byte[] SharedKey;
 
-        private DNSCryptStamp Stamp;
+        private readonly DNSCryptStamp Stamp;
 
         private readonly Random Random;
+
         private readonly IOptionsMonitor<DNSCryptOptions> Options;
-        private readonly BinarySerializer BinarySerializer;
+
+        private bool IsInitialized;
 
         public DNSCrypt(IOptionsMonitor<DNSCryptOptions> DNSCryptOptions)
         {
             Options = DNSCryptOptions;
 
             Random = new Random();
-
-            BinarySerializer = new BinarySerializer();
-        }
-
-
-        public async ValueTask Initialize()
-        {
-            Stamp = (DNSCryptStamp)Options.CurrentValue.Stamp.Value;
-
-            IPEndPoint = IPEndPoint.Parse(Stamp.Address);
 
             Client = new UdpClient
             {
@@ -63,7 +60,23 @@ namespace Texnomic.DNS.Protocols
                 }
             };
 
-            var SessionMessage = new Message()
+            Stamp = (DNSCryptStamp) Options.CurrentValue.Stamp.Value;
+
+            IPEndPoint = IPEndPoint.Parse(Stamp.Address);
+
+            var ClientCurve25519 = new Curve25519();
+
+            ClientPublicKey = ClientCurve25519.GetPublicKey();
+
+            ClientPrivateKey = ClientCurve25519.GetPrivateKey();
+
+            IsInitialized = false;
+        }
+
+
+        public async ValueTask Initialize()
+        {
+            var Query = new Message()
             {
                 ID = (ushort)Random.Next(),
                 MessageType = MessageType.Query,
@@ -81,96 +94,45 @@ namespace Texnomic.DNS.Protocols
                 }
             };
 
-            var AnswerMessage = await ResolveAsync(SessionMessage);
+            var SerializedQuery = await BinarySerializer.SerializeAsync(Query);
 
-            var IsVerified = await VerifyServer(AnswerMessage);
+            await Client.SendAsync(SerializedQuery, SerializedQuery.Length, IPEndPoint);
 
-            CreateKeys();
+            var Task = Client.ReceiveAsync();
 
-            var QueryMessage = new Message()
-            {
-                ID = (ushort)Random.Next(),
-                MessageType = MessageType.Query,
-                Truncated = false,
-                CheckingDisabled = true,
-                RecursionDesired = true,
-                Questions = new List<IQuestion>()
-                {
-                    new Question()
-                    {
-                        Type = RecordType.A,
-                        Class = RecordClass.Internet,
-                        Domain = (Domain)"facebook.com"
-                    }
-                }
-            };
+            Task.Wait(Options.CurrentValue.Timeout);
 
-            var Bytes = BinarySerializer.Serialize(QueryMessage);
+            var SerializedAnswer = Task.IsCompleted ? Task.Result.Buffer : throw new TimeoutException();
 
-            var EQB = CreateDNSCryptQuery(Bytes);
+            var AnswerMessage = await BinarySerializer.DeserializeAsync<Message>(SerializedAnswer);
 
-            var Result = await ResolveAsync(EQB);
+            var IsValid = await VerifyServer(AnswerMessage);
+
+            if(!IsValid)
+                throw new CryptographicUnexpectedOperationException("Invalid Server Certificate.");
+
+            SharedKey = MontgomeryCurve25519.KeyExchange(Certificate.PublicKey, ClientPrivateKey);
+
+            IsInitialized = true;
         }
 
 
         private async ValueTask<bool> VerifyServer(IMessage Message)
         {
-            var Record = (TXT) Message.Answers[0].Record;
+            var Record = (TXT)Message.Answers[0].Record;
 
-            ServerCertificate = Record.Certificate;
+            Certificate = Record.Certificate;
 
-            var Bytes = await BinarySerializer.SerializeAsync(ServerCertificate);
+            var Bytes = await BinarySerializer.SerializeAsync(Certificate);
 
-            return //Stamp.PublicKey.Value == ServerCertificate.PublicKey && 
-                   Chaos.NaCl.Ed25519.Verify(ServerCertificate.Signature, Bytes.Skip(72).ToArray(), ServerCertificate.PublicKey);
+            var Ed25519 = new Ed25519();
+
+            Ed25519.FromPublicKey(Stamp.PublicKey.Value);
+
+            return Ed25519.VerifyMessage(Bytes[72..], Certificate.Signature);
         }
 
-        private void CreateKeys()
-        {
-            var KeyCreationParameters = new KeyCreationParameters()
-            {
-                ExportPolicy = KeyExportPolicies.AllowPlaintextExport
-            };
-
-            var ClientKeys = RandomGenerator.Default.GenerateKey(KeyAgreementAlgorithm.X25519, KeyCreationParameters);
-
-            ClientPublicKey = ClientKeys.Export(KeyBlobFormat.RawPublicKey);
-
-            ClientPrivateKey = ClientKeys.Export(KeyBlobFormat.RawPrivateKey);
-
-            SharedKey = Chaos.NaCl.MontgomeryCurve25519.KeyExchange(ServerCertificate.PublicKey, ClientPrivateKey);
-        }
-
-        /// <summary>
-        /// <dnscrypt-query> ::= <client-magic> <client-pk> <client-nonce> <encrypted-query>
-        /// </summary>
-        /// <returns></returns>
-        private byte[] CreateDNSCryptQuery(byte[] Query)
-        {
-            var ClientNonce = RandomGenerator.Default.GenerateBytes(12);
-
-            return ServerCertificate.ClientMagic
-                                    .Concat(ClientPublicKey)
-                                    .Concat(ClientNonce)
-                                    .Concat(CreateEncryptedQuery(ClientNonce, Query))
-                                    .ToArray();
-        }
-
-        private IEnumerable<byte> CreateEncryptedQuery(byte[] ClientNonce, byte[] Query)
-        {
-            var ClientNoncePad = GenerateQueryNoncePad(12);
-
-            var Message = Query.Concat(GenerateQueryPad(Query.Length)).ToArray();
-
-            return Chaos.NaCl.XSalsa20Poly1305.Encrypt(Message, SharedKey, ClientNonce.Concat(ClientNoncePad).ToArray());
-        }
-
-        /// <summary>
-        /// <min-query-len> is a variable length, initially set to 256 bytes,
-        /// and must be a multiple of 64 bytes.
-        /// </summary>
-        /// <returns></returns>
-        private static IEnumerable<byte> GenerateQueryPad(int QueryLength)
+        private static byte[] GenerateQueryPad(int QueryLength)
         {
             var Pad = Array.Empty<byte>();
 
@@ -196,97 +158,68 @@ namespace Texnomic.DNS.Protocols
             return Pad;
         }
 
-        /// <summary>
-        /// When using X25519-XSalsa20Poly1305, this construction requires a 24 bytes
-        /// nonce, that must not be reused for a given shared secret.
-        /// 
-        /// With a 24 bytes nonce, a question sent by a DNSCrypt client must be
-        /// encrypted using the shared secret, and a nonce constructed as follows:
-        /// 12 bytes chosen by the client followed by 12 NUL (0) bytes.
-        /// 
-        /// A response to this question must be encrypted using the shared secret,
-        /// and a nonce constructed as follows: the bytes originally chosen by
-        /// the client, followed by bytes chosen by the resolver.
-        /// 
-        /// The resolver's half of the nonce should be randomly chosen.
-        /// 
-        /// The client's half of the nonce can include a timestamp in addition to a
-        /// counter or to random bytes, so that when a response is received, the
-        /// client can use this timestamp to immediately discard responses to
-        /// queries that have been sent too long ago, or dated in the future.
-        /// </summary>
-        /// <returns></returns>
-        private static Nonce GenerateQueryNonce(int Length = 12)
+        private static T[] Concat<T>(params T[][] Arrays)
         {
-            return new Nonce(RandomGenerator.Default.GenerateBytes(Length), 0);
+            var Result = new T[Arrays.Sum(A => A.Length)];
+
+            var Offset = 0;
+
+            foreach (var Array in Arrays)
+            {
+                Array.CopyTo(Result, Offset);
+
+                Offset += Array.Length;
+            }
+
+            return Result;
         }
 
-        /// <summary>
-        /// <client-nonce-pad> ::= <client-nonce> length is half the nonce length
-        /// required by the encryption algorithm.In client queries, the other half,
-        /// <client-nonce-pad> is filled with NUL bytes.
-        /// </summary>
-        /// <returns></returns>
-        private static IEnumerable<byte> GenerateQueryNoncePad(int Length)
+        public override async Task<byte[]> ResolveAsync(byte[] Query)
         {
-            return new byte[Length];
-        }
+            if (!IsInitialized) await Initialize();
 
-        public byte[] Resolve(byte[] Query)
-        {
-            Client.Send(Query, Query.Length, IPEndPoint);
+            var ClientNonce = RandomGenerator.Default.GenerateBytes(12);
 
-            return Client.Receive(ref IPEndPoint);
-        }
+            var ClientNoncePad = new byte[12];
 
-        public IMessage Resolve(IMessage Query)
-        {
-            var Buffer = BinarySerializer.Serialize(Query);
+            var PaddedClientNonce = Concat(ClientNonce, ClientNoncePad);
 
-            Client.Send(Buffer, Buffer.Length, IPEndPoint);
+            var QueryPad = GenerateQueryPad(Query.Length);
 
-            Buffer = Client.Receive(ref IPEndPoint);
+            var PaddedQuery = Concat(Query, QueryPad);
 
-            return BinarySerializer.Deserialize<Message>(Buffer);
-        }
+            var EncryptedQuery = XSalsa20Poly1305.Encrypt(PaddedQuery, SharedKey, PaddedClientNonce);
 
-        public async Task<byte[]> ResolveAsync(byte[] Query)
-        {
-            await Client.SendAsync(Query, Query.Length, IPEndPoint);
+            var QueryPacket = Concat(Certificate.ClientMagic, ClientPublicKey, ClientNonce, EncryptedQuery);
+
+            await Client.SendAsync(QueryPacket, QueryPacket.Length, IPEndPoint);
 
             var Task = Client.ReceiveAsync();
 
             Task.Wait(Options.CurrentValue.Timeout);
 
-            var Result = Task.IsCompleted ? Task.Result : throw new TimeoutException();
+            var AnswerPacket = Task.IsCompleted ? Task.Result.Buffer : throw new TimeoutException();
 
-            return Result.Buffer;
+            var ClientMagic = Encoding.ASCII.GetString(AnswerPacket[..8]);
+
+            if(ClientMagic != "r6fnvWj8")
+                throw new CryptographicUnexpectedOperationException("Invalid Client Magic Received.");
+
+            if (ClientNonce != AnswerPacket[8..20]) 
+                throw new CryptographicUnexpectedOperationException("Invalid Client Nonce Received.");
+
+            var ServerNonce = AnswerPacket[20..32];
+
+            var Nonce = Concat(ClientNonce, ServerNonce);
+
+            var EncryptedAnswer = AnswerPacket[32..];
+
+            var DecryptedAnswer = XSalsa20Poly1305.TryDecrypt(EncryptedAnswer, SharedKey, Nonce);
+
+            return DecryptedAnswer;
         }
 
-        public async Task<IMessage> ResolveAsync(IMessage Query)
-        {
-            var Buffer = await BinarySerializer.SerializeAsync(Query);
-
-            await Client.SendAsync(Buffer, Buffer.Length, IPEndPoint);
-
-            var Task = Client.ReceiveAsync();
-
-            Task.Wait(Options.CurrentValue.Timeout);
-
-            var Result = Task.IsCompleted ? Task.Result : throw new TimeoutException();
-
-            return await BinarySerializer.DeserializeAsync<Message>(Result.Buffer);
-        }
-
-        private bool IsDisposed;
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool Disposing)
+        protected override void Dispose(bool Disposing)
         {
             if (IsDisposed) return;
 
@@ -296,11 +229,6 @@ namespace Texnomic.DNS.Protocols
             }
 
             IsDisposed = true;
-        }
-
-        ~DNSCrypt()
-        {
-            Dispose(false);
         }
     }
 }

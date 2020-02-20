@@ -16,9 +16,8 @@ using Microsoft.Extensions.Options;
 
 namespace Texnomic.DNS.Protocols
 {
-    public class TLS : IProtocol
+    public class TLS : Protocol
     {
-        private readonly BinarySerializer BinarySerializer;
         private readonly IOptionsMonitor<TLSOptions> Options;
         private readonly TcpClient TcpClient;
 
@@ -29,8 +28,6 @@ namespace Texnomic.DNS.Protocols
         public TLS(IOptionsMonitor<TLSOptions> TLSOptions)
         {
             Options = TLSOptions;
-
-            BinarySerializer = new BinarySerializer();
 
             TcpClient = new TcpClient();
         }
@@ -52,17 +49,7 @@ namespace Texnomic.DNS.Protocols
             PipeWriter = SslStream.UsePipeWriter();
         }
 
-        public byte[] Resolve(byte[] Query)
-        {
-            return Async.RunSync(() => ResolveAsync(Query));
-        }
-
-        public IMessage Resolve(IMessage Query)
-        {
-            return Async.RunSync(() => ResolveAsync(Query));
-        }
-
-        public async Task<byte[]> ResolveAsync(byte[] Query)
+        public override async Task<byte[]> ResolveAsync(byte[] Query)
         {
             if (!TcpClient.Connected || !SslStream.CanWrite) await InitializeAsync();
 
@@ -96,47 +83,6 @@ namespace Texnomic.DNS.Protocols
             throw new TimeoutException();
         }
 
-        public async Task<IMessage> ResolveAsync(IMessage Query)
-        {
-            if (!TcpClient.Connected || !SslStream.CanWrite) await InitializeAsync();
-
-            Query.Length = (ushort)await BinarySerializer.SizeOfAsync(Query);
-
-            //Must be set AFTER SizeOfAsync to avoid length field being included in count.
-            Query.Prefixed = true; 
-
-            var Bytes = await BinarySerializer.SerializeAsync(Query);
-
-            await PipeWriter.WriteAsync(Bytes);
-
-            PipeWriter.Complete();
-
-            var Task = PipeReader.ReadAsync().AsTask();
-
-            Task.Wait(Options.CurrentValue.Timeout);
-
-            if (Task.IsCompleted)
-            {
-                var Result = Task.Result;
-
-                var Buffer = Result.Buffer.Length > 14
-                    ? Result.Buffer.Slice(2)
-                    : throw new OperationCanceledException();
-
-                var Response = await BinarySerializer.DeserializeAsync<Message>(Buffer);
-
-                PipeReader.Complete();
-
-                return Response;
-            }
-
-            PipeReader.CancelPendingRead();
-
-            PipeReader.Complete();
-
-            throw new TimeoutException();
-        }
-
 
         private bool ValidateServerCertificate(object Sender, X509Certificate Certificate, X509Chain Chain, SslPolicyErrors SslPolicyErrors)
         {
@@ -158,15 +104,7 @@ namespace Texnomic.DNS.Protocols
             return Buffer;
         }
 
-        private bool IsDisposed;
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool Disposing)
+        protected override void Dispose(bool Disposing)
         {
             if (IsDisposed) return;
 
@@ -177,11 +115,6 @@ namespace Texnomic.DNS.Protocols
             }
 
             IsDisposed = true;
-        }
-
-        ~TLS()
-        {
-            Dispose(false);
         }
     }
 }

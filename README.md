@@ -25,10 +25,10 @@ The [v0.2 Alpha Release](https://github.com/Texnomic/SecureDNS/releases/tag/v0.2
 ## Protocols
 - [x] [DNS Over Blockchain (ENS)](https://ens.domains/)
 - [ ] [DNS Over Blockchain (HandShake)](https://handshake.org/)
-- [ ] [DNS Over TCP](https://tools.ietf.org/html/rfc1035)
+- [X] [DNS Over TCP](https://tools.ietf.org/html/rfc1035)
 - [x] [DNS Over TLS](https://tools.ietf.org/html/rfc7858)
 - [x] [DNS Over HTTP/S](https://tools.ietf.org/html/rfc8484)
-- [ ] [DNSCrypt](https://dnscrypt.info/)
+- [X] [DNSCrypt](https://dnscrypt.info/)
 
 ## Integrations
 1. [Ethereum Name Service](https://ens.domains/)
