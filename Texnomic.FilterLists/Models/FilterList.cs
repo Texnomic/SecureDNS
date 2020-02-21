@@ -32,7 +32,7 @@ namespace Texnomic.FilterLists.Models
         public string SubmissionUrl { get; set; }
 
         [JsonProperty("syntaxId")]
-        public Syntax Syntax { get; set; }
+        public Syntax? Syntax { get; set; }
 
         [JsonProperty("tagIds")]
         public List<Tags> Tags { get; set; }

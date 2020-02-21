@@ -20,11 +20,10 @@ using Texnomic.DNS.Servers.Events;
 using Texnomic.DNS.Servers.Extensions;
 using Texnomic.DNS.Servers.Options;
 using Microsoft.Extensions.Options;
-using System.Net.NetworkInformation;
 
 namespace Texnomic.DNS.Servers
 {
-    public class ProxyServer : IHostedService, IDisposable
+    public sealed class ProxyServer : IHostedService, IDisposable
     {
         private readonly ILogger Logger;
         private readonly List<Task> Workers;
@@ -153,26 +152,6 @@ namespace Texnomic.DNS.Servers
                 return await BinarySerializer.SerializeAsync(ErrorMessage);
             }
         }
-        private async ValueTask<IMessage> ExecuteAsync(IMessage Query)
-        {
-            try
-            {
-                return await ResponsibilityChain.Execute(Query);
-            }
-            catch (Exception Error)
-            {
-                Logger?.Error(Error, "{@Error} Occurred While Resolving {@Query}.", Error, Query);
-
-                Errored?.Invoke(this, new ErroredEventArgs(Error));
-
-                return new Message()
-                {
-                    ID = Query.ID,
-                    MessageType = MessageType.Response,
-                    ResponseCode = ResponseCode.FormatError,
-                };
-            }
-        }
 
         private async Task ReceiveAsync()
         {
@@ -181,34 +160,42 @@ namespace Texnomic.DNS.Servers
                 try
                 {
                     var Result = await UdpClient.ReceiveAsync()
-                                                .WithCancellation(CancellationToken);
+                        .WithCancellation(CancellationToken);
 
                     var Message = await DeserializeAsync(Result.Buffer);
 
                     switch (Message.MessageType)
                     {
                         case MessageType.Query:
-                            {
-                                await IncomingQueue.SendAsync((Message, Result.RemoteEndPoint), CancellationToken);
+                        {
+                            await IncomingQueue.SendAsync((Message, Result.RemoteEndPoint), CancellationToken);
 
-                                Logger?.Verbose("Received {@Query} From {@RemoteEndPoint}.", Message, Result.RemoteEndPoint.ToString());
+                            Logger?.Verbose("Received {@Query} From {@RemoteEndPoint}.", Message,
+                                Result.RemoteEndPoint.ToString());
 
-                                Queried?.Invoke(this, new QueriedEventArgs(Message, Result.RemoteEndPoint));
+                            Queried?.Invoke(this, new QueriedEventArgs(Message, Result.RemoteEndPoint));
 
-                                break;
-                            }
+                            break;
+                        }
 
                         case MessageType.Response:
-                            {
-                                await OutgoingQueue.SendAsync((Message, Result.RemoteEndPoint), CancellationToken);
+                        {
+                            await OutgoingQueue.SendAsync((Message, Result.RemoteEndPoint), CancellationToken);
 
-                                Logger?.Debug("Queueing (Outgoing) Format Error {@Answer} To {@RemoteEndPoint}.", Message, Result.RemoteEndPoint.ToString());
+                            Logger?.Debug("Queueing (Outgoing) Format Error {@Answer} To {@RemoteEndPoint}.", Message,
+                                Result.RemoteEndPoint.ToString());
 
-                                break;
-                            }
+                            break;
+                        }
                         default:
                             throw new ArgumentOutOfRangeException();
                     }
+                }
+                catch (TimeoutException Error)
+                {
+                    Logger?.Error(Error, "{@Error} Operation Timed Out While Receiving Message.", Error);
+
+                    Errored?.Invoke(this, new ErroredEventArgs(Error));
                 }
                 catch (SocketException Error)
                 {
@@ -217,6 +204,12 @@ namespace Texnomic.DNS.Servers
                     Errored?.Invoke(this, new ErroredEventArgs(Error));
                 }
                 catch (OperationCanceledException Error)
+                {
+                    Logger?.Error(Error, "{@Error} Operation Canceled While Receiving Message.", Error);
+
+                    Errored?.Invoke(this, new ErroredEventArgs(Error));
+                }
+                catch (InvalidOperationException Error) //Serialization Errors
                 {
                     Logger?.Error(Error, "{@Error} Operation Canceled While Receiving Message.", Error);
 
@@ -242,8 +235,7 @@ namespace Texnomic.DNS.Servers
                     var (Query, RemoteEndPoint) = await IncomingQueue.ReceiveAsync(CancellationToken)
                         .WithCancellation(CancellationToken);
 
-
-                    var Answer = await ExecuteAsync(Query);
+                    var Answer = await ResponsibilityChain.Execute(Query);
 
                     await OutgoingQueue.SendAsync((Answer, RemoteEndPoint), CancellationToken);
 
@@ -251,7 +243,19 @@ namespace Texnomic.DNS.Servers
 
                     Resolved?.Invoke(this, new ResolvedEventArgs(Query, Answer, RemoteEndPoint));
                 }
+                catch (TimeoutException Error)
+                {
+                    Logger?.Error(Error, "{@Error} Operation Timed Out While Resolving Message.", Error);
+
+                    Errored?.Invoke(this, new ErroredEventArgs(Error));
+                }
                 catch (OperationCanceledException Error)
+                {
+                    Logger?.Error(Error, "{@Error} Operation Canceled While Resolving Message.", Error);
+
+                    Errored?.Invoke(this, new ErroredEventArgs(Error));
+                }
+                catch (InvalidOperationException Error) //Serialization Errors
                 {
                     Logger?.Error(Error, "{@Error} Operation Canceled While Resolving Message.", Error);
 
@@ -286,7 +290,19 @@ namespace Texnomic.DNS.Servers
                     Answered?.Invoke(this, new AnsweredEventArgs(Answer, RemoteEndPoint));
 
                 }
+                catch (TimeoutException Error)
+                {
+                    Logger?.Error(Error, "{@Error} Operation Timed Out While Sending Message.", Error);
+
+                    Errored?.Invoke(this, new ErroredEventArgs(Error));
+                }
                 catch (OperationCanceledException Error)
+                {
+                    Logger?.Error(Error, "{@Error} Operation Canceled While Sending Message.", Error);
+
+                    Errored?.Invoke(this, new ErroredEventArgs(Error));
+                }
+                catch (InvalidOperationException Error) //Serialization Errors
                 {
                     Logger?.Error(Error, "{@Error} Operation Canceled While Sending Message.", Error);
 
@@ -312,7 +328,7 @@ namespace Texnomic.DNS.Servers
             GC.SuppressFinalize(this);
         }
 
-        protected virtual void Dispose(bool Disposing)
+        private void Dispose(bool Disposing)
         {
             if (IsDisposed) return;
 

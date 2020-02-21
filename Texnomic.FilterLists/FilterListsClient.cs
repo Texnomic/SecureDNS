@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Polly;
 using Polly.Retry;
@@ -27,7 +28,7 @@ namespace Texnomic.FilterLists
 
         public async Task<List<FilterList>> GetListsAsync()
         {
-            var RestRequest = new RestRequest("https://filterlists.com/api/v1/lists/");
+            var RestRequest = new RestRequest("https://filterlists.com/api/v1/lists/", Method.GET);
 
             RestClient.UseSerializer<NewtonsoftJsonSerializer>();
 

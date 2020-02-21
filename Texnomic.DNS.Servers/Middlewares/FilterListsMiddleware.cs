@@ -67,7 +67,7 @@ namespace Texnomic.DNS.Servers.Middlewares
             }
         }
 
-        public async Task InitializeAsync(int[] IDs)
+        private async Task InitializeAsync(int[] IDs)
         {
             try
             {
@@ -75,7 +75,7 @@ namespace Texnomic.DNS.Servers.Middlewares
 
                 var Lists = await GetFilterListsAsync(IDs);
 
-                Logger.Information("FilterLists Initialization Started with {@Count} Selected Lists.", string.Format("{0:n0}", Lists.Count));
+                Logger.Information("FilterLists Initialization Started with {@Count} Selected Lists.", $"{Lists.Count:n0}");
 
                 string File = null;
                 string[] Domains = null;
@@ -88,11 +88,11 @@ namespace Texnomic.DNS.Servers.Middlewares
 
                         Domains = Parse(File);
 
-                        for (int i = 0; i < Domains.Length; i++)
+                        foreach (var Domain in Domains)
                         {
-                            if (!Filter.Contains(Domains[i]))
+                            if (!Filter.Contains(Domain))
                             {
-                                Filter.Add(Domains[i]);
+                                Filter.Add(Domain);
                             }
                         }
 
@@ -110,7 +110,7 @@ namespace Texnomic.DNS.Servers.Middlewares
                 Domains = null;
                 Lists = null;
 
-                Logger.Information("FilterLists Initialization Completed with {@Count} Domains.", string.Format("{0:n0}", Filter.Count));
+                Logger.Information("FilterLists Initialization Completed with {@Count} Domains.", $"{Filter.Count:n0}");
             }
             catch (Exception Error)
             {
@@ -138,8 +138,8 @@ namespace Texnomic.DNS.Servers.Middlewares
                        .Select(Line => Line.Replace("127.0.0.1", ""))
                        .Select(Line => Line.Trim())
                        .SkipWhile(Line => Line.StartsWith("#"))
-                       .SkipWhile(Line => string.IsNullOrEmpty(Line))
-                       .SkipWhile(Line => string.IsNullOrWhiteSpace(Line))
+                       .SkipWhile(string.IsNullOrEmpty)
+                       .SkipWhile(string.IsNullOrWhiteSpace)
                        .ToArray();
         }
     }
