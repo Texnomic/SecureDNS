@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Colorful;
 using Common.Logging;
 using Common.Logging.Serilog;
+using Destructurama;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -101,6 +102,7 @@ namespace Texnomic.SecureDNS.Terminal
         private static void ConfigureLogger(HostBuilderContext HostBuilderContext, LoggerConfiguration LoggerConfiguration)
         {
             LoggerConfiguration.ReadFrom.Configuration(Configurations);
+            LoggerConfiguration.Destructure.UsingAttributes();
         }
         private static void ConfigureServices(HostBuilderContext HostBuilderContext, IServiceCollection Services)
         {
