@@ -1,21 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using BinarySerialization;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
-using Texnomic.DNS.Protocols;
 using Texnomic.DNS.Models;
 using Texnomic.DNS.Options;
+using Texnomic.DNS.Protocols;
+using Texnomic.DNS.Extensions;
 
-namespace Texnomic.DNS.Tests.Providers.HTTPS
+namespace Texnomic.DNS.Tests.Records
 {
     [TestClass]
-    public class Google
+    public class TXT
     {
         private ushort ID;
         private IProtocol Resolver;
@@ -28,14 +29,11 @@ namespace Texnomic.DNS.Tests.Providers.HTTPS
         {
             ID = (ushort)new Random().Next();
 
-            var TLSOptions = new HTTPsOptions()
-            {
-                Uri = new Uri($"https://dns.google:443/")
-            };
+            var Options = new UDPOptions();
 
-            var TLSOptionsMonitor = Mock.Of<IOptionsMonitor<HTTPsOptions>>(Options => Options.CurrentValue == TLSOptions);
+            var OptionsMonitor = Mock.Of<IOptionsMonitor<UDPOptions>>(Opt => Opt.CurrentValue == Options);
 
-            Resolver = new HTTPs(TLSOptionsMonitor);
+            Resolver = new UDP(OptionsMonitor);
 
             RequestMessage = new Message()
             {
@@ -45,9 +43,9 @@ namespace Texnomic.DNS.Tests.Providers.HTTPS
                 {
                     new Question()
                     {
-                        Domain = Domain.FromString("facebook.com"),
+                        Domain = Domain.FromString("texnomic.com"),
                         Class = RecordClass.Internet,
-                        Type = RecordType.A
+                        Type = RecordType.TXT
                     }
                 }
             };
@@ -61,7 +59,14 @@ namespace Texnomic.DNS.Tests.Providers.HTTPS
             Assert.AreEqual(ID, ResponseMessage.ID);
             Assert.IsNotNull(ResponseMessage.Questions);
             Assert.IsNotNull(ResponseMessage.Answers);
-            Assert.IsInstanceOfType(ResponseMessage.Answers.First().Record, typeof(DNS.Records.A));
+            Assert.IsInstanceOfType(ResponseMessage.Answers[0].Record, typeof(DNS.Records.TXT));
+
+
+            var BinarySerializer = new BinarySerializer();
+
+            var Bytes = await BinarySerializer.SerializeAsync(ResponseMessage);
+
+            ResponseMessage = await BinarySerializer.DeserializeAsync<Message>(Bytes);
         }
     }
 }

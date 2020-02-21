@@ -18,8 +18,7 @@ namespace Texnomic.DNS.Models
         [FieldOrder(4)]
         [FieldBitLength(16)]
         [FieldEndianness(Endianness.Big)]
-        [JsonIgnore]
-        [NotLogged]
+        [JsonIgnore, NotLogged]
         public ushort Length { get; set; }
 
         [FieldOrder(5)]

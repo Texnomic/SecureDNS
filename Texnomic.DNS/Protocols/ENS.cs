@@ -142,40 +142,15 @@ namespace Texnomic.DNS.Protocols
             }
 
 
-            var ResolverAddress = await GetResolverAddress(Query.Questions[0].Domain.Name);
+            var ResolverAddress = (TXT)$"Resolver={await GetResolverAddress(Query.Questions[0].Domain.Name)}";
 
-            var Resolver = new TXT()
-            {
-                Length = (byte)ResolverAddress.Length,
-                Text = $"Resolver={ResolverAddress}"
-            };
+            var RegistrantAddress = (TXT)$"Registrant={await GetRegistrantAddress(Query.Questions[0].Domain.Name)}";
 
-            var RegistrantAddress = await GetRegistrantAddress(Query.Questions[0].Domain.Name);
+            var ContractAddress = (TXT)$"Contract={await GetContractAddress(Query.Questions[0].Domain.Name)}";
 
-            var Registrant = new TXT()
-            {
-                Length = (byte)RegistrantAddress.Length,
-                Text = $"Registrant={RegistrantAddress}"
-            };
-
-            var OwnerAddress = await GetContractAddress(Query.Questions[0].Domain.Name);
-
-            var Owner = new TXT()
-            {
-                Length = (byte)OwnerAddress.Length,
-                Text = $"Address={OwnerAddress}"
-            };
-
-            var ExpiryDateTime = await GetExpiryDateTimeAsync(Query.Questions[0].Domain.Name);
-
-            var Expiry = new TXT()
-            {
-                Length = (byte)ExpiryDateTime.ToString().Length,
-                Text = $"Expiry={ExpiryDateTime}"
-            };
+            var ExpiryDateTime = (TXT)$"Expiry={await GetExpiryDateTimeAsync(Query.Questions[0].Domain.Name)}";
 
             var TimeToLive = await GetTimeToLiveAsync(Query.Questions[0].Domain.Name);
-
 
             return new Message()
             {
@@ -198,9 +173,9 @@ namespace Texnomic.DNS.Protocols
 
                         Domain = Query.Questions[0].Domain,
 
-                        Length = (ushort)(Owner.Length + 1),
+                        Length = (ushort)(await BinarySerializer.SizeOfAsync(ContractAddress)),
 
-                        Record = Owner
+                        Record = ContractAddress
                     },
 
                     new Answer()
@@ -216,9 +191,9 @@ namespace Texnomic.DNS.Protocols
 
                         Domain = Query.Questions[0].Domain,
 
-                        Length = (ushort) (Resolver.Text.Length + 1),
+                        Length = (ushort) (await BinarySerializer.SizeOfAsync(ResolverAddress)),
 
-                        Record = Resolver
+                        Record = ResolverAddress
                     },
 
                     new Answer()
@@ -234,9 +209,9 @@ namespace Texnomic.DNS.Protocols
 
                         Domain = Query.Questions[0].Domain,
 
-                        Length = (ushort) (Registrant.Text.Length + 1),
+                        Length = (ushort) (await BinarySerializer.SizeOfAsync(RegistrantAddress)),
 
-                        Record = Registrant
+                        Record = RegistrantAddress
                     },
 
                     new Answer()
@@ -252,9 +227,9 @@ namespace Texnomic.DNS.Protocols
 
                         Domain = Query.Questions[0].Domain,
 
-                        Length = (ushort)( Expiry.Text.Length + 1),
+                        Length = (ushort) (await BinarySerializer.SizeOfAsync(ExpiryDateTime)),
 
-                        Record = Expiry
+                        Record = ExpiryDateTime
                     },
                 }
             };

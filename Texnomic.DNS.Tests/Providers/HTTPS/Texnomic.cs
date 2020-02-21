@@ -55,13 +55,7 @@ namespace Texnomic.DNS.Tests.Providers.HTTPS
         [TestMethod]
         public async Task QueryAsync()
         {
-            //Using Binary Format Over HTTPs 
-
-            var RequestBytes = await RequestMessage.ToArrayAsync();
-
-            var ResponseBytes = await Resolver.ResolveAsync(RequestBytes);
-
-            ResponseMessage = await Message.FromArrayAsync(ResponseBytes);
+            ResponseMessage = await Resolver.ResolveAsync(RequestMessage);
 
             Assert.AreEqual(ID, ResponseMessage.ID);
             Assert.IsNotNull(ResponseMessage.Questions);

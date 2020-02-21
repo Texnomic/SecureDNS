@@ -203,7 +203,7 @@ namespace Texnomic.DNS.Protocols
             if(ClientMagic != "r6fnvWj8")
                 throw new CryptographicUnexpectedOperationException("Invalid Client Magic Received.");
 
-            if (ClientNonce != AnswerPacket[8..20]) 
+            if (!ClientNonce.SequenceEqual(AnswerPacket[8..20])) 
                 throw new CryptographicUnexpectedOperationException("Invalid Client Nonce Received.");
 
             var ServerNonce = AnswerPacket[20..32];
