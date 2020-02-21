@@ -16,7 +16,7 @@ using Texnomic.DNS.Extensions;
 using Texnomic.DNS.Models;
 using Texnomic.DNS.Options;
 using Texnomic.DNS.Records;
-
+using Algorithm = NSec.Cryptography.Algorithm;
 using Ed25519 = Rebex.Security.Cryptography.Ed25519;
 
 namespace Texnomic.DNS.Protocols
@@ -29,6 +29,8 @@ namespace Texnomic.DNS.Protocols
         private readonly IPEndPoint IPEndPoint;
 
         private readonly UdpClient Client;
+
+        private readonly ChaCha20Poly1305 ChaCha20Poly1305;
 
         private Certificate Certificate;
 
@@ -60,7 +62,7 @@ namespace Texnomic.DNS.Protocols
                 }
             };
 
-            Stamp = (DNSCryptStamp) Options.CurrentValue.Stamp.Value;
+            Stamp = (DNSCryptStamp)Options.CurrentValue.Stamp.Value;
 
             IPEndPoint = IPEndPoint.Parse(Stamp.Address);
 
@@ -69,6 +71,8 @@ namespace Texnomic.DNS.Protocols
             ClientPublicKey = ClientCurve25519.GetPublicKey();
 
             ClientPrivateKey = ClientCurve25519.GetPrivateKey();
+
+            ChaCha20Poly1305 = new ChaCha20Poly1305();
 
             IsInitialized = false;
         }
@@ -107,7 +111,7 @@ namespace Texnomic.DNS.Protocols
 
             var IsValid = await VerifyServer(AnswerMessage);
 
-            if(!IsValid)
+            if (!IsValid)
                 throw new CryptographicUnexpectedOperationException("Invalid Server Certificate.");
 
             SharedKey = MontgomeryCurve25519.KeyExchange(Certificate.PublicKey, ClientPrivateKey);
@@ -186,7 +190,7 @@ namespace Texnomic.DNS.Protocols
 
             var PaddedQuery = Concat(Query, QueryPad);
 
-            var EncryptedQuery = XSalsa20Poly1305.Encrypt(PaddedQuery, SharedKey, PaddedClientNonce);
+            var EncryptedQuery = Encrypt(ref PaddedQuery, ref PaddedClientNonce);
 
             var QueryPacket = Concat(Certificate.ClientMagic, ClientPublicKey, ClientNonce, EncryptedQuery);
 
@@ -200,10 +204,10 @@ namespace Texnomic.DNS.Protocols
 
             var ClientMagic = Encoding.ASCII.GetString(AnswerPacket[..8]);
 
-            if(ClientMagic != "r6fnvWj8")
+            if (ClientMagic != "r6fnvWj8")
                 throw new CryptographicUnexpectedOperationException("Invalid Client Magic Received.");
 
-            if (!ClientNonce.SequenceEqual(AnswerPacket[8..20])) 
+            if (!ClientNonce.SequenceEqual(AnswerPacket[8..20]))
                 throw new CryptographicUnexpectedOperationException("Invalid Client Nonce Received.");
 
             var ServerNonce = AnswerPacket[20..32];
@@ -212,9 +216,53 @@ namespace Texnomic.DNS.Protocols
 
             var EncryptedAnswer = AnswerPacket[32..];
 
-            var DecryptedAnswer = XSalsa20Poly1305.TryDecrypt(EncryptedAnswer, SharedKey, Nonce);
+            var DecryptedAnswer = Decrypt(ref EncryptedAnswer, ref Nonce);
 
             return DecryptedAnswer;
+        }
+
+        private byte[] Encrypt(ref byte[] PaddedQuery, ref byte[] PaddedClientNonce)
+        {
+            switch (Certificate.Version)
+            {
+                case ESVersion.X25519_XSalsa20Poly1305:
+
+                    return XSalsa20Poly1305.Encrypt(PaddedQuery, SharedKey, PaddedClientNonce);
+
+                case ESVersion.X25519_XChacha20Poly1305:
+
+                    var SKey = Key.Import(KeyAgreementAlgorithm.X25519, SharedKey, KeyBlobFormat.RawSymmetricKey);
+
+                    var Nonce = new Nonce(PaddedClientNonce, 0);
+
+                    return ChaCha20Poly1305.Encrypt(SKey, in Nonce, null, PaddedQuery);
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(ESVersion));
+            }
+        }
+
+        private byte[] Decrypt(ref byte[] EncryptedAnswer, ref byte[] ServerNonce)
+        {
+            switch (Certificate.Version)
+            {
+                case ESVersion.X25519_XSalsa20Poly1305:
+
+                    return XSalsa20Poly1305.TryDecrypt(EncryptedAnswer, SharedKey, ServerNonce);
+
+                case ESVersion.X25519_XChacha20Poly1305:
+
+                    var SKey = Key.Import(KeyAgreementAlgorithm.X25519, SharedKey, KeyBlobFormat.RawSymmetricKey);
+
+                    var Nonce = new Nonce(ServerNonce, 0);
+
+                    ChaCha20Poly1305.Decrypt(SKey, in Nonce, null, EncryptedAnswer, out var Answer);
+
+                    return Answer;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(ESVersion));
+            }
         }
 
         protected override void Dispose(bool Disposing)
