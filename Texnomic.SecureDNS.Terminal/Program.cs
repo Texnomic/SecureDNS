@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging;
 using PipelineNet.ChainsOfResponsibility;
 using PipelineNet.MiddlewareResolver;
 using Serilog;
+using Serilog.Enrichers;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Options;
 using Texnomic.DNS.Protocols;
@@ -64,17 +65,16 @@ namespace Texnomic.SecureDNS.Terminal
 
             var Options = Configurations.GetSection("Terminal Options").Get<TerminalOptions>();
 
-            if (Options.Mode == Mode.Daemon)
-            {
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    HostBuilder = HostBuilder.UseWindowsService();
-                }
+            if (Options.Mode != Mode.Daemon) return;
 
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                {
-                    HostBuilder = HostBuilder.UseSystemd();
-                }
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                HostBuilder = HostBuilder.UseWindowsService();
+            }
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                HostBuilder = HostBuilder.UseSystemd();
             }
         }
 
@@ -103,6 +103,7 @@ namespace Texnomic.SecureDNS.Terminal
         {
             LoggerConfiguration.ReadFrom.Configuration(Configurations);
             LoggerConfiguration.Destructure.UsingAttributes();
+            LoggerConfiguration.Enrich.WithThreadId();
         }
         private static void ConfigureServices(HostBuilderContext HostBuilderContext, IServiceCollection Services)
         {
@@ -121,51 +122,51 @@ namespace Texnomic.SecureDNS.Terminal
             Services.AddSingleton<MemoryCache>();
             Services.AddSingleton<HostTableMiddleware>();
             Services.AddSingleton<FilterListsMiddleware>();
-            Services.AddSingleton<ENSMiddleware>();
-            Services.AddSingleton<ResolverMiddleware>();
-            Services.AddSingleton<ILog, SerilogCommonLogger>();
-            Services.AddSingleton<IMiddlewareResolver, ServerMiddlewareActivator>();
-            Services.AddSingleton<IAsyncResponsibilityChain<IMessage, IMessage>, ProxyResponsibilityChain>();
+            Services.AddScoped<ENSMiddleware>();
+            Services.AddScoped<ResolverMiddleware>();
+            Services.AddScoped<ILog, SerilogCommonLogger>();
+            Services.AddScoped<IMiddlewareResolver, ServerMiddlewareActivator>();
+            Services.AddScoped<IAsyncResponsibilityChain<IMessage, IMessage>, ProxyResponsibilityChain>();
 
             var Options = Configurations.GetSection("Terminal Options").Get<TerminalOptions>();
 
             switch (Options.Protocol)
             {
                 case Protocol.DNSCrypt:
-                    Services.AddSingleton<IProtocol, DNSCrypt>();
+                    Services.AddScoped<IProtocol, DNSCrypt>();
                     break;
                 case Protocol.HTTPs:
-                    Services.AddSingleton<IProtocol, HTTPs>();
+                    Services.AddScoped<IProtocol, HTTPs>();
                     break;
                 case Protocol.TLS:
-                    Services.AddSingleton<IProtocol, TLS>();
+                    Services.AddScoped<IProtocol, TLS>();
                     break;
                 case Protocol.TCP:
-                    Services.AddSingleton<IProtocol, TCP>();
+                    Services.AddScoped<IProtocol, TCP>();
                     break;
                 case Protocol.UDP:
-                    Services.AddSingleton<IProtocol, UDP>();
+                    Services.AddScoped<IProtocol, UDP>();
                     break;
                 default:
-                    Services.AddSingleton<IProtocol, DNSCrypt>();
+                    Services.AddScoped<IProtocol, DNSCrypt>();
                     break;
             }
 
             switch (Options.Mode)
             {
                 case Mode.GUI:
-                    Services.AddSingleton<ProxyServer>();
+                    Services.AddScoped<ProxyServer>();
                     Services.AddHostedService<GUI>();
                     break;
                 case Mode.CLI:
-                    Services.AddSingleton<ProxyServer>();
+                    Services.AddScoped<ProxyServer>();
                     Services.AddHostedService<CLI>();
                     break;
                 case Mode.Daemon:
                     Services.AddHostedService<ProxyServer>();
                     break;
                 default:
-                    Services.AddSingleton<ProxyServer>();
+                    Services.AddScoped<ProxyServer>();
                     Services.AddHostedService<GUI>();
                     break;
             }

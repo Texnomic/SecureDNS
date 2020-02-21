@@ -218,6 +218,9 @@ namespace Texnomic.DNS.Protocols
 
             var DecryptedAnswer = Decrypt(ref EncryptedAnswer, ref Nonce);
 
+            if(DecryptedAnswer == null) 
+                throw new CryptographicUnexpectedOperationException("DNSCrypt Decryption Failed.");
+
             return DecryptedAnswer;
         }
 

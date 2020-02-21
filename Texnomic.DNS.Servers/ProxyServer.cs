@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
@@ -20,6 +21,8 @@ using Texnomic.DNS.Servers.Events;
 using Texnomic.DNS.Servers.Extensions;
 using Texnomic.DNS.Servers.Options;
 using Microsoft.Extensions.Options;
+using PipelineNet.MiddlewareResolver;
+using Texnomic.DNS.Servers.ResponsibilityChain;
 
 namespace Texnomic.DNS.Servers
 {
@@ -29,7 +32,8 @@ namespace Texnomic.DNS.Servers
         private readonly List<Task> Workers;
         private readonly IOptionsMonitor<ProxyServerOptions> Options;
         private readonly BinarySerializer BinarySerializer;
-        private readonly IAsyncResponsibilityChain<IMessage, IMessage> ResponsibilityChain;
+        private readonly IMiddlewareResolver MiddlewareResolver;
+        private readonly IOptionsMonitor<ProxyResponsibilityChainOptions> ProxyResponsibilityChainOptions;
         private readonly BufferBlock<(IMessage, IPEndPoint)> IncomingQueue;
         private readonly BufferBlock<(IMessage, IPEndPoint)> OutgoingQueue;
 
@@ -44,11 +48,16 @@ namespace Texnomic.DNS.Servers
 
         private UdpClient UdpClient;
 
-        public ProxyServer(IAsyncResponsibilityChain<IMessage, IMessage> ResponsibilityChain, ILogger Logger, IOptionsMonitor<ProxyServerOptions> ProxyServerOptions)
+        public ProxyServer(IOptionsMonitor<ProxyResponsibilityChainOptions> ProxyResponsibilityChainOptions,
+            IOptionsMonitor<ProxyServerOptions> ProxyServerOptions,
+            IMiddlewareResolver MiddlewareResolver,
+            ILogger Logger)
         {
             Options = ProxyServerOptions;
 
-            this.ResponsibilityChain = ResponsibilityChain;
+            this.MiddlewareResolver = MiddlewareResolver;
+
+            this.ProxyResponsibilityChainOptions = ProxyResponsibilityChainOptions;
 
             this.Logger = Logger;
 
@@ -155,6 +164,8 @@ namespace Texnomic.DNS.Servers
 
         private async Task ReceiveAsync()
         {
+            Thread.CurrentThread.Name = "Receiver";
+
             while (!CancellationToken.IsCancellationRequested)
             {
                 try
@@ -167,51 +178,33 @@ namespace Texnomic.DNS.Servers
                     switch (Message.MessageType)
                     {
                         case MessageType.Query:
-                        {
-                            await IncomingQueue.SendAsync((Message, Result.RemoteEndPoint), CancellationToken);
+                            {
+                                await IncomingQueue.SendAsync((Message, Result.RemoteEndPoint), CancellationToken);
 
-                            Logger?.Verbose("Received {@Query} From {@RemoteEndPoint}.", Message,
-                                Result.RemoteEndPoint.ToString());
+                                Logger?.Verbose("Received {@Query} From {@RemoteEndPoint}.", Message,
+                                    Result.RemoteEndPoint.ToString());
 
-                            Queried?.Invoke(this, new QueriedEventArgs(Message, Result.RemoteEndPoint));
+                                Queried?.Invoke(this, new QueriedEventArgs(Message, Result.RemoteEndPoint));
 
-                            break;
-                        }
+                                break;
+                            }
 
                         case MessageType.Response:
-                        {
-                            await OutgoingQueue.SendAsync((Message, Result.RemoteEndPoint), CancellationToken);
+                            {
+                                await OutgoingQueue.SendAsync((Message, Result.RemoteEndPoint), CancellationToken);
 
-                            Logger?.Debug("Queueing (Outgoing) Format Error {@Answer} To {@RemoteEndPoint}.", Message,
-                                Result.RemoteEndPoint.ToString());
+                                Logger?.Debug("Queueing (Outgoing) Format Error {@Answer} To {@RemoteEndPoint}.", Message,
+                                    Result.RemoteEndPoint.ToString());
 
-                            break;
-                        }
+                                break;
+                            }
                         default:
                             throw new ArgumentOutOfRangeException();
                     }
                 }
-                catch (TimeoutException Error)
-                {
-                    Logger?.Error(Error, "{@Error} Operation Timed Out While Receiving Message.", Error);
-
-                    Errored?.Invoke(this, new ErroredEventArgs(Error));
-                }
-                catch (SocketException Error)
+                catch (Exception Error) when (Handler(Error))
                 {
                     Logger?.Error(Error, "{@Error} Occurred While Receiving Message.", Error);
-
-                    Errored?.Invoke(this, new ErroredEventArgs(Error));
-                }
-                catch (OperationCanceledException Error)
-                {
-                    Logger?.Error(Error, "{@Error} Operation Canceled While Receiving Message.", Error);
-
-                    Errored?.Invoke(this, new ErroredEventArgs(Error));
-                }
-                catch (InvalidOperationException Error) //Serialization Errors
-                {
-                    Logger?.Error(Error, "{@Error} Operation Canceled While Receiving Message.", Error);
 
                     Errored?.Invoke(this, new ErroredEventArgs(Error));
                 }
@@ -228,6 +221,10 @@ namespace Texnomic.DNS.Servers
 
         private async Task ResolveAsync()
         {
+            Thread.CurrentThread.Name = "Resolver";
+
+            var ResponsibilityChain = new ProxyResponsibilityChain(ProxyResponsibilityChainOptions, MiddlewareResolver);
+
             while (!CancellationToken.IsCancellationRequested)
             {
                 try
@@ -243,21 +240,9 @@ namespace Texnomic.DNS.Servers
 
                     Resolved?.Invoke(this, new ResolvedEventArgs(Query, Answer, RemoteEndPoint));
                 }
-                catch (TimeoutException Error)
+                catch (Exception Error) when (Handler(Error))
                 {
-                    Logger?.Error(Error, "{@Error} Operation Timed Out While Resolving Message.", Error);
-
-                    Errored?.Invoke(this, new ErroredEventArgs(Error));
-                }
-                catch (OperationCanceledException Error)
-                {
-                    Logger?.Error(Error, "{@Error} Operation Canceled While Resolving Message.", Error);
-
-                    Errored?.Invoke(this, new ErroredEventArgs(Error));
-                }
-                catch (InvalidOperationException Error) //Serialization Errors
-                {
-                    Logger?.Error(Error, "{@Error} Operation Canceled While Resolving Message.", Error);
+                    Logger?.Error(Error, "{@Error} Occurred While Resolving Message.", Error);
 
                     Errored?.Invoke(this, new ErroredEventArgs(Error));
                 }
@@ -274,13 +259,15 @@ namespace Texnomic.DNS.Servers
 
         private async Task SendAsync()
         {
+            Thread.CurrentThread.Name = "Sender";
+
             while (!CancellationToken.IsCancellationRequested)
             {
                 try
                 {
                     var (Answer, RemoteEndPoint) = await OutgoingQueue.ReceiveAsync(CancellationToken)
                                                                             .WithCancellation(CancellationToken);
-                    
+
                     var Bytes = await SerializeAsync(Answer);
 
                     await UdpClient.SendAsync(Bytes, Bytes.Length, RemoteEndPoint);
@@ -290,21 +277,9 @@ namespace Texnomic.DNS.Servers
                     Answered?.Invoke(this, new AnsweredEventArgs(Answer, RemoteEndPoint));
 
                 }
-                catch (TimeoutException Error)
+                catch (Exception Error) when(Handler(Error))
                 {
-                    Logger?.Error(Error, "{@Error} Operation Timed Out While Sending Message.", Error);
-
-                    Errored?.Invoke(this, new ErroredEventArgs(Error));
-                }
-                catch (OperationCanceledException Error)
-                {
-                    Logger?.Error(Error, "{@Error} Operation Canceled While Sending Message.", Error);
-
-                    Errored?.Invoke(this, new ErroredEventArgs(Error));
-                }
-                catch (InvalidOperationException Error) //Serialization Errors
-                {
-                    Logger?.Error(Error, "{@Error} Operation Canceled While Sending Message.", Error);
+                    Logger?.Error(Error, "{@Error} Occurred While Sending Message.", Error);
 
                     Errored?.Invoke(this, new ErroredEventArgs(Error));
                 }
@@ -319,6 +294,24 @@ namespace Texnomic.DNS.Servers
             }
         }
 
+
+        private static bool Handler(Exception Error)
+        {
+            switch (Error)
+            {
+                case TimeoutException Timeout:
+                case OperationCanceledException OperationCanceled:
+                case ArgumentNullException ArgumentNull:
+                case ArgumentOutOfRangeException ArgumentOutOfRange:
+                case InvalidOperationException InvalidOperation:
+                case CryptographicUnexpectedOperationException CryptographicUnexpectedOperation:
+                    {
+                        return true;
+                    }
+                default:
+                    return false;
+            }
+        }
 
         private bool IsDisposed;
 
