@@ -10,7 +10,7 @@ SecureDNS Project is implemented using modern [Clean-Architecture](https://www.a
 1. [Releases](#Releases)
 2. [Protocols](#Protocols)
 3. [Integrations](#Integrations)
-4. [Records](#Records)
+4. [Resource Records](https://github.com/Texnomic/SecureDNS/wiki/Supported-Resource-Records)
 5. [Platforms](#Platforms)
 6. [Chips](#Chips)
 7. [Launch](#Launch)
@@ -37,51 +37,6 @@ The [v0.2 Alpha Release](https://github.com/Texnomic/SecureDNS/releases/tag/v0.2
 4. [IANA Root Files](https://www.iana.org/domains/root/files)
 5. [ICANN Zone Data Service](https://czds.icann.org/home)
 6. Any Standard-Compliant Public `DoH` or `DoT` Resolvers.
-
-## Records
-| Type | Code | Supported | Description | 
-| :---: | :---: | :---:  | :--- |
-| `A` | `1` | `Yes` | IPv4 Address |
-| `NS` | `2` | `Yes` | Authoritative Name Server |
-| `MD` | `3` | `Yes` | Mail Destination |
-| `MF` | `4` | `Yes` | Mail Forwarder  |
-| `CNAME` | `5` | `Yes` | Canonical Name for An Alias |
-| `SOA` | `6` | `Yes` | Marks The Start of A Zone of Authority |
-| `MB` | `7` | `Yes` | Mailbox Domain  |
-| `MG` | `8` | `Yes` | Mail Group Member  |
-| `MR` | `9` | `Yes` | Mail Rename Domain Name  |
-| `NULL` | `10` | `Yes` | RFC 1035 |
-| `WKS` | `11` | `Yes` | A Well Known Service Description  |
-| `PTR` | `12` | `Yes` | Pointer Record  |
-| `HINFO` | `13` | `Yes` | Host Information Resource Record  |
-| `MX` | `15` | `Yes` | Mail Exchange  |
-| `TXT` | `16` | `Yes` | Text Record  |
-| `RP` | `17` | `No` | Responsible Person  |
-| `AFSDB` | `18` | `No` | AFS Database Record  |
-| `X25` | `19` | `No` | Public Switched Data Network (PSDN) Address Number |
-| `ISDN` | `20` | `No` | Integrated Services Digital Network (ISDN) Telephone Number |
-| `RT` | `21` | `No` | Route Through  |
-| `NSAP` | `22` | `No` | Network Service Access Point (NSAP) Address  |
-| `NSAP_PTR` | `23` | `No` | Network Service Access Point (NSAP) Pointer  |
-| `SIG` | `24` | `No` | Signature Record  |
-| `Key` | `25` | `No` | Key Record  |
-| `PX` | `26` | `No` | MIXER Conformant Global Address Mapping  |
-| `GPOS` | `27` | `No` | Geographical Position  |
-| `AAAA` | `28` | `Yes` | IPv6 Address  |
-| `LOC` | `29` | `Yes` | Location Record  |
-| `NXT` | `30` | `No` | RFC 3755  |
-| `EID` | `31` | `No` | Endpoint Identifier  |
-| `NIMLOC` | `32` | `No` | Nimrod Locator  |
-| `SRV` | `33` | `Yes` |  Service Locator  |
-| `ATMA` | `34` | `No` |  Asynchronous Transfer Mode Address  |
-| `NAPTR` | `35` | `Yes` |  Naming Authority Pointer  |
-| `KX` | `36` | `No` |  Key Exchanger  |
-| `CERT` | `37` | `No` |  Certificate Record  |
-| `A6` | `38` | `No` |  Service Locator  |
-| `DNAME` | `39` | `No` |  Non-Terminal DNS Name Redirection  |
-| `SINK` | `40` | `No` |  Kitchen Sink  |
-| `OPT` | `41` | `Yes` |  Option  |
-| `APL` | `42` | `No` |  Address Prefix List  |
 
 ## Platforms
 - [x] Alpine: 3.10+
