@@ -52,12 +52,66 @@ namespace Texnomic.DNS.Models
 
         public void Deserialize(Stream Stream, Endianness Endianness, BinarySerializationContext Context)
         {
-            var Test = GetPacket((BoundedStream)Stream);
+            var BoundStream = (BoundedStream)Stream;
 
-            var BoundedStream = (BoundedStream)Stream;
+            var Packet = GetPacket(BoundStream);
 
-            var BitStream = new BitStream(BoundedStream, true);
+            var BitStream = new BitStream(Packet, true);
 
+            BitStream.Seek(BoundStream.GlobalPosition.TotalByteCount, 0);
+
+            ReadLabels(Stream, BitStream);
+        }
+
+        private void ReadLabels(Stream Stream, BitStream BitStream)
+        {
+            while (true)
+            {
+                var LabelType = (LabelType)(BitStream.ReadByte(2) >> 6);
+
+                switch (LabelType)
+                {
+                    case LabelType.Normal:
+                        {
+                            var Length = BitStream.ReadByte(6) >> 2; //Compensate for MSB
+
+                            Stream.ReadByte();
+
+                            if (Length == 0) return;
+
+                            Labels.Add(new Label
+                            {
+                                Type = LabelType.Normal,
+                                Count = (ushort)Length,
+                                Text = BitStream.ReadString(Length),
+                            });
+
+                            Stream.Read(new byte[Length]);
+
+                            continue;
+                        }
+                    case LabelType.Compressed:
+                        {
+                            var Pointer = BitStream.ReadByte(6) + BitStream.ReadByte();
+
+                            BitStream.Seek(Pointer, 0);
+
+                            Stream.Read(new byte[2]);
+
+                            ReadLabels(BitStream);
+
+                            return;
+                        }
+                    case LabelType.Extended:
+                    case LabelType.Unallocated:
+                        throw new NotImplementedException(Enum.GetName(typeof(LabelType), LabelType));
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(LabelType));
+                }
+            }
+        }
+        private void ReadLabels(BitStream BitStream)
+        {
             while (true)
             {
                 var LabelType = (LabelType)(BitStream.ReadByte(2) >> 6);
@@ -74,7 +128,6 @@ namespace Texnomic.DNS.Models
                             {
                                 Type = LabelType.Normal,
                                 Count = (ushort)Length,
-                                Offset = BoundedStream.GlobalPosition.TotalByteCount - 1,
                                 Text = BitStream.ReadString(Length),
                             });
 
@@ -84,32 +137,9 @@ namespace Texnomic.DNS.Models
                         {
                             var Pointer = BitStream.ReadByte(6) + BitStream.ReadByte();
 
-                            var Message = Context.FindAncestor<Message>();
+                            BitStream.Seek(Pointer, 0);
 
-                            //TODO Get All Domains from RRs inside Answer!
-
-                            var QuestionsDomains = Message.Questions.Select(Question => Question.Domain).ToArray();
-
-                            var AnswersDomains = Message.Answers.Select(Answer => Answer.Domain).ToArray();
-
-                            var AnswersRRsDomains = Message.Answers.Select(Answer => Answer.Record)
-                                                                            .Where(Record => Record is CNAME)
-                                                                             .Select(Record => ((CNAME)Record).Domain)
-                                                                             .ToArray();
-
-                            var Domains = Concat(QuestionsDomains, AnswersDomains, AnswersRRsDomains);
-
-                            var Domain = Domains.First(Domain => Domain.Labels.Any(Label => Label.Offset == Pointer));
-
-                            var Label = Domain.Labels.Single(Label => Label.Offset == Pointer);
-
-                            var Index = Domain.Labels.IndexOf(Label);
-
-                            var QLabel = Domain.Labels.ToArray()[Index..];
-
-                            Labels.AddRange(QLabel);
-
-                            return;
+                            continue;
                         }
                     case LabelType.Extended:
                     case LabelType.Unallocated:
@@ -140,22 +170,6 @@ namespace Texnomic.DNS.Models
                         }
                 }
             }
-        }
-
-        private static T[] Concat<T>(params T[][] Arrays)
-        {
-            var Result = new T[Arrays.Sum(A => A.Length)];
-
-            var Offset = 0;
-
-            foreach (var Array in Arrays)
-            {
-                Array.CopyTo(Result, Offset);
-
-                Offset += Array.Length;
-            }
-
-            return Result;
         }
 
         public byte[] ToArray()
