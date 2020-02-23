@@ -62,6 +62,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Design" Version="1.1.6" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.2" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.1" />
     <PackageReference Include="morelinq" Version="3.3.2" />
     <PackageReference Include="Serilog.AspNetCore" Version="3.2.0" />
     <PackageReference Include="Serilog.Enrichers.AspnetcoreHttpcontext" Version="1.1.0" />

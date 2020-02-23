@@ -18,14 +18,6 @@ namespace Texnomic.DNS.Models
     /// </remarks>
     public class Message : IMessage
     {
-        [Ignore, JsonIgnore, NotLogged]
-        public bool Prefixed { get; set; }
-
-        [FieldOrder(0), FieldBitLength(16), FieldEndianness(Endianness.Big)]
-        [JsonIgnore, NotLogged]
-        [SerializeWhen(nameof(Prefixed), true)]
-        public ushort Length { get; set; }
-
         [FieldOrder(1), FieldBitLength(16), FieldEndianness(Endianness.Big), JsonIgnore]
         public ushort ID { get; set; }
 

@@ -1,0 +1,72 @@
+@page "/Configurations"
+@inherits ConfigurationBase
+
+@using Syncfusion.EJ2.Blazor.Navigations
+
+<EjsMenu Items="@MenuItems"></EjsMenu>
+
+@code {
+    public List<MenuItem> MenuItems = new List<MenuItem>{
+        new MenuItem{ Text = "Proxy Server", IconCss = "e-icons e-file", Items = new List<MenuItem>{
+            new MenuItem { Text= "Open", IconCss= "e-icons e-open" },
+            new MenuItem { Text= "Save", IconCss= "e-icons e-save" },
+            new MenuItem { Separator= true },
+            new MenuItem { Text= "Exit" }}
+    },
+        new MenuItem{ Text = "DNS-Over-HTTPs", IconCss = "e-icons e-edit", Items = new List<MenuItem>{
+            new MenuItem{ Text= "Cut", IconCss= "e-icons e-cut" },
+            new MenuItem{ Text= "Copy", IconCss= "e-icons e-copy" },
+            new MenuItem{ Text= "Paste", IconCss= "e-icons e-paste" }}
+    },
+        new MenuItem{ Text = "DNS-Over-TLS", Items = new List<MenuItem>{
+            new MenuItem{ Text = "Toolbars", Items = new List<MenuItem>{
+            new MenuItem { Text= "Menu Bar" },
+            new MenuItem { Text= "Bookmarks Toolbar" },
+            new MenuItem { Text= "Customize" }}
+    },
+        new MenuItem { Text = "DNSCrypt", Items = new List<MenuItem>{
+            new MenuItem { Text= "Zoom In" },
+            new MenuItem { Text= "Zoom Out" },
+            new MenuItem { Text= "Reset" },}
+    },
+        new MenuItem { Text = "Full Screen" }}
+    },
+        new MenuItem{ Text = "Tools", Items = new List<MenuItem>() {
+            new MenuItem { Text= "Spelling & Grammar" },
+            new MenuItem { Text= "Customize" },
+            new MenuItem { Separator= true },
+            new MenuItem { Text= "Options" }}
+    },
+        new MenuItem { Text = "Help" }
+    };
+}
+
+<style>
+    .e-file::before {
+        content: '\e30d';
+    }
+
+    .e-edit::before {
+        content: '\e7a3';
+    }
+
+    .e-open::before {
+        content: '\ec04';
+    }
+
+    .e-save::before {
+        content: '\ec11';
+    }
+
+    .e-cut::before {
+        content: '\e279';
+    }
+
+    .e-copy::before {
+        content: '\e280';
+    }
+
+    .e-paste::before {
+        content: '\e601';
+    }
+</style>

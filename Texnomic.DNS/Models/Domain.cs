@@ -10,6 +10,7 @@ using Destructurama.Attributed;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Extensions;
+using Texnomic.DNS.Records;
 
 namespace Texnomic.DNS.Models
 {
@@ -51,6 +52,8 @@ namespace Texnomic.DNS.Models
 
         public void Deserialize(Stream Stream, Endianness Endianness, BinarySerializationContext Context)
         {
+            var Test = GetPacket((BoundedStream)Stream);
+
             var BoundedStream = (BoundedStream)Stream;
 
             var BitStream = new BitStream(BoundedStream, true);
@@ -83,11 +86,26 @@ namespace Texnomic.DNS.Models
 
                             var Message = Context.FindAncestor<Message>();
 
-                            var QLabel = Message.Questions
-                                                .Select(Question => Question.Domain)
-                                                .Where(Domain => Domain.Labels.Any(Label => Label.Offset == Pointer))
-                                                .SelectMany(Domain => Domain.Labels)
-                                                .Where(Label => Label.Offset >= Pointer);
+                            //TODO Get All Domains from RRs inside Answer!
+
+                            var QuestionsDomains = Message.Questions.Select(Question => Question.Domain).ToArray();
+
+                            var AnswersDomains = Message.Answers.Select(Answer => Answer.Domain).ToArray();
+
+                            var AnswersRRsDomains = Message.Answers.Select(Answer => Answer.Record)
+                                                                            .Where(Record => Record is CNAME)
+                                                                             .Select(Record => ((CNAME)Record).Domain)
+                                                                             .ToArray();
+
+                            var Domains = Concat(QuestionsDomains, AnswersDomains, AnswersRRsDomains);
+
+                            var Domain = Domains.First(Domain => Domain.Labels.Any(Label => Label.Offset == Pointer));
+
+                            var Label = Domain.Labels.Single(Label => Label.Offset == Pointer);
+
+                            var Index = Domain.Labels.IndexOf(Label);
+
+                            var QLabel = Domain.Labels.ToArray()[Index..];
 
                             Labels.AddRange(QLabel);
 
@@ -100,6 +118,44 @@ namespace Texnomic.DNS.Models
                         throw new ArgumentOutOfRangeException(nameof(LabelType));
                 }
             }
+        }
+
+        private static byte[] GetPacket(BoundedStream BoundedStream)
+        {
+            var Root = BoundedStream.Source;
+
+            while (true)
+            {
+                switch (Root)
+                {
+                    case BoundedStream Bounded:
+                        {
+                            Root = Bounded.Source;
+
+                            continue;
+                        }
+                    case MemoryStream Memory:
+                        {
+                            return Memory.ToArray();
+                        }
+                }
+            }
+        }
+
+        private static T[] Concat<T>(params T[][] Arrays)
+        {
+            var Result = new T[Arrays.Sum(A => A.Length)];
+
+            var Offset = 0;
+
+            foreach (var Array in Arrays)
+            {
+                Array.CopyTo(Result, Offset);
+
+                Offset += Array.Length;
+            }
+
+            return Result;
         }
 
         public byte[] ToArray()
