@@ -15,7 +15,6 @@ using Microsoft.Extensions.Logging;
 using PipelineNet.ChainsOfResponsibility;
 using PipelineNet.MiddlewareResolver;
 using Serilog;
-using Serilog.Enrichers;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Options;
 using Texnomic.DNS.Protocols;

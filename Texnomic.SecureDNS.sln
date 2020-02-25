@@ -57,6 +57,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.ENS.BaseRegistrar"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Texnomic.BitStream", "Texnomic.BitStream\Texnomic.BitStream.csproj", "{7F9B3E21-7824-4F77-9F6C-A9D31E3204D5}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.SecureDNS.Serialization", "Texnomic.SecureDNS.Serialization\Texnomic.SecureDNS.Serialization.csproj", "{FBB1765F-558E-4D8B-AC6A-3CF22845D3A6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Texnomic.SecureDNS.Core", "Texnomic.SecureDNS.Core\Texnomic.SecureDNS.Core.csproj", "{ADA13064-0F67-4A87-BA15-4950BD87EB53}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Texnomic.SecureDNS.Abstractions", "Texnomic.SecureDNS.Abstractions\Texnomic.SecureDNS.Abstractions.csproj", "{0C72B387-8B22-4429-98A4-AC4BB2442D28}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -147,6 +153,18 @@ Global
 		{7F9B3E21-7824-4F77-9F6C-A9D31E3204D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7F9B3E21-7824-4F77-9F6C-A9D31E3204D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7F9B3E21-7824-4F77-9F6C-A9D31E3204D5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FBB1765F-558E-4D8B-AC6A-3CF22845D3A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBB1765F-558E-4D8B-AC6A-3CF22845D3A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBB1765F-558E-4D8B-AC6A-3CF22845D3A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FBB1765F-558E-4D8B-AC6A-3CF22845D3A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ADA13064-0F67-4A87-BA15-4950BD87EB53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ADA13064-0F67-4A87-BA15-4950BD87EB53}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ADA13064-0F67-4A87-BA15-4950BD87EB53}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ADA13064-0F67-4A87-BA15-4950BD87EB53}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C72B387-8B22-4429-98A4-AC4BB2442D28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C72B387-8B22-4429-98A4-AC4BB2442D28}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C72B387-8B22-4429-98A4-AC4BB2442D28}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C72B387-8B22-4429-98A4-AC4BB2442D28}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -44,7 +44,7 @@ namespace Texnomic.DNS.Tests.Providers.DNSCrypt
                 {
                     new Question()
                     {
-                        Domain = Domain.FromString("facebook.com"),
+                        Domain = Domain.FromString("www.youtube.com"),
                         Class = RecordClass.Internet,
                         Type = RecordType.A
                     }

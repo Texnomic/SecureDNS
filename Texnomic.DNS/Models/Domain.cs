@@ -60,56 +60,29 @@ namespace Texnomic.DNS.Models
 
             BitStream.Seek(BoundStream.GlobalPosition.TotalByteCount, 0);
 
-            ReadLabels(Stream, BitStream);
+            ReadLabels(BitStream);
+
+            Seek(BoundStream);
         }
 
-        private void ReadLabels(Stream Stream, BitStream BitStream)
+        private static void Seek(BoundedStream BoundedStream)
         {
             while (true)
             {
-                var LabelType = (LabelType)(BitStream.ReadByte(2) >> 6);
+                var Byte = BoundedStream.ReadByte();
 
-                switch (LabelType)
+                switch (Byte)
                 {
-                    case LabelType.Normal:
-                        {
-                            var Length = BitStream.ReadByte(6) >> 2; //Compensate for MSB
+                    case 0b00000000:
+                        return;
 
-                            Stream.ReadByte();
-
-                            if (Length == 0) return;
-
-                            Labels.Add(new Label
-                            {
-                                Type = LabelType.Normal,
-                                Count = (ushort)Length,
-                                Text = BitStream.ReadString(Length),
-                            });
-
-                            Stream.Read(new byte[Length]);
-
-                            continue;
-                        }
-                    case LabelType.Compressed:
-                        {
-                            var Pointer = BitStream.ReadByte(6) + BitStream.ReadByte();
-
-                            BitStream.Seek(Pointer, 0);
-
-                            Stream.Read(new byte[2]);
-
-                            ReadLabels(BitStream);
-
-                            return;
-                        }
-                    case LabelType.Extended:
-                    case LabelType.Unallocated:
-                        throw new NotImplementedException(Enum.GetName(typeof(LabelType), LabelType));
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(LabelType));
+                    case 0b11000000:
+                        BoundedStream.ReadByte();
+                        return;
                 }
             }
         }
+
         private void ReadLabels(BitStream BitStream)
         {
             while (true)
@@ -152,6 +125,13 @@ namespace Texnomic.DNS.Models
 
         private static byte[] GetPacket(BoundedStream BoundedStream)
         {
+            var Root = GetRootStream(BoundedStream);
+
+            return Root.ToArray();
+        }
+
+        private static MemoryStream GetRootStream(BoundedStream BoundedStream)
+        {
             var Root = BoundedStream.Source;
 
             while (true)
@@ -159,15 +139,15 @@ namespace Texnomic.DNS.Models
                 switch (Root)
                 {
                     case BoundedStream Bounded:
-                        {
-                            Root = Bounded.Source;
+                    {
+                        Root = Bounded.Source;
 
-                            continue;
-                        }
+                        continue;
+                    }
                     case MemoryStream Memory:
-                        {
-                            return Memory.ToArray();
-                        }
+                    {
+                        return Memory;
+                    }
                 }
             }
         }

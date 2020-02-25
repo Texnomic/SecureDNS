@@ -16,7 +16,7 @@ using Texnomic.DNS.Extensions;
 using Texnomic.DNS.Models;
 using Texnomic.DNS.Options;
 using Texnomic.DNS.Records;
-using Algorithm = NSec.Cryptography.Algorithm;
+
 using Ed25519 = Rebex.Security.Cryptography.Ed25519;
 
 namespace Texnomic.DNS.Protocols
@@ -207,8 +207,8 @@ namespace Texnomic.DNS.Protocols
             if (ClientMagic != "r6fnvWj8")
                 throw new CryptographicUnexpectedOperationException("Invalid Client Magic Received.");
 
-            //if (!ClientNonce.SequenceEqual(AnswerPacket[8..20]))
-            //    throw new CryptographicUnexpectedOperationException("Invalid Client Nonce Received.");
+            if (!ClientNonce.SequenceEqual(AnswerPacket[8..20]))
+                throw new CryptographicUnexpectedOperationException("Invalid Client Nonce Received.");
 
             var ServerNonce = AnswerPacket[20..32];
 
@@ -221,7 +221,17 @@ namespace Texnomic.DNS.Protocols
             if(DecryptedAnswer == null) 
                 throw new CryptographicUnexpectedOperationException("DNSCrypt Decryption Failed.");
 
+            DecryptedAnswer = DecryptedAnswer.TrimEnd();
+
+            //TODO Retry ?
+            //DecryptedAnswer = DecryptedAnswer.Length > Query.Length + 1 ? DecryptedAnswer : await ResolveAsync(Query);
+
             return DecryptedAnswer;
+        }
+
+        private static string ByteArrayToString(byte[] Data)
+        {
+            return BitConverter.ToString(Data).Replace("-", ", 0x");
         }
 
         private byte[] Encrypt(ref byte[] PaddedQuery, ref byte[] PaddedClientNonce)
