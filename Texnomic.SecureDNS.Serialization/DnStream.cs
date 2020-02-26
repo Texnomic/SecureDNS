@@ -10,17 +10,19 @@ namespace Texnomic.SecureDNS.Serialization
     {
         private byte[] Raw;
 
-        private ushort ByteIndex;
+        private int ByteIndex;
 
-        private byte BitIndex;
+        private int BitIndex;
 
-        public ushort BytePosition => ByteIndex;
+        public ushort BytePosition => (ushort)ByteIndex;
 
-        public ushort BitPosition => BitIndex;
+        public ushort BitPosition => (ushort)BitIndex;
 
         public DnStream()
         {
-            Raw = new byte[12];
+            Raw = new byte[512];
+
+            (ByteIndex, BitIndex) = (0, 0);
         }
 
         public DnStream(ref byte[] Raw)
@@ -37,11 +39,11 @@ namespace Texnomic.SecureDNS.Serialization
 
         public byte GetBits(byte Length)
         {
-            var Byte = Raw[ByteIndex].GetBits(BitIndex, Length);
+            var Byte = Raw[ByteIndex].GetBits((byte)BitIndex, Length);
 
             BitIndex += Length;
 
-            if (BitIndex >= 7)
+            if (BitIndex > 7)
             {
                 ByteIndex++;
                 BitIndex = 0;
@@ -52,24 +54,24 @@ namespace Texnomic.SecureDNS.Serialization
 
         public void SetBits(byte Length, byte Value)
         {
-            BitIndex++;
+            Raw[ByteIndex] = Raw[ByteIndex].SetBits((byte)BitIndex, Length, Value);
 
-            if (BitIndex == 7)
+            BitIndex += Length;
+
+            if (BitIndex > 7)
             {
                 ByteIndex++;
                 BitIndex = 0;
             }
-
-            Raw[ByteIndex].SetBits(BitIndex, Length, Value);
         }
 
         public byte GetBit()
         {
-            var Byte = Raw[ByteIndex].GetBit(BitIndex);
+            var Byte = Raw[ByteIndex].GetBit((byte)BitIndex);
 
             BitIndex++;
 
-            if (BitIndex == 7)
+            if (BitIndex > 7)
             {
                 ByteIndex++;
                 BitIndex = 0;
@@ -80,15 +82,15 @@ namespace Texnomic.SecureDNS.Serialization
 
         public void SetBit(byte Value)
         {
+            Raw[ByteIndex] = Raw[ByteIndex].SetBit((byte)BitIndex, Value);
+
             BitIndex++;
 
-            if (BitIndex == 7)
+            if (BitIndex > 7)
             {
                 ByteIndex++;
                 BitIndex = 0;
             }
-
-            Raw[ByteIndex].SetBit(BitIndex, Value);
         }
 
         public byte GetByte()
@@ -98,6 +100,13 @@ namespace Texnomic.SecureDNS.Serialization
             ByteIndex += 1;
 
             return Byte;
+        }
+
+        public void SetByte(byte Value)
+        {
+            Raw[ByteIndex] = Value;
+
+            ByteIndex++;
         }
 
         public byte[] GetBytes(ushort Length)
@@ -134,8 +143,6 @@ namespace Texnomic.SecureDNS.Serialization
 
         public void SetUShort(ushort Value)
         {
-            ByteIndex++;
-
             var Bytes = new byte[2];
 
             BinaryPrimitives.WriteUInt16BigEndian(Bytes, Value);
@@ -224,8 +231,6 @@ namespace Texnomic.SecureDNS.Serialization
 
         public void SetString(string Value)
         {
-            ByteIndex++;
-
             var Bytes = Encoding.ASCII.GetBytes(Value);
 
             Array.Copy(Bytes, 0, Raw, ByteIndex, Bytes.Length);
@@ -240,6 +245,11 @@ namespace Texnomic.SecureDNS.Serialization
             return new TimeSpan(0, 0, Seconds);
         }
 
+        public void SetTimeSpan(TimeSpan TimeSpan)
+        {
+            SetInt((int)TimeSpan.TotalSeconds);
+        }
+
         public IPAddress GetIPv4Address()
         {
             var Bytes = GetBytes(4);
@@ -247,11 +257,22 @@ namespace Texnomic.SecureDNS.Serialization
             return new IPAddress(Bytes);
         }
 
+        public void SetIPv4Address(IPAddress IPAddress)
+        {
+            var Bytes = IPAddress.GetAddressBytes();
+
+        }
+
         public IPAddress GetIPv6Address()
         {
             var Bytes = GetBytes(16);
 
             return new IPAddress(Bytes);
+        }
+
+        public byte[] ToArray()
+        {
+            return Raw.TrimEnd();
         }
     }
 }

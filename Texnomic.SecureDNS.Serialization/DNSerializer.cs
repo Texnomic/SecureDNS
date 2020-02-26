@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Buffers.Binary;
 using Texnomic.SecureDNS.Core;
 using Texnomic.SecureDNS.Core.DataTypes;
 using System.Collections.Generic;
+using System.Linq;
 using Texnomic.SecureDNS.Abstractions;
 using Texnomic.SecureDNS.Abstractions.Enums;
 using Texnomic.SecureDNS.Core.Records;
@@ -9,7 +11,7 @@ using Texnomic.SecureDNS.Serialization.Extensions;
 
 namespace Texnomic.SecureDNS.Serialization
 {
-    public static class DNSerializer
+    public static class DnSerializer
     {
         public static IMessage Deserialize(ref byte[] Raw)
         {
@@ -18,16 +20,19 @@ namespace Texnomic.SecureDNS.Serialization
             var Message = new Message
             {
                 ID = Stream.GetUShort(),
+
                 MessageType = Stream.GetBit().AsEnum<MessageType>(),
                 OperationCode = Stream.GetBits(4).AsEnum<OperationCode>(),
                 AuthoritativeAnswer = Stream.GetBit().AsEnum<AuthoritativeAnswer>(),
                 Truncated = Stream.GetBit().AsBool(),
                 RecursionDesired = Stream.GetBit().AsBool(),
+
                 RecursionAvailable = Stream.GetBit().AsBool(),
                 Zero = Stream.GetBit(),
                 AuthenticatedData = Stream.GetBit().AsBool(),
                 CheckingDisabled = Stream.GetBit().AsBool(),
                 ResponseCode = Stream.GetBits(4).AsEnum<ResponseCode>(),
+
                 QuestionsCount = Stream.GetUShort(),
                 AnswersCount = Stream.GetUShort(),
                 AuthorityCount = Stream.GetUShort(),
@@ -40,11 +45,35 @@ namespace Texnomic.SecureDNS.Serialization
             return Message;
         }
 
-        public static byte[] Serialize(IMessage Message)
+        public static byte[] Serialize(ref IMessage Message)
         {
             var Stream = new DnStream();
 
-            return default;
+            var Pointers = new Dictionary<string, ushort>();
+
+            Stream.SetUShort(Message.ID);
+
+            Stream.SetBit((byte)Message.MessageType);
+            Stream.SetBits(4, (byte)Message.OperationCode);
+            Stream.SetBit((byte)Message.AuthoritativeAnswer);
+            Stream.SetBit(Convert.ToByte(Message.Truncated));
+            Stream.SetBit(Convert.ToByte(Message.RecursionDesired));
+
+            Stream.SetBit(Convert.ToByte(Message.RecursionAvailable));
+            Stream.SetBit(Message.Zero);
+            Stream.SetBit(Convert.ToByte(Message.AuthenticatedData));
+            Stream.SetBit(Convert.ToByte(Message.CheckingDisabled));
+            Stream.SetBits(4, (byte)Message.ResponseCode);
+
+            Stream.SetUShort((ushort)Message.Questions.Count());
+            Stream.SetUShort((ushort)Message.Answers.Count());
+
+            Stream.SetUShort((ushort)Message.Authority.Count());
+            Stream.SetUShort((ushort)Message.Additional.Count());
+
+            SetQuestions(ref Stream, ref Pointers, Message.Questions);
+
+            return Stream.ToArray();
         }
 
         private static IEnumerable<IQuestion> GetQuestions(ref DnStream Stream, ushort Count)
@@ -62,6 +91,14 @@ namespace Texnomic.SecureDNS.Serialization
             return Questions;
         }
 
+        private static void SetQuestions(ref DnStream Stream, ref Dictionary<string, ushort> Pointers, IEnumerable<IQuestion> Questions)
+        {
+            foreach (var Question in Questions)
+            {
+                SetQuestion(ref Stream, ref Pointers, Question);
+            }
+        }
+
         private static IQuestion GetQuestion(ref DnStream Stream)
         {
             var Question = new Question()
@@ -74,6 +111,15 @@ namespace Texnomic.SecureDNS.Serialization
             return Question;
         }
 
+        private static void SetQuestion(ref DnStream Stream, ref Dictionary<string, ushort> Pointers, IQuestion Question)
+        {
+            SetDomain(ref Stream, ref Pointers, Question.Domain);
+
+            Stream.SetUShort((byte)Question.Type);
+
+            Stream.SetUShort((byte)Question.Class);
+        }
+
         private static IDomain GetDomain(ref DnStream Stream)
         {
             var Domain = new Domain()
@@ -82,6 +128,11 @@ namespace Texnomic.SecureDNS.Serialization
             };
 
             return Domain;
+        }
+
+        private static void SetDomain(ref DnStream Stream, ref Dictionary<string, ushort> Pointers, IDomain Domain)
+        {
+            SetLabels(ref Stream, ref Pointers, Domain.Labels);
         }
 
         private static IEnumerable<string> GetLabels(ref DnStream Stream)
@@ -130,6 +181,43 @@ namespace Texnomic.SecureDNS.Serialization
             }
         }
 
+        private static void SetLabels(ref DnStream Stream, ref Dictionary<string, ushort> Pointers, IEnumerable<string> Labels)
+        {
+            var Domain = string.Join('.', Labels);
+
+            if (Pointers.ContainsKey(Domain))
+            {
+                Stream.SetBits(2, (byte)LabelType.Compressed);
+
+                var Bytes = new byte[2];
+
+                BinaryPrimitives.WriteUInt16BigEndian(Bytes, Pointers[Domain]);
+
+                Stream.SetBits(6, Bytes[0]);
+
+                Stream.SetByte(Bytes[1]);
+            }
+            else
+            {
+                var Pointer = (ushort)(Stream.BytePosition);
+
+                Pointers.Add(Domain, Pointer);
+
+                foreach (var Label in Labels)
+                {
+                    Pointers.Add(Label, Stream.BytePosition);
+
+                    Stream.SetBits(2, (byte)LabelType.Normal);
+
+                    Stream.SetBits(6, (byte)Label.Length);
+
+                    Stream.SetString(Label);
+                }
+
+                Stream.SetByte(0);
+            }
+        }
+
         private static IEnumerable<IAnswer> GetAnswers(ref DnStream Stream, ushort Count)
         {
             var Answers = new List<IAnswer>();
@@ -143,6 +231,14 @@ namespace Texnomic.SecureDNS.Serialization
             while (Answers.Count < Count);
 
             return Answers;
+        }
+
+        private static void SetAnswers(ref DnStream Stream, ref Dictionary<string, ushort> Pointers, IEnumerable<IAnswer> Answers)
+        {
+            foreach (var Answer in Answers)
+            {
+                SetAnswer(ref Stream, ref Pointers, Answer);
+            }
         }
 
         private static IAnswer GetAnswer(ref DnStream Stream)
@@ -159,6 +255,19 @@ namespace Texnomic.SecureDNS.Serialization
             Answer.Record = GetRecord(ref Stream, Answer.Type);
 
             return Answer;
+        }
+
+        private static void SetAnswer(ref DnStream Stream, ref Dictionary<string, ushort> Pointers, IAnswer Answer)
+        {
+            SetDomain(ref Stream, ref Pointers, Answer.Domain);
+
+            Stream.SetUShort((byte)Answer.Type);
+
+            Stream.SetUShort((byte)Answer.Class);
+
+            Stream.SetTimeSpan(Answer.TimeToLive);
+
+            Stream.SetUShort(Answer.Length);
         }
 
         private static IRecord GetRecord(ref DnStream Stream, RecordType RecordType)
@@ -327,12 +436,42 @@ namespace Texnomic.SecureDNS.Serialization
             }
         }
 
+        private static void SetRecord(ref DnStream Stream, ref Dictionary<string, ushort> Pointers, ref IRecord Record)
+        {
+            switch (Record)
+            {
+                case A A:
+                    {
+
+                        break;
+                    }
+                case CNAME CNAME:
+                    {
+                        SetCNAME(ref Stream, ref Pointers, ref CNAME);
+                        break;
+                    }
+                case AAAA AAAA:
+                    {
+
+                        break;
+                    }
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(Record), Record, null);
+            }
+        }
+
         private static CNAME GetCNAME(ref DnStream Stream)
         {
             return new CNAME()
             {
                 Domain = GetDomain(ref Stream)
             };
+        }
+
+        private static void SetCNAME(ref DnStream Stream, ref Dictionary<string, ushort> Pointers, ref CNAME CNAME)
+        {
+            SetDomain(ref Stream, ref Pointers, CNAME.Domain);
         }
 
         private static A GetA(ref DnStream Stream)
@@ -351,6 +490,6 @@ namespace Texnomic.SecureDNS.Serialization
             };
         }
 
-        
+
     }
 }

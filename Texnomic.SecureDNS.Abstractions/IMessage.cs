@@ -19,7 +19,7 @@ namespace Texnomic.SecureDNS.Abstractions
 
         bool RecursionAvailable { get; set; }
 
-        int Zero { get; set; }
+        byte Zero { get; set; }
 
         bool AuthenticatedData { get; set; }
 

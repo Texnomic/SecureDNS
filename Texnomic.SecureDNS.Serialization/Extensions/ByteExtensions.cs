@@ -15,7 +15,7 @@ namespace Texnomic.SecureDNS.Serialization.Extensions
             return (byte)((Byte & Mask) >> 8 - (Index + Length));
         }
 
-        public static void SetBits(this byte Byte, byte Index, byte Length, byte Value)
+        public static byte SetBits(this byte Byte, byte Index, byte Length, byte Value)
         {
             Value = (byte)(Value << Length - Index);
 
@@ -23,8 +23,10 @@ namespace Texnomic.SecureDNS.Serialization.Extensions
             {
                 var Bit = Value.GetBit(Index);
 
-                Byte.SetBit(Index, Bit);
+                Byte = Byte.SetBit(Index, Bit);
             }
+
+            return Byte;
         }
 
         public static byte GetBit(this byte Byte, byte Index)
@@ -32,13 +34,15 @@ namespace Texnomic.SecureDNS.Serialization.Extensions
             return Byte.GetBits(Index, 1);
         }
 
-        public static void SetBit(this byte Byte, byte Index, byte Value)
+        public static byte SetBit(this byte Byte, byte Index, byte Value)
         {
             if (Value > 1) throw new ArgumentOutOfRangeException(nameof(Value));
 
             var Mask = (byte)(0b10000000 >> Index);
 
             Byte = Value == 1 ? Byte |= Mask : Byte &= (byte)~Mask;
+
+            return Byte;
         }
 
         public static bool AsBool(this byte Byte)

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Texnomic.SecureDNS.Abstractions;
 using Texnomic.SecureDNS.Abstractions.Enums;
 
@@ -6,6 +7,14 @@ namespace Texnomic.SecureDNS.Core
 {
     public class Message : IMessage
     {
+        public Message()
+        {
+            Questions = Array.Empty<IQuestion>();
+            Answers = Array.Empty<IAnswer>();
+            Authority = Array.Empty<IAnswer>();
+            Additional = Array.Empty<IAnswer>();
+        }
+
         public ushort ID { get; set; }
 
         public MessageType MessageType { get; set; }
@@ -20,7 +29,7 @@ namespace Texnomic.SecureDNS.Core
 
         public bool RecursionAvailable { get; set; }
 
-        public int Zero { get; set; } = 0;
+        public byte Zero { get; set; } = 0;
 
         public bool AuthenticatedData { get; set; }
 
