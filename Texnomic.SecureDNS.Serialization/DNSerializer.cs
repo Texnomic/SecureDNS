@@ -4,44 +4,56 @@ using Texnomic.SecureDNS.Core.DataTypes;
 using System.Collections.Generic;
 using Texnomic.SecureDNS.Abstractions;
 using Texnomic.SecureDNS.Abstractions.Enums;
+using Texnomic.SecureDNS.Core.Records;
 using Texnomic.SecureDNS.Serialization.Extensions;
 
 namespace Texnomic.SecureDNS.Serialization
 {
-    public static class DnSerializer
+    public static class DNSerializer
     {
         public static IMessage Deserialize(ref byte[] Raw)
         {
-            ushort Index = 12;
+            var Stream = new DnStream(ref Raw);
 
-            return new Message()
+            var Message = new Message
             {
-                ID = Raw.GetUShort(0),
-                MessageType = Raw[2].GetBit(0).AsEnum<MessageType>(),
-                OperationCode = Raw[2].GetBits(1, 4).AsEnum<OperationCode>(),
-                AuthoritativeAnswer = Raw[2].GetBit(5).AsEnum<AuthoritativeAnswer>(),
-                Truncated = Raw[2].GetBit(6).AsBool(),
-                RecursionDesired = Raw[2].GetBit(7).AsBool(),
-                RecursionAvailable = Raw[3].GetBit(0).AsBool(),
-                Zero = Raw[3].GetBit(1),
-                AuthenticatedData = Raw[3].GetBit(2).AsBool(),
-                CheckingDisabled = Raw[3].GetBit(3).AsBool(),
-                ResponseCode = Raw[3].GetBits(4, 4).AsEnum<ResponseCode>(),
-                QuestionsCount = Raw.GetUShort(4),
-                AnswersCount = Raw.GetUShort(6),
-                AuthorityCount = Raw.GetUShort(8),
-                AdditionalCount = Raw.GetUShort(10),
-                Questions = DeserializeQuestions(ref Raw, Raw.GetUShort(4), ref Index),
+                ID = Stream.GetUShort(),
+                MessageType = Stream.GetBit().AsEnum<MessageType>(),
+                OperationCode = Stream.GetBits(4).AsEnum<OperationCode>(),
+                AuthoritativeAnswer = Stream.GetBit().AsEnum<AuthoritativeAnswer>(),
+                Truncated = Stream.GetBit().AsBool(),
+                RecursionDesired = Stream.GetBit().AsBool(),
+                RecursionAvailable = Stream.GetBit().AsBool(),
+                Zero = Stream.GetBit(),
+                AuthenticatedData = Stream.GetBit().AsBool(),
+                CheckingDisabled = Stream.GetBit().AsBool(),
+                ResponseCode = Stream.GetBits(4).AsEnum<ResponseCode>(),
+                QuestionsCount = Stream.GetUShort(),
+                AnswersCount = Stream.GetUShort(),
+                AuthorityCount = Stream.GetUShort(),
+                AdditionalCount = Stream.GetUShort()
             };
+
+            Message.Questions = GetQuestions(ref Stream, Message.QuestionsCount);
+            Message.Answers = GetAnswers(ref Stream, Message.AnswersCount);
+
+            return Message;
         }
 
-        public static IEnumerable<IQuestion> DeserializeQuestions(ref byte[] Raw, ushort Count, ref ushort Index)
+        public static byte[] Serialize(IMessage Message)
+        {
+            var Stream = new DnStream();
+
+            return default;
+        }
+
+        private static IEnumerable<IQuestion> GetQuestions(ref DnStream Stream, ushort Count)
         {
             var Questions = new List<IQuestion>();
 
             do
             {
-                var Question = DeserializeQuestion(ref Raw, ref Index);
+                var Question = GetQuestion(ref Stream);
 
                 Questions.Add(Question);
             }
@@ -50,95 +62,295 @@ namespace Texnomic.SecureDNS.Serialization
             return Questions;
         }
 
-        public static IQuestion DeserializeQuestion(ref byte[] Raw, ref ushort Index)
+        private static IQuestion GetQuestion(ref DnStream Stream)
         {
-            return new Question()
+            var Question = new Question()
             {
-                Domain = DeserializeDomain(ref Raw, ref Index),
-                Type = Raw.GetUShort(Index += 1).AsEnum<RecordType>(),
-                Class = Raw.GetUShort(Index += 2).AsEnum<RecordClass>()
+                Domain = GetDomain(ref Stream),
+                Type = Stream.GetUShort().AsEnum<RecordType>(),
+                Class = Stream.GetUShort().AsEnum<RecordClass>()
             };
+
+            return Question;
         }
 
-        public static IDomain DeserializeDomain(ref byte[] Raw, ref ushort Index)
+        private static IDomain GetDomain(ref DnStream Stream)
         {
             var Domain = new Domain()
             {
-                Labels = DeserializeLabels(ref Raw, ref Index),
+                Labels = GetLabels(ref Stream),
             };
 
             return Domain;
         }
 
-        public static IEnumerable<string> DeserializeLabels(ref byte[] Raw, ref ushort Index)
+        private static IEnumerable<string> GetLabels(ref DnStream Stream)
         {
             var Labels = new List<string>();
 
             while (true)
             {
-                var (Label, Type) = DeserializeLabel(ref Raw, Index);
+                var LabelType = Stream.GetBits(2).AsEnum<LabelType>();
 
-                if (Label == null) 
-                    break;
-
-                Labels.Add(Label);
-
-                switch (Type)
+                switch (LabelType)
                 {
                     case LabelType.Normal:
                         {
-                            Index += (ushort)(Label.Length + 1);
+                            var Length = Stream.GetBits(6);
+
+                            if (Length == 0)
+                                return Labels;
+
+
+                            var Label = Stream.GetString(Length);
+
+                            Labels.Add(Label);
 
                             break;
                         }
                     case LabelType.Compressed:
                         {
-                            Index += 2;
+                            var Pointer = (ushort)(Stream.GetBits(6) + Stream.GetByte());
 
-                            break;
+                            if (Pointer >= Stream.BytePosition - 2) throw new ArgumentOutOfRangeException(nameof(Pointer), Pointer, "Compressed Label Infinite Loop Detected.");
+
+                            var Position = Stream.BytePosition;
+
+                            Stream.Seek(Pointer);
+
+                            Labels.AddRange(GetLabels(ref Stream));
+
+                            Stream.Seek(Position);
+
+                            return Labels;
                         }
                     default:
-                        throw new ArgumentOutOfRangeException(nameof(LabelType));
+                        throw new ArgumentOutOfRangeException(nameof(LabelType), LabelType, null);
                 }
             }
-
-            return Labels;
         }
 
-        public static (string, LabelType) DeserializeLabel(ref byte[] Raw, ushort Index)
+        private static IEnumerable<IAnswer> GetAnswers(ref DnStream Stream, ushort Count)
         {
-            var LabelType = Raw[Index].GetBits(0, 2).AsEnum<LabelType>();
+            var Answers = new List<IAnswer>();
 
-            switch (LabelType)
+            do
             {
-                case LabelType.Normal:
-                    {
-                        var Length = Raw[Index].GetBits(2, 6);
+                var Answer = GetAnswer(ref Stream);
 
-                        if (Length == 0) return default;
+                Answers.Add(Answer);
+            }
+            while (Answers.Count < Count);
 
-                        var Label = Raw.GetString(++Index, Length);
+            return Answers;
+        }
 
-                        return (Label, LabelType.Normal);
-                    }
-                case LabelType.Compressed:
-                    {
-                        var Pointer = Raw[Index].GetBits(2, 6) + Raw[++Index];
+        private static IAnswer GetAnswer(ref DnStream Stream)
+        {
+            var Answer = new Answer()
+            {
+                Domain = GetDomain(ref Stream),
+                Type = Stream.GetUShort().AsEnum<RecordType>(),
+                Class = Stream.GetUShort().AsEnum<RecordClass>(),
+                TimeToLive = Stream.GetTimeSpan(),
+                Length = Stream.GetUShort(),
+            };
 
-                        if (Pointer >= Index) throw new ArgumentOutOfRangeException(nameof(Pointer));
+            Answer.Record = GetRecord(ref Stream, Answer.Type);
 
-                        var (Label, _) = DeserializeLabel(ref Raw, (ushort)Pointer);
+            return Answer;
+        }
 
-                        return (Label, LabelType.Compressed);
-                    }
+        private static IRecord GetRecord(ref DnStream Stream, RecordType RecordType)
+        {
+            switch (RecordType)
+            {
+                case RecordType.A: return GetA(ref Stream);
+
+                case RecordType.NS:
+
+                case RecordType.MD:
+
+                case RecordType.MF:
+
+                case RecordType.CNAME: return GetCNAME(ref Stream);
+
+
+                case RecordType.SOA:
+
+                case RecordType.MB:
+
+                case RecordType.MG:
+
+                case RecordType.MR:
+
+                case RecordType.NULL:
+
+                case RecordType.WKS:
+
+                case RecordType.PTR:
+
+                case RecordType.HINFO:
+
+                case RecordType.MINFO:
+
+                case RecordType.MX:
+
+                case RecordType.TXT:
+
+                case RecordType.RP:
+
+                case RecordType.AFSDB:
+
+                case RecordType.X25:
+
+                case RecordType.ISDN:
+
+                case RecordType.RT:
+
+                case RecordType.NSAP:
+
+                case RecordType.NSAP_PTR:
+
+                case RecordType.SIG:
+
+                case RecordType.KEY:
+
+                case RecordType.PX:
+
+                case RecordType.GPOS:
+
+                case RecordType.AAAA: return GetAAAA(ref Stream);
+
+                case RecordType.LOC:
+
+                case RecordType.NXT:
+
+                case RecordType.EID:
+
+                case RecordType.NIMLOC:
+
+                case RecordType.SRV:
+
+                case RecordType.ATMA:
+
+                case RecordType.NAPTR:
+
+                case RecordType.KX:
+
+                case RecordType.CERT:
+
+                case RecordType.A6:
+
+                case RecordType.DNAME:
+
+                case RecordType.SINK:
+
+                case RecordType.OPT:
+
+                case RecordType.APL:
+
+                case RecordType.DS:
+
+                case RecordType.SSHFP:
+
+                case RecordType.IPSECKEY:
+
+                case RecordType.RRSIG:
+
+                case RecordType.NSEC:
+
+                case RecordType.DNSKEY:
+
+                case RecordType.DHCID:
+
+                case RecordType.NSEC3:
+
+                case RecordType.NSEC3PARAM:
+
+                case RecordType.TLSA:
+
+                case RecordType.SMIMEA:
+
+                case RecordType.HIP:
+
+                case RecordType.NINFO:
+
+                case RecordType.RKEY:
+
+                case RecordType.CDS:
+
+                case RecordType.CDNSKEY:
+
+                case RecordType.OPENPGPKEY:
+
+                case RecordType.SPF:
+
+                case RecordType.UINFO:
+
+                case RecordType.UID:
+
+                case RecordType.GID:
+
+                case RecordType.UNSPEC:
+
+                case RecordType.TKEY:
+
+                case RecordType.TSIG:
+
+                case RecordType.IXFR:
+
+                case RecordType.AXFR:
+
+                case RecordType.MAILB:
+
+                case RecordType.MAILA:
+
+                case RecordType.Any:
+
+                case RecordType.URI:
+
+                case RecordType.CAA:
+
+                case RecordType.AVC:
+
+                case RecordType.DOA:
+
+                case RecordType.AMTRELAY:
+
+                case RecordType.TA:
+
+                case RecordType.DLV:
+
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(LabelType));
+                    throw new ArgumentOutOfRangeException(nameof(RecordType), RecordType, null);
             }
         }
 
-        public static byte[] Serialize(IMessage Message)
+        private static CNAME GetCNAME(ref DnStream Stream)
         {
-            return default;
+            return new CNAME()
+            {
+                Domain = GetDomain(ref Stream)
+            };
         }
+
+        private static A GetA(ref DnStream Stream)
+        {
+            return new A()
+            {
+                Address = Stream.GetIPv4Address()
+            };
+        }
+
+        private static AAAA GetAAAA(ref DnStream Stream)
+        {
+            return new AAAA()
+            {
+                Address = Stream.GetIPv6Address()
+            };
+        }
+
+        
     }
 }

@@ -33,7 +33,7 @@ namespace Texnomic.SecureDNS.Tests.Core
                 0x23
             };
 
-            var ResponseMessage = DnSerializer.Deserialize(ref ResponseBytes);
+            var ResponseMessage = DNSerializer.Deserialize(ref ResponseBytes);
         }
     }
 }
