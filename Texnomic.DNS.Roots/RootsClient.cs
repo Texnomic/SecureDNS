@@ -29,7 +29,7 @@ namespace Texnomic.DNS.Roots
         {
             var RestRequest = new RestRequest(Link);
 
-            var Response = await RestClient.ExecuteGetTaskAsync(RestRequest);
+            var Response = await RestClient.ExecuteGetAsync(RestRequest);
 
             var Deserializer = new Deserializer();
 
@@ -40,7 +40,7 @@ namespace Texnomic.DNS.Roots
         {
             var RestRequest = new RestRequest(Date);
 
-            var Response = await RestClient.ExecuteGetTaskAsync(RestRequest);
+            var Response = await RestClient.ExecuteGetAsync(RestRequest);
 
             var HtmlDocument = new HtmlDocument();
 
@@ -57,7 +57,7 @@ namespace Texnomic.DNS.Roots
         {
             var RestRequest = new RestRequest();
 
-            var Response = await RestClient.ExecuteGetTaskAsync(RestRequest);
+            var Response = await RestClient.ExecuteGetAsync(RestRequest);
 
             var HtmlDocument = new HtmlDocument();
 

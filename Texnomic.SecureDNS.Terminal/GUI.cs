@@ -153,6 +153,8 @@ namespace Texnomic.SecureDNS.Terminal
             StatusTimer.Start();
 
             Application.Run();
+
+            await Task.Yield();
         }
 
         public async Task StopAsync(CancellationToken CancellationToken)
