@@ -73,6 +73,12 @@ namespace Texnomic.SecureDNS.Serialization
 
             SetQuestions(ref Stream, ref Pointers, Message.Questions);
 
+            SetAnswers(ref Stream, ref Pointers, Message.Answers);
+
+            SetAnswers(ref Stream, ref Pointers, Message.Authority);
+
+            SetAnswers(ref Stream, ref Pointers, Message.Additional);
+
             return Stream.ToArray();
         }
 
@@ -185,37 +191,37 @@ namespace Texnomic.SecureDNS.Serialization
         {
             var Domain = string.Join('.', Labels);
 
-            if (Pointers.ContainsKey(Domain))
+            foreach (var Label in Labels)
             {
-                Stream.SetBits(2, (byte)LabelType.Compressed);
+                var SubDomain = Domain.Substring(Domain.IndexOf(Label));
 
-                var Bytes = new byte[2];
-
-                BinaryPrimitives.WriteUInt16BigEndian(Bytes, Pointers[Domain]);
-
-                Stream.SetBits(6, Bytes[0]);
-
-                Stream.SetByte(Bytes[1]);
-            }
-            else
-            {
-                var Pointer = (ushort)(Stream.BytePosition);
-
-                Pointers.Add(Domain, Pointer);
-
-                foreach (var Label in Labels)
+                if (Pointers.ContainsKey(SubDomain))
                 {
-                    Pointers.Add(Label, Stream.BytePosition);
+                    Stream.SetBits(2, (byte) LabelType.Compressed);
 
-                    Stream.SetBits(2, (byte)LabelType.Normal);
+                    var Bytes = new byte[2];
 
-                    Stream.SetBits(6, (byte)Label.Length);
+                    BinaryPrimitives.WriteUInt16BigEndian(Bytes, Pointers[SubDomain]);
+
+                    Stream.SetBits(6, Bytes[0]);
+
+                    Stream.SetByte(Bytes[1]);
+
+                    return;
+                }
+                else
+                {
+                    Pointers.Add(SubDomain, Stream.BytePosition);
+
+                    Stream.SetBits(2, (byte) LabelType.Normal);
+
+                    Stream.SetBits(6, (byte) Label.Length);
 
                     Stream.SetString(Label);
                 }
-
-                Stream.SetByte(0);
             }
+
+            Stream.SetByte(0);
         }
 
         private static IEnumerable<IAnswer> GetAnswers(ref DnStream Stream, ushort Count)
@@ -268,6 +274,8 @@ namespace Texnomic.SecureDNS.Serialization
             Stream.SetTimeSpan(Answer.TimeToLive);
 
             Stream.SetUShort(Answer.Length);
+
+            SetRecord(ref Stream, ref Pointers, Answer.Record);
         }
 
         private static IRecord GetRecord(ref DnStream Stream, RecordType RecordType)
@@ -436,13 +444,13 @@ namespace Texnomic.SecureDNS.Serialization
             }
         }
 
-        private static void SetRecord(ref DnStream Stream, ref Dictionary<string, ushort> Pointers, ref IRecord Record)
+        private static void SetRecord(ref DnStream Stream, ref Dictionary<string, ushort> Pointers, IRecord Record)
         {
             switch (Record)
             {
                 case A A:
                     {
-
+                        SetA(ref Stream, ref A);
                         break;
                     }
                 case CNAME CNAME:
@@ -452,7 +460,7 @@ namespace Texnomic.SecureDNS.Serialization
                     }
                 case AAAA AAAA:
                     {
-
+                        SetAAAA(ref Stream, ref AAAA);
                         break;
                     }
 
@@ -482,6 +490,11 @@ namespace Texnomic.SecureDNS.Serialization
             };
         }
 
+        public static void SetA(ref DnStream Stream, ref A A)
+        {
+            Stream.SetIPv4Address(A.Address);
+        }
+
         private static AAAA GetAAAA(ref DnStream Stream)
         {
             return new AAAA()
@@ -490,6 +503,9 @@ namespace Texnomic.SecureDNS.Serialization
             };
         }
 
-
+        public static void SetAAAA(ref DnStream Stream, ref AAAA AAAA)
+        {
+            Stream.SetIPv6Address(AAAA.Address);
+        }
     }
 }

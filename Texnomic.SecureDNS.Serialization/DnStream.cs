@@ -118,6 +118,13 @@ namespace Texnomic.SecureDNS.Serialization
             return Bytes;
         }
 
+        public void SetBytes(byte[] Bytes)
+        {
+            Array.Copy(Bytes, 0, Raw, ByteIndex, Bytes.Length);
+
+            ByteIndex += (ushort) Bytes.Length;
+        }
+
         public short GetShort()
         {
             return BinaryPrimitives.ReadInt16BigEndian(GetBytes(2));
@@ -125,8 +132,6 @@ namespace Texnomic.SecureDNS.Serialization
 
         public void SetShort(short Value)
         {
-            ByteIndex++;
-
             var Bytes = new byte[2];
 
             BinaryPrimitives.WriteInt16BigEndian(Bytes, Value);
@@ -159,8 +164,6 @@ namespace Texnomic.SecureDNS.Serialization
 
         public void SetInt(int Value)
         {
-            ByteIndex++;
-
             var Bytes = new byte[4];
 
             BinaryPrimitives.WriteInt32BigEndian(Bytes, Value);
@@ -177,8 +180,6 @@ namespace Texnomic.SecureDNS.Serialization
 
         public void SetUInt(uint Value)
         {
-            ByteIndex++;
-
             var Bytes = new byte[4];
 
             BinaryPrimitives.WriteUInt32BigEndian(Bytes, Value);
@@ -195,8 +196,6 @@ namespace Texnomic.SecureDNS.Serialization
 
         public void SetLong(long Value)
         {
-            ByteIndex++;
-
             var Bytes = new byte[8];
 
             BinaryPrimitives.WriteInt64BigEndian(Bytes, Value);
@@ -213,8 +212,6 @@ namespace Texnomic.SecureDNS.Serialization
 
         public void SetULong(ulong Value)
         {
-            ByteIndex++;
-
             var Bytes = new byte[8];
 
             BinaryPrimitives.WriteUInt64BigEndian(Bytes, Value);
@@ -247,7 +244,7 @@ namespace Texnomic.SecureDNS.Serialization
 
         public void SetTimeSpan(TimeSpan TimeSpan)
         {
-            SetInt((int)TimeSpan.TotalSeconds);
+            SetUInt((uint)TimeSpan.TotalSeconds);
         }
 
         public IPAddress GetIPv4Address()
@@ -261,6 +258,9 @@ namespace Texnomic.SecureDNS.Serialization
         {
             var Bytes = IPAddress.GetAddressBytes();
 
+            //Array.Reverse(Bytes);
+
+            SetBytes(Bytes);
         }
 
         public IPAddress GetIPv6Address()
@@ -268,6 +268,15 @@ namespace Texnomic.SecureDNS.Serialization
             var Bytes = GetBytes(16);
 
             return new IPAddress(Bytes);
+        }
+
+        public void SetIPv6Address(IPAddress IPAddress)
+        {
+            var Bytes = IPAddress.GetAddressBytes();
+
+            //Array.Reverse(Bytes);
+
+            SetBytes(Bytes);
         }
 
         public byte[] ToArray()

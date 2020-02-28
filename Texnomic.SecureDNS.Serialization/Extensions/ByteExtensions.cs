@@ -17,13 +17,13 @@ namespace Texnomic.SecureDNS.Serialization.Extensions
 
         public static byte SetBits(this byte Byte, byte Index, byte Length, byte Value)
         {
-            Value = (byte)(Value << Length - Index);
+            Value = (byte)(Value << (8 - (Index + Length)));
 
-            for (int I = Index; I < Length; I++)
+            for (var I = Index; I <= Index + Length - 1; I++)
             {
-                var Bit = Value.GetBit(Index);
+                var Bit = Value.GetBit(I);
 
-                Byte = Byte.SetBit(Index, Bit);
+                Byte = Byte.SetBit(I, Bit);
             }
 
             return Byte;
