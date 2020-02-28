@@ -47,7 +47,9 @@ namespace Texnomic.SecureDNS.Serialization
 
         public static byte[] Serialize(ref IMessage Message)
         {
-            var Stream = new DnStream();
+            var Size = SizeOf(ref Message);
+
+            var Stream = new DnStream(Size);
 
             var Pointers = new Dictionary<string, ushort>();
 
@@ -71,15 +73,29 @@ namespace Texnomic.SecureDNS.Serialization
             Stream.SetUShort((ushort)Message.Authority.Count());
             Stream.SetUShort((ushort)Message.Additional.Count());
 
-            SetQuestions(ref Stream, ref Pointers, Message.Questions);
+            Set(ref Stream, ref Pointers, Message.Questions);
 
-            SetAnswers(ref Stream, ref Pointers, Message.Answers);
+            Set(ref Stream, ref Pointers, Message.Answers);
 
-            SetAnswers(ref Stream, ref Pointers, Message.Authority);
+            Set(ref Stream, ref Pointers, Message.Authority);
 
-            SetAnswers(ref Stream, ref Pointers, Message.Additional);
+            Set(ref Stream, ref Pointers, Message.Additional);
 
             return Stream.ToArray();
+        }
+
+        public static ushort SizeOf(ref IMessage Message)
+        {
+            var Pointers = new List<string>();
+
+            ushort Size = 12;
+
+            Size += SizeOf(ref Pointers, Message.Questions);
+            Size += SizeOf(ref Pointers, Message.Answers);
+            Size += SizeOf(ref Pointers, Message.Authority);
+            Size += SizeOf(ref Pointers, Message.Additional);
+
+            return Size;
         }
 
         private static IEnumerable<IQuestion> GetQuestions(ref DnStream Stream, ushort Count)
@@ -97,12 +113,24 @@ namespace Texnomic.SecureDNS.Serialization
             return Questions;
         }
 
-        private static void SetQuestions(ref DnStream Stream, ref Dictionary<string, ushort> Pointers, IEnumerable<IQuestion> Questions)
+        private static void Set(ref DnStream Stream, ref Dictionary<string, ushort> Pointers, IEnumerable<IQuestion> Questions)
         {
             foreach (var Question in Questions)
             {
-                SetQuestion(ref Stream, ref Pointers, Question);
+                Set(ref Stream, ref Pointers, Question);
             }
+        }
+
+        private static ushort SizeOf(ref List<string> Pointers, IEnumerable<IQuestion> Questions)
+        {
+            ushort Size = 0;
+
+            foreach (var Question in Questions)
+            {
+                Size += SizeOf(ref Pointers, Question);
+            }
+
+            return Size;
         }
 
         private static IQuestion GetQuestion(ref DnStream Stream)
@@ -117,13 +145,20 @@ namespace Texnomic.SecureDNS.Serialization
             return Question;
         }
 
-        private static void SetQuestion(ref DnStream Stream, ref Dictionary<string, ushort> Pointers, IQuestion Question)
+        private static void Set(ref DnStream Stream, ref Dictionary<string, ushort> Pointers, IQuestion Question)
         {
-            SetDomain(ref Stream, ref Pointers, Question.Domain);
+            Set(ref Stream, ref Pointers, Question.Domain);
 
             Stream.SetUShort((byte)Question.Type);
 
             Stream.SetUShort((byte)Question.Class);
+        }
+
+        private static ushort SizeOf(ref List<string> Pointers, IQuestion Question)
+        {
+            var Size = SizeOf(ref Pointers, Question.Domain);
+
+            return (ushort)(Size + 4);
         }
 
         private static IDomain GetDomain(ref DnStream Stream)
@@ -136,9 +171,14 @@ namespace Texnomic.SecureDNS.Serialization
             return Domain;
         }
 
-        private static void SetDomain(ref DnStream Stream, ref Dictionary<string, ushort> Pointers, IDomain Domain)
+        private static void Set(ref DnStream Stream, ref Dictionary<string, ushort> Pointers, IDomain Domain)
         {
-            SetLabels(ref Stream, ref Pointers, Domain.Labels);
+            Set(ref Stream, ref Pointers, Domain.Labels);
+        }
+
+        private static ushort SizeOf(ref List<string> Pointers, IDomain Domain)
+        {
+            return SizeOf(ref Pointers, Domain.Labels);
         }
 
         private static IEnumerable<string> GetLabels(ref DnStream Stream)
@@ -187,7 +227,7 @@ namespace Texnomic.SecureDNS.Serialization
             }
         }
 
-        private static void SetLabels(ref DnStream Stream, ref Dictionary<string, ushort> Pointers, IEnumerable<string> Labels)
+        private static void Set(ref DnStream Stream, ref Dictionary<string, ushort> Pointers, IEnumerable<string> Labels)
         {
             var Domain = string.Join('.', Labels);
 
@@ -224,6 +264,35 @@ namespace Texnomic.SecureDNS.Serialization
             Stream.SetByte(0);
         }
 
+        private static ushort SizeOf(ref List<string> Pointers, IEnumerable<string> Labels)
+        {
+            var Domain = string.Join('.', Labels);
+
+            ushort Size = 0;
+
+            foreach (var Label in Labels)
+            {
+                var SubDomain = Domain.Substring(Domain.IndexOf(Label));
+
+                if (Pointers.Contains(SubDomain))
+                {
+                    Size += 2;
+
+                    return Size;
+                }
+                else
+                {
+                    Pointers.Add(SubDomain);
+
+                    Size += (ushort)(1 + Label.Length);
+                }
+            }
+
+            Size += 1;
+
+            return Size;
+        }
+
         private static IEnumerable<IAnswer> GetAnswers(ref DnStream Stream, ushort Count)
         {
             var Answers = new List<IAnswer>();
@@ -239,12 +308,24 @@ namespace Texnomic.SecureDNS.Serialization
             return Answers;
         }
 
-        private static void SetAnswers(ref DnStream Stream, ref Dictionary<string, ushort> Pointers, IEnumerable<IAnswer> Answers)
+        private static void Set(ref DnStream Stream, ref Dictionary<string, ushort> Pointers, IEnumerable<IAnswer> Answers)
         {
             foreach (var Answer in Answers)
             {
-                SetAnswer(ref Stream, ref Pointers, Answer);
+                Set(ref Stream, ref Pointers, Answer);
             }
+        }
+
+        private static ushort SizeOf(ref List<string> Pointers, IEnumerable<IAnswer> Answers)
+        {
+            ushort Size = 0;
+
+            foreach (var Answer in Answers)
+            {
+                Size += SizeOf(ref Pointers, Answer);
+            }
+
+            return Size;
         }
 
         private static IAnswer GetAnswer(ref DnStream Stream)
@@ -263,9 +344,9 @@ namespace Texnomic.SecureDNS.Serialization
             return Answer;
         }
 
-        private static void SetAnswer(ref DnStream Stream, ref Dictionary<string, ushort> Pointers, IAnswer Answer)
+        private static void Set(ref DnStream Stream, ref Dictionary<string, ushort> Pointers, IAnswer Answer)
         {
-            SetDomain(ref Stream, ref Pointers, Answer.Domain);
+            Set(ref Stream, ref Pointers, Answer.Domain);
 
             Stream.SetUShort((byte)Answer.Type);
 
@@ -275,7 +356,20 @@ namespace Texnomic.SecureDNS.Serialization
 
             Stream.SetUShort(Answer.Length);
 
-            SetRecord(ref Stream, ref Pointers, Answer.Record);
+            Set(ref Stream, ref Pointers, Answer.Record);
+        }
+
+        private static ushort SizeOf(ref List<string> Pointers, IAnswer Answer)
+        {
+            ushort Size = 0;
+
+            Size += SizeOf(ref Pointers, Answer.Domain);
+
+            Size += 10;
+
+            Size += SizeOf(ref Pointers, Answer.Record);
+
+            return Size;
         }
 
         private static IRecord GetRecord(ref DnStream Stream, RecordType RecordType)
@@ -444,25 +538,47 @@ namespace Texnomic.SecureDNS.Serialization
             }
         }
 
-        private static void SetRecord(ref DnStream Stream, ref Dictionary<string, ushort> Pointers, IRecord Record)
+        private static void Set(ref DnStream Stream, ref Dictionary<string, ushort> Pointers, IRecord Record)
         {
             switch (Record)
             {
                 case A A:
                     {
-                        SetA(ref Stream, ref A);
+                        Set(ref Stream, ref A);
                         break;
                     }
                 case CNAME CNAME:
                     {
-                        SetCNAME(ref Stream, ref Pointers, ref CNAME);
+                        Set(ref Stream, ref Pointers, ref CNAME);
                         break;
                     }
                 case AAAA AAAA:
                     {
-                        SetAAAA(ref Stream, ref AAAA);
+                        Set(ref Stream, ref AAAA);
                         break;
                     }
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(Record), Record, null);
+            }
+        }
+
+        private static ushort SizeOf(ref List<string> Pointers, IRecord Record)
+        {
+            switch (Record)
+            {
+                case A A:
+                {
+                    return SizeOf(ref A);
+                }
+                case CNAME CNAME:
+                {
+                    return SizeOf(ref Pointers, ref CNAME);
+                }
+                case AAAA AAAA:
+                {
+                    return SizeOf(ref AAAA);
+                }
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(Record), Record, null);
@@ -477,9 +593,14 @@ namespace Texnomic.SecureDNS.Serialization
             };
         }
 
-        private static void SetCNAME(ref DnStream Stream, ref Dictionary<string, ushort> Pointers, ref CNAME CNAME)
+        private static void Set(ref DnStream Stream, ref Dictionary<string, ushort> Pointers, ref CNAME CNAME)
         {
-            SetDomain(ref Stream, ref Pointers, CNAME.Domain);
+            Set(ref Stream, ref Pointers, CNAME.Domain);
+        }
+
+        private static ushort SizeOf(ref List<string> Pointers, ref CNAME CNAME)
+        {
+            return SizeOf(ref Pointers, CNAME.Domain);
         }
 
         private static A GetA(ref DnStream Stream)
@@ -490,9 +611,14 @@ namespace Texnomic.SecureDNS.Serialization
             };
         }
 
-        public static void SetA(ref DnStream Stream, ref A A)
+        private static void Set(ref DnStream Stream, ref A A)
         {
             Stream.SetIPv4Address(A.Address);
+        }
+
+        private static ushort SizeOf(ref A A)
+        {
+            return 4;
         }
 
         private static AAAA GetAAAA(ref DnStream Stream)
@@ -503,9 +629,14 @@ namespace Texnomic.SecureDNS.Serialization
             };
         }
 
-        public static void SetAAAA(ref DnStream Stream, ref AAAA AAAA)
+        private static void Set(ref DnStream Stream, ref AAAA AAAA)
         {
             Stream.SetIPv6Address(AAAA.Address);
+        }
+
+        private static ushort SizeOf(ref AAAA AAAA)
+        {
+            return 8;
         }
     }
 }
