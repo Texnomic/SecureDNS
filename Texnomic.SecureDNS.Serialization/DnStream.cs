@@ -258,8 +258,6 @@ namespace Texnomic.SecureDNS.Serialization
         {
             var Bytes = IPAddress.GetAddressBytes();
 
-            //Array.Reverse(Bytes);
-
             SetBytes(Bytes);
         }
 
@@ -274,14 +272,26 @@ namespace Texnomic.SecureDNS.Serialization
         {
             var Bytes = IPAddress.GetAddressBytes();
 
-            //Array.Reverse(Bytes);
-
             SetBytes(Bytes);
+        }
+
+        public DateTime GetEpoch()
+        {
+            var Seconds = GetUInt();
+
+            return new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddSeconds(Seconds);
+        }
+
+        public void SetEpoch(DateTime DateTime)
+        {
+            var Seconds = DateTime.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
+
+            SetUInt((uint)Seconds);
         }
 
         public byte[] ToArray()
         {
-            return Raw.TrimEnd();
+            return Raw;
         }
     }
 }

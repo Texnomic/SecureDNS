@@ -10,9 +10,11 @@ namespace Texnomic.SecureDNS.Serialization.Extensions
 
             if (Length > 8) throw new ArgumentOutOfRangeException(nameof(Length));
 
-            var Mask = (byte)((0b11111111 >> Index >> 8 - (Index + Length)) << 8 - (Index + Length));
+            var Shift = 8 - (Index + Length);
 
-            return (byte)((Byte & Mask) >> 8 - (Index + Length));
+            var Mask = (byte)(0b11111111 >> Index >> Shift << Shift);
+
+            return (byte)((Byte & Mask) >> Shift);
         }
 
         public static byte SetBits(this byte Byte, byte Index, byte Length, byte Value)
@@ -40,7 +42,7 @@ namespace Texnomic.SecureDNS.Serialization.Extensions
 
             var Mask = (byte)(0b10000000 >> Index);
 
-            Byte = Value == 1 ? Byte |= Mask : Byte &= (byte)~Mask;
+            Byte = (byte)(Value == 1 ? Byte | Mask : Byte & (byte)~Mask);
 
             return Byte;
         }

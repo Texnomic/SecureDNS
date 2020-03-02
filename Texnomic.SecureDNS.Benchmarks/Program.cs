@@ -10,17 +10,11 @@ namespace Texnomic.SecureDNS.Benchmarks
 {
     class Program
     {
-        static void Main(string[] args)
-        {
-            var Summary = BenchmarkRunner.Run(typeof(Program).Assembly);
-
-            Summary.ToList().ForEach(Console.WriteLine);
-
-            Console.ReadLine();
-        }
+        static void Main(string[] Args) => _ = BenchmarkRunner.Run<Serialization>();
     }
 
     [SimpleJob(launchCount: 3, warmupCount: 10, targetCount: 30)]
+    [MemoryDiagnoser]
     [MinColumn, MaxColumn, MeanColumn, MedianColumn]
     public class Serialization
     {

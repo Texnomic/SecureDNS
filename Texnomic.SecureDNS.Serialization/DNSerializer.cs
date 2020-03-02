@@ -237,7 +237,7 @@ namespace Texnomic.SecureDNS.Serialization
 
                 if (Pointers.ContainsKey(SubDomain))
                 {
-                    Stream.SetBits(2, (byte) LabelType.Compressed);
+                    Stream.SetBits(2, (byte)LabelType.Compressed);
 
                     var Bytes = new byte[2];
 
@@ -253,9 +253,9 @@ namespace Texnomic.SecureDNS.Serialization
                 {
                     Pointers.Add(SubDomain, Stream.BytePosition);
 
-                    Stream.SetBits(2, (byte) LabelType.Normal);
+                    Stream.SetBits(2, (byte)LabelType.Normal);
 
-                    Stream.SetBits(6, (byte) Label.Length);
+                    Stream.SetBits(6, (byte)Label.Length);
 
                     Stream.SetString(Label);
                 }
@@ -374,168 +374,13 @@ namespace Texnomic.SecureDNS.Serialization
 
         private static IRecord GetRecord(ref DnStream Stream, RecordType RecordType)
         {
-            switch (RecordType)
+            return RecordType switch
             {
-                case RecordType.A: return GetA(ref Stream);
-
-                case RecordType.NS:
-
-                case RecordType.MD:
-
-                case RecordType.MF:
-
-                case RecordType.CNAME: return GetCNAME(ref Stream);
-
-
-                case RecordType.SOA:
-
-                case RecordType.MB:
-
-                case RecordType.MG:
-
-                case RecordType.MR:
-
-                case RecordType.NULL:
-
-                case RecordType.WKS:
-
-                case RecordType.PTR:
-
-                case RecordType.HINFO:
-
-                case RecordType.MINFO:
-
-                case RecordType.MX:
-
-                case RecordType.TXT:
-
-                case RecordType.RP:
-
-                case RecordType.AFSDB:
-
-                case RecordType.X25:
-
-                case RecordType.ISDN:
-
-                case RecordType.RT:
-
-                case RecordType.NSAP:
-
-                case RecordType.NSAP_PTR:
-
-                case RecordType.SIG:
-
-                case RecordType.KEY:
-
-                case RecordType.PX:
-
-                case RecordType.GPOS:
-
-                case RecordType.AAAA: return GetAAAA(ref Stream);
-
-                case RecordType.LOC:
-
-                case RecordType.NXT:
-
-                case RecordType.EID:
-
-                case RecordType.NIMLOC:
-
-                case RecordType.SRV:
-
-                case RecordType.ATMA:
-
-                case RecordType.NAPTR:
-
-                case RecordType.KX:
-
-                case RecordType.CERT:
-
-                case RecordType.A6:
-
-                case RecordType.DNAME:
-
-                case RecordType.SINK:
-
-                case RecordType.OPT:
-
-                case RecordType.APL:
-
-                case RecordType.DS:
-
-                case RecordType.SSHFP:
-
-                case RecordType.IPSECKEY:
-
-                case RecordType.RRSIG:
-
-                case RecordType.NSEC:
-
-                case RecordType.DNSKEY:
-
-                case RecordType.DHCID:
-
-                case RecordType.NSEC3:
-
-                case RecordType.NSEC3PARAM:
-
-                case RecordType.TLSA:
-
-                case RecordType.SMIMEA:
-
-                case RecordType.HIP:
-
-                case RecordType.NINFO:
-
-                case RecordType.RKEY:
-
-                case RecordType.CDS:
-
-                case RecordType.CDNSKEY:
-
-                case RecordType.OPENPGPKEY:
-
-                case RecordType.SPF:
-
-                case RecordType.UINFO:
-
-                case RecordType.UID:
-
-                case RecordType.GID:
-
-                case RecordType.UNSPEC:
-
-                case RecordType.TKEY:
-
-                case RecordType.TSIG:
-
-                case RecordType.IXFR:
-
-                case RecordType.AXFR:
-
-                case RecordType.MAILB:
-
-                case RecordType.MAILA:
-
-                case RecordType.Any:
-
-                case RecordType.URI:
-
-                case RecordType.CAA:
-
-                case RecordType.AVC:
-
-                case RecordType.DOA:
-
-                case RecordType.AMTRELAY:
-
-                case RecordType.TA:
-
-                case RecordType.DLV:
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(RecordType), RecordType, null);
-            }
+                RecordType.A => GetA(ref Stream),
+                RecordType.CNAME => GetCNAME(ref Stream),
+                RecordType.AAAA => GetAAAA(ref Stream),
+                _ => throw new ArgumentOutOfRangeException(nameof(RecordType), RecordType, null)
+            };
         }
 
         private static void Set(ref DnStream Stream, ref Dictionary<string, ushort> Pointers, IRecord Record)
@@ -568,17 +413,17 @@ namespace Texnomic.SecureDNS.Serialization
             switch (Record)
             {
                 case A A:
-                {
-                    return SizeOf(ref A);
-                }
+                    {
+                        return SizeOf(ref A);
+                    }
                 case CNAME CNAME:
-                {
-                    return SizeOf(ref Pointers, ref CNAME);
-                }
+                    {
+                        return SizeOf(ref Pointers, ref CNAME);
+                    }
                 case AAAA AAAA:
-                {
-                    return SizeOf(ref AAAA);
-                }
+                    {
+                        return SizeOf(ref AAAA);
+                    }
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(Record), Record, null);
@@ -637,6 +482,50 @@ namespace Texnomic.SecureDNS.Serialization
         private static ushort SizeOf(ref AAAA AAAA)
         {
             return 8;
+        }
+
+        private static ICharacterString GetCharacterString(ref DnStream Stream)
+        {
+            var Length = Stream.GetByte();
+
+            return new CharacterString()
+            {
+                Length = Length,
+                Value = Stream.GetString(Length)
+            };
+        }
+
+        private static void Set(ref DnStream Stream, ref ICharacterString CharacterString)
+        {
+            Stream.SetByte(CharacterString.Length);
+            Stream.SetString(CharacterString.Value);
+        }
+
+        private static ushort SizeOf(ref ICharacterString CharacterString)
+        {
+            return (ushort)(CharacterString.Length + 1);
+        }
+
+        private static ICertificate GetCertificate(ref DnStream Stream)
+        {
+            return new Certificate()
+            {
+                Magic = Stream.GetString(4),
+                Version = Stream.GetUShort().AsEnum<ESVersion>(),
+                MinorVersion = Stream.GetUShort(),
+                Signature = Stream.GetBytes(64),
+                PublicKey = Stream.GetBytes(32),
+                ClientMagic = Stream.GetBytes(8),
+                Serial = Stream.GetInt(),
+                StartTimeStamp = Stream.GetEpoch(),
+                EndTimeStamp = Stream.GetEpoch(),
+                //Extensions = Stream.GetBytes()
+            };
+        }
+
+        private static void Set(ref DnStream Stream, ref ICertificate Certificate)
+        {
+
         }
     }
 }
