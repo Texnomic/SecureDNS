@@ -10,7 +10,10 @@ namespace Texnomic.SecureDNS.Benchmarks
 {
     class Program
     {
-        static void Main(string[] Args) => _ = BenchmarkRunner.Run<Serialization>();
+        static void Main(string[] Args)
+        {
+            _ = BenchmarkRunner.Run<Serialization>();
+        }
     }
 
     [SimpleJob(launchCount: 3, warmupCount: 10, targetCount: 30)]
@@ -52,7 +55,7 @@ namespace Texnomic.SecureDNS.Benchmarks
         [Benchmark]
         public void MySerializer()
         {
-            var ResponseMessage = DnSerializer.Deserialize(ref ResponseBytes);
+            var ResponseMessage = DnSerializer.Deserialize(in ResponseBytes);
         }
     }
 }

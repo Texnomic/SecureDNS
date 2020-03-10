@@ -8,7 +8,7 @@ namespace Texnomic.SecureDNS.Serialization
 {
     public class DnStream
     {
-        private byte[] Raw;
+        private readonly Memory<byte> Raw;
 
         private int ByteIndex;
 
@@ -18,6 +18,7 @@ namespace Texnomic.SecureDNS.Serialization
 
         public ushort BitPosition => (ushort)BitIndex;
 
+
         public DnStream(ushort Length)
         {
             Raw = new byte[Length];
@@ -25,7 +26,7 @@ namespace Texnomic.SecureDNS.Serialization
             (ByteIndex, BitIndex) = (0, 0);
         }
 
-        public DnStream(ref byte[] Raw)
+        public DnStream(in byte[] Raw)
         {
             this.Raw = Raw;
 
@@ -37,9 +38,20 @@ namespace Texnomic.SecureDNS.Serialization
             (ByteIndex, BitIndex) = (Bytes, Bits);
         }
 
+
+        private Span<byte> GetSpan(ushort Length)
+        {
+            return Raw.Slice(ByteIndex, Length).Span;
+        }
+
+        private Span<byte> GetSpan(int Length)
+        {
+            return Raw.Slice(ByteIndex, Length).Span;
+        }
+
         public byte GetBits(byte Length)
         {
-            var Byte = Raw[ByteIndex].GetBits((byte)BitIndex, Length);
+            var Byte = Raw.Span[ByteIndex].GetBits((byte)BitIndex, Length);
 
             BitIndex += Length;
 
@@ -54,7 +66,7 @@ namespace Texnomic.SecureDNS.Serialization
 
         public void SetBits(byte Length, byte Value)
         {
-            Raw[ByteIndex] = Raw[ByteIndex].SetBits((byte)BitIndex, Length, Value);
+            Raw.Span[ByteIndex] = Raw.Span[ByteIndex].SetBits((byte)BitIndex, Length, Value);
 
             BitIndex += Length;
 
@@ -67,7 +79,7 @@ namespace Texnomic.SecureDNS.Serialization
 
         public byte GetBit()
         {
-            var Byte = Raw[ByteIndex].GetBit((byte)BitIndex);
+            var Byte = Raw.Span[ByteIndex].GetBit((byte)BitIndex);
 
             BitIndex++;
 
@@ -82,7 +94,7 @@ namespace Texnomic.SecureDNS.Serialization
 
         public void SetBit(byte Value)
         {
-            Raw[ByteIndex] = Raw[ByteIndex].SetBit((byte)BitIndex, Value);
+            Raw.Span[ByteIndex] = Raw.Span[ByteIndex].SetBit((byte)BitIndex, Value);
 
             BitIndex++;
 
@@ -95,7 +107,7 @@ namespace Texnomic.SecureDNS.Serialization
 
         public byte GetByte()
         {
-            var Byte = Raw[ByteIndex];
+            var Byte = Raw.Span[ByteIndex];
 
             ByteIndex += 1;
 
@@ -104,194 +116,169 @@ namespace Texnomic.SecureDNS.Serialization
 
         public void SetByte(byte Value)
         {
-            Raw[ByteIndex] = Value;
+            Raw.Span[ByteIndex] = Value;
 
             ByteIndex++;
         }
 
-        public byte[] GetBytes(ushort Length)
+        public ReadOnlySpan<byte> ReadBytes(ushort Length)
         {
-            var Bytes = Raw[ByteIndex..(ByteIndex + Length)];
+            var Bytes = GetSpan(Length);
 
             ByteIndex += Length;
 
             return Bytes;
         }
 
-        public void SetBytes(byte[] Bytes)
+        public void WriteBytes(Span<byte> Bytes)
         {
-            Array.Copy(Bytes, 0, Raw, ByteIndex, Bytes.Length);
+            Bytes.CopyTo(GetSpan(Bytes.Length));
 
-            ByteIndex += (ushort) Bytes.Length;
+            ByteIndex += Bytes.Length;
         }
 
-        public short GetShort()
+        public void WriteBytes(ReadOnlySpan<byte> Bytes)
         {
-            return BinaryPrimitives.ReadInt16BigEndian(GetBytes(2));
+            Bytes.CopyTo(GetSpan(Bytes.Length));
+
+            ByteIndex += Bytes.Length;
         }
 
-        public void SetShort(short Value)
+        public short ReadShort()
         {
-            var Bytes = new byte[2];
-
-            BinaryPrimitives.WriteInt16BigEndian(Bytes, Value);
-
-            Array.Copy(Bytes, 0, Raw, ByteIndex, Bytes.Length);
-
-            ByteIndex += (ushort)Bytes.Length;
+            return BinaryPrimitives.ReadInt16BigEndian(ReadBytes(2));
         }
 
-        public ushort GetUShort()
+        public void WriteShort(short Value)
         {
-            return BinaryPrimitives.ReadUInt16BigEndian(GetBytes(2));
+            BinaryPrimitives.WriteInt16BigEndian(GetSpan(2), Value);
+
+            ByteIndex += 2;
         }
 
-        public void SetUShort(ushort Value)
+        public ushort ReadUShort()
         {
-            var Bytes = new byte[2];
-
-            BinaryPrimitives.WriteUInt16BigEndian(Bytes, Value);
-
-            Array.Copy(Bytes, 0, Raw, ByteIndex, Bytes.Length);
-
-            ByteIndex += (ushort)Bytes.Length;
+            return BinaryPrimitives.ReadUInt16BigEndian(ReadBytes(2));
         }
 
-        public int GetInt()
+        public void WriteUShort(ushort Value)
         {
-            return BinaryPrimitives.ReadInt32BigEndian(GetBytes(4));
+            BinaryPrimitives.WriteUInt16BigEndian(GetSpan(2), Value);
+
+            ByteIndex += 2;
         }
 
-        public void SetInt(int Value)
+        public int ReadInt32()
         {
-            var Bytes = new byte[4];
-
-            BinaryPrimitives.WriteInt32BigEndian(Bytes, Value);
-
-            Array.Copy(Bytes, 0, Raw, ByteIndex, Bytes.Length);
-
-            ByteIndex += (ushort)Bytes.Length;
+            return BinaryPrimitives.ReadInt32BigEndian(ReadBytes(4));
         }
 
-        public uint GetUInt()
+        public void WriteInt32(int Value)
         {
-            return BinaryPrimitives.ReadUInt32BigEndian(GetBytes(4));
+            BinaryPrimitives.WriteInt32BigEndian(GetSpan(4), Value);
+
+            ByteIndex += 4;
         }
 
-        public void SetUInt(uint Value)
+        public uint ReadUInt32()
         {
-            var Bytes = new byte[4];
-
-            BinaryPrimitives.WriteUInt32BigEndian(Bytes, Value);
-
-            Array.Copy(Bytes, 0, Raw, ByteIndex, Bytes.Length);
-
-            ByteIndex += (ushort)Bytes.Length;
+            return BinaryPrimitives.ReadUInt32BigEndian(ReadBytes(4));
         }
 
-        public long GetLong()
+        public void WriteUInt32(uint Value)
         {
-            return BinaryPrimitives.ReadInt64BigEndian(GetBytes(8));
+            BinaryPrimitives.WriteUInt32BigEndian(GetSpan(4), Value);
+
+            ByteIndex += 4;
         }
 
-        public void SetLong(long Value)
+        public long ReadLong()
         {
-            var Bytes = new byte[8];
-
-            BinaryPrimitives.WriteInt64BigEndian(Bytes, Value);
-
-            Array.Copy(Bytes, 0, Raw, ByteIndex, Bytes.Length);
-
-            ByteIndex += (ushort)Bytes.Length;
+            return BinaryPrimitives.ReadInt64BigEndian(ReadBytes(8));
         }
 
-        public ulong GetULong()
+        public void WriteLong(long Value)
         {
-            return BinaryPrimitives.ReadUInt64BigEndian(GetBytes(8));
+            BinaryPrimitives.WriteInt64BigEndian(GetSpan(8), Value);
+
+            ByteIndex += 8;
         }
 
-        public void SetULong(ulong Value)
+        public ulong ReadULong()
         {
-            var Bytes = new byte[8];
-
-            BinaryPrimitives.WriteUInt64BigEndian(Bytes, Value);
-
-            Array.Copy(Bytes, 0, Raw, ByteIndex, Bytes.Length);
-
-            ByteIndex += (ushort)Bytes.Length;
+            return BinaryPrimitives.ReadUInt64BigEndian(ReadBytes(8));
         }
 
-        public string GetString(ushort Length)
+        public void WriteULong(ulong Value)
         {
-            return Encoding.ASCII.GetString(GetBytes(Length));
+            BinaryPrimitives.WriteUInt64BigEndian(GetSpan(8), Value);
+
+            ByteIndex += 8;
         }
 
-        public void SetString(string Value)
+        public string ReadString(ushort Length)
+        {
+            return Encoding.ASCII.GetString(ReadBytes(Length));
+        }
+
+        public void WriteString(string Value)
         {
             var Bytes = Encoding.ASCII.GetBytes(Value);
 
-            Array.Copy(Bytes, 0, Raw, ByteIndex, Bytes.Length);
+            Bytes.CopyTo(GetSpan(Bytes.Length));
 
-            ByteIndex += (ushort)Bytes.Length;
+            ByteIndex += Bytes.Length;
         }
 
-        public TimeSpan GetTimeSpan()
+        public TimeSpan ReadTimeSpan()
         {
-            var Seconds = GetInt();
+            var Seconds = ReadInt32();
 
             return new TimeSpan(0, 0, Seconds);
         }
 
-        public void SetTimeSpan(TimeSpan TimeSpan)
+        public void WriteTimeSpan(TimeSpan TimeSpan)
         {
-            SetUInt((uint)TimeSpan.TotalSeconds);
+            WriteUInt32((uint)TimeSpan.TotalSeconds);
         }
 
-        public IPAddress GetIPv4Address()
+        public IPAddress ReadIPv4Address()
         {
-            var Bytes = GetBytes(4);
-
-            return new IPAddress(Bytes);
+            return new IPAddress(ReadBytes(4));
         }
 
-        public void SetIPv4Address(IPAddress IPAddress)
+        public void WriteIPv4Address(IPAddress IPAddress)
         {
-            var Bytes = IPAddress.GetAddressBytes();
-
-            SetBytes(Bytes);
+            WriteBytes(IPAddress.GetAddressBytes());
         }
 
-        public IPAddress GetIPv6Address()
+        public IPAddress ReadIPv6Address()
         {
-            var Bytes = GetBytes(16);
-
-            return new IPAddress(Bytes);
+            return new IPAddress(ReadBytes(16));
         }
 
-        public void SetIPv6Address(IPAddress IPAddress)
+        public void WriteIPv6Address(IPAddress IPAddress)
         {
-            var Bytes = IPAddress.GetAddressBytes();
-
-            SetBytes(Bytes);
+            WriteBytes(IPAddress.GetAddressBytes());
         }
 
-        public DateTime GetEpoch()
+        public DateTime ReadEpoch()
         {
-            var Seconds = GetUInt();
+            var Seconds = ReadUInt32();
 
             return new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddSeconds(Seconds);
         }
 
-        public void SetEpoch(DateTime DateTime)
+        public void WriteEpoch(DateTime DateTime)
         {
             var Seconds = DateTime.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
 
-            SetUInt((uint)Seconds);
+            WriteUInt32((uint)Seconds);
         }
 
         public byte[] ToArray()
         {
-            return Raw;
+            return Raw.ToArray();
         }
     }
 }
