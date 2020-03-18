@@ -1,18 +1,23 @@
 ﻿using System;
 using Destructurama.Attributed;
 using System.Collections.Generic;
+using System.Linq;
 using Texnomic.SecureDNS.Abstractions;
+using Texnomic.SecureDNS.Abstractions.Enums;
 
 namespace Texnomic.SecureDNS.Core.DataTypes
 {
     [LogAsScalar(true)]
     public class Domain : IDomain
     {
-        public IEnumerable<string> Labels { get; set; }
+        public LabelType LabelType { get; set; }
+        public ushort? Pointer { get; set; }
+        public IEnumerable<ILabel> Labels { get; set; }
 
         public Domain()
         {
-            Labels = new List<string>();
+            LabelType = LabelType.Normal;
+            Labels = new List<ILabel>();
         }
 
         public static implicit operator string(Domain Domain)
@@ -32,10 +37,20 @@ namespace Texnomic.SecureDNS.Core.DataTypes
 
         public static Domain FromString(string FQDN)
         {
-            return new Domain()
+            var Array = FQDN.Split('.', StringSplitOptions.RemoveEmptyEntries);
+
+            var Domain = new Domain();
+
+            var Labels = new List<ILabel>();
+
+            foreach (var Label in Array)
             {
-                Labels = FQDN.Split('.', StringSplitOptions.RemoveEmptyEntries)
-            };
+                Labels.Add((Label)Label);
+            }
+
+            Domain.Labels = Labels;
+
+            return Domain;
         }
     }
 }

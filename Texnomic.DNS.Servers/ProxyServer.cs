@@ -171,7 +171,7 @@ namespace Texnomic.DNS.Servers
                 try
                 {
                     var Result = await UdpClient.ReceiveAsync()
-                        .WithCancellation(CancellationToken);
+                                                .WithCancellation(CancellationToken);
 
                     var Message = await DeserializeAsync(Result.Buffer);
 
@@ -230,7 +230,7 @@ namespace Texnomic.DNS.Servers
                 try
                 {
                     var (Query, RemoteEndPoint) = await IncomingQueue.ReceiveAsync(CancellationToken)
-                        .WithCancellation(CancellationToken);
+                                                                            .WithCancellation(CancellationToken);
 
                     var Answer = await ResponsibilityChain.Execute(Query);
 
@@ -305,11 +305,12 @@ namespace Texnomic.DNS.Servers
                 case ArgumentOutOfRangeException ArgumentOutOfRange:
                 case InvalidOperationException InvalidOperation:
                 case CryptographicUnexpectedOperationException CryptographicUnexpectedOperation:
-                    {
-                        return true;
-                    }
+                    //{
+                    //    return true;
+                    //}
                 default:
-                    return false;
+                    //return false;
+                    return true;
             }
         }
 
