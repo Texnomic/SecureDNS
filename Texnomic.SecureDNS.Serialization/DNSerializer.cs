@@ -13,13 +13,13 @@ namespace Texnomic.SecureDNS.Serialization
 {
     public static class DnSerializer
     {
-        public static IMessage Deserialize(in byte[] Raw)
+        public static IMessage Deserialize(ref byte[] Raw)
         {
-            var Stream = new DnStream(in Raw);
+            var Stream = new DnStream(ref Raw);
 
             var Message = new Message
             {
-                ID = Stream.ReadUShort(),
+                ID = Stream.GetUShort(),
 
                 MessageType = Stream.GetBit().AsEnum<MessageType>(),
                 OperationCode = Stream.GetBits(4).AsEnum<OperationCode>(),
@@ -33,27 +33,27 @@ namespace Texnomic.SecureDNS.Serialization
                 CheckingDisabled = Stream.GetBit().AsBool(),
                 ResponseCode = Stream.GetBits(4).AsEnum<ResponseCode>(),
 
-                QuestionsCount = Stream.ReadUShort(),
-                AnswersCount = Stream.ReadUShort(),
-                AuthorityCount = Stream.ReadUShort(),
-                AdditionalCount = Stream.ReadUShort()
+                QuestionsCount = Stream.GetUShort(),
+                AnswersCount = Stream.GetUShort(),
+                AuthorityCount = Stream.GetUShort(),
+                AdditionalCount = Stream.GetUShort()
             };
 
-            Message.Questions = GetQuestions(in Stream, Message.QuestionsCount);
-            Message.Answers = GetAnswers(in Stream, Message.AnswersCount);
+            Message.Questions = GetQuestions(ref Stream, Message.QuestionsCount);
+            Message.Answers = GetAnswers(ref Stream, Message.AnswersCount);
 
             return Message;
         }
 
-        public static byte[] Serialize(in IMessage Message)
+        public static byte[] Serialize(ref IMessage Message)
         {
-            var Size = SizeOf(in Message);
+            var Size = SizeOf(ref Message);
 
             var Stream = new DnStream(Size);
 
             var Pointers = new Dictionary<string, ushort>();
 
-            Stream.WriteUShort(Message.ID);
+            Stream.SetUShort(Message.ID);
 
             Stream.SetBit((byte)Message.MessageType);
             Stream.SetBits(4, (byte)Message.OperationCode);
@@ -67,44 +67,44 @@ namespace Texnomic.SecureDNS.Serialization
             Stream.SetBit(Convert.ToByte(Message.CheckingDisabled));
             Stream.SetBits(4, (byte)Message.ResponseCode);
 
-            Stream.WriteUShort((ushort)Message.Questions.Count());
-            Stream.WriteUShort((ushort)Message.Answers.Count());
+            Stream.SetUShort((ushort)Message.Questions.Count());
+            Stream.SetUShort((ushort)Message.Answers.Count());
 
-            Stream.WriteUShort((ushort)Message.Authority.Count());
-            Stream.WriteUShort((ushort)Message.Additional.Count());
+            Stream.SetUShort((ushort)Message.Authority.Count());
+            Stream.SetUShort((ushort)Message.Additional.Count());
 
-            Set(in Stream, in Pointers, Message.Questions);
+            Set(ref Stream, ref Pointers, Message.Questions);
 
-            Set(in Stream, in Pointers, Message.Answers);
+            Set(ref Stream, ref Pointers, Message.Answers);
 
-            Set(in Stream, in Pointers, Message.Authority);
+            Set(ref Stream, ref Pointers, Message.Authority);
 
-            Set(in Stream, in Pointers, Message.Additional);
+            Set(ref Stream, ref Pointers, Message.Additional);
 
             return Stream.ToArray();
         }
 
-        public static ushort SizeOf(in IMessage Message)
+        public static ushort SizeOf(ref IMessage Message)
         {
-            var Pointers = new SortedSet<string>();
+            var Pointers = new List<string>();
 
             ushort Size = 12;
 
-            Size += SizeOf(in Pointers, Message.Questions);
-            Size += SizeOf(in Pointers, Message.Answers);
-            Size += SizeOf(in Pointers, Message.Authority);
-            Size += SizeOf(in Pointers, Message.Additional);
+            Size += SizeOf(ref Pointers, Message.Questions);
+            Size += SizeOf(ref Pointers, Message.Answers);
+            Size += SizeOf(ref Pointers, Message.Authority);
+            Size += SizeOf(ref Pointers, Message.Additional);
 
             return Size;
         }
 
-        private static IEnumerable<IQuestion> GetQuestions(in DnStream Stream, ushort Count)
+        private static IEnumerable<IQuestion> GetQuestions(ref DnStream Stream, ushort Count)
         {
             var Questions = new List<IQuestion>();
 
             do
             {
-                var Question = GetQuestion(in Stream);
+                var Question = GetQuestion(ref Stream);
 
                 Questions.Add(Question);
             }
@@ -113,75 +113,75 @@ namespace Texnomic.SecureDNS.Serialization
             return Questions;
         }
 
-        private static void Set(in DnStream Stream, in Dictionary<string, ushort> Pointers, IEnumerable<IQuestion> Questions)
+        private static void Set(ref DnStream Stream, ref Dictionary<string, ushort> Pointers, IEnumerable<IQuestion> Questions)
         {
             foreach (var Question in Questions)
             {
-                Set(in Stream, in Pointers, Question);
+                Set(ref Stream, ref Pointers, Question);
             }
         }
 
-        private static ushort SizeOf(in SortedSet<string> Pointers, IEnumerable<IQuestion> Questions)
+        private static ushort SizeOf(ref List<string> Pointers, IEnumerable<IQuestion> Questions)
         {
             ushort Size = 0;
 
             foreach (var Question in Questions)
             {
-                Size += SizeOf(in Pointers, Question);
+                Size += SizeOf(ref Pointers, Question);
             }
 
             return Size;
         }
 
-        private static IQuestion GetQuestion(in DnStream Stream)
+        private static IQuestion GetQuestion(ref DnStream Stream)
         {
             var Question = new Question()
             {
-                Domain = GetDomain(in Stream),
-                Type = Stream.ReadUShort().AsEnum<RecordType>(),
-                Class = Stream.ReadUShort().AsEnum<RecordClass>()
+                Domain = GetDomain(ref Stream),
+                Type = Stream.GetUShort().AsEnum<RecordType>(),
+                Class = Stream.GetUShort().AsEnum<RecordClass>()
             };
 
             return Question;
         }
 
-        private static void Set(in DnStream Stream, in Dictionary<string, ushort> Pointers, IQuestion Question)
+        private static void Set(ref DnStream Stream, ref Dictionary<string, ushort> Pointers, IQuestion Question)
         {
-            Set(in Stream, in Pointers, Question.Domain);
+            Set(ref Stream, ref Pointers, Question.Domain);
 
-            Stream.WriteUShort((byte)Question.Type);
+            Stream.SetUShort((byte)Question.Type);
 
-            Stream.WriteUShort((byte)Question.Class);
+            Stream.SetUShort((byte)Question.Class);
         }
 
-        private static ushort SizeOf(in SortedSet<string> Pointers, IQuestion Question)
+        private static ushort SizeOf(ref List<string> Pointers, IQuestion Question)
         {
-            var Size = SizeOf(in Pointers, Question.Domain);
+            var Size = SizeOf(ref Pointers, Question.Domain);
 
             return (ushort)(Size + 4);
         }
 
-        private static IDomain GetDomain(in DnStream Stream)
+        private static IDomain GetDomain(ref DnStream Stream)
         {
             var Domain = new Domain()
             {
-                Labels = GetLabels(in Stream),
+                Labels = GetLabels(ref Stream),
             };
 
             return Domain;
         }
 
-        private static void Set(in DnStream Stream, in Dictionary<string, ushort> Pointers, IDomain Domain)
+        private static void Set(ref DnStream Stream, ref Dictionary<string, ushort> Pointers, IDomain Domain)
         {
-            Set(in Stream, in Pointers, Domain.Labels.ToArray());
+            Set(ref Stream, ref Pointers, Domain.Labels);
         }
 
-        private static ushort SizeOf(in SortedSet<string> Pointers, IDomain Domain)
+        private static ushort SizeOf(ref List<string> Pointers, IDomain Domain)
         {
-            return SizeOf(in Pointers, Domain.Labels.ToArray());
+            return SizeOf(ref Pointers, Domain.Labels);
         }
 
-        private static IEnumerable<string> GetLabels(in DnStream Stream)
+        private static IEnumerable<string> GetLabels(ref DnStream Stream)
         {
             var Labels = new List<string>();
 
@@ -199,7 +199,7 @@ namespace Texnomic.SecureDNS.Serialization
                                 return Labels;
 
 
-                            var Label = Stream.ReadString(Length);
+                            var Label = Stream.GetString(Length);
 
                             Labels.Add(Label);
 
@@ -215,7 +215,7 @@ namespace Texnomic.SecureDNS.Serialization
 
                             Stream.Seek(Pointer);
 
-                            Labels.AddRange(GetLabels(in Stream));
+                            Labels.AddRange(GetLabels(ref Stream));
 
                             Stream.Seek(Position);
 
@@ -227,11 +227,13 @@ namespace Texnomic.SecureDNS.Serialization
             }
         }
 
-        private static void Set(in DnStream Stream, in Dictionary<string, ushort> Pointers, ReadOnlySpan<string> Labels)
+        private static void Set(ref DnStream Stream, ref Dictionary<string, ushort> Pointers, IEnumerable<string> Labels)
         {
+            var Domain = string.Join('.', Labels);
+
             foreach (var Label in Labels)
             {
-                var SubDomain = string.Join('.', Labels.Slice(Labels.IndexOf(Label)).ToArray());
+                var SubDomain = Domain.Substring(Domain.IndexOf(Label));
 
                 if (Pointers.ContainsKey(SubDomain))
                 {
@@ -255,20 +257,22 @@ namespace Texnomic.SecureDNS.Serialization
 
                     Stream.SetBits(6, (byte)Label.Length);
 
-                    Stream.WriteString(Label);
+                    Stream.SetString(Label);
                 }
             }
 
             Stream.SetByte(0);
         }
 
-        private static ushort SizeOf(in SortedSet<string> Pointers, ReadOnlySpan<string> Labels)
+        private static ushort SizeOf(ref List<string> Pointers, IEnumerable<string> Labels)
         {
+            var Domain = string.Join('.', Labels);
+
             ushort Size = 0;
 
             foreach (var Label in Labels)
             {
-                var SubDomain = string.Join('.', Labels.Slice(Labels.IndexOf(Label)).ToArray());
+                var SubDomain = Domain.Substring(Domain.IndexOf(Label));
 
                 if (Pointers.Contains(SubDomain))
                 {
@@ -289,13 +293,13 @@ namespace Texnomic.SecureDNS.Serialization
             return Size;
         }
 
-        private static IEnumerable<IAnswer> GetAnswers(in DnStream Stream, ushort Count)
+        private static IEnumerable<IAnswer> GetAnswers(ref DnStream Stream, ushort Count)
         {
             var Answers = new List<IAnswer>();
 
             do
             {
-                var Answer = GetAnswer(in Stream);
+                var Answer = GetAnswer(ref Stream);
 
                 Answers.Add(Answer);
             }
@@ -304,98 +308,98 @@ namespace Texnomic.SecureDNS.Serialization
             return Answers;
         }
 
-        private static void Set(in DnStream Stream, in Dictionary<string, ushort> Pointers, IEnumerable<IAnswer> Answers)
+        private static void Set(ref DnStream Stream, ref Dictionary<string, ushort> Pointers, IEnumerable<IAnswer> Answers)
         {
             foreach (var Answer in Answers)
             {
-                Set(in Stream, in Pointers, Answer);
+                Set(ref Stream, ref Pointers, Answer);
             }
         }
 
-        private static ushort SizeOf(in SortedSet<string> Pointers, IEnumerable<IAnswer> Answers)
+        private static ushort SizeOf(ref List<string> Pointers, IEnumerable<IAnswer> Answers)
         {
             ushort Size = 0;
 
             foreach (var Answer in Answers)
             {
-                Size += SizeOf(in Pointers, Answer);
+                Size += SizeOf(ref Pointers, Answer);
             }
 
             return Size;
         }
 
-        private static IAnswer GetAnswer(in DnStream Stream)
+        private static IAnswer GetAnswer(ref DnStream Stream)
         {
             var Answer = new Answer()
             {
-                Domain = GetDomain(in Stream),
-                Type = Stream.ReadUShort().AsEnum<RecordType>(),
-                Class = Stream.ReadUShort().AsEnum<RecordClass>(),
-                TimeToLive = Stream.ReadTimeSpan(),
-                Length = Stream.ReadUShort(),
+                Domain = GetDomain(ref Stream),
+                Type = Stream.GetUShort().AsEnum<RecordType>(),
+                Class = Stream.GetUShort().AsEnum<RecordClass>(),
+                TimeToLive = Stream.GetTimeSpan(),
+                Length = Stream.GetUShort(),
             };
 
-            Answer.Record = GetRecord(in Stream, Answer.Type);
+            Answer.Record = GetRecord(ref Stream, Answer.Type);
 
             return Answer;
         }
 
-        private static void Set(in DnStream Stream, in Dictionary<string, ushort> Pointers, IAnswer Answer)
+        private static void Set(ref DnStream Stream, ref Dictionary<string, ushort> Pointers, IAnswer Answer)
         {
-            Set(in Stream, in Pointers, Answer.Domain);
+            Set(ref Stream, ref Pointers, Answer.Domain);
 
-            Stream.WriteUShort((byte)Answer.Type);
+            Stream.SetUShort((byte)Answer.Type);
 
-            Stream.WriteUShort((byte)Answer.Class);
+            Stream.SetUShort((byte)Answer.Class);
 
-            Stream.WriteTimeSpan(Answer.TimeToLive);
+            Stream.SetTimeSpan(Answer.TimeToLive);
 
-            Stream.WriteUShort(Answer.Length);
+            Stream.SetUShort(Answer.Length);
 
-            Set(in Stream, in Pointers, Answer.Record);
+            Set(ref Stream, ref Pointers, Answer.Record);
         }
 
-        private static ushort SizeOf(in SortedSet<string> Pointers, IAnswer Answer)
+        private static ushort SizeOf(ref List<string> Pointers, IAnswer Answer)
         {
             ushort Size = 0;
 
-            Size += SizeOf(in Pointers, Answer.Domain);
+            Size += SizeOf(ref Pointers, Answer.Domain);
 
             Size += 10;
 
-            Size += SizeOf(in Pointers, Answer.Record);
+            Size += SizeOf(ref Pointers, Answer.Record);
 
             return Size;
         }
 
-        private static IRecord GetRecord(in DnStream Stream, RecordType RecordType)
+        private static IRecord GetRecord(ref DnStream Stream, RecordType RecordType)
         {
             return RecordType switch
             {
-                RecordType.A => GetA(in Stream),
-                RecordType.CNAME => GetCNAME(in Stream),
-                RecordType.AAAA => GetAAAA(in Stream),
+                RecordType.A => GetA(ref Stream),
+                RecordType.CNAME => GetCNAME(ref Stream),
+                RecordType.AAAA => GetAAAA(ref Stream),
                 _ => throw new ArgumentOutOfRangeException(nameof(RecordType), RecordType, null)
             };
         }
 
-        private static void Set(in DnStream Stream, in Dictionary<string, ushort> Pointers, IRecord Record)
+        private static void Set(ref DnStream Stream, ref Dictionary<string, ushort> Pointers, IRecord Record)
         {
             switch (Record)
             {
                 case A A:
                     {
-                        Set(in Stream, in A);
+                        Set(ref Stream, ref A);
                         break;
                     }
                 case CNAME CNAME:
                     {
-                        Set(in Stream, in Pointers, in CNAME);
+                        Set(ref Stream, ref Pointers, ref CNAME);
                         break;
                     }
                 case AAAA AAAA:
                     {
-                        Set(in Stream, in AAAA);
+                        Set(ref Stream, ref AAAA);
                         break;
                     }
 
@@ -404,21 +408,21 @@ namespace Texnomic.SecureDNS.Serialization
             }
         }
 
-        private static ushort SizeOf(in SortedSet<string> Pointers, IRecord Record)
+        private static ushort SizeOf(ref List<string> Pointers, IRecord Record)
         {
             switch (Record)
             {
                 case A A:
                     {
-                        return SizeOf(in A);
+                        return SizeOf(ref A);
                     }
                 case CNAME CNAME:
                     {
-                        return SizeOf(in Pointers, in CNAME);
+                        return SizeOf(ref Pointers, ref CNAME);
                     }
                 case AAAA AAAA:
                     {
-                        return SizeOf(in AAAA);
+                        return SizeOf(ref AAAA);
                     }
 
                 default:
@@ -426,116 +430,102 @@ namespace Texnomic.SecureDNS.Serialization
             }
         }
 
-        private static CNAME GetCNAME(in DnStream Stream)
+        private static CNAME GetCNAME(ref DnStream Stream)
         {
             return new CNAME()
             {
-                Domain = GetDomain(in Stream)
+                Domain = GetDomain(ref Stream)
             };
         }
 
-        private static void Set(in DnStream Stream, in Dictionary<string, ushort> Pointers, in CNAME CNAME)
+        private static void Set(ref DnStream Stream, ref Dictionary<string, ushort> Pointers, ref CNAME CNAME)
         {
-            Set(in Stream, in Pointers, CNAME.Domain);
+            Set(ref Stream, ref Pointers, CNAME.Domain);
         }
 
-        private static ushort SizeOf(in SortedSet<string> Pointers, in CNAME CNAME)
+        private static ushort SizeOf(ref List<string> Pointers, ref CNAME CNAME)
         {
-            return SizeOf(in Pointers, CNAME.Domain);
+            return SizeOf(ref Pointers, CNAME.Domain);
         }
 
-        private static A GetA(in DnStream Stream)
+        private static A GetA(ref DnStream Stream)
         {
             return new A()
             {
-                Address = Stream.ReadIPv4Address()
+                Address = Stream.GetIPv4Address()
             };
         }
 
-        private static void Set(in DnStream Stream, in A A)
+        private static void Set(ref DnStream Stream, ref A A)
         {
-            Stream.WriteIPv4Address(A.Address);
+            Stream.SetIPv4Address(A.Address);
         }
 
-        private static ushort SizeOf(in A A)
+        private static ushort SizeOf(ref A A)
         {
             return 4;
         }
 
-        private static AAAA GetAAAA(in DnStream Stream)
+        private static AAAA GetAAAA(ref DnStream Stream)
         {
             return new AAAA()
             {
-                Address = Stream.ReadIPv6Address()
+                Address = Stream.GetIPv6Address()
             };
         }
 
-        private static void Set(in DnStream Stream, in AAAA AAAA)
+        private static void Set(ref DnStream Stream, ref AAAA AAAA)
         {
-            Stream.WriteIPv6Address(AAAA.Address);
+            Stream.SetIPv6Address(AAAA.Address);
         }
 
-        private static ushort SizeOf(in AAAA AAAA)
+        private static ushort SizeOf(ref AAAA AAAA)
         {
             return 8;
         }
 
-        private static ICharacterString GetCharacterString(in DnStream Stream)
+        private static ICharacterString GetCharacterString(ref DnStream Stream)
         {
             var Length = Stream.GetByte();
 
             return new CharacterString()
             {
                 Length = Length,
-                Value = Stream.ReadString(Length)
+                Value = Stream.GetString(Length)
             };
         }
 
-        private static void Set(in DnStream Stream, in ICharacterString CharacterString)
+        private static void Set(ref DnStream Stream, ref ICharacterString CharacterString)
         {
             Stream.SetByte(CharacterString.Length);
-            Stream.WriteString(CharacterString.Value);
+            Stream.SetString(CharacterString.Value);
         }
 
-        private static ushort SizeOf(in ICharacterString CharacterString)
+        private static ushort SizeOf(ref ICharacterString CharacterString)
         {
             return (ushort)(CharacterString.Length + 1);
         }
 
-        private static Certificate GetCertificate(in DnStream Stream)
+        private static ICertificate GetCertificate(ref DnStream Stream)
         {
             return new Certificate()
             {
-                Magic = Stream.ReadString(4),
-                Version = Stream.ReadUShort().AsEnum<ESVersion>(),
-                MinorVersion = Stream.ReadUShort(),
-                Signature = Stream.ReadBytes(64).ToArray(),
-                PublicKey = Stream.ReadBytes(32).ToArray(),
-                ClientMagic = Stream.ReadBytes(8).ToArray(),
-                Serial = Stream.ReadInt32(),
-                StartTimeStamp = Stream.ReadEpoch(),
-                EndTimeStamp = Stream.ReadEpoch(),
+                Magic = Stream.GetString(4),
+                Version = Stream.GetUShort().AsEnum<ESVersion>(),
+                MinorVersion = Stream.GetUShort(),
+                Signature = Stream.GetBytes(64),
+                PublicKey = Stream.GetBytes(32),
+                ClientMagic = Stream.GetBytes(8),
+                Serial = Stream.GetInt(),
+                StartTimeStamp = Stream.GetEpoch(),
+                EndTimeStamp = Stream.GetEpoch(),
                 //Extensions = Stream.GetBytes()
             };
         }
 
-        private static void Set(in DnStream Stream, in ICertificate Certificate)
+        private static void Set(ref DnStream Stream, ref ICertificate Certificate)
         {
-            Stream.WriteString(Certificate.Magic);
-            Stream.WriteUShort((ushort)Certificate.Version);
-            Stream.WriteUShort(Certificate.MinorVersion);
-            Stream.WriteBytes(Certificate.Signature);
-            Stream.WriteBytes(Certificate.PublicKey);
-            Stream.WriteBytes(Certificate.ClientMagic);
-            Stream.WriteInt32(Certificate.Serial);
-            Stream.WriteEpoch(Certificate.StartTimeStamp);
-            Stream.WriteEpoch(Certificate.EndTimeStamp);
-            //Stream.SetBytes(Certificate.Extensions);
-        }
 
-        private static ushort SizeOf(in ICertificate Certificate)
-        {
-            return (ushort)(124 + Certificate.Extensions.Length);
         }
     }
 }
