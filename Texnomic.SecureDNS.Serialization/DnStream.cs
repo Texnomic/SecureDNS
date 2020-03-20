@@ -38,12 +38,7 @@ namespace Texnomic.SecureDNS.Serialization
             (ByteIndex, BitIndex) = (Bytes, Bits);
         }
 
-        public int Find(ReadOnlySpan<byte> Bytes)
-        {
-            return Raw.Span.IndexOf(Bytes);
-        }
 
-        
         private Span<byte> GetSpan(ushort Length)
         {
             return Raw.Slice(ByteIndex, Length).Span;
@@ -224,16 +219,6 @@ namespace Texnomic.SecureDNS.Serialization
         public string ReadString(ushort Length)
         {
             return Encoding.ASCII.GetString(ReadBytes(Length));
-        }
-
-        public ReadOnlySpan<char> ReadStringSpan(ushort Length)
-        {
-            return ReadString(Length).AsSpan();
-        }
-
-        public ReadOnlyMemory<char> ReadStringSpan(ushort Length)
-        {
-            return ReadString(Length).AsSpan();
         }
 
         public void WriteString(string Value)
