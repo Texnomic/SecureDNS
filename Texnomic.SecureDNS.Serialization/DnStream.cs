@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers;
 using System.Text;
 using System.Buffers.Binary;
 using System.Net;
@@ -114,6 +115,7 @@ namespace Texnomic.SecureDNS.Serialization
         {
             var Byte = Raw.Span[ByteIndex];
 
+            
             ByteIndex += 1;
 
             return Byte;
@@ -231,9 +233,9 @@ namespace Texnomic.SecureDNS.Serialization
             return ReadString(Length).AsSpan();
         }
 
-        public ReadOnlyMemory<char> ReadStringSpan(ushort Length)
+        public ReadOnlyMemory<char> ReadStringMemory(ushort Length)
         {
-            return ReadString(Length).AsSpan();
+            return ReadString(Length).AsMemory();
         }
 
         public void WriteString(string Value)
@@ -294,6 +296,11 @@ namespace Texnomic.SecureDNS.Serialization
         public byte[] ToArray()
         {
             return Raw.ToArray();
+        }
+
+        public ReadOnlySpan<byte> ToSpan()
+        {
+            return Raw.Span;
         }
     }
 }

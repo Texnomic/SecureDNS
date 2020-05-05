@@ -176,6 +176,40 @@ namespace Texnomic.SecureDNS.Serialization
             Set(in Stream, in Pointers, Domain.Labels.ToArray());
         }
 
+        private static ReadOnlySpan<byte> Serialize(in IDomain Domain)
+        {
+            var Size = Domain.Labels.Sum(Label => Label.Length) + Domain.Labels.Count();
+
+            var Stream = new DnStream((ushort)Size);
+
+            foreach (var Label in Domain.Labels)
+            {
+                Stream.SetBits(2, (byte) LabelType.Normal);
+
+                Stream.SetBits(6, (byte) Label.Length);
+
+                Stream.WriteString(Label);
+            }
+
+            Stream.SetByte(0);
+
+            return Stream.ToSpan();
+        }
+
+        private static void Set(in DnStream Stream, in IDomain Domain)
+        {
+            var Span = Serialize(in Domain);
+
+            byte Index = 0;
+
+            while (Span[Index] != 0)
+            {
+                var Label = Span.Slice(Index);
+
+
+            }
+        }
+
         private static ushort SizeOf(in SortedSet<string> Pointers, IDomain Domain)
         {
             return SizeOf(in Pointers, Domain.Labels.ToArray());

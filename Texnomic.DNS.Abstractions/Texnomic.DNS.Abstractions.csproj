@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BinarySerializer" Version="8.4.3" />
+    <PackageReference Include="BinarySerializer" Version="8.5.1" />
   </ItemGroup>
 
 </Project>

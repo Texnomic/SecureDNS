@@ -4,6 +4,6 @@ namespace Texnomic.SecureDNS.Abstractions
 {
     public interface IDomain
     {
-        IEnumerable<ILabel> Labels { get; }
+        IEnumerable<string> Labels { get; }
     }
 }
