@@ -34,7 +34,7 @@ namespace Texnomic.SecureDNS.Tests.Core
                 0x23
             };
 
-            var ResponseMessage = DnSerializer.Deserialize(ref ResponseBytes);
+            var ResponseMessage = DnSerializer.Deserialize(in ResponseBytes);
         }
 
         [TestMethod]
@@ -64,16 +64,16 @@ namespace Texnomic.SecureDNS.Tests.Core
                 0x23
             };
 
-            var ResponseMessage = DnSerializer.Deserialize(ref ResponseBytes);
+            var ResponseMessage = DnSerializer.Deserialize(in ResponseBytes);
 
-            var Bytes = DnSerializer.Serialize(ref ResponseMessage);
+            var Bytes = DnSerializer.Serialize(in ResponseMessage);
 
             for (var I = 0; I < Bytes.Length; I++)
             {
                 Assert.AreEqual(ResponseBytes[I], Bytes[I]);
             }
 
-            var Size = DnSerializer.SizeOf(ref ResponseMessage);
+            var Size = DnSerializer.SizeOf(in ResponseMessage);
 
             Assert.AreEqual(ResponseBytes.Length, Size);
         }
@@ -109,7 +109,7 @@ namespace Texnomic.SecureDNS.Tests.Core
                 0xd9, 0x12, 0xee
             };
 
-            var ResponseMessage = DnSerializer.Deserialize(ref ResponseBytes);
+            var ResponseMessage = DnSerializer.Deserialize(in ResponseBytes);
         }
 
         [TestMethod]
@@ -143,16 +143,16 @@ namespace Texnomic.SecureDNS.Tests.Core
                 0xd9, 0x12, 0xee
             };
 
-            var ResponseMessage = DnSerializer.Deserialize(ref ResponseBytes);
+            var ResponseMessage = DnSerializer.Deserialize(in ResponseBytes);
 
-            var Bytes = DnSerializer.Serialize(ref ResponseMessage);
+            var Bytes = DnSerializer.Serialize(in ResponseMessage);
 
             for (var I = 0; I < Bytes.Length; I++)
             {
                 Assert.AreEqual(ResponseBytes[I], Bytes[I]);
             }
 
-            var Size = DnSerializer.SizeOf(ref ResponseMessage);
+            var Size = DnSerializer.SizeOf(in ResponseMessage);
 
             Assert.AreEqual(ResponseBytes.Length, Size);
         }
