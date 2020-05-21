@@ -56,6 +56,9 @@ namespace Texnomic.SecureDNS.Terminal
 
         private static void BuildHost()
         {
+            if(!File.Exists("AppSettings.json"))
+                File.WriteAllBytes("AppSettings.json", Resources.AppSettings);
+
             HostBuilder = new HostBuilder()
                  .ConfigureAppConfiguration(ConfigureApp)
                  .ConfigureServices(ConfigureServices)

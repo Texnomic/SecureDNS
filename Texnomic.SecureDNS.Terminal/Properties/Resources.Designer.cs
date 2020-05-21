@@ -63,6 +63,16 @@ namespace Texnomic.SecureDNS.Terminal.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] AppSettings {
+            get {
+                object obj = ResourceManager.GetObject("AppSettings", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] Speed {
             get {
                 object obj = ResourceManager.GetObject("Speed", resourceCulture);
