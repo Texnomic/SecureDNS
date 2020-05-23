@@ -1,27 +1,27 @@
 ﻿@page "/"
-@using Syncfusion.EJ2.Blazor.Layouts
-@using Syncfusion.EJ2.Blazor.Charts
+@using Syncfusion.Blazor.Layouts
+@using Syncfusion.Blazor.Charts
 
-<EjsDashboardLayout Columns="8" CellSpacing="@CellSpacing" AllowResizing="true" MediaQuery="max-width:700px">
+<SfDashboardLayout Columns="8" CellSpacing="@CellSpacing" AllowResizing="true" MediaQuery="max-width:700px">
     <DashboardLayoutPanels>
         <DashboardLayoutPanel Id="Panel1" SizeX=3 SizeY=2>
             <HeaderTemplate><div class='header'> Product usage ratio </div></HeaderTemplate>
             <ContentTemplate>
-                <EjsAccumulationChart Id="piechart" Height="@Height">
+                <SfAccumulationChart Id="piechart" Height="@Height">
                     <AccumulationChartTooltipSettings Enable="true"></AccumulationChartTooltipSettings>
                     <AccumulationChartLegendSettings Visible="false"></AccumulationChartLegendSettings>
                     <AccumulationChartSeriesCollection>
                         <AccumulationChartSeries DataSource="@PieData" XName="XValue" YName="YValue">
                         </AccumulationChartSeries>
                     </AccumulationChartSeriesCollection>
-                </EjsAccumulationChart>
+                </SfAccumulationChart>
             </ContentTemplate>
         </DashboardLayoutPanel>
         <DashboardLayoutPanel Id="Panel2" SizeX=3 SizeY=2 Col=3>
             <HeaderTemplate><div class='header'> UK trade in food groups </div></HeaderTemplate>
             <ContentTemplate>
-                <EjsChart id="barchart" Height="@Height">
-                    <ChartPrimaryXAxis ValueType="Syncfusion.EJ2.Blazor.Charts.ValueType.Category">
+                <SfChart id="barchart" Height="@Height">
+                    <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category">
                         <ChartAxisMajorGridLines Width="0"></ChartAxisMajorGridLines>
                     </ChartPrimaryXAxis>
                     <ChartPrimaryYAxis LabelFormat="{value}B" EdgeLabelPlacement="EdgeLabelPlacement.Shift">
@@ -34,35 +34,35 @@
                         <ChartSeries DataSource="@BarData" XName="X" YName="Y" Width=2 Type="ChartSeriesType.Bar">
                         </ChartSeries>
                     </ChartSeriesCollection>
-                </EjsChart>
+                </SfChart>
             </ContentTemplate>
         </DashboardLayoutPanel>
         <DashboardLayoutPanel Id="Panel3" SizeX=3 SizeY=2 Row=2>
             <HeaderTemplate><div class='header'> Sales increase percentage </div></HeaderTemplate>
             <ContentTemplate>
-                <EjsChart id="linechart" Height="@Height">
+                <SfChart id="linechart" Height="@Height">
                     <ChartSeriesCollection>
                         <ChartSeries DataSource="@LineData" XName="XValue" YName="YValue">
                         </ChartSeries>
                     </ChartSeriesCollection>
-                </EjsChart>
+                </SfChart>
             </ContentTemplate>
         </DashboardLayoutPanel>
         <DashboardLayoutPanel Id="Panel4" SizeX=3 SizeY=2 Row=2 Col=3>
             <HeaderTemplate><div class='header'> Mobile browsers usage </div></HeaderTemplate>
             <ContentTemplate>
-                <EjsAccumulationChart Id="piechart1" Height="@Height">
+                <SfAccumulationChart Id="piechart1" Height="@Height">
                     <AccumulationChartTooltipSettings Enable="true"></AccumulationChartTooltipSettings>
                     <AccumulationChartLegendSettings Visible="false"></AccumulationChartLegendSettings>
                     <AccumulationChartSeriesCollection>
                         <AccumulationChartSeries DataSource="@PieData1" XName="X" YName="Y">
                         </AccumulationChartSeries>
                     </AccumulationChartSeriesCollection>
-                </EjsAccumulationChart>
+                </SfAccumulationChart>
             </ContentTemplate>
         </DashboardLayoutPanel>
     </DashboardLayoutPanels>
-</EjsDashboardLayout>
+</SfDashboardLayout>
 
 @code
 {

@@ -52,7 +52,7 @@ namespace Texnomic.SecureDNS.Benchmarks
         [Benchmark]
         public void MySerializer()
         {
-            var ResponseMessage = DnSerializer.Deserialize(ref ResponseBytes);
+            var ResponseMessage = DnSerializer.Deserialize(in ResponseBytes);
         }
     }
 }

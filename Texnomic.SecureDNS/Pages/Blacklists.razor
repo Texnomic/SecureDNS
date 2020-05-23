@@ -1,12 +1,12 @@
 @page "/Blacklists"
-@using Syncfusion.EJ2.Blazor.Grids
-@using Syncfusion.EJ2.Blazor.Buttons
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Buttons
 @using Texnomic.SecureDNS.Data.Models
 @inherits BlacklistsBase
 
 
 <Alert Color="Color.Dark" IsShow="true">
-    <strong>Blacklist Initialization: </strong><Button Color="Color.Primary" Clicked="@InitializeAsync">Run</Button>
+    <strong>Blacklist Initialization: </strong><SfButton Color="Color.Primary" Clicked="@InitializeAsync()">Run</SfButton>
 </Alert>
 
 
@@ -14,12 +14,12 @@
 <p>@Output</p>
 
 <div>
-    <EjsButton OnClick="PdfExport" Content="Pdf Export"></EjsButton>
-    <EjsButton OnClick="ExcelExport" Content="Excel Export"></EjsButton>
+    <Button OnClick="PdfExport" Content="Pdf Export"></Button>
+    <Button OnClick="ExcelExport" Content="Excel Export"></Button>
 </div>
 
 <div>
-    <EjsGrid ID="BlacklistGrid" @ref="@DefaultGrid" DataSource="@DatabaseContext.Blacklists.AsQueryable()" EnablePersistence="false" AllowResizing="true" AllowPaging="true" AllowSorting="true" AllowFiltering="true" AllowGrouping="true" AllowExcelExport="true" AllowPdfExport="true" ShowColumnMenu="true" ColumnMenuItems="@MenuItems" Toolbar="@Toolbar">
+    <SfGrid ID="BlacklistGrid" @ref="@DefaultGrid" DataSource="@DatabaseContext.Blacklists.AsQueryable()" EnablePersistence="false" AllowResizing="true" AllowPaging="true" AllowSorting="true" AllowFiltering="true" AllowGrouping="true" AllowExcelExport="true" AllowPdfExport="true" ShowColumnMenu="true" ColumnMenuItems="@MenuItems" Toolbar="@Toolbar">
         <GridPageSettings PageSize="25"></GridPageSettings>
         <GridSelectionSettings Type="SelectionType.Multiple"></GridSelectionSettings>
         <GridEditSettings AllowAdding="true" AllowEditing="true" AllowDeleting="true" Mode="EditMode.Normal"></GridEditSettings>
@@ -28,7 +28,7 @@
             <GridColumn Field="Domain.Name" HeaderText="Domain" TextAlign="TextAlign.Left"></GridColumn>
             <GridColumn Field="@nameof(Blacklist.Timestamp)" HeaderText="Time Stamp" Format="yMd" Type="ColumnType.Date" TextAlign="TextAlign.Left"></GridColumn>
         </GridColumns>
-    </EjsGrid>
+    </SfGrid>
 </div>
 
 @code

@@ -12,7 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
-using Syncfusion.EJ2.Blazor;
+using Syncfusion.Blazor;
 using Texnomic.SecureDNS.Data;
 using Texnomic.SecureDNS.Extensions;
 using Texnomic.SecureDNS.Hangfire;
