@@ -24,17 +24,17 @@ namespace Texnomic.SecureDNS.Serialization
             {
                 ID = Stream.ReadUShort(),
 
-                MessageType = Stream.GetBit().AsEnum<MessageType>(),
-                OperationCode = Stream.GetBits(4).AsEnum<OperationCode>(),
-                AuthoritativeAnswer = Stream.GetBit().AsEnum<AuthoritativeAnswer>(),
-                Truncated = Stream.GetBit().AsBool(),
-                RecursionDesired = Stream.GetBit().AsBool(),
+                MessageType = Stream.ReadBit().AsEnum<MessageType>(),
+                OperationCode = Stream.ReadBits(4).AsEnum<OperationCode>(),
+                AuthoritativeAnswer = Stream.ReadBit().AsEnum<AuthoritativeAnswer>(),
+                Truncated = Stream.ReadBit().AsBool(),
+                RecursionDesired = Stream.ReadBit().AsBool(),
 
-                RecursionAvailable = Stream.GetBit().AsBool(),
-                Zero = Stream.GetBit(),
-                AuthenticatedData = Stream.GetBit().AsBool(),
-                CheckingDisabled = Stream.GetBit().AsBool(),
-                ResponseCode = Stream.GetBits(4).AsEnum<ResponseCode>(),
+                RecursionAvailable = Stream.ReadBit().AsBool(),
+                Zero = Stream.ReadBit(),
+                AuthenticatedData = Stream.ReadBit().AsBool(),
+                CheckingDisabled = Stream.ReadBit().AsBool(),
+                ResponseCode = Stream.ReadBits(4).AsEnum<ResponseCode>(),
 
                 QuestionsCount = Stream.ReadUShort(),
                 AnswersCount = Stream.ReadUShort(),
@@ -58,17 +58,17 @@ namespace Texnomic.SecureDNS.Serialization
 
             Stream.WriteUShort(Message.ID);
 
-            Stream.SetBit((byte)Message.MessageType);
-            Stream.SetBits(4, (byte)Message.OperationCode);
-            Stream.SetBit((byte)Message.AuthoritativeAnswer);
-            Stream.SetBit(Convert.ToByte(Message.Truncated));
-            Stream.SetBit(Convert.ToByte(Message.RecursionDesired));
+            Stream.WriteBit((byte)Message.MessageType);
+            Stream.WriteBits(4, (byte)Message.OperationCode);
+            Stream.WriteBit((byte)Message.AuthoritativeAnswer);
+            Stream.WriteBit(Convert.ToByte(Message.Truncated));
+            Stream.WriteBit(Convert.ToByte(Message.RecursionDesired));
 
-            Stream.SetBit(Convert.ToByte(Message.RecursionAvailable));
-            Stream.SetBit(Message.Zero);
-            Stream.SetBit(Convert.ToByte(Message.AuthenticatedData));
-            Stream.SetBit(Convert.ToByte(Message.CheckingDisabled));
-            Stream.SetBits(4, (byte)Message.ResponseCode);
+            Stream.WriteBit(Convert.ToByte(Message.RecursionAvailable));
+            Stream.WriteBit(Message.Zero);
+            Stream.WriteBit(Convert.ToByte(Message.AuthenticatedData));
+            Stream.WriteBit(Convert.ToByte(Message.CheckingDisabled));
+            Stream.WriteBits(4, (byte)Message.ResponseCode);
 
             Stream.WriteUShort((ushort)Message.Questions.Count());
             Stream.WriteUShort((ushort)Message.Answers.Count());
@@ -196,14 +196,14 @@ namespace Texnomic.SecureDNS.Serialization
 
             foreach (var Label in Domain.Labels)
             {
-                Stream.SetBits(2, (byte)LabelType.Normal);
+                Stream.WriteBits(2, (byte)LabelType.Normal);
 
-                Stream.SetBits(6, (byte)Label.Length);
+                Stream.WriteBits(6, (byte)Label.Length);
 
                 Stream.WriteString(Label);
             }
 
-            Stream.SetByte(0);
+            Stream.WriteByte(0);
 
             return Stream.ToSpan();
         }
@@ -233,13 +233,13 @@ namespace Texnomic.SecureDNS.Serialization
 
             while (true)
             {
-                var LabelType = Stream.GetBits(2).AsEnum<LabelType>();
+                var LabelType = Stream.ReadBits(2).AsEnum<LabelType>();
 
                 switch (LabelType)
                 {
                     case LabelType.Normal:
                         {
-                            var Length = Stream.GetBits(6);
+                            var Length = Stream.ReadBits(6);
 
                             if (Length == 0)
                                 return Labels;
@@ -253,7 +253,7 @@ namespace Texnomic.SecureDNS.Serialization
                         }
                     case LabelType.Compressed:
                         {
-                            var Pointer = (ushort)(Stream.GetBits(6) + Stream.GetByte());
+                            var Pointer = (ushort)(Stream.ReadBits(6) + Stream.ReadByte());
 
                             if (Pointer >= Stream.BytePosition - 2) throw new ArgumentOutOfRangeException(nameof(Pointer), Pointer, "Compressed Label Infinite Loop Detected.");
 
@@ -281,15 +281,15 @@ namespace Texnomic.SecureDNS.Serialization
 
                 if (Pointers.ContainsKey(SubDomain))
                 {
-                    Stream.SetBits(2, (byte)LabelType.Compressed);
+                    Stream.WriteBits(2, (byte)LabelType.Compressed);
 
                     var Bytes = new byte[2];
 
                     BinaryPrimitives.WriteUInt16BigEndian(Bytes, Pointers[SubDomain]);
 
-                    Stream.SetBits(6, Bytes[0]);
+                    Stream.WriteBits(6, Bytes[0]);
 
-                    Stream.SetByte(Bytes[1]);
+                    Stream.WriteByte(Bytes[1]);
 
                     return;
                 }
@@ -297,15 +297,15 @@ namespace Texnomic.SecureDNS.Serialization
                 {
                     Pointers.Add(SubDomain, Stream.BytePosition);
 
-                    Stream.SetBits(2, (byte)LabelType.Normal);
+                    Stream.WriteBits(2, (byte)LabelType.Normal);
 
-                    Stream.SetBits(6, (byte)Label.Length);
+                    Stream.WriteBits(6, (byte)Label.Length);
 
                     Stream.WriteString(Label);
                 }
             }
 
-            Stream.SetByte(0);
+            Stream.WriteByte(0);
         }
 
         private static ushort SizeOf(in SortedSet<string> Pointers, ReadOnlySpan<string> Labels)
@@ -438,6 +438,8 @@ namespace Texnomic.SecureDNS.Serialization
                 RecordType.NS => GetNS(in Stream),
                 RecordType.PTR => GetPTR(in Stream),
                 RecordType.SOA => GetSOA(in Stream),
+                RecordType.SRV => GetSRV(in Stream),
+                RecordType.DNSKEY => GetDNSKEY(in Stream),
                 _ => throw new ArgumentOutOfRangeException(nameof(RecordType), RecordType, null)
             };
         }
@@ -486,6 +488,16 @@ namespace Texnomic.SecureDNS.Serialization
                         Set(in Stream, in SOA);
                         break;
                     }
+                case SRV SRV:
+                    {
+                        Set(in Stream, in SRV);
+                        break;
+                    }
+                case DNSKEY DNSKEY:
+                    {
+                        Set(in Stream, in DNSKEY);
+                        break;
+                    }
                 default:
                     throw new ArgumentOutOfRangeException(nameof(Record), Record, null);
             }
@@ -493,24 +505,20 @@ namespace Texnomic.SecureDNS.Serialization
 
         private static ushort SizeOf(in SortedSet<string> Pointers, IRecord Record)
         {
-            switch (Record)
+            return Record switch
             {
-                case A A:
-                    {
-                        return SizeOf(in A);
-                    }
-                case CNAME CNAME:
-                    {
-                        return SizeOf(in Pointers, in CNAME);
-                    }
-                case AAAA AAAA:
-                    {
-                        return SizeOf(in AAAA);
-                    }
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(Record), Record, null);
-            }
+                A A => SizeOf(in A),
+                CNAME CNAME => SizeOf(in Pointers, in CNAME),
+                AAAA AAAA => SizeOf(in AAAA),
+                TXT TXT => SizeOf(in TXT),
+                MX MX => SizeOf(in Pointers, in MX),
+                NS NS => SizeOf(in Pointers, in NS),
+                PTR PTR => SizeOf(in Pointers, in PTR),
+                SOA SOA => SizeOf(in Pointers, in SOA),
+                SRV SRV => SizeOf(in Pointers, in SRV),
+                DNSKEY DNSKEY => SizeOf(in DNSKEY),
+                _ => throw new ArgumentOutOfRangeException(nameof(Record), Record, null)
+            };
         }
 
         #endregion
@@ -585,7 +593,7 @@ namespace Texnomic.SecureDNS.Serialization
 
         private static ICharacterString GetCharacterString(in DnStream Stream)
         {
-            var Length = Stream.GetByte();
+            var Length = Stream.ReadByte();
 
             return new CharacterString()
             {
@@ -596,7 +604,7 @@ namespace Texnomic.SecureDNS.Serialization
 
         private static void Set(in DnStream Stream, in ICharacterString CharacterString)
         {
-            Stream.SetByte(CharacterString.Length);
+            Stream.WriteByte(CharacterString.Length);
             Stream.WriteString(CharacterString.Value);
         }
 
@@ -611,7 +619,7 @@ namespace Texnomic.SecureDNS.Serialization
         {
             return new Certificate()
             {
-                Length = Stream.GetByte(),
+                Length = Stream.ReadByte(),
                 Magic = Stream.ReadString(4),
                 Version = Stream.ReadUShort().AsEnum<ESVersion>(),
                 MinorVersion = Stream.ReadUShort(),
@@ -621,13 +629,13 @@ namespace Texnomic.SecureDNS.Serialization
                 Serial = Stream.ReadInt32(),
                 StartTimeStamp = Stream.ReadEpoch(),
                 EndTimeStamp = Stream.ReadEpoch(),
-                //Extensions = Stream.GetBytes()
+                Extensions = Stream.ReadBytesToEnd().ToArray()
             };
         }
 
         private static void Set(in DnStream Stream, in ICertificate Certificate)
         {
-            Stream.SetByte(Certificate.Length);
+            Stream.WriteByte(Certificate.Length);
             Stream.WriteString(Certificate.Magic);
             Stream.WriteUShort((ushort)Certificate.Version);
             Stream.WriteUShort(Certificate.MinorVersion);
@@ -637,7 +645,7 @@ namespace Texnomic.SecureDNS.Serialization
             Stream.WriteInt32(Certificate.Serial);
             Stream.WriteEpoch(Certificate.StartTimeStamp);
             Stream.WriteEpoch(Certificate.EndTimeStamp);
-            //Stream.SetBytes(Certificate.Extensions);
+            Stream.WriteBytes(Certificate.Extensions);
         }
 
         private static ushort SizeOf(in ICertificate Certificate)
@@ -649,7 +657,7 @@ namespace Texnomic.SecureDNS.Serialization
 
         private static TXT GetTXT(in DnStream Stream)
         {
-            var Length = Stream.GetByte();
+            var Length = Stream.ReadByte();
 
             var Magic = Stream.ReadString(4);
 
@@ -681,7 +689,7 @@ namespace Texnomic.SecureDNS.Serialization
             }
         }
 
-        private static ushort SizeOf(in DnStream Stream, in TXT TXT)
+        private static ushort SizeOf(in TXT TXT)
         {
             return TXT.Certificate is null ? SizeOf(TXT.Text) : SizeOf(TXT.Certificate);
         }
@@ -786,6 +794,75 @@ namespace Texnomic.SecureDNS.Serialization
         private static ushort SizeOf(in SortedSet<string> Pointers, in SOA SOA)
         {
             return (ushort)(SizeOf(in Pointers, SOA.PrimaryNameServer) + SizeOf(in Pointers, SOA.ResponsibleAuthorityMailbox) + 4 * 5);
+        }
+
+        #endregion
+
+        #region SRV
+
+        private static SRV GetSRV(in DnStream Stream)
+        {
+            return new SRV()
+            {
+                Priority = Stream.ReadUShort(),
+                Weight = Stream.ReadUShort(),
+                Port = Stream.ReadUShort(),
+                Target = GetDomain(in Stream)
+            };
+        }
+
+        private static void Set(in DnStream Stream, in SRV SRV)
+        {
+            Stream.WriteUShort(SRV.Priority);
+            Stream.WriteUShort(SRV.Weight);
+            Stream.WriteUShort(SRV.Port);
+            Set(in Stream, SRV.Target);
+        }
+
+        private static ushort SizeOf(in SortedSet<string> Pointers, in SRV SRV)
+        {
+            return (ushort)(2 * 3 + SizeOf(in Pointers, SRV.Target));
+        }
+
+        #endregion
+
+        #region DNSKEY
+
+        private static Base64String GetBase64String(in DnStream Stream)
+        {
+            return new Base64String()
+            {
+                Bytes = Stream.ReadBytesToEnd().ToArray()
+            };
+        }
+
+        private static DNSKEY GetDNSKEY(in DnStream Stream)
+        {
+            return new DNSKEY()
+            {
+                Flags = (ushort)(Stream.ReadByte() + Stream.ReadBits(7)),
+                SecureEntryPoint = Stream.ReadBit().AsBool(),
+                Algorithm = Stream.ReadByte().AsEnum<Algorithm>(),
+                Protocol = Stream.ReadByte(),
+                PublicKey = GetBase64String(in Stream)
+            };
+        }
+
+        private static void Set(in DnStream Stream, in DNSKEY DNSKEY)
+        {
+            var Flags = new byte[2];
+            BinaryPrimitives.WriteUInt16BigEndian(Flags, DNSKEY.Flags);
+            Stream.WriteByte(Flags[0]);
+            Stream.WriteBits(7, Flags[1]);
+            Stream.WriteBit(DNSKEY.SecureEntryPoint.AsByte());
+            Stream.WriteByte((byte)DNSKEY.Algorithm);
+            Stream.WriteByte(DNSKEY.Protocol);
+            Stream.WriteBytes(DNSKEY.PublicKey.Bytes);
+        }
+
+        private static ushort SizeOf(in DNSKEY DNSKEY)
+        {
+            return (ushort)(4 + DNSKEY.PublicKey.Bytes.Length);
         }
 
         #endregion

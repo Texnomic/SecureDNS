@@ -45,18 +45,23 @@ namespace Texnomic.SecureDNS.Serialization
             return Raw.Span.IndexOf(Bytes);
         }
 
-        
-        private Span<byte> GetSpan(ushort Length)
+
+        private Span<byte> ReadSpan(ushort Length)
         {
             return Raw.Slice(ByteIndex, Length).Span;
         }
 
-        private Span<byte> GetSpan(int Length)
+        private Span<byte> ReadSpanToEnd()
+        {
+            return Raw.Slice(ByteIndex).Span;
+        }
+
+        private Span<byte> ReadSpan(int Length)
         {
             return Raw.Slice(ByteIndex, Length).Span;
         }
 
-        public byte GetBits(byte Length)
+        public byte ReadBits(byte Length)
         {
             var Byte = Raw.Span[ByteIndex].GetBits((byte)BitIndex, Length);
 
@@ -71,7 +76,7 @@ namespace Texnomic.SecureDNS.Serialization
             return Byte;
         }
 
-        public void SetBits(byte Length, byte Value)
+        public void WriteBits(byte Length, byte Value)
         {
             Raw.Span[ByteIndex] = Raw.Span[ByteIndex].SetBits((byte)BitIndex, Length, Value);
 
@@ -84,7 +89,7 @@ namespace Texnomic.SecureDNS.Serialization
             }
         }
 
-        public byte GetBit()
+        public byte ReadBit()
         {
             var Byte = Raw.Span[ByteIndex].GetBit((byte)BitIndex);
 
@@ -99,7 +104,7 @@ namespace Texnomic.SecureDNS.Serialization
             return Byte;
         }
 
-        public void SetBit(byte Value)
+        public void WriteBit(byte Value)
         {
             Raw.Span[ByteIndex] = Raw.Span[ByteIndex].SetBit((byte)BitIndex, Value);
 
@@ -112,17 +117,17 @@ namespace Texnomic.SecureDNS.Serialization
             }
         }
 
-        public byte GetByte()
+        public byte ReadByte()
         {
             var Byte = Raw.Span[ByteIndex];
 
-            
+
             ByteIndex += 1;
 
             return Byte;
         }
 
-        public void SetByte(byte Value)
+        public void WriteByte(byte Value)
         {
             Raw.Span[ByteIndex] = Value;
 
@@ -131,23 +136,32 @@ namespace Texnomic.SecureDNS.Serialization
 
         public ReadOnlySpan<byte> ReadBytes(ushort Length)
         {
-            var Bytes = GetSpan(Length);
+            var Bytes = ReadSpan(Length);
 
             ByteIndex += Length;
 
             return Bytes;
         }
 
+        public ReadOnlySpan<byte> ReadBytesToEnd()
+        {
+            var Bytes = ReadSpanToEnd();
+
+            ByteIndex = Raw.Length - 1;
+
+            return Bytes;
+        }
+
         public void WriteBytes(Span<byte> Bytes)
         {
-            Bytes.CopyTo(GetSpan(Bytes.Length));
+            Bytes.CopyTo(ReadSpan(Bytes.Length));
 
             ByteIndex += Bytes.Length;
         }
 
         public void WriteBytes(ReadOnlySpan<byte> Bytes)
         {
-            Bytes.CopyTo(GetSpan(Bytes.Length));
+            Bytes.CopyTo(ReadSpan(Bytes.Length));
 
             ByteIndex += Bytes.Length;
         }
@@ -159,7 +173,7 @@ namespace Texnomic.SecureDNS.Serialization
 
         public void WriteShort(short Value)
         {
-            BinaryPrimitives.WriteInt16BigEndian(GetSpan(2), Value);
+            BinaryPrimitives.WriteInt16BigEndian(ReadSpan(2), Value);
 
             ByteIndex += 2;
         }
@@ -171,7 +185,7 @@ namespace Texnomic.SecureDNS.Serialization
 
         public void WriteUShort(ushort Value)
         {
-            BinaryPrimitives.WriteUInt16BigEndian(GetSpan(2), Value);
+            BinaryPrimitives.WriteUInt16BigEndian(ReadSpan(2), Value);
 
             ByteIndex += 2;
         }
@@ -183,7 +197,7 @@ namespace Texnomic.SecureDNS.Serialization
 
         public void WriteInt32(int Value)
         {
-            BinaryPrimitives.WriteInt32BigEndian(GetSpan(4), Value);
+            BinaryPrimitives.WriteInt32BigEndian(ReadSpan(4), Value);
 
             ByteIndex += 4;
         }
@@ -195,7 +209,7 @@ namespace Texnomic.SecureDNS.Serialization
 
         public void WriteUInt32(uint Value)
         {
-            BinaryPrimitives.WriteUInt32BigEndian(GetSpan(4), Value);
+            BinaryPrimitives.WriteUInt32BigEndian(ReadSpan(4), Value);
 
             ByteIndex += 4;
         }
@@ -207,7 +221,7 @@ namespace Texnomic.SecureDNS.Serialization
 
         public void WriteLong(long Value)
         {
-            BinaryPrimitives.WriteInt64BigEndian(GetSpan(8), Value);
+            BinaryPrimitives.WriteInt64BigEndian(ReadSpan(8), Value);
 
             ByteIndex += 8;
         }
@@ -219,7 +233,7 @@ namespace Texnomic.SecureDNS.Serialization
 
         public void WriteULong(ulong Value)
         {
-            BinaryPrimitives.WriteUInt64BigEndian(GetSpan(8), Value);
+            BinaryPrimitives.WriteUInt64BigEndian(ReadSpan(8), Value);
 
             ByteIndex += 8;
         }
@@ -243,7 +257,7 @@ namespace Texnomic.SecureDNS.Serialization
         {
             var Bytes = Encoding.ASCII.GetBytes(Value);
 
-            Bytes.CopyTo(GetSpan(Bytes.Length));
+            Bytes.CopyTo(ReadSpan(Bytes.Length));
 
             ByteIndex += Bytes.Length;
         }

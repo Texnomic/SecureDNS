@@ -47,6 +47,11 @@ namespace Texnomic.SecureDNS.Serialization.Extensions
             return Byte;
         }
 
+        public static byte AsByte(this bool Bool)
+        {
+            return Convert.ToByte(Bool);
+        }
+
         public static bool AsBool(this byte Byte)
         {
             return Byte == 1;

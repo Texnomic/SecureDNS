@@ -91,13 +91,13 @@ namespace Texnomic.DNS.Models
 
             while (true)
             {
-                var LabelType = Stream.GetBits(2).AsEnum<LabelType>();
+                var LabelType = Stream.ReadBits(2).AsEnum<LabelType>();
 
                 switch (LabelType)
                 {
                     case LabelType.Normal:
                         {
-                            var Length = Stream.GetBits(6);
+                            var Length = Stream.ReadBits(6);
 
                             if (Length == 0)
                                 return Labels;
@@ -116,7 +116,7 @@ namespace Texnomic.DNS.Models
                         }
                     case LabelType.Compressed:
                         {
-                            var Pointer = (ushort)(Stream.GetBits(6) + Stream.GetByte());
+                            var Pointer = (ushort)(Stream.ReadBits(6) + Stream.ReadByte());
 
                             if (Pointer >= Stream.BytePosition - 2)
                                 throw new ArgumentOutOfRangeException(nameof(Pointer), Pointer, "Compressed Label Infinite Loop Detected.");
