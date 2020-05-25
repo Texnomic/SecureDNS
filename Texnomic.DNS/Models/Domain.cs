@@ -11,6 +11,8 @@ using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Extensions;
 using Texnomic.DNS.Records;
+using Texnomic.SecureDNS.Serialization;
+using Texnomic.SecureDNS.Serialization.Extensions;
 
 namespace Texnomic.DNS.Models
 {
@@ -30,61 +32,123 @@ namespace Texnomic.DNS.Models
 
         public void Serialize(Stream Stream, Endianness Endianness, BinarySerializationContext Context)
         {
-            const byte NullOctet = 0b00000000;
-
-            var Domain = (Domain)Context.Value;
-
-            foreach (var Label in Domain.Labels)
+            foreach (var Label in Labels)
             {
-                var Flag = (ushort)Label.Type << 6;
+                switch (Label.Type)
+                {
+                    case LabelType.Normal:
+                        {
+                            var Flag = (ushort) Label.Type << 6;
 
-                var FlagSize = (byte)(Flag + Label.Count);
+                            var FlagSize = (byte) (Flag + Label.Count);
 
-                Stream.WriteByte(FlagSize);
+                            Stream.WriteByte(FlagSize);
 
-                var Bytes = Encoding.ASCII.GetBytes(Label.Text);
+                            var Bytes = Encoding.ASCII.GetBytes(Label.Text);
 
-                Stream.Write(Bytes, 0, Bytes.Length);
+                            Stream.Write(Bytes, 0, Bytes.Length);
+
+                            continue;
+                        }
+                    case LabelType.Compressed:
+                        {
+                            var Flag = (ushort) Label.Type << 6;
+
+                            var FlagOffset = (byte) (Flag + Label.Offset);
+
+                            Stream.WriteByte(FlagOffset);
+
+                            return;
+                        }
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(LabelType), Label.Type, null);
+                }
             }
 
-            Stream.WriteByte(NullOctet);
+            Stream.WriteByte(0);
         }
 
         public void Deserialize(Stream Stream, Endianness Endianness, BinarySerializationContext Context)
         {
-            var BoundStream = (BoundedStream)Stream;
+            var MemoryStream = GetRootStream(Stream);
 
-            var Packet = GetPacket(BoundStream);
+            var Bytes = MemoryStream.ToArray();
 
+            var DnStream = new DnStream(in Bytes);
+
+            DnStream.Seek((ushort)MemoryStream.Position);
+
+            Labels = GetLabels(DnStream);
+
+            var BoundStream = Stream as BoundedStream;
+
+            BoundStream.Seek(DnStream.BytePosition + 1, SeekOrigin.Begin);
         }
 
-        private static byte[] GetPacket(BoundedStream BoundedStream)
+        private static List<ILabel> GetLabels(DnStream Stream)
         {
-            var Root = GetRootStream(BoundedStream);
-
-            return Root.ToArray();
-        }
-
-        private static MemoryStream GetRootStream(BoundedStream BoundedStream)
-        {
-            var Root = BoundedStream.Source;
+            var Labels = new List<ILabel>();
 
             while (true)
             {
-                switch (Root)
-                {
-                    case BoundedStream Bounded:
-                    {
-                        Root = Bounded.Source;
+                var LabelType = Stream.GetBits(2).AsEnum<LabelType>();
 
-                        continue;
-                    }
-                    case MemoryStream Memory:
-                    {
-                        return Memory;
-                    }
+                switch (LabelType)
+                {
+                    case LabelType.Normal:
+                        {
+                            var Length = Stream.GetBits(6);
+
+                            if (Length == 0)
+                                return Labels;
+
+                            var Label = new Label()
+                            {
+                                Type = LabelType,
+                                Count = Length,
+                                Offset = Stream.BytePosition,
+                                Text = Stream.ReadString(Length)
+                            };
+
+                            Labels.Add(Label);
+
+                            break;
+                        }
+                    case LabelType.Compressed:
+                        {
+                            var Pointer = (ushort)(Stream.GetBits(6) + Stream.GetByte());
+
+                            if (Pointer >= Stream.BytePosition - 2)
+                                throw new ArgumentOutOfRangeException(nameof(Pointer), Pointer, "Compressed Label Infinite Loop Detected.");
+
+                            var Position = Stream.BytePosition;
+
+                            Stream.Seek(Pointer);
+
+                            var CompressedLabels = GetLabels(Stream).ToList();
+
+                            CompressedLabels.ForEach(Label => Label.Type = LabelType);
+
+                            Labels.AddRange(CompressedLabels);
+
+                            Stream.Seek(Position);
+
+                            return Labels;
+                        }
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(LabelType), LabelType, null);
                 }
             }
+        }
+
+        private static MemoryStream GetRootStream(Stream Stream)
+        {
+            while (Stream is BoundedStream BoundedStream)
+            {
+                Stream = BoundedStream.Source;
+            }
+
+            return Stream as MemoryStream;
         }
 
         public byte[] ToArray()

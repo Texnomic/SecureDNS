@@ -2,6 +2,7 @@
 using System.Buffers;
 using System.Text;
 using System.Buffers.Binary;
+using System.IO;
 using System.Net;
 using Texnomic.SecureDNS.Serialization.Extensions;
 

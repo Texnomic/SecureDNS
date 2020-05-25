@@ -3,8 +3,10 @@ using System.Buffers.Binary;
 using Texnomic.SecureDNS.Core;
 using Texnomic.SecureDNS.Core.DataTypes;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using Texnomic.SecureDNS.Abstractions;
 using Texnomic.SecureDNS.Abstractions.Enums;
 using Texnomic.SecureDNS.Core.Records;
@@ -99,6 +101,8 @@ namespace Texnomic.SecureDNS.Serialization
             return Size;
         }
 
+        #region Questions
+
         private static IEnumerable<IQuestion> GetQuestions(in DnStream Stream, ushort Count)
         {
             var Questions = new List<IQuestion>();
@@ -108,8 +112,7 @@ namespace Texnomic.SecureDNS.Serialization
                 var Question = GetQuestion(in Stream);
 
                 Questions.Add(Question);
-            }
-            while (Questions.Count < Count);
+            } while (Questions.Count < Count);
 
             return Questions;
         }
@@ -133,6 +136,10 @@ namespace Texnomic.SecureDNS.Serialization
 
             return Size;
         }
+
+        #endregion
+
+        #region Question
 
         private static IQuestion GetQuestion(in DnStream Stream)
         {
@@ -162,6 +169,10 @@ namespace Texnomic.SecureDNS.Serialization
             return (ushort)(Size + 4);
         }
 
+        #endregion
+
+        #region Domain
+
         private static IDomain GetDomain(in DnStream Stream)
         {
             var Domain = new Domain()
@@ -185,9 +196,9 @@ namespace Texnomic.SecureDNS.Serialization
 
             foreach (var Label in Domain.Labels)
             {
-                Stream.SetBits(2, (byte) LabelType.Normal);
+                Stream.SetBits(2, (byte)LabelType.Normal);
 
-                Stream.SetBits(6, (byte) Label.Length);
+                Stream.SetBits(6, (byte)Label.Length);
 
                 Stream.WriteString(Label);
             }
@@ -324,6 +335,10 @@ namespace Texnomic.SecureDNS.Serialization
             return Size;
         }
 
+        #endregion
+
+        #region Answers
+
         private static IEnumerable<IAnswer> GetAnswers(in DnStream Stream, ushort Count)
         {
             var Answers = new List<IAnswer>();
@@ -333,13 +348,13 @@ namespace Texnomic.SecureDNS.Serialization
                 var Answer = GetAnswer(in Stream);
 
                 Answers.Add(Answer);
-            }
-            while (Answers.Count < Count);
+            } while (Answers.Count < Count);
 
             return Answers;
         }
 
-        private static void Set(in DnStream Stream, in Dictionary<string, ushort> Pointers, IEnumerable<IAnswer> Answers)
+        private static void Set(in DnStream Stream, in Dictionary<string, ushort> Pointers,
+            IEnumerable<IAnswer> Answers)
         {
             foreach (var Answer in Answers)
             {
@@ -358,6 +373,10 @@ namespace Texnomic.SecureDNS.Serialization
 
             return Size;
         }
+
+        #endregion
+
+        #region Answer
 
         private static IAnswer GetAnswer(in DnStream Stream)
         {
@@ -403,6 +422,10 @@ namespace Texnomic.SecureDNS.Serialization
             return Size;
         }
 
+        #endregion
+
+        #region Record
+
         private static IRecord GetRecord(in DnStream Stream, RecordType RecordType)
         {
             return RecordType switch
@@ -410,6 +433,11 @@ namespace Texnomic.SecureDNS.Serialization
                 RecordType.A => GetA(in Stream),
                 RecordType.CNAME => GetCNAME(in Stream),
                 RecordType.AAAA => GetAAAA(in Stream),
+                RecordType.TXT => GetTXT(in Stream),
+                RecordType.MX => GetMX(in Stream),
+                RecordType.NS => GetNS(in Stream),
+                RecordType.PTR => GetPTR(in Stream),
+                RecordType.SOA => GetSOA(in Stream),
                 _ => throw new ArgumentOutOfRangeException(nameof(RecordType), RecordType, null)
             };
         }
@@ -433,7 +461,31 @@ namespace Texnomic.SecureDNS.Serialization
                         Set(in Stream, in AAAA);
                         break;
                     }
-
+                case TXT TXT:
+                    {
+                        Set(in Stream, in TXT);
+                        break;
+                    }
+                case MX MX:
+                    {
+                        Set(in Stream, in MX);
+                        break;
+                    }
+                case NS NS:
+                    {
+                        Set(in Stream, in NS);
+                        break;
+                    }
+                case PTR PTR:
+                    {
+                        Set(in Stream, in PTR);
+                        break;
+                    }
+                case SOA SOA:
+                    {
+                        Set(in Stream, in SOA);
+                        break;
+                    }
                 default:
                     throw new ArgumentOutOfRangeException(nameof(Record), Record, null);
             }
@@ -461,23 +513,9 @@ namespace Texnomic.SecureDNS.Serialization
             }
         }
 
-        private static CNAME GetCNAME(in DnStream Stream)
-        {
-            return new CNAME()
-            {
-                Domain = GetDomain(in Stream)
-            };
-        }
+        #endregion
 
-        private static void Set(in DnStream Stream, in Dictionary<string, ushort> Pointers, in CNAME CNAME)
-        {
-            Set(in Stream, in Pointers, CNAME.Domain);
-        }
-
-        private static ushort SizeOf(in SortedSet<string> Pointers, in CNAME CNAME)
-        {
-            return SizeOf(in Pointers, CNAME.Domain);
-        }
+        #region A
 
         private static A GetA(in DnStream Stream)
         {
@@ -497,6 +535,32 @@ namespace Texnomic.SecureDNS.Serialization
             return 4;
         }
 
+        #endregion
+
+        #region CNAME
+
+        private static CNAME GetCNAME(in DnStream Stream)
+        {
+            return new CNAME()
+            {
+                Domain = GetDomain(in Stream)
+            };
+        }
+
+        private static void Set(in DnStream Stream, in Dictionary<string, ushort> Pointers, in CNAME CNAME)
+        {
+            Set(in Stream, in Pointers, CNAME.Domain);
+        }
+
+        private static ushort SizeOf(in SortedSet<string> Pointers, in CNAME CNAME)
+        {
+            return SizeOf(in Pointers, CNAME.Domain);
+        }
+
+        #endregion
+
+        #region AAAA
+
         private static AAAA GetAAAA(in DnStream Stream)
         {
             return new AAAA()
@@ -514,6 +578,10 @@ namespace Texnomic.SecureDNS.Serialization
         {
             return 8;
         }
+
+        #endregion
+
+        #region TXT
 
         private static ICharacterString GetCharacterString(in DnStream Stream)
         {
@@ -537,10 +605,13 @@ namespace Texnomic.SecureDNS.Serialization
             return (ushort)(CharacterString.Length + 1);
         }
 
+
+
         private static Certificate GetCertificate(in DnStream Stream)
         {
             return new Certificate()
             {
+                Length = Stream.GetByte(),
                 Magic = Stream.ReadString(4),
                 Version = Stream.ReadUShort().AsEnum<ESVersion>(),
                 MinorVersion = Stream.ReadUShort(),
@@ -556,6 +627,7 @@ namespace Texnomic.SecureDNS.Serialization
 
         private static void Set(in DnStream Stream, in ICertificate Certificate)
         {
+            Stream.SetByte(Certificate.Length);
             Stream.WriteString(Certificate.Magic);
             Stream.WriteUShort((ushort)Certificate.Version);
             Stream.WriteUShort(Certificate.MinorVersion);
@@ -572,5 +644,150 @@ namespace Texnomic.SecureDNS.Serialization
         {
             return (ushort)(124 + Certificate.Extensions.Length);
         }
+
+
+
+        private static TXT GetTXT(in DnStream Stream)
+        {
+            var Length = Stream.GetByte();
+
+            var Magic = Stream.ReadString(4);
+
+            Stream.Seek((ushort)(Stream.BytePosition - 5));
+
+            if (Magic == "DNSC")
+            {
+                return new TXT()
+                {
+                    Certificate = GetCertificate(in Stream)
+                };
+            }
+
+            return new TXT()
+            {
+                Text = GetCharacterString(in Stream)
+            };
+        }
+
+        private static void Set(in DnStream Stream, in TXT TXT)
+        {
+            if (TXT.Certificate is null)
+            {
+                Set(in Stream, TXT.Text);
+            }
+            else
+            {
+                Set(in Stream, TXT.Certificate);
+            }
+        }
+
+        private static ushort SizeOf(in DnStream Stream, in TXT TXT)
+        {
+            return TXT.Certificate is null ? SizeOf(TXT.Text) : SizeOf(TXT.Certificate);
+        }
+
+        #endregion
+
+        #region MX
+
+        private static MX GetMX(in DnStream Stream)
+        {
+            return new MX()
+            {
+                Preference = Stream.ReadShort(),
+                Exchange = GetDomain(in Stream)
+            };
+        }
+
+        private static void Set(in DnStream Stream, in MX MX)
+        {
+            Stream.WriteShort(MX.Preference);
+            Set(in Stream, MX.Exchange);
+        }
+
+        private static ushort SizeOf(in SortedSet<string> Pointers, in MX MX)
+        {
+            return (ushort)(2 + SizeOf(Pointers, MX.Exchange));
+        }
+
+        #endregion
+
+        #region NS
+
+        private static NS GetNS(in DnStream Stream)
+        {
+            return new NS()
+            {
+                Domain = GetDomain(in Stream)
+            };
+        }
+
+        private static void Set(in DnStream Stream, in NS NS)
+        {
+            Set(in Stream, NS.Domain);
+        }
+
+        private static ushort SizeOf(in SortedSet<string> Pointers, in NS NS)
+        {
+            return SizeOf(in Pointers, NS.Domain);
+        }
+
+        #endregion
+
+        #region PTR
+
+        private static PTR GetPTR(in DnStream Stream)
+        {
+            return new PTR()
+            {
+                Domain = GetDomain(in Stream)
+            };
+        }
+
+        private static void Set(in DnStream Stream, in PTR PTR)
+        {
+            Set(in Stream, PTR.Domain);
+        }
+
+        private static ushort SizeOf(in SortedSet<string> Pointers, in PTR PTR)
+        {
+            return SizeOf(in Pointers, PTR.Domain);
+        }
+
+        #endregion
+
+        #region SOA
+
+        private static SOA GetSOA(in DnStream Stream)
+        {
+            return new SOA()
+            {
+                PrimaryNameServer = GetDomain(in Stream),
+                ResponsibleAuthorityMailbox = GetDomain(in Stream),
+                SerialNumber = Stream.ReadUInt32(),
+                RefreshInterval = Stream.ReadTimeSpan(),
+                RetryInterval = Stream.ReadTimeSpan(),
+                ExpiryLimit = Stream.ReadTimeSpan(),
+                TimeToLive = Stream.ReadTimeSpan(),
+            };
+        }
+
+        private static void Set(in DnStream Stream, in SOA SOA)
+        {
+            Set(in Stream, SOA.PrimaryNameServer);
+            Set(in Stream, SOA.ResponsibleAuthorityMailbox);
+            Stream.WriteUInt32(SOA.SerialNumber);
+            Stream.WriteTimeSpan(SOA.RefreshInterval);
+            Stream.WriteTimeSpan(SOA.RetryInterval);
+            Stream.WriteTimeSpan(SOA.ExpiryLimit);
+            Stream.WriteTimeSpan(SOA.TimeToLive);
+        }
+
+        private static ushort SizeOf(in SortedSet<string> Pointers, in SOA SOA)
+        {
+            return (ushort)(SizeOf(in Pointers, SOA.PrimaryNameServer) + SizeOf(in Pointers, SOA.ResponsibleAuthorityMailbox) + 4 * 5);
+        }
+
+        #endregion
     }
 }

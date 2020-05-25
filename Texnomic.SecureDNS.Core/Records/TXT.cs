@@ -16,9 +16,9 @@ namespace Texnomic.SecureDNS.Core.Records
     [LogAsScalar(true)]
     public class TXT : IRecord
     {
-        public CharacterString Text { get; set; }
+        public ICharacterString Text { get; set; }
 
-        public Certificate Certificate { get; set; }
+        public ICertificate Certificate { get; set; }
 
         public static implicit operator string(TXT TXT)
         {
@@ -29,7 +29,11 @@ namespace Texnomic.SecureDNS.Core.Records
         {
             return new TXT()
             {
-                Text = Text
+                Text = new CharacterString()
+                {
+                    Length = (byte)Text.Length,
+                    Value = Text
+                }
             };
         }
 

@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Destructurama.Attributed" Version="2.0.0" />
+    <PackageReference Include="System.Text.Json" Version="4.7.1" />
   </ItemGroup>
 
   <ItemGroup>

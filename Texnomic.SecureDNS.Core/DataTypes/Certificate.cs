@@ -6,6 +6,8 @@ namespace Texnomic.SecureDNS.Core.DataTypes
 {
     public class Certificate: ICertificate
     {
+        public byte Length { get; set; }
+
         public string Magic { get; set; }
 
         public ESVersion Version { get; set; }

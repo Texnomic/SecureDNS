@@ -5,6 +5,8 @@ namespace Texnomic.SecureDNS.Abstractions
 {
     public interface ICertificate
     {
+        byte Length { get; set; }
+
         string Magic { get; set; }
 
         ESVersion Version { get; set; }
