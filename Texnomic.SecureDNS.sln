@@ -69,6 +69,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.Chaos.NaCl", "Texn
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Texnomic.SecureDNS.Terminal.Installer", "Texnomic.SecureDNS.Terminal.Installer\Texnomic.SecureDNS.Terminal.Installer.vdproj", "{1B03AE42-6F4A-4850-87E9-BE35B86D209A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Texnomic.SecureDNS.Protocols", "Texnomic.SecureDNS.Protocols\Texnomic.SecureDNS.Protocols.csproj", "{86634C81-4B00-4578-8ABB-D39286F393E5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -181,6 +183,10 @@ Global
 		{457650AA-B063-4376-9BE3-905E4EECD21B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1B03AE42-6F4A-4850-87E9-BE35B86D209A}.Debug|Any CPU.ActiveCfg = Debug
 		{1B03AE42-6F4A-4850-87E9-BE35B86D209A}.Release|Any CPU.ActiveCfg = Release
+		{86634C81-4B00-4578-8ABB-D39286F393E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86634C81-4B00-4578-8ABB-D39286F393E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86634C81-4B00-4578-8ABB-D39286F393E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86634C81-4B00-4578-8ABB-D39286F393E5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

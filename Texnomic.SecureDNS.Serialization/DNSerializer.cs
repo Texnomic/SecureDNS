@@ -101,6 +101,17 @@ namespace Texnomic.SecureDNS.Serialization
             return Size;
         }
 
+        public static byte[] Serialize(in ICertificate Certificate)
+        {
+            var Size = SizeOf(in Certificate);
+
+            var Stream = new DnStream(Size);
+
+            Set(in Stream, Certificate);
+
+            return Stream.ToArray();
+        }
+
         #region Questions
 
         private static IEnumerable<IQuestion> GetQuestions(in DnStream Stream, ushort Count)
@@ -348,7 +359,8 @@ namespace Texnomic.SecureDNS.Serialization
                 var Answer = GetAnswer(in Stream);
 
                 Answers.Add(Answer);
-            } while (Answers.Count < Count);
+            }
+            while (Answers.Count < Count);
 
             return Answers;
         }
@@ -689,7 +701,7 @@ namespace Texnomic.SecureDNS.Serialization
             }
         }
 
-        private static ushort SizeOf(in TXT TXT)
+        public static ushort SizeOf(in TXT TXT)
         {
             return TXT.Certificate is null ? SizeOf(TXT.Text) : SizeOf(TXT.Certificate);
         }

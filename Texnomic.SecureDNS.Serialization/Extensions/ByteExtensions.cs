@@ -54,7 +54,7 @@ namespace Texnomic.SecureDNS.Serialization.Extensions
 
         public static bool AsBool(this byte Byte)
         {
-            return Byte == 1;
+            return Convert.ToBoolean(Byte);
         }
 
         public static TEnum AsEnum<TEnum>(this byte Byte) where TEnum : Enum

@@ -14,6 +14,8 @@ namespace Texnomic.SecureDNS.Core.DataTypes
             Labels = new List<string>();
         }
 
+        public string Name => ToString();
+
         public static implicit operator string(Domain Domain)
         {
             return Domain?.ToString();
