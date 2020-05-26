@@ -5,18 +5,18 @@ using Texnomic.SecureDNS.Abstractions.Enums;
 
 namespace Texnomic.SecureDNS.Core.DataTypes
 {
-    public class Stamp
+    public class DnStamp : IDnStamp
     {
         public StampProtocol Protocol { get; set; }
 
         public IStamp Value { get; set; }
 
-        public static Stamp FromString(string Stamp)
+        public static DnStamp FromString(string Stamp)
         {
             throw new NotImplementedException();
         }
 
-        public static async Task<Stamp> FromStringAsync(string Stamp)
+        public static async Task<IDnStamp> FromStringAsync(string Stamp)
         {
             throw new NotImplementedException();
         }

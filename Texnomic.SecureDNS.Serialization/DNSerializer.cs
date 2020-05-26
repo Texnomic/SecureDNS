@@ -16,10 +16,27 @@ namespace Texnomic.SecureDNS.Serialization
 {
     public static class DnSerializer
     {
-        public static IMessage Deserialize(in byte[] Raw)
+        public static T Deserialize<T>(in byte[] Raw) 
         {
-            var Stream = new DnStream(in Raw);
+            if (typeof(T) == typeof(Message))
+            {
+                var Stream = new DnStream(in Raw);
 
+                return (T)GetMessage(in Stream);
+            }
+
+            if (typeof(T) == typeof(DnStamp))
+            {
+                var Stream = new DnStream(in Raw);
+
+                return (T)GetStamp(in Stream);
+            }
+
+            throw new ArgumentOutOfRangeException(nameof(T), typeof(T), null);
+        }
+
+        private static IMessage GetMessage(in DnStream Stream)
+        {
             var Message = new Message
             {
                 ID = Stream.ReadUShort(),
@@ -101,7 +118,7 @@ namespace Texnomic.SecureDNS.Serialization
             return Size;
         }
 
-        public static byte[] Serialize(in ICertificate Certificate)
+        public static byte[] Serialize(ICertificate Certificate)
         {
             var Size = SizeOf(in Certificate);
 
@@ -110,6 +127,91 @@ namespace Texnomic.SecureDNS.Serialization
             Set(in Stream, Certificate);
 
             return Stream.ToArray();
+        }
+
+
+        private static IDnStamp GetStamp(in DnStream Stream)
+        {
+            var DnStamp = new DnStamp()
+            {
+                Protocol = Stream.ReadByte().AsEnum<StampProtocol>(),
+            };
+
+            DnStamp.Value = GetStamp(in Stream, DnStamp.Protocol);
+
+            return DnStamp;
+        }
+
+        private static IStamp GetStamp(in DnStream Stream, StampProtocol Protocol)
+        {
+            return Protocol switch
+            {
+                StampProtocol.DNSCrypt => GetDNSCryptStamp(in Stream),
+                _ => throw new ArgumentOutOfRangeException(nameof(StampProtocol), Protocol, null)
+            };
+        }
+
+        private static IStamp GetDNSCryptStamp(in DnStream Stream)
+        {
+            return new DNSCryptStamp()
+            {
+                DnsSec = Stream.ReadByte().AsBool(),
+                NoLog = Stream.ReadByte().AsBool(),
+                NoFilter = Stream.ReadByte().AsBool(),
+                Flags = Stream.ReadBytes(5).ToArray(),
+                Address = Stream.ReadPrefixedString(),
+                PublicKey = Stream.ReadPrefixedBytes().ToArray(),
+                ProviderName = Stream.ReadPrefixedString()
+            };
+        }
+
+        private static IStamp GetDNSCryptRelayStamp(in DnStream Stream)
+        {
+            return new DNSCryptRelayStamp()
+            {
+                Address = Stream.ReadPrefixedString()
+            };
+        }
+
+        private static IStamp GetDoHStamp(in DnStream Stream)
+        {
+            return new DoHStamp()
+            {
+                DnsSec = Stream.ReadByte().AsBool(),
+                NoLog = Stream.ReadByte().AsBool(),
+                NoFilter = Stream.ReadByte().AsBool(),
+                Flags = Stream.ReadBytes(5).ToArray(),
+                Address = Stream.ReadPrefixedString(),
+                Hash = Stream.ReadListPrefixedBytes(),
+                Hostname = Stream.ReadPrefixedString(),
+                Path = Stream.ReadPrefixedString()
+            };
+        }
+
+        private static IStamp GetDoTStamp(in DnStream Stream)
+        {
+            return new DoTStamp()
+            {
+                DnsSec = Stream.ReadByte().AsBool(),
+                NoLog = Stream.ReadByte().AsBool(),
+                NoFilter = Stream.ReadByte().AsBool(),
+                Flags = Stream.ReadBytes(5).ToArray(),
+                Address = Stream.ReadPrefixedString(),
+                Hash = Stream.ReadListPrefixedBytes(),
+                Hostname = Stream.ReadPrefixedString()
+            };
+        }
+
+        private static IStamp GetDoUStamp(in DnStream Stream)
+        {
+            return new DoUStamp()
+            {
+                DnsSec = Stream.ReadByte().AsBool(),
+                NoLog = Stream.ReadByte().AsBool(),
+                NoFilter = Stream.ReadByte().AsBool(),
+                Flags = Stream.ReadBytes(5).ToArray(),
+                Address = Stream.ReadPrefixedString()
+            };
         }
 
         #region Questions

@@ -15,6 +15,6 @@ namespace Texnomic.SecureDNS.Core.DataTypes
 
         public byte[] Flags { get; set; }
 
-        public PrefixedString Address { get; set; }
+        public string Address { get; set; }
     }
 }

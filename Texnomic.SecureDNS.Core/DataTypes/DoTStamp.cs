@@ -5,8 +5,8 @@
     /// </summary>
     public class DoTStamp: DoUStamp
     {
-        public PrefixedArray<PrefixedByteArray> Hash { get; set; }
+        public byte[][] Hash { get; set; }
 
-        public PrefixedString Hostname { get; set; }
+        public string Hostname { get; set; }
     }
 }

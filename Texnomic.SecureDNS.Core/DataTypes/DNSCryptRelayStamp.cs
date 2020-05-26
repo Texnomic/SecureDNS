@@ -7,6 +7,6 @@ namespace Texnomic.SecureDNS.Core.DataTypes
     /// </summary>
     public class DNSCryptRelayStamp : IStamp
     {
-        public PrefixedString Address { get; set; }
+        public string Address { get; set; }
     }
 }

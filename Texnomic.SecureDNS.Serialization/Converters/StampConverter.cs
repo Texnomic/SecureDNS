@@ -5,14 +5,20 @@ using Texnomic.SecureDNS.Core.DataTypes;
 
 namespace Texnomic.SecureDNS.Serialization.Converters
 {
-    public class StampConverter : JsonConverter<Stamp>
+    public class StampConverter : JsonConverter<DnStamp>
     {
-        public override Stamp Read(ref Utf8JsonReader Reader, Type TypeToConvert, JsonSerializerOptions Options)
+        public override DnStamp Read(ref Utf8JsonReader Reader, Type TypeToConvert, JsonSerializerOptions Options)
         {
+            var Stamp = Reader.GetString();
+
+            if (!Stamp.StartsWith("sdns://")) throw new ArgumentException("Stamp Uri Must Start With SDNS://");
+
+            var Bytes = Decode(Stamp[7..]);
+
             throw new NotImplementedException();
         }
 
-        public override void Write(Utf8JsonWriter Writer, Stamp Value, JsonSerializerOptions Options)
+        public override void Write(Utf8JsonWriter Writer, DnStamp Value, JsonSerializerOptions Options)
         {
             throw new NotImplementedException();
         }

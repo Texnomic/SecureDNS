@@ -5,8 +5,8 @@
     /// </summary>
     public class DNSCryptStamp : DoUStamp
     {
-        public PrefixedByteArray PublicKey { get; set; }
+        public byte[] PublicKey { get; set; }
 
-        public PrefixedString ProviderName { get; set; }
+        public string ProviderName { get; set; }
     }
 }

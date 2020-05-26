@@ -1,15 +1,11 @@
-﻿using System;
-using System.Threading.Tasks;
-using BinarySerialization;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Texnomic.DNS.Models;
-using Texnomic.DNS.Extensions;
-
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Texnomic.SecureDNS.Core;
+using Texnomic.SecureDNS.Serialization;
 
 namespace Texnomic.SecureDNS.Tests.Core
 {
     [TestClass]
-    public class BinarySerialization
+    public class Serialization
     {
         [TestMethod]
         public void DeserializeFast()
@@ -38,14 +34,11 @@ namespace Texnomic.SecureDNS.Tests.Core
                 0x23
             };
 
-            var BinarySerializer = new BinarySerializer();
-
-            var ResponseMessage = BinarySerializer.Deserialize<Message>(ResponseBytes);
-
+            var ResponseMessage = DnSerializer.Deserialize<Message>(in ResponseBytes);
         }
 
         [TestMethod]
-        public async Task SerializeFast()
+        public void SerializeFast()
         {
             //api.fast.com A Record
             var ResponseBytes = new byte[]
@@ -71,19 +64,18 @@ namespace Texnomic.SecureDNS.Tests.Core
                 0x23
             };
 
-            var BinarySerializer = new BinarySerializer();
+            var ResponseMessage = DnSerializer.Deserialize<Message>(in ResponseBytes);
 
-            var ResponseMessage = BinarySerializer.Deserialize<Message>(ResponseBytes);
-
-            var Bytes = await BinarySerializer.SerializeAsync(ResponseMessage);
+            var Bytes = DnSerializer.Serialize(ResponseMessage);
 
             for (var I = 0; I < Bytes.Length; I++)
             {
-                if(ResponseBytes[I] != Bytes[I])
-                {
-
-                }
+                Assert.AreEqual(ResponseBytes[I], Bytes[I]);
             }
+
+            var Size = DnSerializer.SizeOf(ResponseMessage);
+
+            Assert.AreEqual(ResponseBytes.Length, Size);
         }
 
         [TestMethod]
@@ -117,14 +109,11 @@ namespace Texnomic.SecureDNS.Tests.Core
                 0xd9, 0x12, 0xee
             };
 
-            var BinarySerializer = new BinarySerializer();
-
-            var ResponseMessage = BinarySerializer.Deserialize<Message>(ResponseBytes);
-
+            var ResponseMessage = DnSerializer.Deserialize<Message>(in ResponseBytes);
         }
 
         [TestMethod]
-        public async Task SerializeYouTube()
+        public void SerializeYouTube()
         {
             //www.youtube.com A Record
             var ResponseBytes = new byte[]
@@ -154,16 +143,18 @@ namespace Texnomic.SecureDNS.Tests.Core
                 0xd9, 0x12, 0xee
             };
 
-            var BinarySerializer = new BinarySerializer();
+            var ResponseMessage = DnSerializer.Deserialize<Message>(in ResponseBytes);
 
-            var ResponseMessage = BinarySerializer.Deserialize<Message>(ResponseBytes);
-
-            var Bytes = await BinarySerializer.SerializeAsync(ResponseMessage);
+            var Bytes = DnSerializer.Serialize(ResponseMessage);
 
             for (var I = 0; I < Bytes.Length; I++)
             {
                 Assert.AreEqual(ResponseBytes[I], Bytes[I]);
             }
+
+            var Size = DnSerializer.SizeOf(ResponseMessage);
+
+            Assert.AreEqual(ResponseBytes.Length, Size);
         }
     }
 }

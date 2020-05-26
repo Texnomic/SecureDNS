@@ -2,6 +2,7 @@
 using System.Buffers;
 using System.Text;
 using System.Buffers.Binary;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using Texnomic.SecureDNS.Serialization.Extensions;
@@ -143,6 +144,27 @@ namespace Texnomic.SecureDNS.Serialization
             return Bytes;
         }
 
+        public ReadOnlySpan<byte> ReadPrefixedBytes()
+        {
+            var Length = ReadByte();
+
+            return ReadBytes(Length);
+        }
+
+        public byte[][] ReadListPrefixedBytes()
+        {
+            var Count = ReadByte();
+
+            var List = new List<byte[]>(Count);
+
+            for (var i = 0; i < Count; i++)
+            {
+                List.Add(ReadPrefixedBytes().ToArray());
+            }
+
+            return List.ToArray();
+        }
+
         public ReadOnlySpan<byte> ReadBytesToEnd()
         {
             var Bytes = ReadSpanToEnd();
@@ -157,6 +179,23 @@ namespace Texnomic.SecureDNS.Serialization
             Bytes.CopyTo(ReadSpan(Bytes.Length));
 
             ByteIndex += Bytes.Length;
+        }
+
+        public void WritePrefixedBytes(Span<byte> Bytes)
+        {
+            WriteByte((byte)Bytes.Length);
+
+            WriteBytes(Bytes);
+        }
+
+        public void WriteListPrefixedBytes(byte[][] Value)
+        {
+            WriteByte((byte)Value.Length);
+
+            foreach (var Array in Value)
+            {
+                WritePrefixedBytes(Array);
+            }
         }
 
         public void WriteBytes(ReadOnlySpan<byte> Bytes)
@@ -243,6 +282,13 @@ namespace Texnomic.SecureDNS.Serialization
             return Encoding.ASCII.GetString(ReadBytes(Length));
         }
 
+        public string ReadPrefixedString()
+        {
+            var Length = ReadByte();
+
+            return ReadString(Length);
+        }
+
         public ReadOnlySpan<char> ReadStringSpan(ushort Length)
         {
             return ReadString(Length).AsSpan();
@@ -260,6 +306,13 @@ namespace Texnomic.SecureDNS.Serialization
             Bytes.CopyTo(ReadSpan(Bytes.Length));
 
             ByteIndex += Bytes.Length;
+        }
+
+        public void WritePrefixedString(string Value)
+        {
+            WriteByte((byte)Value.Length);
+
+            WriteString(Value);
         }
 
         public TimeSpan ReadTimeSpan()

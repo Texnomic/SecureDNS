@@ -5,6 +5,6 @@
     /// </summary>
     public class DoHStamp: DoTStamp
     {
-        public PrefixedString Path { get; set; }
+        public string Path { get; set; }
     }
 }
