@@ -945,7 +945,7 @@ namespace Texnomic.SecureDNS.Serialization
         private static ushort SizeOf(in ICertificate Certificate)
         {
             //return (ushort)(126 + Certificate.Extensions.Length);
-            return 126;
+            return 125;
         }
 
 
