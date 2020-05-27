@@ -64,7 +64,7 @@ namespace Texnomic.SecureDNS.Protocols
                 }
             };
 
-            Stamp = DnSerializer.Deserialize(Options.CurrentValue.Stamp) as DNSCryptStamp;
+            Stamp = DnSerializer.Deserialize(Options.CurrentValue.Stamp).Value as DNSCryptStamp;
 
             IPEndPoint = IPEndPoint.Parse(Stamp.Address);
 
@@ -123,17 +123,24 @@ namespace Texnomic.SecureDNS.Protocols
 
         private bool VerifyServer(IMessage Message)
         {
-            var Record = (TXT)Message.Answers.First().Record;
+            foreach (var Answer in Message.Answers)
+            {
+                var Record = Answer.Record as TXT;
 
-            Certificate = Record.Certificate;
+                Certificate = Record.Certificate;
 
-            var Bytes = DnSerializer.Serialize(Certificate);
+                var Bytes = DnSerializer.Serialize(Certificate);
 
-            var Ed25519 = new Ed25519();
+                var Ed25519 = new Ed25519();
 
-            Ed25519.FromPublicKey(Stamp.PublicKey);
+                Ed25519.FromPublicKey(Stamp.PublicKey);
 
-            return Ed25519.VerifyMessage(Bytes[72..], Certificate.Signature);
+                var Result = Ed25519.VerifyMessage(Bytes[73..], Certificate.Signature);
+
+                if (Result) return true;
+            }
+
+            return false;
         }
 
         private static byte[] GenerateQueryPad(int QueryLength)

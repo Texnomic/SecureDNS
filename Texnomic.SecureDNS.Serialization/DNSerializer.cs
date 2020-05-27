@@ -923,7 +923,7 @@ namespace Texnomic.SecureDNS.Serialization
                 Serial = Stream.ReadInt32(),
                 StartTimeStamp = Stream.ReadEpoch(),
                 EndTimeStamp = Stream.ReadEpoch(),
-                Extensions = Stream.ReadBytesToEnd().ToArray()
+                //Extensions = Stream.ReadBytesToEnd().ToArray()
             };
         }
 
@@ -939,12 +939,13 @@ namespace Texnomic.SecureDNS.Serialization
             Stream.WriteInt32(Certificate.Serial);
             Stream.WriteEpoch(Certificate.StartTimeStamp);
             Stream.WriteEpoch(Certificate.EndTimeStamp);
-            Stream.WriteBytes(Certificate.Extensions);
+            //Stream.WriteBytes(Certificate.Extensions);
         }
 
         private static ushort SizeOf(in ICertificate Certificate)
         {
-            return (ushort)(124 + Certificate.Extensions.Length);
+            //return (ushort)(126 + Certificate.Extensions.Length);
+            return 126;
         }
 
 
