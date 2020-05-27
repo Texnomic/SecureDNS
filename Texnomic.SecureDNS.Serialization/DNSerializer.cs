@@ -482,39 +482,6 @@ namespace Texnomic.SecureDNS.Serialization
             Set(in Stream, in Pointers, Domain.Labels.ToArray());
         }
 
-        private static ReadOnlySpan<byte> Serialize(in IDomain Domain)
-        {
-            var Size = Domain.Labels.Sum(Label => Label.Length) + Domain.Labels.Count();
-
-            var Stream = new DnStream((ushort)Size);
-
-            foreach (var Label in Domain.Labels)
-            {
-                Stream.WriteBits(2, (byte)LabelType.Normal);
-
-                Stream.WriteBits(6, (byte)Label.Length);
-
-                Stream.WriteString(Label);
-            }
-
-            Stream.WriteByte(0);
-
-            return Stream.ToSpan();
-        }
-
-        private static void Set(in DnStream Stream, in IDomain Domain)
-        {
-            var Span = Serialize(in Domain);
-
-            byte Index = 0;
-
-            while (Span[Index] != 0)
-            {
-                var Label = Span.Slice(Index);
-
-
-            }
-        }
 
         private static ushort SizeOf(in SortedSet<string> Pointers, IDomain Domain)
         {
@@ -616,12 +583,10 @@ namespace Texnomic.SecureDNS.Serialization
 
                     return Size;
                 }
-                else
-                {
-                    Pointers.Add(SubDomain);
 
-                    Size += (ushort)(1 + Label.Length);
-                }
+                Pointers.Add(SubDomain);
+
+                Size += (ushort)(1 + Label.Length);
             }
 
             Size += 1;
@@ -647,8 +612,7 @@ namespace Texnomic.SecureDNS.Serialization
             return Answers;
         }
 
-        private static void Set(in DnStream Stream, in Dictionary<string, ushort> Pointers,
-            IEnumerable<IAnswer> Answers)
+        private static void Set(in DnStream Stream, in Dictionary<string, ushort> Pointers, IEnumerable<IAnswer> Answers)
         {
             foreach (var Answer in Answers)
             {
@@ -764,27 +728,27 @@ namespace Texnomic.SecureDNS.Serialization
                     }
                 case MX MX:
                     {
-                        Set(in Stream, in MX);
+                        Set(in Stream, in Pointers, in MX);
                         break;
                     }
                 case NS NS:
                     {
-                        Set(in Stream, in NS);
+                        Set(in Stream, in Pointers, in NS);
                         break;
                     }
                 case PTR PTR:
                     {
-                        Set(in Stream, in PTR);
+                        Set(in Stream, in Pointers, in PTR);
                         break;
                     }
                 case SOA SOA:
                     {
-                        Set(in Stream, in SOA);
+                        Set(in Stream, in Pointers, in SOA);
                         break;
                     }
                 case SRV SRV:
                     {
-                        Set(in Stream, in SRV);
+                        Set(in Stream, in Pointers, in SRV);
                         break;
                     }
                 case DNSKEY DNSKEY:
@@ -878,7 +842,7 @@ namespace Texnomic.SecureDNS.Serialization
 
         private static ushort SizeOf(in AAAA AAAA)
         {
-            return 8;
+            return 16;
         }
 
         #endregion
@@ -1002,10 +966,10 @@ namespace Texnomic.SecureDNS.Serialization
             };
         }
 
-        private static void Set(in DnStream Stream, in MX MX)
+        private static void Set(in DnStream Stream, in Dictionary<string, ushort> Pointers, in MX MX)
         {
             Stream.WriteShort(MX.Preference);
-            Set(in Stream, MX.Exchange);
+            Set(in Stream, in Pointers, MX.Exchange);
         }
 
         private static ushort SizeOf(in SortedSet<string> Pointers, in MX MX)
@@ -1025,9 +989,9 @@ namespace Texnomic.SecureDNS.Serialization
             };
         }
 
-        private static void Set(in DnStream Stream, in NS NS)
+        private static void Set(in DnStream Stream, in Dictionary<string, ushort> Pointers, in NS NS)
         {
-            Set(in Stream, NS.Domain);
+            Set(in Stream, in Pointers, NS.Domain);
         }
 
         private static ushort SizeOf(in SortedSet<string> Pointers, in NS NS)
@@ -1047,9 +1011,9 @@ namespace Texnomic.SecureDNS.Serialization
             };
         }
 
-        private static void Set(in DnStream Stream, in PTR PTR)
+        private static void Set(in DnStream Stream, in Dictionary<string, ushort> Pointers, in PTR PTR)
         {
-            Set(in Stream, PTR.Domain);
+            Set(in Stream, in Pointers, PTR.Domain);
         }
 
         private static ushort SizeOf(in SortedSet<string> Pointers, in PTR PTR)
@@ -1075,10 +1039,10 @@ namespace Texnomic.SecureDNS.Serialization
             };
         }
 
-        private static void Set(in DnStream Stream, in SOA SOA)
+        private static void Set(in DnStream Stream, in Dictionary<string, ushort> Pointers, in SOA SOA)
         {
-            Set(in Stream, SOA.PrimaryNameServer);
-            Set(in Stream, SOA.ResponsibleAuthorityMailbox);
+            Set(in Stream, in Pointers, SOA.PrimaryNameServer);
+            Set(in Stream, in Pointers, SOA.ResponsibleAuthorityMailbox);
             Stream.WriteUInt32(SOA.SerialNumber);
             Stream.WriteTimeSpan(SOA.RefreshInterval);
             Stream.WriteTimeSpan(SOA.RetryInterval);
@@ -1106,12 +1070,12 @@ namespace Texnomic.SecureDNS.Serialization
             };
         }
 
-        private static void Set(in DnStream Stream, in SRV SRV)
+        private static void Set(in DnStream Stream, in Dictionary<string, ushort> Pointers, in SRV SRV)
         {
             Stream.WriteUShort(SRV.Priority);
             Stream.WriteUShort(SRV.Weight);
             Stream.WriteUShort(SRV.Port);
-            Set(in Stream, SRV.Target);
+            Set(in Stream, in Pointers, SRV.Target);
         }
 
         private static ushort SizeOf(in SortedSet<string> Pointers, in SRV SRV)

@@ -40,5 +40,37 @@ namespace Texnomic.SecureDNS.Protocols.Extensions
                 .Unwrap()
                 .GetAwaiter()
                 .GetResult();
+
+        public static async Task<T> WithCancellation<T>(this Task<T> Action, CancellationToken CancellationToken)
+        {
+            var TaskCompletionSource = new TaskCompletionSource<bool>();
+
+            await using (CancellationToken.Register(() => TaskCompletionSource.TrySetResult(true)))
+            {
+                if (Action != await Task.WhenAny(Action, TaskCompletionSource.Task))
+                {
+                    throw new OperationCanceledException(CancellationToken);
+                }
+            }
+
+            return Action.Result;
+        }
+
+        public static async Task<T> WithTimeout<T>(this Task<T> Action, CancellationToken CancellationToken)
+        {
+            var TaskCompletionSource = new TaskCompletionSource<bool>();
+
+            await using (CancellationToken.Register(() => TaskCompletionSource.TrySetResult(true)))
+            {
+                if (Action != await Task.WhenAny(Action, TaskCompletionSource.Task))
+                {
+                    throw new TimeoutException();
+                }
+            }
+
+            return Action.Result;
+        }
     }
+
+
 }

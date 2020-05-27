@@ -220,12 +220,16 @@ namespace Texnomic.DNS.Servers
 
             var ResponsibilityChain = new ProxyResponsibilityChain(ProxyResponsibilityChainOptions, MiddlewareResolver);
 
+            IMessage Query = null;
+
+            IPEndPoint RemoteEndPoint = null;
+
             while (!CancellationToken.IsCancellationRequested)
             {
                 try
                 {
-                    var (Query, RemoteEndPoint) = await IncomingQueue.ReceiveAsync(CancellationToken)
-                        .WithCancellation(CancellationToken);
+                    (Query, RemoteEndPoint) = await IncomingQueue.ReceiveAsync(CancellationToken)
+                                                                 .WithCancellation(CancellationToken);
 
                     var Answer = await ResponsibilityChain.Execute(Query);
 
@@ -240,6 +244,15 @@ namespace Texnomic.DNS.Servers
                     Logger?.Error(Error, "{@Error} Occurred While Resolving Message.", Error);
 
                     Errored?.Invoke(this, new ErroredEventArgs(Error));
+
+                    var ErrorMessage = new Message()
+                    {
+                        ID = Query.ID,
+                        MessageType = MessageType.Response,
+                        ResponseCode = ResponseCode.ServerFailure,
+                    };
+
+                    await OutgoingQueue.SendAsync((ErrorMessage, RemoteEndPoint), CancellationToken);
                 }
                 catch (Exception Error)
                 {
@@ -296,9 +309,9 @@ namespace Texnomic.DNS.Servers
             {
                 case TimeoutException Timeout:
                 case OperationCanceledException OperationCanceled:
-                case ArgumentNullException ArgumentNull:
-                case ArgumentOutOfRangeException ArgumentOutOfRange:
-                case InvalidOperationException InvalidOperation:
+                //case ArgumentNullException ArgumentNull:
+                //case ArgumentOutOfRangeException ArgumentOutOfRange:
+                //case InvalidOperationException InvalidOperation:
                 case CryptographicUnexpectedOperationException CryptographicUnexpectedOperation:
                     {
                         return true;
