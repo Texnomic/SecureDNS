@@ -29,4 +29,8 @@
     <ProjectReference Include="..\Texnomic.SecureDNS.Serialization\Texnomic.SecureDNS.Serialization.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="DataTypes\" />
+  </ItemGroup>
+
 </Project>

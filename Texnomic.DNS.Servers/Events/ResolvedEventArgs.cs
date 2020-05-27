@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Net;
-using Texnomic.DNS.Abstractions;
+using Texnomic.SecureDNS.Abstractions;
 
 namespace Texnomic.DNS.Servers.Events
 {

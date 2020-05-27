@@ -1,5 +1,4 @@
 ﻿using System;
-using Texnomic.DNS.Abstractions;
 
 namespace Texnomic.DNS.Servers.Events
 {

@@ -3,10 +3,7 @@ using System.Buffers.Binary;
 using Texnomic.SecureDNS.Core;
 using Texnomic.SecureDNS.Core.DataTypes;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
-using System.Net;
-using System.Reflection;
 using Texnomic.SecureDNS.Abstractions;
 using Texnomic.SecureDNS.Abstractions.Enums;
 using Texnomic.SecureDNS.Core.Records;
@@ -16,23 +13,22 @@ namespace Texnomic.SecureDNS.Serialization
 {
     public static class DnSerializer
     {
-        public static T Deserialize<T>(in byte[] Raw) 
+        public static IMessage Deserialize(in byte[] Raw)
         {
-            if (typeof(T) == typeof(Message))
-            {
-                var Stream = new DnStream(in Raw);
+            var Stream = new DnStream(in Raw);
 
-                return (T)GetMessage(in Stream);
-            }
+            return GetMessage(in Stream);
+        }
 
-            if (typeof(T) == typeof(DnStamp))
-            {
-                var Stream = new DnStream(in Raw);
+        public static IDnStamp Deserialize(in string Stamp)
+        {
+            if (!Stamp.StartsWith("sdns://")) throw new ArgumentException("Stamp Uri Must Start With SDNS://");
 
-                return (T)GetStamp(in Stream);
-            }
+            var Raw = Decode(Stamp[7..]);
 
-            throw new ArgumentOutOfRangeException(nameof(T), typeof(T), null);
+            var Stream = new DnStream(in Raw);
+
+            return GetStamp(in Stream);
         }
 
         private static IMessage GetMessage(in DnStream Stream)
@@ -60,6 +56,7 @@ namespace Texnomic.SecureDNS.Serialization
             };
 
             Message.Questions = GetQuestions(in Stream, Message.QuestionsCount);
+
             Message.Answers = GetAnswers(in Stream, Message.AnswersCount);
 
             return Message;
@@ -129,6 +126,39 @@ namespace Texnomic.SecureDNS.Serialization
             return Stream.ToArray();
         }
 
+        public static byte[] Serialize(IDnStamp Stamp)
+        {
+            var Size = SizeOf(Stamp);
+
+            var Stream = new DnStream(Size);
+
+            Set(in Stream, Stamp);
+
+            return Stream.ToArray();
+        }
+
+        #region DnStamp
+
+        private static string Encode(byte[] Stamp)
+        {
+            return Convert.ToBase64String(Stamp)
+                .Replace("=", "")
+                .Replace("/", "_")
+                .Replace("+", "-");
+        }
+
+        private static string ToBase64(string Stamp)
+        {
+            return Stamp
+                .PadRight(Stamp.Length + (4 - Stamp.Length % 4) % 4, '=')
+                .Replace("_", "/")
+                .Replace("-", "+");
+        }
+
+        private static byte[] Decode(string Stamp)
+        {
+            return Convert.FromBase64String(ToBase64(Stamp));
+        }
 
         private static IDnStamp GetStamp(in DnStream Stream)
         {
@@ -142,14 +172,73 @@ namespace Texnomic.SecureDNS.Serialization
             return DnStamp;
         }
 
+        private static void Set(in DnStream Stream, IDnStamp Stamp)
+        {
+            Stream.WriteByte((byte)Stamp.Protocol);
+
+            switch (Stamp)
+            {
+                case DNSCryptRelayStamp DNSCryptRelayStamp:
+                    {
+                        Set(in Stream, in DNSCryptRelayStamp);
+                        break;
+                    }
+                case DNSCryptStamp DNSCryptStamp:
+                    {
+                        Set(in Stream, in DNSCryptStamp);
+                        break;
+                    }
+                case DoHStamp DoHStamp:
+                    {
+                        Set(in Stream, in DoHStamp);
+                        break;
+                    }
+                case DoTStamp DoTStamp:
+                    {
+                        Set(in Stream, in DoTStamp);
+                        break;
+                    }
+                case DoUStamp DoUStamp:
+                    {
+                        Set(in Stream, in DoUStamp);
+                        break;
+                    }
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(Stamp), Stamp, null);
+            }
+        }
+
+        private static ushort SizeOf(IDnStamp Stamp)
+        {
+            var Size = Stamp switch
+            {
+                DNSCryptRelayStamp DNSCryptRelayStamp => SizeOf(in DNSCryptRelayStamp),
+                DNSCryptStamp DNSCryptStamp => SizeOf(in DNSCryptStamp),
+                DoHStamp DoHStamp => SizeOf(in DoHStamp),
+                DoTStamp DoTStamp => SizeOf(in DoTStamp),
+                DoUStamp DoUStamp => SizeOf(in DoUStamp),
+                _ => throw new ArgumentOutOfRangeException(nameof(Stamp), Stamp, null)
+            };
+
+            return (ushort) (Size + 1);
+        }
+
         private static IStamp GetStamp(in DnStream Stream, StampProtocol Protocol)
         {
             return Protocol switch
             {
+                StampProtocol.DNSCryptRelay => GetDNSCryptRelayStamp(in Stream),
                 StampProtocol.DNSCrypt => GetDNSCryptStamp(in Stream),
+                StampProtocol.DoH => GetDoTStamp(in Stream),
+                StampProtocol.DoT => GetDoTStamp(in Stream),
+                StampProtocol.DoU => GetDoUStamp(in Stream),
                 _ => throw new ArgumentOutOfRangeException(nameof(StampProtocol), Protocol, null)
             };
         }
+
+        #endregion
+
+        #region DNSCryptStamp
 
         private static IStamp GetDNSCryptStamp(in DnStream Stream)
         {
@@ -165,6 +254,26 @@ namespace Texnomic.SecureDNS.Serialization
             };
         }
 
+        private static void Set(in DnStream Stream, in DNSCryptStamp Stamp)
+        {
+            Stream.WriteByte(Stamp.DnsSec.AsByte());
+            Stream.WriteByte(Stamp.NoLog.AsByte());
+            Stream.WriteByte(Stamp.NoFilter.AsByte());
+            Stream.WriteBytes(Stamp.Flags);
+            Stream.WritePrefixedString(Stamp.Address);
+            Stream.WritePrefixedBytes(Stamp.PublicKey);
+            Stream.WritePrefixedString(Stamp.ProviderName);
+        }
+
+        private static ushort SizeOf(in DNSCryptStamp Stamp)
+        {
+            return (ushort)(8 + Stamp.Address.Length + Stamp.PublicKey.Length + Stamp.ProviderName.Length);
+        }
+
+
+        #endregion
+
+        #region DNSCryptRelayStamp
         private static IStamp GetDNSCryptRelayStamp(in DnStream Stream)
         {
             return new DNSCryptRelayStamp()
@@ -172,6 +281,20 @@ namespace Texnomic.SecureDNS.Serialization
                 Address = Stream.ReadPrefixedString()
             };
         }
+
+        private static void Set(in DnStream Stream, in DNSCryptRelayStamp Stamp)
+        {
+            Stream.WritePrefixedString(Stamp.Address);
+        }
+
+        private static ushort SizeOf(in DNSCryptRelayStamp Stamp)
+        {
+            return (ushort)Stamp.Address.Length;
+        }
+
+        #endregion
+
+        #region DoHStamp
 
         private static IStamp GetDoHStamp(in DnStream Stream)
         {
@@ -182,11 +305,32 @@ namespace Texnomic.SecureDNS.Serialization
                 NoFilter = Stream.ReadByte().AsBool(),
                 Flags = Stream.ReadBytes(5).ToArray(),
                 Address = Stream.ReadPrefixedString(),
-                Hash = Stream.ReadListPrefixedBytes(),
+                Hash = Stream.ReadPrefixedBytes().ToArray(),
                 Hostname = Stream.ReadPrefixedString(),
                 Path = Stream.ReadPrefixedString()
             };
         }
+
+        private static void Set(in DnStream Stream, in DoHStamp Stamp)
+        {
+            Stream.WriteByte(Stamp.DnsSec.AsByte());
+            Stream.WriteByte(Stamp.NoLog.AsByte());
+            Stream.WriteByte(Stamp.NoFilter.AsByte());
+            Stream.WriteBytes(Stamp.Flags);
+            Stream.WritePrefixedString(Stamp.Address);
+            Stream.WritePrefixedBytes(Stamp.Hash);
+            Stream.WritePrefixedString(Stamp.Hostname);
+            Stream.WritePrefixedString(Stamp.Path);
+        }
+
+        private static ushort SizeOf(in DoHStamp Stamp)
+        {
+            return (ushort)(9 + Stamp.Address.Length + Stamp.Hostname.Length + Stamp.Path.Length + Stamp.Hash.Length);
+        }
+
+        #endregion
+
+        #region DoTStamp
 
         private static IStamp GetDoTStamp(in DnStream Stream)
         {
@@ -197,10 +341,29 @@ namespace Texnomic.SecureDNS.Serialization
                 NoFilter = Stream.ReadByte().AsBool(),
                 Flags = Stream.ReadBytes(5).ToArray(),
                 Address = Stream.ReadPrefixedString(),
-                Hash = Stream.ReadListPrefixedBytes(),
+                Hash = Stream.ReadPrefixedBytes().ToArray(),
                 Hostname = Stream.ReadPrefixedString()
             };
         }
+        private static void Set(in DnStream Stream, in DoTStamp Stamp)
+        {
+            Stream.WriteByte(Stamp.DnsSec.AsByte());
+            Stream.WriteByte(Stamp.NoLog.AsByte());
+            Stream.WriteByte(Stamp.NoFilter.AsByte());
+            Stream.WriteBytes(Stamp.Flags);
+            Stream.WritePrefixedString(Stamp.Address);
+            Stream.WritePrefixedBytes(Stamp.Hash);
+            Stream.WritePrefixedString(Stamp.Hostname);
+        }
+
+        private static ushort SizeOf(in DoTStamp Stamp)
+        {
+            return (ushort)(9 + Stamp.Address.Length + Stamp.Hostname.Length + Stamp.Hash.Length);
+        }
+
+        #endregion
+
+        #region DoUStamp
 
         private static IStamp GetDoUStamp(in DnStream Stream)
         {
@@ -214,18 +377,36 @@ namespace Texnomic.SecureDNS.Serialization
             };
         }
 
+        private static void Set(in DnStream Stream, in DoUStamp Stamp)
+        {
+            Stream.WriteByte(Stamp.DnsSec.AsByte());
+            Stream.WriteByte(Stamp.NoLog.AsByte());
+            Stream.WriteByte(Stamp.NoFilter.AsByte());
+            Stream.WriteBytes(Stamp.Flags);
+            Stream.WritePrefixedString(Stamp.Address);
+        }
+
+        private static ushort SizeOf(in DoUStamp Stamp)
+        {
+            return (ushort)(8 + Stamp.Address.Length);
+        }
+
+        #endregion
+
         #region Questions
 
         private static IEnumerable<IQuestion> GetQuestions(in DnStream Stream, ushort Count)
         {
+            if(Count < 1) throw new ArgumentOutOfRangeException($"DNS Message Must Have At Least 1 Question. Got {Count}.");
+
             var Questions = new List<IQuestion>();
 
-            do
+            for (var i = 0; i < Count; i++)
             {
                 var Question = GetQuestion(in Stream);
 
                 Questions.Add(Question);
-            } while (Questions.Count < Count);
+            }
 
             return Questions;
         }
@@ -456,13 +637,12 @@ namespace Texnomic.SecureDNS.Serialization
         {
             var Answers = new List<IAnswer>();
 
-            do
+            for (var i = 0; i < Count; i++)
             {
                 var Answer = GetAnswer(in Stream);
 
                 Answers.Add(Answer);
             }
-            while (Answers.Count < Count);
 
             return Answers;
         }

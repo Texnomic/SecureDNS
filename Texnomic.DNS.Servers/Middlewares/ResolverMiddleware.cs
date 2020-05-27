@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
 using Microsoft.Extensions.Caching.Memory;
 using PipelineNet.Middleware;
 using Serilog;
-using Texnomic.DNS.Abstractions;
-using Texnomic.DNS.Abstractions.Enums;
-using Texnomic.DNS.Models;
+using Texnomic.SecureDNS.Abstractions;
+using Texnomic.SecureDNS.Abstractions.Enums;
+using Texnomic.SecureDNS.Core;
 
 namespace Texnomic.DNS.Servers.Middlewares
 {
@@ -55,7 +56,7 @@ namespace Texnomic.DNS.Servers.Middlewares
 
                 Message.Answers = Answers;
 
-                Logger.Information("Resolved Query {@ID} For {@Domain} From Cache.", Message.ID, Message.Questions[0].Domain.Name);
+                Logger.Information("Resolved Query {@ID} For {@Domain} From Cache.", Message.ID, Message.Questions.First().Domain.Name);
 
                 return await Next(Message);
             }
@@ -67,12 +68,12 @@ namespace Texnomic.DNS.Servers.Middlewares
 
             if (Message.AnswersCount == 0) return;
 
-            MemoryCache.Set($"{Message.Questions[0].Domain.Name}:{Message.Questions[0].Type}", Message.Answers, Message.Answers[0].TimeToLive.Value);
+            MemoryCache.Set($"{Message.Questions.First().Domain.Name}:{Message.Questions.First().Type}", Message.Answers, Message.Answers.First().TimeToLive);
         }
 
         private List<IAnswer> GetCache(IMessage Message)
         {
-            return MemoryCache.Get<List<IAnswer>>($"{Message.Questions[0].Domain.Name}:{Message.Questions[0].Type}");
+            return MemoryCache.Get<List<IAnswer>>($"{Message.Questions.First().Domain.Name}:{Message.Questions.First().Type}");
         }
 
         private static IMessage CreateAnswer(IMessage Query)

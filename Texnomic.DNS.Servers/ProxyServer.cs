@@ -8,21 +8,19 @@ using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
-using BinarySerialization;
 using Microsoft.Extensions.Hosting;
 using Nethereum.Util;
-using PipelineNet.ChainsOfResponsibility;
 using Serilog;
-using Texnomic.DNS.Abstractions;
-using Texnomic.DNS.Abstractions.Enums;
-using Texnomic.DNS.Models;
-using Texnomic.DNS.Extensions;
 using Texnomic.DNS.Servers.Events;
 using Texnomic.DNS.Servers.Extensions;
 using Texnomic.DNS.Servers.Options;
 using Microsoft.Extensions.Options;
 using PipelineNet.MiddlewareResolver;
 using Texnomic.DNS.Servers.ResponsibilityChain;
+using Texnomic.SecureDNS.Abstractions;
+using Texnomic.SecureDNS.Abstractions.Enums;
+using Texnomic.SecureDNS.Core;
+using Texnomic.SecureDNS.Serialization;
 
 namespace Texnomic.DNS.Servers
 {
@@ -31,7 +29,6 @@ namespace Texnomic.DNS.Servers
         private readonly ILogger Logger;
         private readonly List<Task> Workers;
         private readonly IOptionsMonitor<ProxyServerOptions> Options;
-        private readonly BinarySerializer BinarySerializer;
         private readonly IMiddlewareResolver MiddlewareResolver;
         private readonly IOptionsMonitor<ProxyResponsibilityChainOptions> ProxyResponsibilityChainOptions;
         private readonly BufferBlock<(IMessage, IPEndPoint)> IncomingQueue;
@@ -60,8 +57,6 @@ namespace Texnomic.DNS.Servers
             this.ProxyResponsibilityChainOptions = ProxyResponsibilityChainOptions;
 
             this.Logger = Logger;
-
-            BinarySerializer = new BinarySerializer();
 
             Workers = new List<Task>();
 
@@ -117,11 +112,11 @@ namespace Texnomic.DNS.Servers
             Stopped?.Invoke(this, EventArgs.Empty);
         }
 
-        private async ValueTask<Message> DeserializeAsync(byte[] Bytes)
+        private async ValueTask<IMessage> DeserializeAsync(byte[] Bytes)
         {
             try
             {
-                return await BinarySerializer.DeserializeAsync<Message>(Bytes);
+                return DnSerializer.Deserialize(Bytes);
             }
             catch (Exception Error)
             {
@@ -143,7 +138,7 @@ namespace Texnomic.DNS.Servers
         {
             try
             {
-                return await BinarySerializer.SerializeAsync(Message);
+                return DnSerializer.Serialize(Message);
             }
             catch (Exception Error)
             {
@@ -158,7 +153,7 @@ namespace Texnomic.DNS.Servers
                     ResponseCode = ResponseCode.FormatError,
                 };
 
-                return await BinarySerializer.SerializeAsync(ErrorMessage);
+                return DnSerializer.Serialize(ErrorMessage);
             }
         }
 
@@ -236,7 +231,7 @@ namespace Texnomic.DNS.Servers
 
                     await OutgoingQueue.SendAsync((Answer, RemoteEndPoint), CancellationToken);
 
-                    Logger?.Information("Resolved {@Answer} For {@Domain} with {@ResponseCode} To {@RemoteEndPoint}.", Answer, Answer.Questions[0].Domain.Name, Answer.ResponseCode, RemoteEndPoint.ToString());
+                    Logger?.Information("Resolved {@Answer} For {@Domain} with {@ResponseCode} To {@RemoteEndPoint}.", Answer, Answer.Questions.First().Domain.Name, Answer.ResponseCode, RemoteEndPoint.ToString());
 
                     Resolved?.Invoke(this, new ResolvedEventArgs(Query, Answer, RemoteEndPoint));
                 }

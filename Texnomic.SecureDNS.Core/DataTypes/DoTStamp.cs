@@ -5,7 +5,7 @@
     /// </summary>
     public class DoTStamp: DoUStamp
     {
-        public byte[][] Hash { get; set; }
+        public byte[] Hash { get; set; }
 
         public string Hostname { get; set; }
     }

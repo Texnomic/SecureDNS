@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using PipelineNet.ChainsOfResponsibility;
 using PipelineNet.MiddlewareResolver;
-using Texnomic.DNS.Abstractions;
-using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Servers.Options;
+using Texnomic.SecureDNS.Abstractions;
+using Texnomic.SecureDNS.Abstractions.Enums;
 
 namespace Texnomic.DNS.Servers.ResponsibilityChain
 {

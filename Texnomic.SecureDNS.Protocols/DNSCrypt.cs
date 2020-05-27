@@ -64,7 +64,7 @@ namespace Texnomic.SecureDNS.Protocols
                 }
             };
 
-            Stamp = (DNSCryptStamp)Options.CurrentValue.Stamp.Value;
+            Stamp = DnSerializer.Deserialize(Options.CurrentValue.Stamp) as DNSCryptStamp;
 
             IPEndPoint = IPEndPoint.Parse(Stamp.Address);
 
@@ -131,7 +131,7 @@ namespace Texnomic.SecureDNS.Protocols
 
             var Ed25519 = new Ed25519();
 
-            Ed25519.FromPublicKey(Stamp.PublicKey.Value);
+            Ed25519.FromPublicKey(Stamp.PublicKey);
 
             return Ed25519.VerifyMessage(Bytes[72..], Certificate.Signature);
         }

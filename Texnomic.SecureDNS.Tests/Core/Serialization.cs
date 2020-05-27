@@ -1,5 +1,7 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Texnomic.SecureDNS.Core;
+﻿using System;
+
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using Texnomic.SecureDNS.Serialization;
 
 namespace Texnomic.SecureDNS.Tests.Core
@@ -7,6 +9,18 @@ namespace Texnomic.SecureDNS.Tests.Core
     [TestClass]
     public class Serialization
     {
+        [TestMethod]
+        public void DeserializeDNSCryptStamp()
+        {
+            var Stamp = DnSerializer.Deserialize("sdns://AQYAAAAAAAAADTkuOS45LjEwOjg0NDMgZ8hHuMh1jNEgJFVDvnVnRt803x2EwAuMRwNo34Idhj4ZMi5kbnNjcnlwdC1jZXJ0LnF1YWQ5Lm5ldA");
+        }
+
+        [TestMethod]
+        public void DeserializeDoHStamp()
+        {
+            var Stamp = DnSerializer.Deserialize("sdns://AgcAAAAAAAAABzEuMC4wLjESZG5zLmNsb3VkZmxhcmUuY29tCi9kbnMtcXVlcnk");
+        }
+
         [TestMethod]
         public void DeserializeFast()
         {
@@ -34,7 +48,7 @@ namespace Texnomic.SecureDNS.Tests.Core
                 0x23
             };
 
-            var ResponseMessage = DnSerializer.Deserialize<Message>(in ResponseBytes);
+            var ResponseMessage = DnSerializer.Deserialize(in ResponseBytes);
         }
 
         [TestMethod]
@@ -64,7 +78,7 @@ namespace Texnomic.SecureDNS.Tests.Core
                 0x23
             };
 
-            var ResponseMessage = DnSerializer.Deserialize<Message>(in ResponseBytes);
+            var ResponseMessage = DnSerializer.Deserialize(in ResponseBytes);
 
             var Bytes = DnSerializer.Serialize(ResponseMessage);
 
@@ -79,7 +93,22 @@ namespace Texnomic.SecureDNS.Tests.Core
         }
 
         [TestMethod]
-        public void DeserializeYouTube()
+        public void RequestYouTube()
+        {
+            //youtube.com A Record
+            var RequestBytes = new byte[]
+            {
+                0x13, 0x1e, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x07, 0x79, 0x6f, 0x75,
+                0x74, 0x75, 0x62, 0x65, 0x03, 0x63, 0x6f, 0x6d,
+                0x00, 0x00, 0x01, 0x00, 0x01
+            };
+
+            var RequestMessage = DnSerializer.Deserialize(in RequestBytes);
+        }
+
+        [TestMethod]
+        public void ResponseYouTube()
         {
             //www.youtube.com A Record
             var ResponseBytes = new byte[]
@@ -109,7 +138,7 @@ namespace Texnomic.SecureDNS.Tests.Core
                 0xd9, 0x12, 0xee
             };
 
-            var ResponseMessage = DnSerializer.Deserialize<Message>(in ResponseBytes);
+            var ResponseMessage = DnSerializer.Deserialize(in ResponseBytes);
         }
 
         [TestMethod]
@@ -143,7 +172,7 @@ namespace Texnomic.SecureDNS.Tests.Core
                 0xd9, 0x12, 0xee
             };
 
-            var ResponseMessage = DnSerializer.Deserialize<Message>(in ResponseBytes);
+            var ResponseMessage = DnSerializer.Deserialize(in ResponseBytes);
 
             var Bytes = DnSerializer.Serialize(ResponseMessage);
 

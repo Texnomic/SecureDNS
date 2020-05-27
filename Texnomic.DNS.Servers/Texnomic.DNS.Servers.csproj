@@ -16,9 +16,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Texnomic.DNS.Abstractions\Texnomic.DNS.Abstractions.csproj" />
-    <ProjectReference Include="..\Texnomic.DNS\Texnomic.DNS.csproj" />
     <ProjectReference Include="..\Texnomic.FilterLists\Texnomic.FilterLists.csproj" />
+    <ProjectReference Include="..\Texnomic.SecureDNS.Abstractions\Texnomic.SecureDNS.Abstractions.csproj" />
+    <ProjectReference Include="..\Texnomic.SecureDNS.Core\Texnomic.SecureDNS.Core.csproj" />
+    <ProjectReference Include="..\Texnomic.SecureDNS.Protocols\Texnomic.SecureDNS.Protocols.csproj" />
+    <ProjectReference Include="..\Texnomic.SecureDNS.Serialization\Texnomic.SecureDNS.Serialization.csproj" />
   </ItemGroup>
 
 </Project>

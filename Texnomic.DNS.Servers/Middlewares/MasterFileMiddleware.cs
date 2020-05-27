@@ -4,7 +4,7 @@ using Serilog;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Texnomic.DNS.Abstractions;
+using Texnomic.SecureDNS.Abstractions;
 using Texnomic.DNS.Servers.Options;
 
 namespace Texnomic.DNS.Servers.Middlewares

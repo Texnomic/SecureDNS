@@ -46,7 +46,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Texnomic.DNS.Servers\Texnomic.DNS.Servers.csproj" />
-    <ProjectReference Include="..\Texnomic.DNS\Texnomic.DNS.csproj" />
+    <ProjectReference Include="..\Texnomic.SecureDNS.Core\Texnomic.SecureDNS.Core.csproj" />
+    <ProjectReference Include="..\Texnomic.SecureDNS.Protocols\Texnomic.SecureDNS.Protocols.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -68,6 +69,12 @@
     <None Include="SecureDNS.ico">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="AppSettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 

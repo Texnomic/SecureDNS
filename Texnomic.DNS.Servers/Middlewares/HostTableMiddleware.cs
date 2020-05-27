@@ -5,12 +5,13 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using Texnomic.DNS.Models;
-using Texnomic.DNS.Abstractions;
-using Texnomic.DNS.Abstractions.Enums;
+using Texnomic.SecureDNS.Abstractions;
 using Texnomic.DNS.Servers.Options;
-using Texnomic.DNS.Records;
 using System.Linq;
+using Texnomic.SecureDNS.Abstractions.Enums;
+using Texnomic.SecureDNS.Core;
+using Texnomic.SecureDNS.Core.DataTypes;
+using Texnomic.SecureDNS.Core.Records;
 
 namespace Texnomic.DNS.Servers.Middlewares
 {
@@ -40,11 +41,11 @@ namespace Texnomic.DNS.Servers.Middlewares
 
         public async Task<IMessage> Run(IMessage Message, Func<IMessage, Task<IMessage>> Next)
         {
-            if (Message.Questions[0].Type == RecordType.A)
+            if (Message.Questions.First().Type == RecordType.A)
             {
-                if (HostTable.ContainsKey(Message.Questions[0].Domain.Name))
+                if (HostTable.ContainsKey(Message.Questions.First().Domain.Name))
                 {
-                    Logger.Information("Resolved Query {@ID} For {@Domain} From Host Table.", Message.ID, Message.Questions[0].Domain.Name);
+                    Logger.Information("Resolved Query {@ID} For {@Domain} From Host Table.", Message.ID, Message.Questions.First().Domain.Name);
 
                     return new Message()
                     {
@@ -57,28 +58,22 @@ namespace Texnomic.DNS.Servers.Middlewares
                             {
                                 Type = RecordType.A,
                                 Class = RecordClass.Internet,
-                                Domain = Domain.FromString(Message.Questions[0].Domain.Name)
+                                Domain = Domain.FromString(Message.Questions.First().Domain.Name)
                             }
                         },
                         Answers = new List<IAnswer>()
                         {
                           new Answer()
                           {
-                              TimeToLive = new TimeToLive()
-                              {
-                                  Value = TimeSpan.FromSeconds(Options.CurrentValue.TimeToLive)
-                              },
+                              TimeToLive = TimeSpan.FromSeconds(Options.CurrentValue.TimeToLive),
 
-                              Domain = Domain.FromString(Message.Questions[0].Domain.Name),
+                              Domain = Domain.FromString(Message.Questions.First().Domain.Name),
 
                               Length = 32,
 
                               Record = new A()
                               {
-                                  Address = new IPv4Address()
-                                  {
-                                      Value = HostTable.GetValueOrDefault(Message.Questions[0].Domain.Name)
-                                  }
+                                  Address = HostTable.GetValueOrDefault(Message.Questions.First().Domain.Name)
                               }
                           }
                         }

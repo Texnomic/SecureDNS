@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using PipelineNet.Middleware;
 using Serilog;
-using Texnomic.DNS.Abstractions;
-using Texnomic.DNS.Abstractions.Enums;
-using Texnomic.DNS.Models;
+using Texnomic.SecureDNS.Abstractions;
 using Texnomic.DNS.Servers.Extensions;
 using Texnomic.DNS.Servers.Options;
 using Texnomic.FilterLists;
 using Texnomic.FilterLists.Enums;
 using Texnomic.FilterLists.Models;
+using Texnomic.SecureDNS.Abstractions.Enums;
+using Texnomic.SecureDNS.Core;
 
 namespace Texnomic.DNS.Servers.Middlewares
 {
@@ -49,9 +49,9 @@ namespace Texnomic.DNS.Servers.Middlewares
 
         public async Task<IMessage> Run(IMessage Message, Func<IMessage, Task<IMessage>> Next)
         {
-            if (Filter.Contains(Message.Questions[0].Domain.Name))
+            if (Filter.Contains(Message.Questions.First().Domain.Name))
             {
-                Logger.Warning("Filtered Query {@ID} To {@Domain}.", Message.ID, Message.Questions[0].Domain.Name);
+                Logger.Warning("Filtered Query {@ID} To {@Domain}.", Message.ID, Message.Questions.First().Domain.Name);
 
                 return new Message()
                 {
