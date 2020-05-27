@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
@@ -46,7 +47,7 @@ namespace Texnomic.SecureDNS.Protocols
 
         public override async ValueTask<byte[]> ResolveAsync(byte[] Query)
         {
-            var Request = new RestRequest($"{Options.CurrentValue.Uri}/dns-query", Method.POST);
+            var Request = new RestRequest(new Uri(Options.CurrentValue.Uri, "/dns-query"), Method.POST);
 
             Request.AddParameter("application/dns-message", Query, "application/dns-message", ParameterType.RequestBody);
 
