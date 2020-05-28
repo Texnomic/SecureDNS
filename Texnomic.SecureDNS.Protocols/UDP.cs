@@ -17,7 +17,8 @@ namespace Texnomic.SecureDNS.Protocols
 
         private readonly IPEndPoint IPEndPoint;
 
-        private readonly CancellationTokenSource CancellationTokenSource;
+        private readonly SemaphoreSlim SemaphoreSlim;
+
 
         public UDP(IOptionsMonitor<UDPOptions> UDPOptions)
         {
@@ -27,13 +28,13 @@ namespace Texnomic.SecureDNS.Protocols
 
             IPEndPoint = new IPEndPoint(IPAddress.Parse(Options.CurrentValue.Host), Options.CurrentValue.Port);
 
-            CancellationTokenSource = new CancellationTokenSource();
-
-            CancellationTokenSource.CancelAfter(Options.CurrentValue.Timeout);
+            SemaphoreSlim = new SemaphoreSlim(1);
         }
 
         public override async ValueTask<byte[]> ResolveAsync(byte[] Query)
         {
+            await SemaphoreSlim.WaitAsync();
+
             await Client.SendAsync(Query, Query.Length, IPEndPoint);
 
             //Note: UDPClient Async Doesn't Support Timeout.
@@ -44,6 +45,8 @@ namespace Texnomic.SecureDNS.Protocols
 
             if (Task.IsCompletedSuccessfully)
             {
+                SemaphoreSlim.Release();
+
                 return Task.Result.Buffer;
             }
 
@@ -52,6 +55,8 @@ namespace Texnomic.SecureDNS.Protocols
             Client.Dispose();
 
             Client = new UdpClient();
+
+            SemaphoreSlim.Release();
 
             throw new TimeoutException();
         }

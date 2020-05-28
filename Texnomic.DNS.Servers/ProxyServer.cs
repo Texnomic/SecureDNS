@@ -112,7 +112,7 @@ namespace Texnomic.DNS.Servers
             Stopped?.Invoke(this, EventArgs.Empty);
         }
 
-        private async ValueTask<IMessage> DeserializeAsync(byte[] Bytes)
+        private IMessage Deserialize(byte[] Bytes)
         {
             try
             {
@@ -122,7 +122,7 @@ namespace Texnomic.DNS.Servers
             {
                 Logger?.Error(Error, "{@Error} Occurred While Deserializing Message.", Error);
 
-                Logger?.Debug(Error, "{@Error} Occurred While Deserializing {@Bytes}.", Error, Bytes);
+                Logger?.Error(Error, "{@Error} Occurred While Deserializing {@Bytes}.", Error, BitConverter.ToString(Bytes).Replace("-", ", 0x"));
 
                 Errored?.Invoke(this, new ErroredEventArgs(Error));
 
@@ -134,7 +134,7 @@ namespace Texnomic.DNS.Servers
                 };
             }
         }
-        private async ValueTask<byte[]> SerializeAsync(IMessage Message)
+        private byte[] Serialize(IMessage Message)
         {
             try
             {
@@ -168,7 +168,7 @@ namespace Texnomic.DNS.Servers
                     var Result = await UdpClient.ReceiveAsync()
                         .WithCancellation(CancellationToken);
 
-                    var Message = await DeserializeAsync(Result.Buffer);
+                    var Message = Deserialize(Result.Buffer);
 
                     switch (Message.MessageType)
                     {
@@ -276,7 +276,7 @@ namespace Texnomic.DNS.Servers
                     var (Answer, RemoteEndPoint) = await OutgoingQueue.ReceiveAsync(CancellationToken)
                                                                             .WithCancellation(CancellationToken);
 
-                    var Bytes = await SerializeAsync(Answer);
+                    var Bytes = Serialize(Answer);
 
                     await UdpClient.SendAsync(Bytes, Bytes.Length, RemoteEndPoint);
 
@@ -309,9 +309,9 @@ namespace Texnomic.DNS.Servers
             {
                 case TimeoutException Timeout:
                 case OperationCanceledException OperationCanceled:
-                //case ArgumentNullException ArgumentNull:
-                //case ArgumentOutOfRangeException ArgumentOutOfRange:
-                //case InvalidOperationException InvalidOperation:
+                case ArgumentNullException ArgumentNull:
+                case ArgumentOutOfRangeException ArgumentOutOfRange:
+                case InvalidOperationException InvalidOperation:
                 case CryptographicUnexpectedOperationException CryptographicUnexpectedOperation:
                     {
                         return true;
