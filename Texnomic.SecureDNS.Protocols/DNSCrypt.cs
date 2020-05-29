@@ -8,13 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Options;
-
-using NaCl.Core;
-
 using NSec.Cryptography;
-
 using Rebex.Security.Cryptography;
-
 using Texnomic.Chaos.NaCl;
 using Texnomic.SecureDNS.Abstractions;
 using Texnomic.SecureDNS.Abstractions.Enums;
@@ -25,7 +20,7 @@ using Texnomic.SecureDNS.Core.Records;
 using Texnomic.SecureDNS.Protocols.Extensions;
 using Texnomic.SecureDNS.Serialization;
 
-using Ed25519 = Rebex.Security.Cryptography.Ed25519;
+using Ed25519 = Texnomic.Chaos.NaCl.Ed25519;
 
 namespace Texnomic.SecureDNS.Protocols
 {
@@ -124,11 +119,7 @@ namespace Texnomic.SecureDNS.Protocols
 
                 var Bytes = DnSerializer.Serialize(Certificate);
 
-                var Ed25519 = new Ed25519();
-
-                Ed25519.FromPublicKey(Stamp.PublicKey);
-
-                var Result = Ed25519.VerifyMessage(Bytes[73..], Certificate.Signature);
+                var Result = Ed25519.Verify(Certificate.Signature, Bytes[73..], Stamp.PublicKey);
 
                 if (Result) return true;
             }
@@ -243,7 +234,11 @@ namespace Texnomic.SecureDNS.Protocols
 
                     var XChaCha20Poly1305 = new XChaCha20Poly1305(SharedKey);
 
-                    return XChaCha20Poly1305.Encrypt(PaddedQuery, null, ClientNonce);
+                    var CipherText = new byte[PaddedQuery.Length];
+
+                    XChaCha20Poly1305.Encrypt(ClientNonce, PaddedQuery, CipherText);
+
+                    return CipherText;
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(ESVersion));
@@ -262,7 +257,11 @@ namespace Texnomic.SecureDNS.Protocols
 
                     var XChaCha20Poly1305 = new XChaCha20Poly1305(SharedKey);
 
-                    return XChaCha20Poly1305.Decrypt(EncryptedAnswer, null, ServerNonce);
+                    var PlainText = new byte[EncryptedAnswer.Length];
+
+                    XChaCha20Poly1305.Decrypt(ServerNonce, EncryptedAnswer, PlainText);
+
+                    return PlainText;
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(ESVersion));

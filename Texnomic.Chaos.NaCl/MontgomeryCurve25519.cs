@@ -1,5 +1,4 @@
 ﻿using System;
-using Texnomic.Chaos.NaCl.Internal;
 using Texnomic.Chaos.NaCl.Internal.Ed25519Ref10;
 using Texnomic.Chaos.NaCl.Internal.Salsa;
 
@@ -23,14 +22,6 @@ namespace Texnomic.Chaos.NaCl
             GetPublicKey(new ArraySegment<byte>(publicKey), new ArraySegment<byte>(PrivateKey));
             return publicKey;
         }
-
-        static readonly byte[] BasePoint = new byte[32]
-		{
-			9, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0 ,0, 0, 0, 0, 0,
-			0, 0, 0 ,0, 0, 0, 0, 0,
-			0, 0, 0 ,0, 0, 0, 0, 0
-		};
 
         public static void GetPublicKey(ArraySegment<byte> PublicKey, ArraySegment<byte> PrivateKey)
         {
@@ -56,44 +47,6 @@ namespace Texnomic.Chaos.NaCl
             FieldElement PublicKeyFe;
             EdwardsToMontgomeryX(out PublicKeyFe, ref A.Y, ref A.Z);
             FieldOperations.fe_tobytes(PublicKey.Array, PublicKey.Offset, ref PublicKeyFe);
-        }
-
-        // hashes like the Curve25519 paper says
-        internal static void KeyExchangeOutputHashCurve25519Paper(byte[] SharedKey, int Offset)
-        {
-            //c = Curve25519output
-            const UInt32 C0 = 'C' | 'u' << 8 | 'r' << 16 | (UInt32)'v' << 24;
-            const UInt32 C1 = 'e' | '2' << 8 | '5' << 16 | (UInt32)'5' << 24;
-            const UInt32 C2 = '1' | '9' << 8 | 'o' << 16 | (UInt32)'u' << 24;
-            const UInt32 C3 = 't' | 'p' << 8 | 'u' << 16 | (UInt32)'t' << 24;
-
-            Array16<UInt32> salsaState;
-            salsaState.x0 = C0;
-            salsaState.x1 = ByteIntegerConverter.LoadLittleEndian32(SharedKey, Offset + 0);
-            salsaState.x2 = 0;
-            salsaState.x3 = ByteIntegerConverter.LoadLittleEndian32(SharedKey, Offset + 4);
-            salsaState.x4 = ByteIntegerConverter.LoadLittleEndian32(SharedKey, Offset + 8);
-            salsaState.x5 = C1;
-            salsaState.x6 = ByteIntegerConverter.LoadLittleEndian32(SharedKey, Offset + 12);
-            salsaState.x7 = 0;
-            salsaState.x8 = 0;
-            salsaState.x9 = ByteIntegerConverter.LoadLittleEndian32(SharedKey, Offset + 16);
-            salsaState.x10 = C2;
-            salsaState.x11 = ByteIntegerConverter.LoadLittleEndian32(SharedKey, Offset + 20);
-            salsaState.x12 = ByteIntegerConverter.LoadLittleEndian32(SharedKey, Offset + 24);
-            salsaState.x13 = 0;
-            salsaState.x14 = ByteIntegerConverter.LoadLittleEndian32(SharedKey, Offset + 28);
-            salsaState.x15 = C3;
-            SalsaCore.Salsa(out salsaState, ref salsaState, 20);
-
-            ByteIntegerConverter.StoreLittleEndian32(SharedKey, Offset + 0, salsaState.x0);
-            ByteIntegerConverter.StoreLittleEndian32(SharedKey, Offset + 4, salsaState.x1);
-            ByteIntegerConverter.StoreLittleEndian32(SharedKey, Offset + 8, salsaState.x2);
-            ByteIntegerConverter.StoreLittleEndian32(SharedKey, Offset + 12, salsaState.x3);
-            ByteIntegerConverter.StoreLittleEndian32(SharedKey, Offset + 16, salsaState.x4);
-            ByteIntegerConverter.StoreLittleEndian32(SharedKey, Offset + 20, salsaState.x5);
-            ByteIntegerConverter.StoreLittleEndian32(SharedKey, Offset + 24, salsaState.x6);
-            ByteIntegerConverter.StoreLittleEndian32(SharedKey, Offset + 28, salsaState.x7);
         }
 
         private static readonly byte[] Zero16 = new byte[16];
