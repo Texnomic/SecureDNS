@@ -512,7 +512,7 @@ namespace Texnomic.SecureDNS.Serialization
 
             while (true)
             {
-                if (Stream.Length <= Stream.BytePosition + 1)
+                if (Stream.Length < Stream.BytePosition + 1)
                     throw new FormatException("Incomplete DNS Message, Missing Entire Domain.");
 
                 var LabelType = Stream.ReadBits(2).AsEnum<LabelType>();

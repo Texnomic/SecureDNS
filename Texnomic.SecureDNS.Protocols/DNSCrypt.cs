@@ -9,9 +9,12 @@ using System.Threading.Tasks;
 
 using Microsoft.Extensions.Options;
 
+using NaCl.Core;
+
 using NSec.Cryptography;
 
 using Rebex.Security.Cryptography;
+
 using Texnomic.Chaos.NaCl;
 using Texnomic.SecureDNS.Abstractions;
 using Texnomic.SecureDNS.Abstractions.Enums;
@@ -32,8 +35,6 @@ namespace Texnomic.SecureDNS.Protocols
     public sealed class DNSCrypt : Protocol
     {
         private readonly IPEndPoint IPEndPoint;
-
-        private readonly ChaCha20Poly1305 ChaCha20Poly1305;
 
         private ICertificate Certificate;
 
@@ -65,8 +66,6 @@ namespace Texnomic.SecureDNS.Protocols
             ClientPublicKey = ClientCurve25519.GetPublicKey();
 
             ClientPrivateKey = ClientCurve25519.GetPrivateKey();
-
-            ChaCha20Poly1305 = new ChaCha20Poly1305();
 
             IsInitialized = false;
         }
@@ -229,34 +228,22 @@ namespace Texnomic.SecureDNS.Protocols
             if (DecryptedAnswer.Length <= Query.Length)
                 throw new CryptographicUnexpectedOperationException("DNSCrypt Decryption Failed.");
 
-            //DecryptedAnswer = DecryptedAnswer.TrimEnd();
-
-            //TODO Retry ?
-            //DecryptedAnswer = DecryptedAnswer.Length > Query.Length + 1 ? DecryptedAnswer : await ResolveAsync(Query);
-
             return DecryptedAnswer;
         }
 
-        private static string ByteArrayToString(byte[] Data)
-        {
-            return BitConverter.ToString(Data).Replace("-", ", 0x");
-        }
-
-        private byte[] Encrypt(ref byte[] PaddedQuery, ref byte[] PaddedClientNonce)
+        private byte[] Encrypt(ref byte[] PaddedQuery, ref byte[] ClientNonce)
         {
             switch (Certificate.Version)
             {
                 case ESVersion.X25519_XSalsa20Poly1305:
 
-                    return XSalsa20Poly1305.Encrypt(PaddedQuery, SharedKey, PaddedClientNonce);
+                    return XSalsa20Poly1305.Encrypt(PaddedQuery, SharedKey, ClientNonce);
 
                 case ESVersion.X25519_XChacha20Poly1305:
 
-                    var SKey = Key.Import(KeyAgreementAlgorithm.X25519, SharedKey, KeyBlobFormat.RawSymmetricKey);
+                    var XChaCha20Poly1305 = new XChaCha20Poly1305(SharedKey);
 
-                    var Nonce = new Nonce(PaddedClientNonce, 0);
-
-                    return ChaCha20Poly1305.Encrypt(SKey, in Nonce, null, PaddedQuery);
+                    return XChaCha20Poly1305.Encrypt(PaddedQuery, null, ClientNonce);
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(ESVersion));
@@ -273,13 +260,9 @@ namespace Texnomic.SecureDNS.Protocols
 
                 case ESVersion.X25519_XChacha20Poly1305:
 
-                    var SKey = Key.Import(KeyAgreementAlgorithm.X25519, SharedKey, KeyBlobFormat.RawSymmetricKey);
+                    var XChaCha20Poly1305 = new XChaCha20Poly1305(SharedKey);
 
-                    var Nonce = new Nonce(ServerNonce, 0);
-
-                    ChaCha20Poly1305.Decrypt(SKey, in Nonce, null, EncryptedAnswer, out var Answer);
-
-                    return Answer;
+                    return XChaCha20Poly1305.Decrypt(EncryptedAnswer, null, ServerNonce);
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(ESVersion));
