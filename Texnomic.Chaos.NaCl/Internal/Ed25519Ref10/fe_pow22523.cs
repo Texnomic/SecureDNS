@@ -1,10 +1,8 @@
-﻿using System;
-
-namespace Chaos.NaCl.Internal.Ed25519Ref10
+﻿namespace Texnomic.Chaos.NaCl.Internal.Ed25519Ref10
 {
 	internal static partial class FieldOperations
 	{
-		internal static void fe_pow22523(out FieldElement result, ref FieldElement z)
+		internal static void fe_pow22523(out FieldElement Result, ref FieldElement Z)
 		{
 			FieldElement t0;
 			FieldElement t1;
@@ -62,7 +60,7 @@ namespace Chaos.NaCl.Internal.Ed25519Ref10
 			/* qhasm: z2 = z1^2^1 */
 			/* asm 1: fe_sq(>z2=fe#1,<z1=fe#11); for (i = 1;i < 1;++i) fe_sq(>z2=fe#1,>z2=fe#1); */
 			/* asm 2: fe_sq(>z2=t0,<z1=z); for (i = 1;i < 1;++i) fe_sq(>z2=t0,>z2=t0); */
-			fe_sq(out t0, ref z); //for (i = 1; i < 1; ++i) fe_sq(out t0, ref t0);
+			fe_sq(out t0, ref Z); //for (i = 1; i < 1; ++i) fe_sq(out t0, ref t0);
 
 			/* qhasm: z8 = z2^2^2 */
 			/* asm 1: fe_sq(>z8=fe#2,<z2=fe#1); for (i = 1;i < 2;++i) fe_sq(>z8=fe#2,>z8=fe#2); */
@@ -72,7 +70,7 @@ namespace Chaos.NaCl.Internal.Ed25519Ref10
 			/* qhasm: z9 = z1*z8 */
 			/* asm 1: fe_mul(>z9=fe#2,<z1=fe#11,<z8=fe#2); */
 			/* asm 2: fe_mul(>z9=t1,<z1=z,<z8=t1); */
-			fe_mul(out t1, ref z, ref t1);
+			fe_mul(out t1, ref Z, ref t1);
 
 			/* qhasm: z11 = z2*z9 */
 			/* asm 1: fe_mul(>z11=fe#1,<z2=fe#1,<z9=fe#2); */
@@ -167,7 +165,7 @@ namespace Chaos.NaCl.Internal.Ed25519Ref10
 			/* qhasm: z_252_3 = z_252_2*z1 */
 			/* asm 1: fe_mul(>z_252_3=fe#12,<z_252_2=fe#1,<z1=fe#11); */
 			/* asm 2: fe_mul(>z_252_3=out,<z_252_2=t0,<z1=z); */
-			fe_mul(out result, ref  t0, ref z);
+			fe_mul(out Result, ref  t0, ref Z);
 
 			/* qhasm: return */
 		}

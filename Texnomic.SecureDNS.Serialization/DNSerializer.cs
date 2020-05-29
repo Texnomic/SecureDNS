@@ -1,9 +1,9 @@
 ﻿using System;
+using System.Linq;
 using System.Buffers.Binary;
 using Texnomic.SecureDNS.Core;
 using Texnomic.SecureDNS.Core.DataTypes;
 using System.Collections.Generic;
-using System.Linq;
 using Texnomic.SecureDNS.Abstractions;
 using Texnomic.SecureDNS.Abstractions.Enums;
 using Texnomic.SecureDNS.Core.Records;
@@ -539,7 +539,8 @@ namespace Texnomic.SecureDNS.Serialization
                         {
                             var Pointer = (ushort)(Stream.ReadBits(6) + Stream.ReadByte());
 
-                            if (Pointer >= Stream.BytePosition - 2) throw new ArgumentOutOfRangeException(nameof(Pointer), Pointer, "Compressed Label Infinite Loop Detected.");
+                            if (Pointer >= Stream.BytePosition - 2) 
+                                throw new ArgumentOutOfRangeException(nameof(Pointer), Pointer, "Compressed Label Infinite Loop Detected.");
 
                             var Position = Stream.BytePosition;
 

@@ -285,7 +285,7 @@ namespace Texnomic.DNS.Servers
                     Answered?.Invoke(this, new AnsweredEventArgs(Answer, RemoteEndPoint));
 
                 }
-                catch (Exception Error) when(Handler(Error))
+                catch (Exception Error) when (Handler(Error))
                 {
                     Logger?.Error(Error, "{@Error} Occurred While Sending Message.", Error);
 
@@ -314,6 +314,7 @@ namespace Texnomic.DNS.Servers
                 case InvalidOperationException InvalidOperation:
                 case CryptographicUnexpectedOperationException CryptographicUnexpectedOperation:
                 case SocketException SocketException when (SocketException.ErrorCode == 10060):
+                case FormatException FormatException:
                     {
                         return true;
                     }

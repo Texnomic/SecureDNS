@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Chaos.NaCl.Internal.Ed25519Ref10
+﻿namespace Texnomic.Chaos.NaCl.Internal.Ed25519Ref10
 {
     internal static partial class LookupTables
     {

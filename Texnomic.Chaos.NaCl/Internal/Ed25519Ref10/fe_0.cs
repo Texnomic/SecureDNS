@@ -1,12 +1,10 @@
-﻿using System;
-
-namespace Chaos.NaCl.Internal.Ed25519Ref10
+﻿namespace Texnomic.Chaos.NaCl.Internal.Ed25519Ref10
 {
 	internal static partial class FieldOperations
 	{
-		public static void fe_0(out FieldElement h)
+		public static void fe_0(out FieldElement H)
 		{
-			h = default(FieldElement);
+			H = default(FieldElement);
 		}
 	}
 }

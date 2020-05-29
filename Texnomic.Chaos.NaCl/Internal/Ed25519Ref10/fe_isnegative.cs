@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Chaos.NaCl.Internal.Ed25519Ref10
+﻿namespace Texnomic.Chaos.NaCl.Internal.Ed25519Ref10
 {
     internal static partial class FieldOperations
     {
@@ -12,10 +10,10 @@ namespace Chaos.NaCl.Internal.Ed25519Ref10
         |f| bounded by 1.1*2^26,1.1*2^25,1.1*2^26,1.1*2^25,etc.
         */
         //int fe_isnegative(const fe f)
-        public static int fe_isnegative(ref FieldElement f)
+        public static int fe_isnegative(ref FieldElement F)
         {
             FieldElement fr;
-            fe_reduce(out fr, ref f);
+            fe_reduce(out fr, ref F);
             return fr.x0 & 1;
         }
     }

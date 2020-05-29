@@ -7,14 +7,12 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-using Chaos.NaCl;
-
 using Microsoft.Extensions.Options;
 
 using NSec.Cryptography;
 
 using Rebex.Security.Cryptography;
-
+using Texnomic.Chaos.NaCl;
 using Texnomic.SecureDNS.Abstractions;
 using Texnomic.SecureDNS.Abstractions.Enums;
 using Texnomic.SecureDNS.Core;

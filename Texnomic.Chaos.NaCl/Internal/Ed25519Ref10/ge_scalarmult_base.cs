@@ -1,55 +1,55 @@
 ﻿using System;
 
-namespace Chaos.NaCl.Internal.Ed25519Ref10
+namespace Texnomic.Chaos.NaCl.Internal.Ed25519Ref10
 {
     internal static partial class GroupOperations
     {
-        static byte equal(byte b, byte c)
+        static byte Equal(byte B, byte C)
         {
 
-            byte ub = b;
-            byte uc = c;
-            byte x = (byte)(ub ^ uc); /* 0: yes; 1..255: no */
+            var ub = B;
+            var uc = C;
+            var x = (byte)(ub ^ uc); /* 0: yes; 1..255: no */
             UInt32 y = x; /* 0: yes; 1..255: no */
             unchecked { y -= 1; } /* 4294967295: yes; 0..254: no */
             y >>= 31; /* 1: yes; 0: no */
             return (byte)y;
         }
 
-        static byte negative(sbyte b)
+        static byte Negative(sbyte B)
         {
-            ulong x = unchecked((ulong)(long)b); /* 18446744073709551361..18446744073709551615: yes; 0..255: no */
+            var x = unchecked((ulong)(long)B); /* 18446744073709551361..18446744073709551615: yes; 0..255: no */
             x >>= 63; /* 1: yes; 0: no */
             return (byte)x;
         }
 
-        static void cmov(ref GroupElementPreComp t, ref GroupElementPreComp u, byte b)
+        static void Cmov(ref GroupElementPreComp T, ref GroupElementPreComp U, byte B)
         {
-            FieldOperations.fe_cmov(ref t.yplusx, ref u.yplusx, b);
-            FieldOperations.fe_cmov(ref t.yminusx, ref u.yminusx, b);
-            FieldOperations.fe_cmov(ref t.xy2d, ref u.xy2d, b);
+            FieldOperations.fe_cmov(ref T.Yplusx, ref U.Yplusx, B);
+            FieldOperations.fe_cmov(ref T.Yminusx, ref U.Yminusx, B);
+            FieldOperations.fe_cmov(ref T.Xy2d, ref U.Xy2d, B);
         }
 
-        static void select(out GroupElementPreComp t, int pos, sbyte b)
+        static void Select(out GroupElementPreComp T, int Pos, sbyte B)
         {
             GroupElementPreComp minust;
-            byte bnegative = negative(b);
-            byte babs = (byte)(b - (((-bnegative) & b) << 1));
+            var bnegative = Negative(B);
+            var babs = (byte)(B - (((-bnegative) & B) << 1));
 
-            ge_precomp_0(out t);
-            var table = LookupTables.Base[pos];
-            cmov(ref t, ref table[0], equal(babs, 1));
-            cmov(ref t, ref table[1], equal(babs, 2));
-            cmov(ref t, ref table[2], equal(babs, 3));
-            cmov(ref t, ref table[3], equal(babs, 4));
-            cmov(ref t, ref table[4], equal(babs, 5));
-            cmov(ref t, ref table[5], equal(babs, 6));
-            cmov(ref t, ref table[6], equal(babs, 7));
-            cmov(ref t, ref table[7], equal(babs, 8));
-            minust.yplusx = t.yminusx;
-            minust.yminusx = t.yplusx;
-            FieldOperations.fe_neg(out minust.xy2d, ref t.xy2d);
-            cmov(ref t, ref minust, bnegative);
+            ge_precomp_0(out T);
+            var table = LookupTables.Base[Pos];
+            Cmov(ref T, ref table[0], Equal(babs, 1));
+            Cmov(ref T, ref table[1], Equal(babs, 2));
+            Cmov(ref T, ref table[2], Equal(babs, 3));
+            Cmov(ref T, ref table[3], Equal(babs, 4));
+            Cmov(ref T, ref table[4], Equal(babs, 5));
+            Cmov(ref T, ref table[5], Equal(babs, 6));
+            Cmov(ref T, ref table[6], Equal(babs, 7));
+            Cmov(ref T, ref table[7], Equal(babs, 8));
+            minust.Yplusx = T.Yminusx;
+            minust.Yminusx = T.Yplusx;
+            FieldOperations.fe_neg(out minust.Xy2d, ref T.Xy2d);
+            Cmov(ref T, ref minust, bnegative);
         }
 
         /*
@@ -61,10 +61,10 @@ namespace Chaos.NaCl.Internal.Ed25519Ref10
           a[31] <= 127
         */
 
-        public static void ge_scalarmult_base(out GroupElementP3 h, byte[] a, int offset)
+        public static void ge_scalarmult_base(out GroupElementP3 H, byte[] A, int Offset)
         {
             // todo: Perhaps remove this allocation
-            sbyte[] e = new sbyte[64];
+            var e = new sbyte[64];
             sbyte carry;
             GroupElementP1P1 r;
             GroupElementP2 s;
@@ -73,8 +73,8 @@ namespace Chaos.NaCl.Internal.Ed25519Ref10
 
             for (i = 0; i < 32; ++i)
             {
-                e[2 * i + 0] = (sbyte)((a[offset + i] >> 0) & 15);
-                e[2 * i + 1] = (sbyte)((a[offset + i] >> 4) & 15);
+                e[2 * i + 0] = (sbyte)((A[Offset + i] >> 0) & 15);
+                e[2 * i + 1] = (sbyte)((A[Offset + i] >> 4) & 15);
             }
             /* each e[i] is between 0 and 15 */
             /* e[63] is between 0 and 7 */
@@ -90,22 +90,22 @@ namespace Chaos.NaCl.Internal.Ed25519Ref10
             e[63] += carry;
             /* each e[i] is between -8 and 8 */
 
-            ge_p3_0(out h);
+            ge_p3_0(out H);
             for (i = 1; i < 64; i += 2)
             {
-                select(out t, i / 2, e[i]);
-                ge_madd(out r, ref h, ref t); ge_p1p1_to_p3(out h, ref r);
+                Select(out t, i / 2, e[i]);
+                ge_madd(out r, ref H, ref t); ge_p1p1_to_p3(out H, ref r);
             }
 
-            ge_p3_dbl(out r, ref h); ge_p1p1_to_p2(out s, ref r);
+            ge_p3_dbl(out r, ref H); ge_p1p1_to_p2(out s, ref r);
             ge_p2_dbl(out r, ref s); ge_p1p1_to_p2(out s, ref r);
             ge_p2_dbl(out r, ref s); ge_p1p1_to_p2(out s, ref r);
-            ge_p2_dbl(out r, ref s); ge_p1p1_to_p3(out h, ref r);
+            ge_p2_dbl(out r, ref s); ge_p1p1_to_p3(out H, ref r);
 
             for (i = 0; i < 64; i += 2)
             {
-                select(out t, i / 2, e[i]);
-                ge_madd(out r, ref h, ref t); ge_p1p1_to_p3(out h, ref r);
+                Select(out t, i / 2, e[i]);
+                ge_madd(out r, ref H, ref t); ge_p1p1_to_p3(out H, ref r);
             }
         }
 

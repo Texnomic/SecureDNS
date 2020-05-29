@@ -16,7 +16,6 @@
     <PackageReference Include="PipelineNet" Version="0.9.0" />
     <PackageReference Include="Polly" Version="7.2.1" />
     <PackageReference Include="Rebex.Elliptic.Curve25519" Version="1.2.0" />
-    <PackageReference Include="Rebex.Elliptic.Ed25519" Version="1.2.0" />
     <PackageReference Include="RestSharp" Version="106.10.1" />
     <PackageReference Include="Serilog.Sinks.ILogger" Version="1.0.2" />
     <PackageReference Include="System.Text.Json" Version="4.7.1" />
@@ -24,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Texnomic.Chaos.NaCl\Texnomic.Chaos.NaCl.csproj" />
     <ProjectReference Include="..\Texnomic.SecureDNS.Abstractions\Texnomic.SecureDNS.Abstractions.csproj" />
     <ProjectReference Include="..\Texnomic.SecureDNS.Core\Texnomic.SecureDNS.Core.csproj" />
     <ProjectReference Include="..\Texnomic.SecureDNS.Serialization\Texnomic.SecureDNS.Serialization.csproj" />

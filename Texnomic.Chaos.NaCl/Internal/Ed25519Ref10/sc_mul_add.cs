@@ -1,25 +1,25 @@
 ﻿using System;
 
-namespace Chaos.NaCl.Internal.Ed25519Ref10
+namespace Texnomic.Chaos.NaCl.Internal.Ed25519Ref10
 {
     internal static partial class ScalarOperations
     {
-        static Int64 load_3(byte[] input, int offset)
+        static Int64 load_3(byte[] Input, int Offset)
         {
             Int64 result;
-            result = (Int64)input[offset + 0];
-            result |= ((Int64)input[offset + 1]) << 8;
-            result |= ((Int64)input[offset + 2]) << 16;
+            result = (Int64)Input[Offset + 0];
+            result |= ((Int64)Input[Offset + 1]) << 8;
+            result |= ((Int64)Input[Offset + 2]) << 16;
             return result;
         }
 
-        static Int64 load_4(byte[] input, int offset)
+        static Int64 load_4(byte[] Input, int Offset)
         {
             Int64 result;
-            result = (Int64)input[offset + 0];
-            result |= ((Int64)input[offset + 1]) << 8;
-            result |= ((Int64)input[offset + 2]) << 16;
-            result |= ((Int64)input[offset + 3]) << 24;
+            result = (Int64)Input[Offset + 0];
+            result |= ((Int64)Input[Offset + 1]) << 8;
+            result |= ((Int64)Input[Offset + 2]) << 16;
+            result |= ((Int64)Input[Offset + 3]) << 24;
             return result;
         }
 
@@ -34,44 +34,44 @@ namespace Chaos.NaCl.Internal.Ed25519Ref10
           where l = 2^252 + 27742317777372353535851937790883648493.
         */
 
-        public static void sc_muladd(byte[] s, byte[] a, byte[] b, byte[] c)
+        public static void sc_muladd(byte[] S, byte[] A, byte[] B, byte[] C)
         {
-            Int64 a0 = 2097151 & load_3(a, 0);
-            Int64 a1 = 2097151 & (load_4(a, 2) >> 5);
-            Int64 a2 = 2097151 & (load_3(a, 5) >> 2);
-            Int64 a3 = 2097151 & (load_4(a, 7) >> 7);
-            Int64 a4 = 2097151 & (load_4(a, 10) >> 4);
-            Int64 a5 = 2097151 & (load_3(a, 13) >> 1);
-            Int64 a6 = 2097151 & (load_4(a, 15) >> 6);
-            Int64 a7 = 2097151 & (load_3(a, 18) >> 3);
-            Int64 a8 = 2097151 & load_3(a, 21);
-            Int64 a9 = 2097151 & (load_4(a, 23) >> 5);
-            Int64 a10 = 2097151 & (load_3(a, 26) >> 2);
-            Int64 a11 = (load_4(a, 28) >> 7);
-            Int64 b0 = 2097151 & load_3(b, 0);
-            Int64 b1 = 2097151 & (load_4(b, 2) >> 5);
-            Int64 b2 = 2097151 & (load_3(b, 5) >> 2);
-            Int64 b3 = 2097151 & (load_4(b, 7) >> 7);
-            Int64 b4 = 2097151 & (load_4(b, 10) >> 4);
-            Int64 b5 = 2097151 & (load_3(b, 13) >> 1);
-            Int64 b6 = 2097151 & (load_4(b, 15) >> 6);
-            Int64 b7 = 2097151 & (load_3(b, 18) >> 3);
-            Int64 b8 = 2097151 & load_3(b, 21);
-            Int64 b9 = 2097151 & (load_4(b, 23) >> 5);
-            Int64 b10 = 2097151 & (load_3(b, 26) >> 2);
-            Int64 b11 = (load_4(b, 28) >> 7);
-            Int64 c0 = 2097151 & load_3(c, 0);
-            Int64 c1 = 2097151 & (load_4(c, 2) >> 5);
-            Int64 c2 = 2097151 & (load_3(c, 5) >> 2);
-            Int64 c3 = 2097151 & (load_4(c, 7) >> 7);
-            Int64 c4 = 2097151 & (load_4(c, 10) >> 4);
-            Int64 c5 = 2097151 & (load_3(c, 13) >> 1);
-            Int64 c6 = 2097151 & (load_4(c, 15) >> 6);
-            Int64 c7 = 2097151 & (load_3(c, 18) >> 3);
-            Int64 c8 = 2097151 & load_3(c, 21);
-            Int64 c9 = 2097151 & (load_4(c, 23) >> 5);
-            Int64 c10 = 2097151 & (load_3(c, 26) >> 2);
-            Int64 c11 = (load_4(c, 28) >> 7);
+            var a0 = 2097151 & load_3(A, 0);
+            var a1 = 2097151 & (load_4(A, 2) >> 5);
+            var a2 = 2097151 & (load_3(A, 5) >> 2);
+            var a3 = 2097151 & (load_4(A, 7) >> 7);
+            var a4 = 2097151 & (load_4(A, 10) >> 4);
+            var a5 = 2097151 & (load_3(A, 13) >> 1);
+            var a6 = 2097151 & (load_4(A, 15) >> 6);
+            var a7 = 2097151 & (load_3(A, 18) >> 3);
+            var a8 = 2097151 & load_3(A, 21);
+            var a9 = 2097151 & (load_4(A, 23) >> 5);
+            var a10 = 2097151 & (load_3(A, 26) >> 2);
+            var a11 = (load_4(A, 28) >> 7);
+            var b0 = 2097151 & load_3(B, 0);
+            var b1 = 2097151 & (load_4(B, 2) >> 5);
+            var b2 = 2097151 & (load_3(B, 5) >> 2);
+            var b3 = 2097151 & (load_4(B, 7) >> 7);
+            var b4 = 2097151 & (load_4(B, 10) >> 4);
+            var b5 = 2097151 & (load_3(B, 13) >> 1);
+            var b6 = 2097151 & (load_4(B, 15) >> 6);
+            var b7 = 2097151 & (load_3(B, 18) >> 3);
+            var b8 = 2097151 & load_3(B, 21);
+            var b9 = 2097151 & (load_4(B, 23) >> 5);
+            var b10 = 2097151 & (load_3(B, 26) >> 2);
+            var b11 = (load_4(B, 28) >> 7);
+            var c0 = 2097151 & load_3(C, 0);
+            var c1 = 2097151 & (load_4(C, 2) >> 5);
+            var c2 = 2097151 & (load_3(C, 5) >> 2);
+            var c3 = 2097151 & (load_4(C, 7) >> 7);
+            var c4 = 2097151 & (load_4(C, 10) >> 4);
+            var c5 = 2097151 & (load_3(C, 13) >> 1);
+            var c6 = 2097151 & (load_4(C, 15) >> 6);
+            var c7 = 2097151 & (load_3(C, 18) >> 3);
+            var c8 = 2097151 & load_3(C, 21);
+            var c9 = 2097151 & (load_4(C, 23) >> 5);
+            var c10 = 2097151 & (load_3(C, 26) >> 2);
+            var c11 = (load_4(C, 28) >> 7);
             Int64 s0;
             Int64 s1;
             Int64 s2;
@@ -336,38 +336,38 @@ namespace Chaos.NaCl.Internal.Ed25519Ref10
 
             unchecked
             {
-                s[0] = (byte)(s0 >> 0);
-                s[1] = (byte)(s0 >> 8);
-                s[2] = (byte)((s0 >> 16) | (s1 << 5));
-                s[3] = (byte)(s1 >> 3);
-                s[4] = (byte)(s1 >> 11);
-                s[5] = (byte)((s1 >> 19) | (s2 << 2));
-                s[6] = (byte)(s2 >> 6);
-                s[7] = (byte)((s2 >> 14) | (s3 << 7));
-                s[8] = (byte)(s3 >> 1);
-                s[9] = (byte)(s3 >> 9);
-                s[10] = (byte)((s3 >> 17) | (s4 << 4));
-                s[11] = (byte)(s4 >> 4);
-                s[12] = (byte)(s4 >> 12);
-                s[13] = (byte)((s4 >> 20) | (s5 << 1));
-                s[14] = (byte)(s5 >> 7);
-                s[15] = (byte)((s5 >> 15) | (s6 << 6));
-                s[16] = (byte)(s6 >> 2);
-                s[17] = (byte)(s6 >> 10);
-                s[18] = (byte)((s6 >> 18) | (s7 << 3));
-                s[19] = (byte)(s7 >> 5);
-                s[20] = (byte)(s7 >> 13);
-                s[21] = (byte)(s8 >> 0);
-                s[22] = (byte)(s8 >> 8);
-                s[23] = (byte)((s8 >> 16) | (s9 << 5));
-                s[24] = (byte)(s9 >> 3);
-                s[25] = (byte)(s9 >> 11);
-                s[26] = (byte)((s9 >> 19) | (s10 << 2));
-                s[27] = (byte)(s10 >> 6);
-                s[28] = (byte)((s10 >> 14) | (s11 << 7));
-                s[29] = (byte)(s11 >> 1);
-                s[30] = (byte)(s11 >> 9);
-                s[31] = (byte)(s11 >> 17);
+                S[0] = (byte)(s0 >> 0);
+                S[1] = (byte)(s0 >> 8);
+                S[2] = (byte)((s0 >> 16) | (s1 << 5));
+                S[3] = (byte)(s1 >> 3);
+                S[4] = (byte)(s1 >> 11);
+                S[5] = (byte)((s1 >> 19) | (s2 << 2));
+                S[6] = (byte)(s2 >> 6);
+                S[7] = (byte)((s2 >> 14) | (s3 << 7));
+                S[8] = (byte)(s3 >> 1);
+                S[9] = (byte)(s3 >> 9);
+                S[10] = (byte)((s3 >> 17) | (s4 << 4));
+                S[11] = (byte)(s4 >> 4);
+                S[12] = (byte)(s4 >> 12);
+                S[13] = (byte)((s4 >> 20) | (s5 << 1));
+                S[14] = (byte)(s5 >> 7);
+                S[15] = (byte)((s5 >> 15) | (s6 << 6));
+                S[16] = (byte)(s6 >> 2);
+                S[17] = (byte)(s6 >> 10);
+                S[18] = (byte)((s6 >> 18) | (s7 << 3));
+                S[19] = (byte)(s7 >> 5);
+                S[20] = (byte)(s7 >> 13);
+                S[21] = (byte)(s8 >> 0);
+                S[22] = (byte)(s8 >> 8);
+                S[23] = (byte)((s8 >> 16) | (s9 << 5));
+                S[24] = (byte)(s9 >> 3);
+                S[25] = (byte)(s9 >> 11);
+                S[26] = (byte)((s9 >> 19) | (s10 << 2));
+                S[27] = (byte)(s10 >> 6);
+                S[28] = (byte)((s10 >> 14) | (s11 << 7));
+                S[29] = (byte)(s11 >> 1);
+                S[30] = (byte)(s11 >> 9);
+                S[31] = (byte)(s11 >> 17);
             }
         }
     }

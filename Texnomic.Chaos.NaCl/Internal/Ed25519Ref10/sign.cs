@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Chaos.NaCl.Internal.Ed25519Ref10
+namespace Texnomic.Chaos.NaCl.Internal.Ed25519Ref10
 {
 	internal static partial class Ed25519Operations
 	{
@@ -40,9 +40,9 @@ namespace Chaos.NaCl.Internal.Ed25519Ref10
 		}*/
 
 		public static void crypto_sign2(
-			byte[] sig, int sigoffset,
-			byte[] m, int moffset, int mlen,
-			byte[] sk, int skoffset)
+			byte[] Sig, int Sigoffset,
+			byte[] M, int Moffset, int Mlen,
+			byte[] Sk, int Skoffset)
 		{
 			byte[] az;
 			byte[] r;
@@ -50,30 +50,30 @@ namespace Chaos.NaCl.Internal.Ed25519Ref10
 			GroupElementP3 R;
 		    var hasher = new Sha512();
 			{
-                hasher.Update(sk, skoffset, 32);
+                hasher.Update(Sk, Skoffset, 32);
 			    az = hasher.Finish();
 			    ScalarOperations.sc_clamp(az, 0);
 
 			    hasher.Init();
 				hasher.Update(az, 32, 32);
-				hasher.Update(m, moffset, mlen);
+				hasher.Update(M, Moffset, Mlen);
 				r = hasher.Finish();
 
 				ScalarOperations.sc_reduce(r);
 				GroupOperations.ge_scalarmult_base(out R, r, 0);
-				GroupOperations.ge_p3_tobytes(sig, sigoffset, ref R);
+				GroupOperations.ge_p3_tobytes(Sig, Sigoffset, ref R);
 
 				hasher.Init();
-				hasher.Update(sig, sigoffset, 32);
-				hasher.Update(sk, skoffset + 32, 32);
-				hasher.Update(m, moffset, mlen);
+				hasher.Update(Sig, Sigoffset, 32);
+				hasher.Update(Sk, Skoffset + 32, 32);
+				hasher.Update(M, Moffset, Mlen);
 				hram = hasher.Finish();
 
 				ScalarOperations.sc_reduce(hram);
 				var s = new byte[32];//todo: remove allocation
-				Array.Copy(sig, sigoffset + 32, s, 0, 32);
+				Array.Copy(Sig, Sigoffset + 32, s, 0, 32);
 				ScalarOperations.sc_muladd(s, hram, az, r);
-				Array.Copy(s, 0, sig, sigoffset + 32, 32);
+				Array.Copy(s, 0, Sig, Sigoffset + 32, 32);
 				CryptoBytes.Wipe(s);
 			}
 		}

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Chaos.NaCl.Internal.Ed25519Ref10
+namespace Texnomic.Chaos.NaCl.Internal.Ed25519Ref10
 {
     internal static partial class Ed25519Operations
     {
@@ -46,32 +46,32 @@ namespace Chaos.NaCl.Internal.Ed25519Ref10
         }*/
 
         public static bool crypto_sign_verify(
-            byte[] sig, int sigoffset,
-            byte[] m, int moffset, int mlen,
-            byte[] pk, int pkoffset)
+            byte[] Sig, int Sigoffset,
+            byte[] M, int Moffset, int Mlen,
+            byte[] Pk, int Pkoffset)
         {
             byte[] h;
-            byte[] checkr = new byte[32];
+            var checkr = new byte[32];
             GroupElementP3 A;
             GroupElementP2 R;
 
-            if ((sig[sigoffset + 63] & 224) != 0) return false;
-            if (GroupOperations.ge_frombytes_negate_vartime(out A, pk, pkoffset) != 0)
+            if ((Sig[Sigoffset + 63] & 224) != 0) return false;
+            if (GroupOperations.ge_frombytes_negate_vartime(out A, Pk, Pkoffset) != 0)
                 return false;
 
             var hasher = new Sha512();
-            hasher.Update(sig, sigoffset, 32);
-            hasher.Update(pk, pkoffset, 32);
-            hasher.Update(m, moffset, mlen);
+            hasher.Update(Sig, Sigoffset, 32);
+            hasher.Update(Pk, Pkoffset, 32);
+            hasher.Update(M, Moffset, Mlen);
             h = hasher.Finish();
 
             ScalarOperations.sc_reduce(h);
 
             var sm32 = new byte[32];//todo: remove allocation
-            Array.Copy(sig, sigoffset + 32, sm32, 0, 32);
+            Array.Copy(Sig, Sigoffset + 32, sm32, 0, 32);
             GroupOperations.ge_double_scalarmult_vartime(out R, h, ref A, sm32);
             GroupOperations.ge_tobytes(checkr, 0, ref R);
-            var result = CryptoBytes.ConstantTimeEquals(checkr, 0, sig, sigoffset, 32);
+            var result = CryptoBytes.ConstantTimeEquals(checkr, 0, Sig, Sigoffset, 32);
             CryptoBytes.Wipe(h);
             CryptoBytes.Wipe(checkr);
             return result;

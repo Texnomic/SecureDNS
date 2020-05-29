@@ -1,20 +1,18 @@
-﻿using System;
-
-namespace Chaos.NaCl.Internal.Ed25519Ref10
+﻿namespace Texnomic.Chaos.NaCl.Internal.Ed25519Ref10
 {
 	internal static partial class GroupOperations
 	{
-		public static void ge_p3_tobytes(byte[] s, int offset, ref GroupElementP3 h)
+		public static void ge_p3_tobytes(byte[] S, int Offset, ref GroupElementP3 H)
 		{
 			FieldElement recip;
 			FieldElement x;
 			FieldElement y;
 
-			FieldOperations.fe_invert(out recip, ref h.Z);
-			FieldOperations.fe_mul(out x, ref h.X, ref  recip);
-			FieldOperations.fe_mul(out y, ref  h.Y, ref  recip);
-			FieldOperations.fe_tobytes(s, offset, ref y);
-			s[offset + 31] ^= (byte)(FieldOperations.fe_isnegative(ref x) << 7);
+			FieldOperations.fe_invert(out recip, ref H.Z);
+			FieldOperations.fe_mul(out x, ref H.X, ref  recip);
+			FieldOperations.fe_mul(out y, ref  H.Y, ref  recip);
+			FieldOperations.fe_tobytes(S, Offset, ref y);
+			S[Offset + 31] ^= (byte)(FieldOperations.fe_isnegative(ref x) << 7);
 		}
 	}
 }

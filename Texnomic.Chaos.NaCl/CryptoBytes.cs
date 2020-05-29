@@ -1,86 +1,86 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 
-namespace Chaos.NaCl
+namespace Texnomic.Chaos.NaCl
 {
     public static class CryptoBytes
     {
-        public static bool ConstantTimeEquals(byte[] x, byte[] y)
+        public static bool ConstantTimeEquals(byte[] x, byte[] Y)
         {
             if (x == null)
-                throw new ArgumentNullException("x");
-            if (y == null)
-                throw new ArgumentNullException("y");
-            if (x.Length != y.Length)
+                throw new ArgumentNullException(nameof(x));
+            if (Y == null)
+                throw new ArgumentNullException(nameof(Y));
+            if (x.Length != Y.Length)
                 throw new ArgumentException("x.Length must equal y.Length");
-            return InternalConstantTimeEquals(x, 0, y, 0, x.Length) != 0;
+            return InternalConstantTimeEquals(x, 0, Y, 0, x.Length) != 0;
         }
 
-        public static bool ConstantTimeEquals(ArraySegment<byte> x, ArraySegment<byte> y)
+        public static bool ConstantTimeEquals(ArraySegment<byte> x, ArraySegment<byte> Y)
         {
             if (x.Array == null)
                 throw new ArgumentNullException("x.Array");
-            if (y.Array == null)
+            if (Y.Array == null)
                 throw new ArgumentNullException("y.Array");
-            if (x.Count != y.Count)
+            if (x.Count != Y.Count)
                 throw new ArgumentException("x.Count must equal y.Count");
 
-            return InternalConstantTimeEquals(x.Array, x.Offset, y.Array, y.Offset, x.Count) != 0;
+            return InternalConstantTimeEquals(x.Array, x.Offset, Y.Array, Y.Offset, x.Count) != 0;
         }
 
-        public static bool ConstantTimeEquals(byte[] x, int xOffset, byte[] y, int yOffset, int length)
+        public static bool ConstantTimeEquals(byte[] x, int Offset, byte[] Y, int YOffset, int Length)
         {
             if (x == null)
-                throw new ArgumentNullException("x");
-            if (xOffset < 0)
-                throw new ArgumentOutOfRangeException("xOffset", "xOffset < 0");
-            if (y == null)
-                throw new ArgumentNullException("y");
-            if (yOffset < 0)
-                throw new ArgumentOutOfRangeException("yOffset", "yOffset < 0");
-            if (length < 0)
-                throw new ArgumentOutOfRangeException("length", "length < 0");
-            if (x.Length - xOffset < length)
+                throw new ArgumentNullException(nameof(x));
+            if (Offset < 0)
+                throw new ArgumentOutOfRangeException(nameof(Offset), "xOffset < 0");
+            if (Y == null)
+                throw new ArgumentNullException(nameof(Y));
+            if (YOffset < 0)
+                throw new ArgumentOutOfRangeException(nameof(YOffset), "yOffset < 0");
+            if (Length < 0)
+                throw new ArgumentOutOfRangeException(nameof(Length), "length < 0");
+            if (x.Length - Offset < Length)
                 throw new ArgumentException("xOffset + length > x.Length");
-            if (y.Length - yOffset < length)
+            if (Y.Length - YOffset < Length)
                 throw new ArgumentException("yOffset + length > y.Length");
 
-            return InternalConstantTimeEquals(x, xOffset, y, yOffset, length) != 0;
+            return InternalConstantTimeEquals(x, Offset, Y, YOffset, Length) != 0;
         }
 
-        private static uint InternalConstantTimeEquals(byte[] x, int xOffset, byte[] y, int yOffset, int length)
+        private static uint InternalConstantTimeEquals(byte[] x, int Offset, byte[] Y, int YOffset, int Length)
         {
-            int differentbits = 0;
-            for (int i = 0; i < length; i++)
-                differentbits |= x[xOffset + i] ^ y[yOffset + i];
+            var differentbits = 0;
+            for (var i = 0; i < Length; i++)
+                differentbits |= x[Offset + i] ^ Y[YOffset + i];
             return (1 & (unchecked((uint)differentbits - 1) >> 8));
         }
 
-        public static void Wipe(byte[] data)
+        public static void Wipe(byte[] Data)
         {
-            if (data == null)
-                throw new ArgumentNullException("data");
-            InternalWipe(data, 0, data.Length);
+            if (Data == null)
+                throw new ArgumentNullException(nameof(Data));
+            InternalWipe(Data, 0, Data.Length);
         }
 
-        public static void Wipe(byte[] data, int offset, int count)
+        public static void Wipe(byte[] Data, int Offset, int Count)
         {
-            if (data == null)
-                throw new ArgumentNullException("data");
-            if (offset < 0)
-                throw new ArgumentOutOfRangeException("offset");
-            if (count < 0)
-                throw new ArgumentOutOfRangeException("count", "Requires count >= 0");
-            if ((uint)offset + (uint)count > (uint)data.Length)
+            if (Data == null)
+                throw new ArgumentNullException(nameof(Data));
+            if (Offset < 0)
+                throw new ArgumentOutOfRangeException(nameof(Offset));
+            if (Count < 0)
+                throw new ArgumentOutOfRangeException(nameof(Count), "Requires count >= 0");
+            if ((uint)Offset + (uint)Count > (uint)Data.Length)
                 throw new ArgumentException("Requires offset + count <= data.Length");
-            InternalWipe(data, offset, count);
+            InternalWipe(Data, Offset, Count);
         }
 
-        public static void Wipe(ArraySegment<byte> data)
+        public static void Wipe(ArraySegment<byte> Data)
         {
-            if (data.Array == null)
+            if (Data.Array == null)
                 throw new ArgumentNullException("data.Array");
-            InternalWipe(data.Array, data.Offset, data.Count);
+            InternalWipe(Data.Array, Data.Offset, Data.Count);
         }
 
         // Secure wiping is hard
@@ -92,17 +92,17 @@ namespace Chaos.NaCl
         //   I hope this is enough, suppressing inlining
         //   but perhaps `RtlSecureZeroMemory` is needed
         [MethodImpl(MethodImplOptions.NoInlining)]
-        internal static void InternalWipe(byte[] data, int offset, int count)
+        internal static void InternalWipe(byte[] Data, int Offset, int Count)
         {
-            Array.Clear(data, offset, count);
+            Array.Clear(Data, Offset, Count);
         }
 
         // shallow wipe of structs
         [MethodImpl(MethodImplOptions.NoInlining)]
-        internal static void InternalWipe<T>(ref T data)
+        internal static void InternalWipe<T>(ref T Data)
             where T : struct
         {
-            data = default(T);
+            Data = default(T);
         }
 
         // constant time hex conversion
@@ -127,17 +127,17 @@ namespace Chaos.NaCl
         // * I didn't use a second loop variable to index into `c`, since measurement shows that calculating it from `i` is cheaper. 
         // * Using exactly `i < bytes.Length` as upper bound of the loop allows the JITter to eliminate bounds checks on `bytes[i]`, so I chose that variant.
         // * Making `b` an int avoids unnecessary conversions from and to byte.
-        public static string ToHexStringUpper(byte[] data)
+        public static string ToHexStringUpper(byte[] Data)
         {
-            if (data == null)
+            if (Data == null)
                 return null;
-            char[] c = new char[data.Length * 2];
+            var c = new char[Data.Length * 2];
             int b;
-            for (int i = 0; i < data.Length; i++)
+            for (var i = 0; i < Data.Length; i++)
             {
-                b = data[i] >> 4;
+                b = Data[i] >> 4;
                 c[i * 2] = (char)(55 + b + (((b - 10) >> 31) & -7));
-                b = data[i] & 0xF;
+                b = Data[i] & 0xF;
                 c[i * 2 + 1] = (char)(55 + b + (((b - 10) >> 31) & -7));
             }
             return new string(c);
@@ -145,46 +145,46 @@ namespace Chaos.NaCl
 
         // Explanation is similar to ToHexStringUpper
         // constant 55 -> 87 and -7 -> -39 to compensate for the offset 32 between lowercase and uppercase letters
-        public static string ToHexStringLower(byte[] data)
+        public static string ToHexStringLower(byte[] Data)
         {
-            if (data == null)
+            if (Data == null)
                 return null;
-            char[] c = new char[data.Length * 2];
+            var c = new char[Data.Length * 2];
             int b;
-            for (int i = 0; i < data.Length; i++)
+            for (var i = 0; i < Data.Length; i++)
             {
-                b = data[i] >> 4;
+                b = Data[i] >> 4;
                 c[i * 2] = (char)(87 + b + (((b - 10) >> 31) & -39));
-                b = data[i] & 0xF;
+                b = Data[i] & 0xF;
                 c[i * 2 + 1] = (char)(87 + b + (((b - 10) >> 31) & -39));
             }
             return new string(c);
         }
 
-        public static byte[] FromHexString(string hexString)
+        public static byte[] FromHexString(string HexString)
         {
-            if (hexString == null)
+            if (HexString == null)
                 return null;
-            if (hexString.Length % 2 != 0)
+            if (HexString.Length % 2 != 0)
                 throw new FormatException("The hex string is invalid because it has an odd length");
-            var result = new byte[hexString.Length / 2];
-            for (int i = 0; i < result.Length; i++)
-                result[i] = Convert.ToByte(hexString.Substring(i * 2, 2), 16);
+            var result = new byte[HexString.Length / 2];
+            for (var i = 0; i < result.Length; i++)
+                result[i] = Convert.ToByte(HexString.Substring(i * 2, 2), 16);
             return result;
         }
 
-        public static string ToBase64String(byte[] data)
+        public static string ToBase64String(byte[] Data)
         {
-            if (data == null)
+            if (Data == null)
                 return null;
-            return Convert.ToBase64String(data);
+            return Convert.ToBase64String(Data);
         }
 
-        public static byte[] FromBase64String(string s)
+        public static byte[] FromBase64String(string S)
         {
-            if (s == null)
+            if (S == null)
                 return null;
-            return Convert.FromBase64String(s);
+            return Convert.FromBase64String(S);
         }
     }
 }

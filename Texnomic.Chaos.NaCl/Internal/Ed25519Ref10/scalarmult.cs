@@ -1,27 +1,27 @@
 ﻿using System;
 
-namespace Chaos.NaCl.Internal.Ed25519Ref10
+namespace Texnomic.Chaos.NaCl.Internal.Ed25519Ref10
 {
 	public static class MontgomeryOperations
 	{
-		public static void scalarmult(
-			byte[] q, int qoffset,
-			byte[] n, int noffset,
-			byte[] p, int poffset)
+		public static void Scalarmult(
+			byte[] Q, int Qoffset,
+			byte[] N, int Noffset,
+			byte[] P, int Poffset)
 		{
 			FieldElement p0;
 			FieldElement q0;
-			FieldOperations.fe_frombytes2(out p0, p, poffset);
-			scalarmult(out q0, n, noffset, ref p0);
-			FieldOperations.fe_tobytes(q, qoffset, ref q0);
+			FieldOperations.fe_frombytes2(out p0, P, Poffset);
+			Scalarmult(out q0, N, Noffset, ref p0);
+			FieldOperations.fe_tobytes(Q, Qoffset, ref q0);
 		}
 
-		internal static void scalarmult(
-			out FieldElement q,
-			byte[] n, int noffset,
-			ref FieldElement p)
+		internal static void Scalarmult(
+			out FieldElement Q,
+			byte[] N, int Noffset,
+			ref FieldElement P)
 		{
-			byte[] e = new byte[32];//ToDo: remove allocation
+			var e = new byte[32];//ToDo: remove allocation
 			UInt32 i;
 			FieldElement x1;
 			FieldElement x2;
@@ -35,9 +35,9 @@ namespace Chaos.NaCl.Internal.Ed25519Ref10
 			UInt32 b;
 
 			for (i = 0; i < 32; ++i)
-				e[i] = n[noffset + i];
+				e[i] = N[Noffset + i];
 		    ScalarOperations.sc_clamp(e, 0);
-			x1 = p;
+			x1 = P;
 			FieldOperations.fe_1(out x2);
 			FieldOperations.fe_0(out z2);
 			x3 = x1;
@@ -198,7 +198,7 @@ namespace Chaos.NaCl.Internal.Ed25519Ref10
 
 			FieldOperations.fe_invert(out z2, ref z2);
 			FieldOperations.fe_mul(out x2, ref x2, ref z2);
-			q = x2;
+			Q = x2;
 			CryptoBytes.Wipe(e);
 		}
 	}

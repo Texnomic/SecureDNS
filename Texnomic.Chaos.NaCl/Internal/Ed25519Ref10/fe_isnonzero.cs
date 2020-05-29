@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Chaos.NaCl.Internal.Ed25519Ref10
+﻿namespace Texnomic.Chaos.NaCl.Internal.Ed25519Ref10
 {
     internal static partial class FieldOperations
     {
@@ -16,11 +14,11 @@ namespace Chaos.NaCl.Internal.Ed25519Ref10
         //   0 if f == 0
         //  -1 if f != 0
         // This code actually returns 0 if f==0 and 1 if f != 0
-        internal static int fe_isnonzero(ref FieldElement f)
+        internal static int fe_isnonzero(ref FieldElement F)
         {
             FieldElement fr;
-            fe_reduce(out fr, ref f);
-            int differentBits = 0;
+            fe_reduce(out fr, ref F);
+            var differentBits = 0;
             differentBits |= fr.x0;
             differentBits |= fr.x1;
             differentBits |= fr.x2;

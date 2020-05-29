@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Chaos.NaCl.Internal.Ed25519Ref10
+﻿namespace Texnomic.Chaos.NaCl.Internal.Ed25519Ref10
 {
 	/*
 	ge means group element.
@@ -41,15 +39,15 @@ namespace Chaos.NaCl.Internal.Ed25519Ref10
 
 	internal struct GroupElementPreComp
 	{
-		public FieldElement yplusx;
-		public FieldElement yminusx;
-		public FieldElement xy2d;
+		public FieldElement Yplusx;
+		public FieldElement Yminusx;
+		public FieldElement Xy2d;
 
-		public GroupElementPreComp(FieldElement yplusx, FieldElement yminusx, FieldElement xy2d)
+		public GroupElementPreComp(FieldElement Yplusx, FieldElement Yminusx, FieldElement Xy2d)
 		{
-			this.yplusx = yplusx;
-			this.yminusx = yminusx;
-			this.xy2d = xy2d;
+			this.Yplusx = Yplusx;
+			this.Yminusx = Yminusx;
+			this.Xy2d = Xy2d;
 		}
 	} ;
 

@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 
-namespace Chaos.NaCl.Internal
+namespace Texnomic.Chaos.NaCl.Internal
 {
     internal static class Sha512Internal
     {
@@ -29,49 +28,49 @@ namespace Chaos.NaCl.Internal
                 0x4cc5d4becb3e42b6,0x597f299cfc657e2a,0x5fcb6fab3ad6faec,0x6c44198c4a475817
             };
 
-        internal static void Sha512Init(out Array8<UInt64> state)
+        internal static void Sha512Init(out Array8<UInt64> State)
         {
-            state.x0 = 0x6a09e667f3bcc908;
-            state.x1 = 0xbb67ae8584caa73b;
-            state.x2 = 0x3c6ef372fe94f82b;
-            state.x3 = 0xa54ff53a5f1d36f1;
-            state.x4 = 0x510e527fade682d1;
-            state.x5 = 0x9b05688c2b3e6c1f;
-            state.x6 = 0x1f83d9abfb41bd6b;
-            state.x7 = 0x5be0cd19137e2179;
+            State.x0 = 0x6a09e667f3bcc908;
+            State.x1 = 0xbb67ae8584caa73b;
+            State.x2 = 0x3c6ef372fe94f82b;
+            State.x3 = 0xa54ff53a5f1d36f1;
+            State.x4 = 0x510e527fade682d1;
+            State.x5 = 0x9b05688c2b3e6c1f;
+            State.x6 = 0x1f83d9abfb41bd6b;
+            State.x7 = 0x5be0cd19137e2179;
         }
 
-        internal static void Core(out Array8<UInt64> outputState, ref Array8<UInt64> inputState, ref Array16<UInt64> input)
+        internal static void Core(out Array8<UInt64> OutputState, ref Array8<UInt64> InputState, ref Array16<UInt64> Input)
         {
             unchecked
             {
-                UInt64 a = inputState.x0;
-                UInt64 b = inputState.x1;
-                UInt64 c = inputState.x2;
-                UInt64 d = inputState.x3;
-                UInt64 e = inputState.x4;
-                UInt64 f = inputState.x5;
-                UInt64 g = inputState.x6;
-                UInt64 h = inputState.x7;
+                var a = InputState.x0;
+                var b = InputState.x1;
+                var c = InputState.x2;
+                var d = InputState.x3;
+                var e = InputState.x4;
+                var f = InputState.x5;
+                var g = InputState.x6;
+                var h = InputState.x7;
 
-                UInt64 w0 = input.x0;
-                UInt64 w1 = input.x1;
-                UInt64 w2 = input.x2;
-                UInt64 w3 = input.x3;
-                UInt64 w4 = input.x4;
-                UInt64 w5 = input.x5;
-                UInt64 w6 = input.x6;
-                UInt64 w7 = input.x7;
-                UInt64 w8 = input.x8;
-                UInt64 w9 = input.x9;
-                UInt64 w10 = input.x10;
-                UInt64 w11 = input.x11;
-                UInt64 w12 = input.x12;
-                UInt64 w13 = input.x13;
-                UInt64 w14 = input.x14;
-                UInt64 w15 = input.x15;
+                var w0 = Input.x0;
+                var w1 = Input.x1;
+                var w2 = Input.x2;
+                var w3 = Input.x3;
+                var w4 = Input.x4;
+                var w5 = Input.x5;
+                var w6 = Input.x6;
+                var w7 = Input.x7;
+                var w8 = Input.x8;
+                var w9 = Input.x9;
+                var w10 = Input.x10;
+                var w11 = Input.x11;
+                var w12 = Input.x12;
+                var w13 = Input.x13;
+                var w14 = Input.x14;
+                var w15 = Input.x15;
 
-                int t = 0;
+                var t = 0;
                 while (true)
                 {
                     ulong t1, t2;
@@ -433,14 +432,14 @@ namespace Chaos.NaCl.Internal
                            ((w0 >> 1) ^ (w0 << (64 - 1)) ^ (w0 >> 8) ^ (w0 << (64 - 8)) ^ (w0 >> 7));
                 }
 
-                outputState.x0 = inputState.x0 + a;
-                outputState.x1 = inputState.x1 + b;
-                outputState.x2 = inputState.x2 + c;
-                outputState.x3 = inputState.x3 + d;
-                outputState.x4 = inputState.x4 + e;
-                outputState.x5 = inputState.x5 + f;
-                outputState.x6 = inputState.x6 + g;
-                outputState.x7 = inputState.x7 + h;
+                OutputState.x0 = InputState.x0 + a;
+                OutputState.x1 = InputState.x1 + b;
+                OutputState.x2 = InputState.x2 + c;
+                OutputState.x3 = InputState.x3 + d;
+                OutputState.x4 = InputState.x4 + e;
+                OutputState.x5 = InputState.x5 + f;
+                OutputState.x6 = InputState.x6 + g;
+                OutputState.x7 = InputState.x7 + h;
             }
         }
     }

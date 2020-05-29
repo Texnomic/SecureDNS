@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 
-namespace Chaos.NaCl.Internal
+namespace Texnomic.Chaos.NaCl.Internal
 {
     internal class Poly1305Donna
     {
         // written by floodyberry (Andrew M.)
         // original license: MIT or PUBLIC DOMAIN
         // https://github.com/floodyberry/poly1305-donna/blob/master/poly1305-donna-unrolled.c
-        public static void poly1305_auth(byte[] output, int outputOffset, byte[] m, int mStart, int mLength, ref Array8<UInt32> key)
+        public static void poly1305_auth(byte[] Output, int OutputOffset, byte[] M, int MStart, int MLength, ref Array8<UInt32> Key)
         {
             UInt32 t0, t1, t2, t3;
             UInt32 h0, h1, h2, h3, h4;
@@ -22,10 +21,10 @@ namespace Chaos.NaCl.Internal
             UInt64 c;
 
             /* clamp key */
-            t0 = key.x0;
-            t1 = key.x1;
-            t2 = key.x2;
-            t3 = key.x3;
+            t0 = Key.x0;
+            t1 = Key.x1;
+            t2 = Key.x2;
+            t3 = Key.x3;
 
             /* precompute multipliers */
             r0 = t0 & 0x3ffffff; t0 >>= 26; t0 |= t1 << 6;
@@ -47,17 +46,17 @@ namespace Chaos.NaCl.Internal
             h4 = 0;
 
             /* full blocks */
-            if (mLength < 16)
+            if (MLength < 16)
                 goto poly1305_donna_atmost15bytes;
 
         poly1305_donna_16bytes:
-            mStart += 16;
-            mLength -= 16;
+            MStart += 16;
+            MLength -= 16;
 
-            t0 = ByteIntegerConverter.LoadLittleEndian32(m, mStart - 16);
-            t1 = ByteIntegerConverter.LoadLittleEndian32(m, mStart - 12);
-            t2 = ByteIntegerConverter.LoadLittleEndian32(m, mStart - 8);
-            t3 = ByteIntegerConverter.LoadLittleEndian32(m, mStart - 4);
+            t0 = ByteIntegerConverter.LoadLittleEndian32(M, MStart - 16);
+            t1 = ByteIntegerConverter.LoadLittleEndian32(M, MStart - 12);
+            t2 = ByteIntegerConverter.LoadLittleEndian32(M, MStart - 8);
+            t3 = ByteIntegerConverter.LoadLittleEndian32(M, MStart - 4);
 
             //todo: looks like these can be simplified a bit
             h0 += t0 & 0x3ffffff;
@@ -84,22 +83,22 @@ namespace Chaos.NaCl.Internal
             }
             h0 += b * 5;
 
-            if (mLength >= 16)
+            if (MLength >= 16)
                 goto poly1305_donna_16bytes;
 
     /* final bytes */
         poly1305_donna_atmost15bytes:
-            if (mLength == 0)
+            if (MLength == 0)
                 goto poly1305_donna_finish;
 
-            byte[] mp = new byte[16];//todo remove allocation
+            var mp = new byte[16];//todo remove allocation
 
-            for (j = 0; j < mLength; j++)
-                mp[j] = m[mStart + j];
+            for (j = 0; j < MLength; j++)
+                mp[j] = M[MStart + j];
             mp[j++] = 1;
             for (; j < 16; j++)
                 mp[j] = 0;
-            mLength = 0;
+            MLength = 0;
 
             t0 = ByteIntegerConverter.LoadLittleEndian32(mp, 0);
             t1 = ByteIntegerConverter.LoadLittleEndian32(mp, 4);
@@ -137,17 +136,17 @@ namespace Chaos.NaCl.Internal
             h3 = (h3 & nb) | (g3 & b);
             h4 = (h4 & nb) | (g4 & b);
 
-            f0 = ((h0) | (h1 << 26)) + (UInt64)key.x4;
-            f1 = ((h1 >> 6) | (h2 << 20)) + (UInt64)key.x5;
-            f2 = ((h2 >> 12) | (h3 << 14)) + (UInt64)key.x6;
-            f3 = ((h3 >> 18) | (h4 << 8)) + (UInt64)key.x7;
+            f0 = ((h0) | (h1 << 26)) + (UInt64)Key.x4;
+            f1 = ((h1 >> 6) | (h2 << 20)) + (UInt64)Key.x5;
+            f2 = ((h2 >> 12) | (h3 << 14)) + (UInt64)Key.x6;
+            f3 = ((h3 >> 18) | (h4 << 8)) + (UInt64)Key.x7;
 
             unchecked
             {
-                ByteIntegerConverter.StoreLittleEndian32(output, outputOffset + 0, (uint)f0); f1 += (f0 >> 32);
-                ByteIntegerConverter.StoreLittleEndian32(output, outputOffset + 4, (uint)f1); f2 += (f1 >> 32);
-                ByteIntegerConverter.StoreLittleEndian32(output, outputOffset + 8, (uint)f2); f3 += (f2 >> 32);
-                ByteIntegerConverter.StoreLittleEndian32(output, outputOffset + 12, (uint)f3);
+                ByteIntegerConverter.StoreLittleEndian32(Output, OutputOffset + 0, (uint)f0); f1 += (f0 >> 32);
+                ByteIntegerConverter.StoreLittleEndian32(Output, OutputOffset + 4, (uint)f1); f2 += (f1 >> 32);
+                ByteIntegerConverter.StoreLittleEndian32(Output, OutputOffset + 8, (uint)f2); f3 += (f2 >> 32);
+                ByteIntegerConverter.StoreLittleEndian32(Output, OutputOffset + 12, (uint)f3);
             }
         }
     }

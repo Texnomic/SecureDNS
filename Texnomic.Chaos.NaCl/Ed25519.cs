@@ -1,7 +1,7 @@
 ﻿using System;
-using Chaos.NaCl.Internal.Ed25519Ref10;
+using Texnomic.Chaos.NaCl.Internal.Ed25519Ref10;
 
-namespace Chaos.NaCl
+namespace Texnomic.Chaos.NaCl
 {
     public static class Ed25519
     {
@@ -11,137 +11,137 @@ namespace Chaos.NaCl
         public static readonly int PrivateKeySeedSizeInBytes = 32;
         public static readonly int SharedKeySizeInBytes = 32;
 
-        public static bool Verify(ArraySegment<byte> signature, ArraySegment<byte> message, ArraySegment<byte> publicKey)
+        public static bool Verify(ArraySegment<byte> Signature, ArraySegment<byte> Message, ArraySegment<byte> PublicKey)
         {
-            if (signature.Count != SignatureSizeInBytes)
+            if (Signature.Count != SignatureSizeInBytes)
                 throw new ArgumentException(string.Format("Signature size must be {0}", SignatureSizeInBytes), "signature.Count");
-            if (publicKey.Count != PublicKeySizeInBytes)
+            if (PublicKey.Count != PublicKeySizeInBytes)
                 throw new ArgumentException(string.Format("Public key size must be {0}", PublicKeySizeInBytes), "publicKey.Count");
-            return Ed25519Operations.crypto_sign_verify(signature.Array, signature.Offset, message.Array, message.Offset, message.Count, publicKey.Array, publicKey.Offset);
+            return Ed25519Operations.crypto_sign_verify(Signature.Array, Signature.Offset, Message.Array, Message.Offset, Message.Count, PublicKey.Array, PublicKey.Offset);
         }
 
-        public static bool Verify(byte[] signature, byte[] message, byte[] publicKey)
+        public static bool Verify(byte[] Signature, byte[] Message, byte[] PublicKey)
         {
-            if (signature == null)
-                throw new ArgumentNullException("signature");
-            if (message == null)
-                throw new ArgumentNullException("message");
-            if (publicKey == null)
-                throw new ArgumentNullException("publicKey");
-            if (signature.Length != SignatureSizeInBytes)
+            if (Signature == null)
+                throw new ArgumentNullException(nameof(Signature));
+            if (Message == null)
+                throw new ArgumentNullException(nameof(Message));
+            if (PublicKey == null)
+                throw new ArgumentNullException(nameof(PublicKey));
+            if (Signature.Length != SignatureSizeInBytes)
                 throw new ArgumentException(string.Format("Signature size must be {0}", SignatureSizeInBytes), "signature.Length");
-            if (publicKey.Length != PublicKeySizeInBytes)
+            if (PublicKey.Length != PublicKeySizeInBytes)
                 throw new ArgumentException(string.Format("Public key size must be {0}", PublicKeySizeInBytes), "publicKey.Length");
-            return Ed25519Operations.crypto_sign_verify(signature, 0, message, 0, message.Length, publicKey, 0);
+            return Ed25519Operations.crypto_sign_verify(Signature, 0, Message, 0, Message.Length, PublicKey, 0);
         }
 
-        public static void Sign(ArraySegment<byte> signature, ArraySegment<byte> message, ArraySegment<byte> expandedPrivateKey)
+        public static void Sign(ArraySegment<byte> Signature, ArraySegment<byte> Message, ArraySegment<byte> ExpandedPrivateKey)
         {
-            if (signature.Array == null)
+            if (Signature.Array == null)
                 throw new ArgumentNullException("signature.Array");
-            if (signature.Count != SignatureSizeInBytes)
+            if (Signature.Count != SignatureSizeInBytes)
                 throw new ArgumentException("signature.Count");
-            if (expandedPrivateKey.Array == null)
+            if (ExpandedPrivateKey.Array == null)
                 throw new ArgumentNullException("expandedPrivateKey.Array");
-            if (expandedPrivateKey.Count != ExpandedPrivateKeySizeInBytes)
+            if (ExpandedPrivateKey.Count != ExpandedPrivateKeySizeInBytes)
                 throw new ArgumentException("expandedPrivateKey.Count");
-            if (message.Array == null)
+            if (Message.Array == null)
                 throw new ArgumentNullException("message.Array");
-            Ed25519Operations.crypto_sign2(signature.Array, signature.Offset, message.Array, message.Offset, message.Count, expandedPrivateKey.Array, expandedPrivateKey.Offset);
+            Ed25519Operations.crypto_sign2(Signature.Array, Signature.Offset, Message.Array, Message.Offset, Message.Count, ExpandedPrivateKey.Array, ExpandedPrivateKey.Offset);
         }
 
-        public static byte[] Sign(byte[] message, byte[] expandedPrivateKey)
+        public static byte[] Sign(byte[] Message, byte[] ExpandedPrivateKey)
         {
             var signature = new byte[SignatureSizeInBytes];
-            Sign(new ArraySegment<byte>(signature), new ArraySegment<byte>(message), new ArraySegment<byte>(expandedPrivateKey));
+            Sign(new ArraySegment<byte>(signature), new ArraySegment<byte>(Message), new ArraySegment<byte>(ExpandedPrivateKey));
             return signature;
         }
 
-        public static byte[] PublicKeyFromSeed(byte[] privateKeySeed)
+        public static byte[] PublicKeyFromSeed(byte[] PrivateKeySeed)
         {
             byte[] privateKey;
             byte[] publicKey;
-            KeyPairFromSeed(out publicKey, out privateKey, privateKeySeed);
+            KeyPairFromSeed(out publicKey, out privateKey, PrivateKeySeed);
             CryptoBytes.Wipe(privateKey);
             return publicKey;
         }
 
-        public static byte[] ExpandedPrivateKeyFromSeed(byte[] privateKeySeed)
+        public static byte[] ExpandedPrivateKeyFromSeed(byte[] PrivateKeySeed)
         {
             byte[] privateKey;
             byte[] publicKey;
-            KeyPairFromSeed(out publicKey, out privateKey, privateKeySeed);
+            KeyPairFromSeed(out publicKey, out privateKey, PrivateKeySeed);
             CryptoBytes.Wipe(publicKey);
             return privateKey;
         }
 
-        public static void KeyPairFromSeed(out byte[] publicKey, out byte[] expandedPrivateKey, byte[] privateKeySeed)
+        public static void KeyPairFromSeed(out byte[] PublicKey, out byte[] ExpandedPrivateKey, byte[] PrivateKeySeed)
         {
-            if (privateKeySeed == null)
-                throw new ArgumentNullException("privateKeySeed");
-            if (privateKeySeed.Length != PrivateKeySeedSizeInBytes)
+            if (PrivateKeySeed == null)
+                throw new ArgumentNullException(nameof(PrivateKeySeed));
+            if (PrivateKeySeed.Length != PrivateKeySeedSizeInBytes)
                 throw new ArgumentException("privateKeySeed");
             var pk = new byte[PublicKeySizeInBytes];
             var sk = new byte[ExpandedPrivateKeySizeInBytes];
-            Ed25519Operations.crypto_sign_keypair(pk, 0, sk, 0, privateKeySeed, 0);
-            publicKey = pk;
-            expandedPrivateKey = sk;
+            Ed25519Operations.crypto_sign_keypair(pk, 0, sk, 0, PrivateKeySeed, 0);
+            PublicKey = pk;
+            ExpandedPrivateKey = sk;
         }
 
-        public static void KeyPairFromSeed(ArraySegment<byte> publicKey, ArraySegment<byte> expandedPrivateKey, ArraySegment<byte> privateKeySeed)
+        public static void KeyPairFromSeed(ArraySegment<byte> PublicKey, ArraySegment<byte> ExpandedPrivateKey, ArraySegment<byte> PrivateKeySeed)
         {
-            if (publicKey.Array == null)
+            if (PublicKey.Array == null)
                 throw new ArgumentNullException("publicKey.Array");
-            if (expandedPrivateKey.Array == null)
+            if (ExpandedPrivateKey.Array == null)
                 throw new ArgumentNullException("expandedPrivateKey.Array");
-            if (privateKeySeed.Array == null)
+            if (PrivateKeySeed.Array == null)
                 throw new ArgumentNullException("privateKeySeed.Array");
-            if (publicKey.Count != PublicKeySizeInBytes)
+            if (PublicKey.Count != PublicKeySizeInBytes)
                 throw new ArgumentException("publicKey.Count");
-            if (expandedPrivateKey.Count != ExpandedPrivateKeySizeInBytes)
+            if (ExpandedPrivateKey.Count != ExpandedPrivateKeySizeInBytes)
                 throw new ArgumentException("expandedPrivateKey.Count");
-            if (privateKeySeed.Count != PrivateKeySeedSizeInBytes)
+            if (PrivateKeySeed.Count != PrivateKeySeedSizeInBytes)
                 throw new ArgumentException("privateKeySeed.Count");
             Ed25519Operations.crypto_sign_keypair(
-                publicKey.Array, publicKey.Offset,
-                expandedPrivateKey.Array, expandedPrivateKey.Offset,
-                privateKeySeed.Array, privateKeySeed.Offset);
+                PublicKey.Array, PublicKey.Offset,
+                ExpandedPrivateKey.Array, ExpandedPrivateKey.Offset,
+                PrivateKeySeed.Array, PrivateKeySeed.Offset);
         }
 
         [Obsolete("Needs more testing")]
-        public static byte[] KeyExchange(byte[] publicKey, byte[] privateKey)
+        public static byte[] KeyExchange(byte[] PublicKey, byte[] PrivateKey)
         {
             var sharedKey = new byte[SharedKeySizeInBytes];
-            KeyExchange(new ArraySegment<byte>(sharedKey), new ArraySegment<byte>(publicKey), new ArraySegment<byte>(privateKey));
+            KeyExchange(new ArraySegment<byte>(sharedKey), new ArraySegment<byte>(PublicKey), new ArraySegment<byte>(PrivateKey));
             return sharedKey;
         }
 
         [Obsolete("Needs more testing")]
-        public static void KeyExchange(ArraySegment<byte> sharedKey, ArraySegment<byte> publicKey, ArraySegment<byte> privateKey)
+        public static void KeyExchange(ArraySegment<byte> SharedKey, ArraySegment<byte> PublicKey, ArraySegment<byte> PrivateKey)
         {
-            if (sharedKey.Array == null)
+            if (SharedKey.Array == null)
                 throw new ArgumentNullException("sharedKey.Array");
-            if (publicKey.Array == null)
+            if (PublicKey.Array == null)
                 throw new ArgumentNullException("publicKey.Array");
-            if (privateKey.Array == null)
-                throw new ArgumentNullException("privateKey");
-            if (sharedKey.Count != 32)
+            if (PrivateKey.Array == null)
+                throw new ArgumentNullException(nameof(PrivateKey));
+            if (SharedKey.Count != 32)
                 throw new ArgumentException("sharedKey.Count != 32");
-            if (publicKey.Count != 32)
+            if (PublicKey.Count != 32)
                 throw new ArgumentException("publicKey.Count != 32");
-            if (privateKey.Count != 64)
+            if (PrivateKey.Count != 64)
                 throw new ArgumentException("privateKey.Count != 64");
 
             FieldElement montgomeryX, edwardsY, edwardsZ, sharedMontgomeryX;
-            FieldOperations.fe_frombytes(out edwardsY, publicKey.Array, publicKey.Offset);
+            FieldOperations.fe_frombytes(out edwardsY, PublicKey.Array, PublicKey.Offset);
             FieldOperations.fe_1(out edwardsZ);
             MontgomeryCurve25519.EdwardsToMontgomeryX(out montgomeryX, ref edwardsY, ref edwardsZ);
-            byte[] h = Sha512.Hash(privateKey.Array, privateKey.Offset, 32);//ToDo: Remove alloc
+            var h = Sha512.Hash(PrivateKey.Array, PrivateKey.Offset, 32);//ToDo: Remove alloc
             ScalarOperations.sc_clamp(h, 0);
-            MontgomeryOperations.scalarmult(out sharedMontgomeryX, h, 0, ref montgomeryX);
+            MontgomeryOperations.Scalarmult(out sharedMontgomeryX, h, 0, ref montgomeryX);
             CryptoBytes.Wipe(h);
-            FieldOperations.fe_tobytes(sharedKey.Array, sharedKey.Offset, ref sharedMontgomeryX);
-            MontgomeryCurve25519.KeyExchangeOutputHashNaCl(sharedKey.Array, sharedKey.Offset);
+            FieldOperations.fe_tobytes(SharedKey.Array, SharedKey.Offset, ref sharedMontgomeryX);
+            MontgomeryCurve25519.KeyExchangeOutputHashNaCl(SharedKey.Array, SharedKey.Offset);
         }
     }
 }

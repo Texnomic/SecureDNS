@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Chaos.NaCl.Internal.Ed25519Ref10
+namespace Texnomic.Chaos.NaCl.Internal.Ed25519Ref10
 {
     internal static partial class FieldOperations
     {
@@ -28,21 +28,21 @@ namespace Chaos.NaCl.Internal.Ed25519Ref10
           Have q+2^(-255)x = 2^(-255)(h + 19 2^(-25) h9 + 2^(-1))
           so floor(2^(-255)(h + 19 2^(-25) h9 + 2^(-1))) = q.
         */
-        internal static void fe_tobytes(byte[] s, int offset, ref FieldElement h)
+        internal static void fe_tobytes(byte[] S, int Offset, ref FieldElement H)
         {
             FieldElement hr;
-            fe_reduce(out hr, ref h);
+            fe_reduce(out hr, ref H);
 
-            Int32 h0 = hr.x0;
-            Int32 h1 = hr.x1;
-            Int32 h2 = hr.x2;
-            Int32 h3 = hr.x3;
-            Int32 h4 = hr.x4;
-            Int32 h5 = hr.x5;
-            Int32 h6 = hr.x6;
-            Int32 h7 = hr.x7;
-            Int32 h8 = hr.x8;
-            Int32 h9 = hr.x9;
+            var h0 = hr.x0;
+            var h1 = hr.x1;
+            var h2 = hr.x2;
+            var h3 = hr.x3;
+            var h4 = hr.x4;
+            var h5 = hr.x5;
+            var h6 = hr.x6;
+            var h7 = hr.x7;
+            var h8 = hr.x8;
+            var h9 = hr.x9;
 
             /*
             Goal: Output h0+...+2^255 h10-2^255 q, which is between 0 and 2^255-20.
@@ -52,53 +52,53 @@ namespace Chaos.NaCl.Internal.Ed25519Ref10
             */
             unchecked
             {
-                s[offset + 0] = (byte) (h0 >> 0);
-                s[offset + 1] = (byte) (h0 >> 8);
-                s[offset + 2] = (byte) (h0 >> 16);
-                s[offset + 3] = (byte) ((h0 >> 24) | (h1 << 2));
-                s[offset + 4] = (byte) (h1 >> 6);
-                s[offset + 5] = (byte) (h1 >> 14);
-                s[offset + 6] = (byte) ((h1 >> 22) | (h2 << 3));
-                s[offset + 7] = (byte) (h2 >> 5);
-                s[offset + 8] = (byte) (h2 >> 13);
-                s[offset + 9] = (byte) ((h2 >> 21) | (h3 << 5));
-                s[offset + 10] = (byte) (h3 >> 3);
-                s[offset + 11] = (byte) (h3 >> 11);
-                s[offset + 12] = (byte) ((h3 >> 19) | (h4 << 6));
-                s[offset + 13] = (byte) (h4 >> 2);
-                s[offset + 14] = (byte) (h4 >> 10);
-                s[offset + 15] = (byte) (h4 >> 18);
-                s[offset + 16] = (byte) (h5 >> 0);
-                s[offset + 17] = (byte) (h5 >> 8);
-                s[offset + 18] = (byte) (h5 >> 16);
-                s[offset + 19] = (byte) ((h5 >> 24) | (h6 << 1));
-                s[offset + 20] = (byte) (h6 >> 7);
-                s[offset + 21] = (byte) (h6 >> 15);
-                s[offset + 22] = (byte) ((h6 >> 23) | (h7 << 3));
-                s[offset + 23] = (byte) (h7 >> 5);
-                s[offset + 24] = (byte) (h7 >> 13);
-                s[offset + 25] = (byte) ((h7 >> 21) | (h8 << 4));
-                s[offset + 26] = (byte) (h8 >> 4);
-                s[offset + 27] = (byte) (h8 >> 12);
-                s[offset + 28] = (byte) ((h8 >> 20) | (h9 << 6));
-                s[offset + 29] = (byte) (h9 >> 2);
-                s[offset + 30] = (byte) (h9 >> 10);
-                s[offset + 31] = (byte) (h9 >> 18);
+                S[Offset + 0] = (byte) (h0 >> 0);
+                S[Offset + 1] = (byte) (h0 >> 8);
+                S[Offset + 2] = (byte) (h0 >> 16);
+                S[Offset + 3] = (byte) ((h0 >> 24) | (h1 << 2));
+                S[Offset + 4] = (byte) (h1 >> 6);
+                S[Offset + 5] = (byte) (h1 >> 14);
+                S[Offset + 6] = (byte) ((h1 >> 22) | (h2 << 3));
+                S[Offset + 7] = (byte) (h2 >> 5);
+                S[Offset + 8] = (byte) (h2 >> 13);
+                S[Offset + 9] = (byte) ((h2 >> 21) | (h3 << 5));
+                S[Offset + 10] = (byte) (h3 >> 3);
+                S[Offset + 11] = (byte) (h3 >> 11);
+                S[Offset + 12] = (byte) ((h3 >> 19) | (h4 << 6));
+                S[Offset + 13] = (byte) (h4 >> 2);
+                S[Offset + 14] = (byte) (h4 >> 10);
+                S[Offset + 15] = (byte) (h4 >> 18);
+                S[Offset + 16] = (byte) (h5 >> 0);
+                S[Offset + 17] = (byte) (h5 >> 8);
+                S[Offset + 18] = (byte) (h5 >> 16);
+                S[Offset + 19] = (byte) ((h5 >> 24) | (h6 << 1));
+                S[Offset + 20] = (byte) (h6 >> 7);
+                S[Offset + 21] = (byte) (h6 >> 15);
+                S[Offset + 22] = (byte) ((h6 >> 23) | (h7 << 3));
+                S[Offset + 23] = (byte) (h7 >> 5);
+                S[Offset + 24] = (byte) (h7 >> 13);
+                S[Offset + 25] = (byte) ((h7 >> 21) | (h8 << 4));
+                S[Offset + 26] = (byte) (h8 >> 4);
+                S[Offset + 27] = (byte) (h8 >> 12);
+                S[Offset + 28] = (byte) ((h8 >> 20) | (h9 << 6));
+                S[Offset + 29] = (byte) (h9 >> 2);
+                S[Offset + 30] = (byte) (h9 >> 10);
+                S[Offset + 31] = (byte) (h9 >> 18);
             }
         }
 
-        internal static void fe_reduce(out FieldElement hr, ref FieldElement h)
+        internal static void fe_reduce(out FieldElement Hr, ref FieldElement H)
         {
-            Int32 h0 = h.x0;
-            Int32 h1 = h.x1;
-            Int32 h2 = h.x2;
-            Int32 h3 = h.x3;
-            Int32 h4 = h.x4;
-            Int32 h5 = h.x5;
-            Int32 h6 = h.x6;
-            Int32 h7 = h.x7;
-            Int32 h8 = h.x8;
-            Int32 h9 = h.x9;
+            var h0 = H.x0;
+            var h1 = H.x1;
+            var h2 = H.x2;
+            var h3 = H.x3;
+            var h4 = H.x4;
+            var h5 = H.x5;
+            var h6 = H.x6;
+            var h7 = H.x7;
+            var h8 = H.x8;
+            var h9 = H.x9;
             Int32 q;
             Int32 carry0;
             Int32 carry1;
@@ -139,16 +139,16 @@ namespace Chaos.NaCl.Internal.Ed25519Ref10
             carry9 = h9 >> 25; h9 -= carry9 << 25;
             /* h10 = carry9 */
 
-            hr.x0 = h0;
-            hr.x1 = h1;
-            hr.x2 = h2;
-            hr.x3 = h3;
-            hr.x4 = h4;
-            hr.x5 = h5;
-            hr.x6 = h6;
-            hr.x7 = h7;
-            hr.x8 = h8;
-            hr.x9 = h9;
+            Hr.x0 = h0;
+            Hr.x1 = h1;
+            Hr.x2 = h2;
+            Hr.x3 = h3;
+            Hr.x4 = h4;
+            Hr.x5 = h5;
+            Hr.x6 = h6;
+            Hr.x7 = h7;
+            Hr.x8 = h8;
+            Hr.x9 = h9;
         }
     }
 }

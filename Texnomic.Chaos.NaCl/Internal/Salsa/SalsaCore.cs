@@ -1,36 +1,35 @@
 ﻿using System;
-using System.Collections.Generic;
 
-namespace Chaos.NaCl.Internal.Salsa
+namespace Texnomic.Chaos.NaCl.Internal.Salsa
 {
     internal static class SalsaCore
     {
-        public static void HSalsa(out Array16<UInt32> output, ref Array16<UInt32> input, int rounds)
+        public static void HSalsa(out Array16<UInt32> Output, ref Array16<UInt32> Input, int Rounds)
         {
-            InternalAssert.Assert(rounds % 2 == 0, "Number of salsa rounds must be even");
+            InternalAssert.Assert(Rounds % 2 == 0, "Number of salsa rounds must be even");
 
-            int doubleRounds = rounds / 2;
+            var doubleRounds = Rounds / 2;
 
-            UInt32 x0 = input.x0;
-            UInt32 x1 = input.x1;
-            UInt32 x2 = input.x2;
-            UInt32 x3 = input.x3;
-            UInt32 x4 = input.x4;
-            UInt32 x5 = input.x5;
-            UInt32 x6 = input.x6;
-            UInt32 x7 = input.x7;
-            UInt32 x8 = input.x8;
-            UInt32 x9 = input.x9;
-            UInt32 x10 = input.x10;
-            UInt32 x11 = input.x11;
-            UInt32 x12 = input.x12;
-            UInt32 x13 = input.x13;
-            UInt32 x14 = input.x14;
-            UInt32 x15 = input.x15;
+            var x0 = Input.x0;
+            var x1 = Input.x1;
+            var x2 = Input.x2;
+            var x3 = Input.x3;
+            var x4 = Input.x4;
+            var x5 = Input.x5;
+            var x6 = Input.x6;
+            var x7 = Input.x7;
+            var x8 = Input.x8;
+            var x9 = Input.x9;
+            var x10 = Input.x10;
+            var x11 = Input.x11;
+            var x12 = Input.x12;
+            var x13 = Input.x13;
+            var x14 = Input.x14;
+            var x15 = Input.x15;
 
             unchecked
             {
-                for (int i = 0; i < doubleRounds; i++)
+                for (var i = 0; i < doubleRounds; i++)
                 {
                     UInt32 y;
 
@@ -116,46 +115,46 @@ namespace Chaos.NaCl.Internal.Salsa
                 }
             }
 
-            output.x0 = x0;
-            output.x1 = x1;
-            output.x2 = x2;
-            output.x3 = x3;
-            output.x4 = x4;
-            output.x5 = x5;
-            output.x6 = x6;
-            output.x7 = x7;
-            output.x8 = x8;
-            output.x9 = x9;
-            output.x10 = x10;
-            output.x11 = x11;
-            output.x12 = x12;
-            output.x13 = x13;
-            output.x14 = x14;
-            output.x15 = x15;
+            Output.x0 = x0;
+            Output.x1 = x1;
+            Output.x2 = x2;
+            Output.x3 = x3;
+            Output.x4 = x4;
+            Output.x5 = x5;
+            Output.x6 = x6;
+            Output.x7 = x7;
+            Output.x8 = x8;
+            Output.x9 = x9;
+            Output.x10 = x10;
+            Output.x11 = x11;
+            Output.x12 = x12;
+            Output.x13 = x13;
+            Output.x14 = x14;
+            Output.x15 = x15;
         }
 
-        public static void Salsa(out Array16<UInt32> output, ref Array16<UInt32> input, int rounds)
+        public static void Salsa(out Array16<UInt32> Output, ref Array16<UInt32> Input, int Rounds)
         {
             Array16<UInt32> temp;
-            HSalsa(out temp, ref input, rounds);
+            HSalsa(out temp, ref Input, Rounds);
             unchecked
             {
-                output.x0 = temp.x0 + input.x0;
-                output.x1 = temp.x1 + input.x1;
-                output.x2 = temp.x2 + input.x2;
-                output.x3 = temp.x3 + input.x3;
-                output.x4 = temp.x4 + input.x4;
-                output.x5 = temp.x5 + input.x5;
-                output.x6 = temp.x6 + input.x6;
-                output.x7 = temp.x7 + input.x7;
-                output.x8 = temp.x8 + input.x8;
-                output.x9 = temp.x9 + input.x9;
-                output.x10 = temp.x10 + input.x10;
-                output.x11 = temp.x11 + input.x11;
-                output.x12 = temp.x12 + input.x12;
-                output.x13 = temp.x13 + input.x13;
-                output.x14 = temp.x14 + input.x14;
-                output.x15 = temp.x15 + input.x15;
+                Output.x0 = temp.x0 + Input.x0;
+                Output.x1 = temp.x1 + Input.x1;
+                Output.x2 = temp.x2 + Input.x2;
+                Output.x3 = temp.x3 + Input.x3;
+                Output.x4 = temp.x4 + Input.x4;
+                Output.x5 = temp.x5 + Input.x5;
+                Output.x6 = temp.x6 + Input.x6;
+                Output.x7 = temp.x7 + Input.x7;
+                Output.x8 = temp.x8 + Input.x8;
+                Output.x9 = temp.x9 + Input.x9;
+                Output.x10 = temp.x10 + Input.x10;
+                Output.x11 = temp.x11 + Input.x11;
+                Output.x12 = temp.x12 + Input.x12;
+                Output.x13 = temp.x13 + Input.x13;
+                Output.x14 = temp.x14 + Input.x14;
+                Output.x15 = temp.x15 + Input.x15;
             }
         }
 

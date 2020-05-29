@@ -1,14 +1,12 @@
-﻿using System;
-
-namespace Chaos.NaCl.Internal.Ed25519Ref10
+﻿namespace Texnomic.Chaos.NaCl.Internal.Ed25519Ref10
 {
     internal static partial class ScalarOperations
     {
-        public static void sc_clamp(byte[] s, int offset)
+        public static void sc_clamp(byte[] S, int Offset)
         {
-            s[offset + 0] &= 248;
-            s[offset + 31] &= 127;
-            s[offset + 31] |= 64;
+            S[Offset + 0] &= 248;
+            S[Offset + 31] &= 127;
+            S[Offset + 31] |= 64;
         }
     }
 }

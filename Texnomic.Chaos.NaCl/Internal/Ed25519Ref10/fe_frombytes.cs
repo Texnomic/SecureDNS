@@ -1,41 +1,41 @@
 ﻿using System;
 
-namespace Chaos.NaCl.Internal.Ed25519Ref10
+namespace Texnomic.Chaos.NaCl.Internal.Ed25519Ref10
 {
 	internal static partial class FieldOperations
 	{
-		private static Int64 load_3(byte[] data, int offset)
+		private static Int64 load_3(byte[] Data, int Offset)
 		{
 			uint result;
-			result = (uint)data[offset + 0];
-			result |= (uint)data[offset + 1] << 8;
-			result |= (uint)data[offset + 2] << 16;
+			result = (uint)Data[Offset + 0];
+			result |= (uint)Data[Offset + 1] << 8;
+			result |= (uint)Data[Offset + 2] << 16;
 			return (Int64)(UInt64)result;
 		}
 
-		private static Int64 load_4(byte[] data, int offset)
+		private static Int64 load_4(byte[] Data, int Offset)
 		{
 			uint result;
-			result = (uint)data[offset + 0];
-			result |= (uint)data[offset + 1] << 8;
-			result |= (uint)data[offset + 2] << 16;
-			result |= (uint)data[offset + 3] << 24;
+			result = (uint)Data[Offset + 0];
+			result |= (uint)Data[Offset + 1] << 8;
+			result |= (uint)Data[Offset + 2] << 16;
+			result |= (uint)Data[Offset + 3] << 24;
 			return (Int64)(UInt64)result;
 		}
 
 		//	Ignores top bit of h.
-		internal static void fe_frombytes(out FieldElement h, byte[] data, int offset)
+		internal static void fe_frombytes(out FieldElement H, byte[] Data, int Offset)
 		{
-			Int64 h0 = load_4(data, offset);
-			Int64 h1 = load_3(data, offset + 4) << 6;
-			Int64 h2 = load_3(data, offset + 7) << 5;
-			Int64 h3 = load_3(data, offset + 10) << 3;
-			Int64 h4 = load_3(data, offset + 13) << 2;
-			Int64 h5 = load_4(data, offset + 16);
-			Int64 h6 = load_3(data, offset + 20) << 7;
-			Int64 h7 = load_3(data, offset + 23) << 5;
-			Int64 h8 = load_3(data, offset + 26) << 4;
-			Int64 h9 = (load_3(data, offset + 29) & 8388607) << 2;
+			var h0 = load_4(Data, Offset);
+			var h1 = load_3(Data, Offset + 4) << 6;
+			var h2 = load_3(Data, Offset + 7) << 5;
+			var h3 = load_3(Data, Offset + 10) << 3;
+			var h4 = load_3(Data, Offset + 13) << 2;
+			var h5 = load_4(Data, Offset + 16);
+			var h6 = load_3(Data, Offset + 20) << 7;
+			var h7 = load_3(Data, Offset + 23) << 5;
+			var h8 = load_3(Data, Offset + 26) << 4;
+			var h9 = (load_3(Data, Offset + 29) & 8388607) << 2;
 			Int64 carry0;
 			Int64 carry1;
 			Int64 carry2;
@@ -59,31 +59,31 @@ namespace Chaos.NaCl.Internal.Ed25519Ref10
 			carry6 = (h6 + (Int64)(1 << 25)) >> 26; h7 += carry6; h6 -= carry6 << 26;
 			carry8 = (h8 + (Int64)(1 << 25)) >> 26; h9 += carry8; h8 -= carry8 << 26;
 
-			h.x0 = (int)h0;
-			h.x1 = (int)h1;
-			h.x2 = (int)h2;
-			h.x3 = (int)h3;
-			h.x4 = (int)h4;
-			h.x5 = (int)h5;
-			h.x6 = (int)h6;
-			h.x7 = (int)h7;
-			h.x8 = (int)h8;
-			h.x9 = (int)h9;
+			H.x0 = (int)h0;
+			H.x1 = (int)h1;
+			H.x2 = (int)h2;
+			H.x3 = (int)h3;
+			H.x4 = (int)h4;
+			H.x5 = (int)h5;
+			H.x6 = (int)h6;
+			H.x7 = (int)h7;
+			H.x8 = (int)h8;
+			H.x9 = (int)h9;
 		}
 
 		// does NOT ignore top bit
-		internal static void fe_frombytes2(out FieldElement h, byte[] data, int offset)
+		internal static void fe_frombytes2(out FieldElement H, byte[] Data, int Offset)
 		{
-			Int64 h0 = load_4(data, offset);
-			Int64 h1 = load_3(data, offset + 4) << 6;
-			Int64 h2 = load_3(data, offset + 7) << 5;
-			Int64 h3 = load_3(data, offset + 10) << 3;
-			Int64 h4 = load_3(data, offset + 13) << 2;
-			Int64 h5 = load_4(data, offset + 16);
-			Int64 h6 = load_3(data, offset + 20) << 7;
-			Int64 h7 = load_3(data, offset + 23) << 5;
-			Int64 h8 = load_3(data, offset + 26) << 4;
-			Int64 h9 = load_3(data, offset + 29) << 2;
+			var h0 = load_4(Data, Offset);
+			var h1 = load_3(Data, Offset + 4) << 6;
+			var h2 = load_3(Data, Offset + 7) << 5;
+			var h3 = load_3(Data, Offset + 10) << 3;
+			var h4 = load_3(Data, Offset + 13) << 2;
+			var h5 = load_4(Data, Offset + 16);
+			var h6 = load_3(Data, Offset + 20) << 7;
+			var h7 = load_3(Data, Offset + 23) << 5;
+			var h8 = load_3(Data, Offset + 26) << 4;
+			var h9 = load_3(Data, Offset + 29) << 2;
 			Int64 carry0;
 			Int64 carry1;
 			Int64 carry2;
@@ -107,16 +107,16 @@ namespace Chaos.NaCl.Internal.Ed25519Ref10
 			carry6 = (h6 + (Int64)(1 << 25)) >> 26; h7 += carry6; h6 -= carry6 << 26;
 			carry8 = (h8 + (Int64)(1 << 25)) >> 26; h9 += carry8; h8 -= carry8 << 26;
 
-			h.x0 = (int)h0;
-			h.x1 = (int)h1;
-			h.x2 = (int)h2;
-			h.x3 = (int)h3;
-			h.x4 = (int)h4;
-			h.x5 = (int)h5;
-			h.x6 = (int)h6;
-			h.x7 = (int)h7;
-			h.x8 = (int)h8;
-			h.x9 = (int)h9;
+			H.x0 = (int)h0;
+			H.x1 = (int)h1;
+			H.x2 = (int)h2;
+			H.x3 = (int)h3;
+			H.x4 = (int)h4;
+			H.x5 = (int)h5;
+			H.x6 = (int)h6;
+			H.x7 = (int)h7;
+			H.x8 = (int)h8;
+			H.x9 = (int)h9;
 		}
 	}
 }

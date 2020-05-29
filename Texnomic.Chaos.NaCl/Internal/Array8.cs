@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Chaos.NaCl.Internal
+﻿namespace Texnomic.Chaos.NaCl.Internal
 {
     // Array8<UInt32> Poly1305 key
     // Array8<UInt64> SHA-512 state/output

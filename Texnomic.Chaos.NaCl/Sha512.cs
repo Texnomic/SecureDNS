@@ -1,113 +1,112 @@
 ﻿using System;
-using System.Collections.Generic;
-using Chaos.NaCl.Internal;
+using Texnomic.Chaos.NaCl.Internal;
 
-namespace Chaos.NaCl
+namespace Texnomic.Chaos.NaCl
 {
     public class Sha512
     {
-        private Array8<UInt64> _state;
-        private readonly byte[] _buffer;
-        private ulong _totalBytes;
+        private Array8<UInt64> State;
+        private readonly byte[] Buffer;
+        private ulong TotalBytes;
         public const int BlockSize = 128;
-        private static readonly byte[] _padding = new byte[] { 0x80 };
+        private static readonly byte[] Padding = new byte[] { 0x80 };
 
         public Sha512()
         {
-            _buffer = new byte[BlockSize];//todo: remove allocation
+            Buffer = new byte[BlockSize];//todo: remove allocation
             Init();
         }
 
         public void Init()
         {
-            Sha512Internal.Sha512Init(out _state);
-            _totalBytes = 0;
+            Sha512Internal.Sha512Init(out State);
+            TotalBytes = 0;
         }
 
-        public void Update(ArraySegment<byte> data)
+        public void Update(ArraySegment<byte> Data)
         {
-            if (data.Array == null)
+            if (Data.Array == null)
                 throw new ArgumentNullException("data.Array");
-            Update(data.Array, data.Offset, data.Count);
+            Update(Data.Array, Data.Offset, Data.Count);
         }
 
-        public void Update(byte[] data, int offset, int count)
+        public void Update(byte[] Data, int Offset, int Count)
         {
-            if (data == null)
-                throw new ArgumentNullException("data");
-            if (offset < 0)
-                throw new ArgumentOutOfRangeException("offset");
-            if (count < 0)
-                throw new ArgumentOutOfRangeException("count");
-            if (data.Length - offset < count)
+            if (Data == null)
+                throw new ArgumentNullException(nameof(Data));
+            if (Offset < 0)
+                throw new ArgumentOutOfRangeException(nameof(Offset));
+            if (Count < 0)
+                throw new ArgumentOutOfRangeException(nameof(Count));
+            if (Data.Length - Offset < Count)
                 throw new ArgumentException("Requires offset + count <= data.Length");
 
             Array16<ulong> block;
-            int bytesInBuffer = (int)_totalBytes & (BlockSize - 1);
-            _totalBytes += (uint)count;
+            var bytesInBuffer = (int)TotalBytes & (BlockSize - 1);
+            TotalBytes += (uint)Count;
 
-            if (_totalBytes >= ulong.MaxValue / 8)
+            if (TotalBytes >= ulong.MaxValue / 8)
                 throw new InvalidOperationException("Too much data");
             // Fill existing buffer
             if (bytesInBuffer != 0)
             {
-                var toCopy = Math.Min(BlockSize - bytesInBuffer, count);
-                Buffer.BlockCopy(data, offset, _buffer, bytesInBuffer, toCopy);
-                offset += toCopy;
-                count -= toCopy;
+                var toCopy = Math.Min(BlockSize - bytesInBuffer, Count);
+                System.Buffer.BlockCopy(Data, Offset, Buffer, bytesInBuffer, toCopy);
+                Offset += toCopy;
+                Count -= toCopy;
                 bytesInBuffer += toCopy;
                 if (bytesInBuffer == BlockSize)
                 {
-                    ByteIntegerConverter.Array16LoadBigEndian64(out block, _buffer, 0);
-                    Sha512Internal.Core(out _state, ref _state, ref block);
-                    CryptoBytes.InternalWipe(_buffer, 0, _buffer.Length);
+                    ByteIntegerConverter.Array16LoadBigEndian64(out block, Buffer, 0);
+                    Sha512Internal.Core(out State, ref State, ref block);
+                    CryptoBytes.InternalWipe(Buffer, 0, Buffer.Length);
                     bytesInBuffer = 0;
                 }
             }
             // Hash complete blocks without copying
-            while (count >= BlockSize)
+            while (Count >= BlockSize)
             {
-                ByteIntegerConverter.Array16LoadBigEndian64(out block, data, offset);
-                Sha512Internal.Core(out _state, ref _state, ref block);
-                offset += BlockSize;
-                count -= BlockSize;
+                ByteIntegerConverter.Array16LoadBigEndian64(out block, Data, Offset);
+                Sha512Internal.Core(out State, ref State, ref block);
+                Offset += BlockSize;
+                Count -= BlockSize;
             }
             // Copy remainder into buffer
-            if (count > 0)
+            if (Count > 0)
             {
-                Buffer.BlockCopy(data, offset, _buffer, bytesInBuffer, count);
+                System.Buffer.BlockCopy(Data, Offset, Buffer, bytesInBuffer, Count);
             }
         }
 
-        public void Finish(ArraySegment<byte> output)
+        public void Finish(ArraySegment<byte> Output)
         {
-            if (output.Array == null)
+            if (Output.Array == null)
                 throw new ArgumentNullException("output.Array");
-            if (output.Count != 64)
+            if (Output.Count != 64)
                 throw new ArgumentException("output.Count must be 64");
 
-            Update(_padding, 0, _padding.Length);
+            Update(Padding, 0, Padding.Length);
             Array16<ulong> block;
-            ByteIntegerConverter.Array16LoadBigEndian64(out block, _buffer, 0);
-            CryptoBytes.InternalWipe(_buffer, 0, _buffer.Length);
-            int bytesInBuffer = (int)_totalBytes & (BlockSize - 1);
+            ByteIntegerConverter.Array16LoadBigEndian64(out block, Buffer, 0);
+            CryptoBytes.InternalWipe(Buffer, 0, Buffer.Length);
+            var bytesInBuffer = (int)TotalBytes & (BlockSize - 1);
             if (bytesInBuffer > BlockSize - 16)
             {
-                Sha512Internal.Core(out _state, ref _state, ref block);
+                Sha512Internal.Core(out State, ref State, ref block);
                 block = default(Array16<ulong>);
             }
-            block.x15 = (_totalBytes - 1) * 8;
-            Sha512Internal.Core(out _state, ref _state, ref block);
+            block.x15 = (TotalBytes - 1) * 8;
+            Sha512Internal.Core(out State, ref State, ref block);
 
-            ByteIntegerConverter.StoreBigEndian64(output.Array, output.Offset + 0, _state.x0);
-            ByteIntegerConverter.StoreBigEndian64(output.Array, output.Offset + 8, _state.x1);
-            ByteIntegerConverter.StoreBigEndian64(output.Array, output.Offset + 16, _state.x2);
-            ByteIntegerConverter.StoreBigEndian64(output.Array, output.Offset + 24, _state.x3);
-            ByteIntegerConverter.StoreBigEndian64(output.Array, output.Offset + 32, _state.x4);
-            ByteIntegerConverter.StoreBigEndian64(output.Array, output.Offset + 40, _state.x5);
-            ByteIntegerConverter.StoreBigEndian64(output.Array, output.Offset + 48, _state.x6);
-            ByteIntegerConverter.StoreBigEndian64(output.Array, output.Offset + 56, _state.x7);
-            _state = default(Array8<ulong>);
+            ByteIntegerConverter.StoreBigEndian64(Output.Array, Output.Offset + 0, State.x0);
+            ByteIntegerConverter.StoreBigEndian64(Output.Array, Output.Offset + 8, State.x1);
+            ByteIntegerConverter.StoreBigEndian64(Output.Array, Output.Offset + 16, State.x2);
+            ByteIntegerConverter.StoreBigEndian64(Output.Array, Output.Offset + 24, State.x3);
+            ByteIntegerConverter.StoreBigEndian64(Output.Array, Output.Offset + 32, State.x4);
+            ByteIntegerConverter.StoreBigEndian64(Output.Array, Output.Offset + 40, State.x5);
+            ByteIntegerConverter.StoreBigEndian64(Output.Array, Output.Offset + 48, State.x6);
+            ByteIntegerConverter.StoreBigEndian64(Output.Array, Output.Offset + 56, State.x7);
+            State = default(Array8<ulong>);
         }
 
         public byte[] Finish()
@@ -117,15 +116,15 @@ namespace Chaos.NaCl
             return result;
         }
 
-        public static byte[] Hash(byte[] data)
+        public static byte[] Hash(byte[] Data)
         {
-            return Hash(data, 0, data.Length);
+            return Hash(Data, 0, Data.Length);
         }
 
-        public static byte[] Hash(byte[] data, int offset, int count)
+        public static byte[] Hash(byte[] Data, int Offset, int Count)
         {
             var hasher = new Sha512();
-            hasher.Update(data, offset, count);
+            hasher.Update(Data, Offset, Count);
             return hasher.Finish();
         }
     }

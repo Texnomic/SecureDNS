@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Chaos.NaCl;
 using Rebex.Security.Cryptography;
+using Texnomic.Chaos.NaCl;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Extensions;
