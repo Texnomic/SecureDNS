@@ -59,7 +59,8 @@ namespace Texnomic.SecureDNS.Tests.Core
         }
 
         [TestMethod]
-        public void DeserializeBug1()
+        [ExpectedException(typeof(FormatException))]
+        public void DeserializeMalformed()
         {
             var ResponseBytes = new byte[]
             {

@@ -19,6 +19,7 @@ namespace Texnomic.SecureDNS.Serialization
 
         public ushort BitPosition => (ushort)BitIndex;
 
+        public ushort Length => (ushort)Raw.Length;
 
         public DnStream(ushort Length)
         {

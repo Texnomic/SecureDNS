@@ -33,6 +33,9 @@ namespace Texnomic.SecureDNS.Serialization
 
         private static IMessage GetMessage(in DnStream Stream)
         {
+            if (Stream.Length <= 12)
+                throw new FormatException($"Incomplete DNS Message, Header Less Than 12 Bytes, Got {Stream.Length}.");
+
             var Message = new Message
             {
                 ID = Stream.ReadUShort(),
@@ -55,9 +58,23 @@ namespace Texnomic.SecureDNS.Serialization
                 AdditionalCount = Stream.ReadUShort()
             };
 
+            if(Message.QuestionsCount == 0)
+                throw new FormatException("Incomplete DNS Message, Message Must Have At Least 1 Question Record.");
+
             Message.Questions = GetQuestions(in Stream, Message.QuestionsCount);
 
+            if (Message.MessageType == MessageType.Query) return Message;
+
+            if (Message.AnswersCount == 0 &&
+               Message.AuthorityCount == 0 &&
+               Message.AdditionalCount == 0)
+                throw new FormatException("Incomplete DNS Message, Response Must Have At Least 1 Answer Record.");
+
             Message.Answers = GetAnswers(in Stream, Message.AnswersCount);
+
+            Message.Authority = GetAnswers(in Stream, Message.AuthorityCount);
+
+            Message.Additional = GetAnswers(in Stream, Message.AdditionalCount);
 
             return Message;
         }
@@ -220,7 +237,7 @@ namespace Texnomic.SecureDNS.Serialization
                 _ => throw new ArgumentOutOfRangeException(nameof(Stamp), Stamp, null)
             };
 
-            return (ushort) (Size + 1);
+            return (ushort)(Size + 1);
         }
 
         private static IStamp GetStamp(in DnStream Stream, StampProtocol Protocol)
@@ -397,7 +414,8 @@ namespace Texnomic.SecureDNS.Serialization
 
         private static IEnumerable<IQuestion> GetQuestions(in DnStream Stream, ushort Count)
         {
-            if(Count < 1) throw new ArgumentOutOfRangeException($"DNS Message Must Have At Least 1 Question. Got {Count}.");
+            if (Count < 1)
+                throw new FormatException($"DNS Message Must Have At Least 1 Question, Got {Count}.");
 
             var Questions = new List<IQuestion>();
 
@@ -494,6 +512,9 @@ namespace Texnomic.SecureDNS.Serialization
 
             while (true)
             {
+                if (Stream.Length <= Stream.BytePosition + 1)
+                    throw new FormatException("Incomplete DNS Message, Missing Entire Domain.");
+
                 var LabelType = Stream.ReadBits(2).AsEnum<LabelType>();
 
                 switch (LabelType)
@@ -505,6 +526,8 @@ namespace Texnomic.SecureDNS.Serialization
                             if (Length == 0)
                                 return Labels;
 
+                            if (Stream.Length < Stream.BytePosition + Length)
+                                throw new FormatException("Incomplete DNS Message, Missing Normal Label.");
 
                             var Label = Stream.ReadString(Length);
 
@@ -646,6 +669,9 @@ namespace Texnomic.SecureDNS.Serialization
                 TimeToLive = Stream.ReadTimeSpan(),
                 Length = Stream.ReadUShort(),
             };
+
+            if (Stream.Length < Answer.Length)
+                throw new FormatException("Incomplete DNS Message, Missing Record Section.");
 
             Answer.Record = GetRecord(in Stream, Answer.Type);
 
