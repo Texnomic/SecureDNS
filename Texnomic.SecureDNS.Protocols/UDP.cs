@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading;
 using System.Threading.Tasks;
+
 using Microsoft.Extensions.Options;
+
 using Texnomic.SecureDNS.Core.Options;
-using Texnomic.SecureDNS.Protocols.Extensions;
 
 namespace Texnomic.SecureDNS.Protocols
 {
@@ -13,52 +13,33 @@ namespace Texnomic.SecureDNS.Protocols
     {
         private readonly IOptionsMonitor<UDPOptions> Options;
 
-        private UdpClient Client;
+        private IPEndPoint IPEndPoint;
 
-        private readonly IPEndPoint IPEndPoint;
-
-        private readonly SemaphoreSlim SemaphoreSlim;
-
-
-        public UDP(IOptionsMonitor<UDPOptions> UDPOptions)
+        public UDP(IOptionsMonitor<UDPOptions> Options)
         {
-            Options = UDPOptions;
+            this.Options = Options;
 
-            Client = new UdpClient();
+            this.Options.OnChange(OptionsOnChange);
 
             IPEndPoint = new IPEndPoint(IPAddress.Parse(Options.CurrentValue.Host), Options.CurrentValue.Port);
+        }
 
-            SemaphoreSlim = new SemaphoreSlim(1);
+        private void OptionsOnChange(UDPOptions UDPOptions)
+        {
+            IPEndPoint = new IPEndPoint(IPAddress.Parse(UDPOptions.Host), UDPOptions.Port);
         }
 
         public override async ValueTask<byte[]> ResolveAsync(byte[] Query)
         {
-            await SemaphoreSlim.WaitAsync();
+            using var Client = new UdpClient();
 
             await Client.SendAsync(Query, Query.Length, IPEndPoint);
-
-            //Note: UDPClient Async Doesn't Support Timeout.
 
             var Task = Client.ReceiveAsync();
 
             Task.Wait(Options.CurrentValue.Timeout);
 
-            if (Task.IsCompletedSuccessfully)
-            {
-                SemaphoreSlim.Release();
-
-                return Task.Result.Buffer;
-            }
-
-            //Note: UPDClient Stops Responding After Throwing TimeoutException.
-
-            Client.Dispose();
-
-            Client = new UdpClient();
-
-            SemaphoreSlim.Release();
-
-            throw new TimeoutException();
+            return Task.IsCompletedSuccessfully ? Task.Result.Buffer : throw new TimeoutException();
         }
 
         protected override void Dispose(bool Disposing)
@@ -67,7 +48,7 @@ namespace Texnomic.SecureDNS.Protocols
 
             if (Disposing)
             {
-                Client.Dispose();
+
             }
 
             IsDisposed = true;

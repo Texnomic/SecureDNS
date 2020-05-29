@@ -6,10 +6,15 @@ using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+
 using Chaos.NaCl;
+
 using Microsoft.Extensions.Options;
+
 using NSec.Cryptography;
+
 using Rebex.Security.Cryptography;
+
 using Texnomic.SecureDNS.Abstractions;
 using Texnomic.SecureDNS.Abstractions.Enums;
 using Texnomic.SecureDNS.Core;
@@ -29,8 +34,6 @@ namespace Texnomic.SecureDNS.Protocols
     public sealed class DNSCrypt : Protocol
     {
         private readonly IPEndPoint IPEndPoint;
-
-        private readonly UdpClient Client;
 
         private readonly ChaCha20Poly1305 ChaCha20Poly1305;
 
@@ -54,15 +57,6 @@ namespace Texnomic.SecureDNS.Protocols
             Options = DNSCryptOptions;
 
             Random = new Random();
-
-            Client = new UdpClient
-            {
-                Client =
-                {
-                    SendTimeout = Options.CurrentValue.Timeout,
-                    ReceiveTimeout = Options.CurrentValue.Timeout
-                }
-            };
 
             Stamp = DnSerializer.Deserialize(Options.CurrentValue.Stamp).Value as DNSCryptStamp;
 
@@ -101,13 +95,15 @@ namespace Texnomic.SecureDNS.Protocols
 
             var SerializedQuery = DnSerializer.Serialize(Query);
 
+            using var Client = new UdpClient();
+
             await Client.SendAsync(SerializedQuery, SerializedQuery.Length, IPEndPoint);
 
             var Task = Client.ReceiveAsync();
 
             Task.Wait(Options.CurrentValue.Timeout);
 
-            var SerializedAnswer = Task.IsCompleted ? Task.Result.Buffer : throw new TimeoutException();
+            var SerializedAnswer = Task.IsCompletedSuccessfully ? Task.Result.Buffer : throw new TimeoutException();
 
             var AnswerMessage = DnSerializer.Deserialize(SerializedAnswer);
 
@@ -203,13 +199,15 @@ namespace Texnomic.SecureDNS.Protocols
 
             var QueryPacket = Concat(Certificate.ClientMagic, ClientPublicKey, ClientNonce, EncryptedQuery);
 
+            using var Client = new UdpClient();
+
             await Client.SendAsync(QueryPacket, QueryPacket.Length, IPEndPoint);
 
             var Task = Client.ReceiveAsync();
 
             Task.Wait(Options.CurrentValue.Timeout);
 
-            var AnswerPacket = Task.IsCompleted ? Task.Result.Buffer : throw new TimeoutException();
+            var AnswerPacket = Task.IsCompletedSuccessfully ? Task.Result.Buffer : throw new TimeoutException();
 
             var ClientMagic = Encoding.ASCII.GetString(AnswerPacket[..8]);
 
@@ -227,7 +225,10 @@ namespace Texnomic.SecureDNS.Protocols
 
             var DecryptedAnswer = Decrypt(ref EncryptedAnswer, ref Nonce);
 
-            if(DecryptedAnswer == null) 
+            if (DecryptedAnswer == null)
+                throw new CryptographicUnexpectedOperationException("DNSCrypt Decryption Failed.");
+
+            if (DecryptedAnswer.Length <= Query.Length)
                 throw new CryptographicUnexpectedOperationException("DNSCrypt Decryption Failed.");
 
             //DecryptedAnswer = DecryptedAnswer.TrimEnd();
@@ -293,7 +294,7 @@ namespace Texnomic.SecureDNS.Protocols
 
             if (Disposing)
             {
-                Client.Dispose();
+
             }
 
             IsDisposed = true;

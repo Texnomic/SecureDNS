@@ -120,7 +120,7 @@ namespace Texnomic.DNS.Servers
             }
             catch (Exception Error)
             {
-                Logger?.Error(Error, "{@Error} Occurred While Deserializing Message.", Error);
+                //Logger?.Error(Error, "{@Error} Occurred While Deserializing Message.", Error);
 
                 Logger?.Error(Error, "{@Error} Occurred While Deserializing {@Bytes}.", Error, BitConverter.ToString(Bytes).Replace("-", ", 0x"));
 
@@ -313,6 +313,7 @@ namespace Texnomic.DNS.Servers
                 case ArgumentOutOfRangeException ArgumentOutOfRange:
                 case InvalidOperationException InvalidOperation:
                 case CryptographicUnexpectedOperationException CryptographicUnexpectedOperation:
+                case SocketException SocketException when (SocketException.ErrorCode == 10060):
                     {
                         return true;
                     }

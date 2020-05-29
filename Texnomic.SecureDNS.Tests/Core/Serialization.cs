@@ -58,6 +58,17 @@ namespace Texnomic.SecureDNS.Tests.Core
             }
         }
 
+        [TestMethod]
+        public void DeserializeBug1()
+        {
+            var ResponseBytes = new byte[]
+            {
+                0x02, 0xBD, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x74, 0x69, 0x6D, 0x65,
+                0x05, 0x63, 0x68, 0x74, 0x74, 0x6C, 0x03, 0x63, 0x6F, 0x6D, 0x02, 0x74, 0x77
+            };
+
+            var ResponseMessage = DnSerializer.Deserialize(in ResponseBytes);
+        }
 
         [TestMethod]
         public void DeserializeFast()
