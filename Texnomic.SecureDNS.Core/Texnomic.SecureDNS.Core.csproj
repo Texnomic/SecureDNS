@@ -24,7 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Texnomic.Chaos.NaCl\Texnomic.Chaos.NaCl.csproj" />
     <ProjectReference Include="..\Texnomic.ENS.BaseRegistrar\Texnomic.ENS.BaseRegistrar.csproj" />
     <ProjectReference Include="..\Texnomic.SecureDNS.Abstractions\Texnomic.SecureDNS.Abstractions.csproj" />
   </ItemGroup>

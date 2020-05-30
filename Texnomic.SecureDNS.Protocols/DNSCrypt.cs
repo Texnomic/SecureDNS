@@ -8,9 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Options;
-using NSec.Cryptography;
-using Rebex.Security.Cryptography;
-using Texnomic.Chaos.NaCl;
+
 using Texnomic.SecureDNS.Abstractions;
 using Texnomic.SecureDNS.Abstractions.Enums;
 using Texnomic.SecureDNS.Core;
@@ -19,8 +17,9 @@ using Texnomic.SecureDNS.Core.Options;
 using Texnomic.SecureDNS.Core.Records;
 using Texnomic.SecureDNS.Protocols.Extensions;
 using Texnomic.SecureDNS.Serialization;
+using Texnomic.Sodium;
 
-using Ed25519 = Texnomic.Chaos.NaCl.Ed25519;
+using Random = Texnomic.Sodium.Random;
 
 namespace Texnomic.SecureDNS.Protocols
 {
@@ -33,14 +32,13 @@ namespace Texnomic.SecureDNS.Protocols
 
         private ICertificate Certificate;
 
-        private readonly byte[] ClientPublicKey;
-        private readonly byte[] ClientPrivateKey;
+        private readonly byte[] PublicKey;
+
+        private readonly byte[] SecretKey;
 
         private byte[] SharedKey;
 
         private readonly DNSCryptStamp Stamp;
-
-        private readonly Random Random;
 
         private readonly IOptionsMonitor<DNSCryptOptions> Options;
 
@@ -50,17 +48,13 @@ namespace Texnomic.SecureDNS.Protocols
         {
             Options = DNSCryptOptions;
 
-            Random = new Random();
-
             Stamp = DnSerializer.Deserialize(Options.CurrentValue.Stamp).Value as DNSCryptStamp;
 
             IPEndPoint = IPEndPoint.Parse(Stamp.Address);
 
-            var ClientCurve25519 = new Curve25519();
+            SecretKey = Random.Generate(32);
 
-            ClientPublicKey = ClientCurve25519.GetPublicKey();
-
-            ClientPrivateKey = ClientCurve25519.GetPrivateKey();
+            PublicKey = Curve25519.ScalarMultiplicationBase(SecretKey);
 
             IsInitialized = false;
         }
@@ -69,7 +63,7 @@ namespace Texnomic.SecureDNS.Protocols
         {
             var Query = new Message()
             {
-                ID = (ushort)Random.Next(),
+                ID = BitConverter.ToUInt16(Random.Generate(2)),
                 MessageType = MessageType.Query,
                 Truncated = false,
                 CheckingDisabled = true,
@@ -104,7 +98,7 @@ namespace Texnomic.SecureDNS.Protocols
             if (!IsValid)
                 throw new CryptographicUnexpectedOperationException("Invalid Server Certificate.");
 
-            SharedKey = MontgomeryCurve25519.KeyExchange(Certificate.PublicKey, ClientPrivateKey);
+            SharedKey = PreComputeSharedKey();
 
             IsInitialized = true;
         }
@@ -173,7 +167,7 @@ namespace Texnomic.SecureDNS.Protocols
         {
             if (!IsInitialized) await InitializeAsync();
 
-            var ClientNonce = RandomGenerator.Default.GenerateBytes(12);
+            var ClientNonce = Random.Generate(12);
 
             var ClientNoncePad = new byte[12];
 
@@ -185,7 +179,7 @@ namespace Texnomic.SecureDNS.Protocols
 
             var EncryptedQuery = Encrypt(ref PaddedQuery, ref PaddedClientNonce);
 
-            var QueryPacket = Concat(Certificate.ClientMagic, ClientPublicKey, ClientNonce, EncryptedQuery);
+            var QueryPacket = Concat(Certificate.ClientMagic, PublicKey, ClientNonce, EncryptedQuery);
 
             using var Client = new UdpClient();
 
@@ -222,50 +216,34 @@ namespace Texnomic.SecureDNS.Protocols
             return DecryptedAnswer;
         }
 
+        private byte[] PreComputeSharedKey()
+        {
+            return Certificate.Version switch
+            {
+                ESVersion.X25519_XSalsa20Poly1305 => NaCl.KeyExchange(Certificate.PublicKey, SecretKey),
+                ESVersion.X25519_XChacha20Poly1305 => Curve25519XChaCha20Poly1305.KeyExchange(Certificate.PublicKey, SecretKey),
+                _ => throw new ArgumentOutOfRangeException(nameof(ESVersion)),
+            };
+        }
+
         private byte[] Encrypt(ref byte[] PaddedQuery, ref byte[] ClientNonce)
         {
-            switch (Certificate.Version)
+            return Certificate.Version switch
             {
-                case ESVersion.X25519_XSalsa20Poly1305:
-
-                    return XSalsa20Poly1305.Encrypt(PaddedQuery, SharedKey, ClientNonce);
-
-                case ESVersion.X25519_XChacha20Poly1305:
-
-                    var XChaCha20Poly1305 = new XChaCha20Poly1305(SharedKey);
-
-                    var CipherText = new byte[PaddedQuery.Length];
-
-                    XChaCha20Poly1305.Encrypt(ClientNonce, PaddedQuery, CipherText);
-
-                    return CipherText;
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(ESVersion));
-            }
+                ESVersion.X25519_XSalsa20Poly1305 => Curve25519XSalsa20Poly1305.Encrypt(PaddedQuery, ClientNonce, SharedKey),
+                ESVersion.X25519_XChacha20Poly1305 => Curve25519XChaCha20Poly1305.Encrypt(PaddedQuery, ClientNonce, SharedKey),
+                _ => throw new ArgumentOutOfRangeException(nameof(ESVersion)),
+            };
         }
 
         private byte[] Decrypt(ref byte[] EncryptedAnswer, ref byte[] ServerNonce)
         {
-            switch (Certificate.Version)
+            return Certificate.Version switch
             {
-                case ESVersion.X25519_XSalsa20Poly1305:
-
-                    return XSalsa20Poly1305.TryDecrypt(EncryptedAnswer, SharedKey, ServerNonce);
-
-                case ESVersion.X25519_XChacha20Poly1305:
-
-                    var XChaCha20Poly1305 = new XChaCha20Poly1305(SharedKey);
-
-                    var PlainText = new byte[EncryptedAnswer.Length];
-
-                    XChaCha20Poly1305.Decrypt(ServerNonce, EncryptedAnswer, PlainText);
-
-                    return PlainText;
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(ESVersion));
-            }
+                ESVersion.X25519_XSalsa20Poly1305 => Curve25519XSalsa20Poly1305.Decrypt(EncryptedAnswer, ServerNonce, SharedKey),
+                ESVersion.X25519_XChacha20Poly1305 => Curve25519XChaCha20Poly1305.Decrypt(EncryptedAnswer, ServerNonce, SharedKey),
+                _ => throw new ArgumentOutOfRangeException(nameof(ESVersion)),
+            };
         }
 
         protected override void Dispose(bool Disposing)
