@@ -58,7 +58,7 @@ namespace Texnomic.SecureDNS.Serialization
                 AdditionalCount = Stream.ReadUShort()
             };
 
-            if(Message.QuestionsCount == 0)
+            if (Message.QuestionsCount == 0)
                 throw new FormatException("Incomplete DNS Message, Message Must Have At Least 1 Question Record.");
 
             Message.Questions = GetQuestions(in Stream, Message.QuestionsCount);
@@ -415,7 +415,7 @@ namespace Texnomic.SecureDNS.Serialization
         private static IEnumerable<IQuestion> GetQuestions(in DnStream Stream, ushort Count)
         {
             if (Count < 1)
-                throw new FormatException($"DNS Message Must Have At Least 1 Question, Got {Count}.");
+                throw new FormatException($"Incomplete DNS Message, DNS Message Must Have At Least 1 Question, Got {Count}.");
 
             var Questions = new List<IQuestion>();
 
@@ -457,10 +457,18 @@ namespace Texnomic.SecureDNS.Serialization
         {
             var Question = new Question()
             {
-                Domain = GetDomain(in Stream),
-                Type = Stream.ReadUShort().AsEnum<RecordType>(),
-                Class = Stream.ReadUShort().AsEnum<RecordClass>()
+                Domain = GetDomain(in Stream)
             };
+
+            if (Stream.Length < Stream.BytePosition + 2)
+                throw new FormatException("Incomplete DNS Message, Missing Question Record Type.");
+
+            Question.Type = Stream.ReadUShort().AsEnum<RecordType>();
+
+            //Note: Ignores Missing Bytes Error As We Can Recover Message in Single Question Cases.
+            Question.Class = Stream.Length >= Stream.BytePosition + 2
+                ? Stream.ReadUShort().AsEnum<RecordClass>()
+                : RecordClass.Internet;
 
             return Question;
         }
@@ -539,7 +547,7 @@ namespace Texnomic.SecureDNS.Serialization
                         {
                             var Pointer = (ushort)(Stream.ReadBits(6) + Stream.ReadByte());
 
-                            if (Pointer >= Stream.BytePosition - 2) 
+                            if (Pointer >= Stream.BytePosition - 2)
                                 throw new ArgumentOutOfRangeException(nameof(Pointer), Pointer, "Compressed Label Infinite Loop Detected.");
 
                             var Position = Stream.BytePosition;
@@ -552,6 +560,8 @@ namespace Texnomic.SecureDNS.Serialization
 
                             return Labels;
                         }
+                    case LabelType.Extended:
+                    case LabelType.Unallocated:
                     default:
                         throw new ArgumentOutOfRangeException(nameof(LabelType), LabelType, null);
                 }
@@ -665,11 +675,18 @@ namespace Texnomic.SecureDNS.Serialization
             var Answer = new Answer()
             {
                 Domain = GetDomain(in Stream),
-                Type = Stream.ReadUShort().AsEnum<RecordType>(),
-                Class = Stream.ReadUShort().AsEnum<RecordClass>(),
-                TimeToLive = Stream.ReadTimeSpan(),
-                Length = Stream.ReadUShort(),
             };
+
+            if (Stream.Length < Stream.BytePosition + 6)
+                throw new FormatException("Incomplete DNS Message, Missing Answer Body.");
+
+            Answer.Type = Stream.ReadUShort().AsEnum<RecordType>();
+
+            Answer.Class = Stream.ReadUShort().AsEnum<RecordClass>();
+
+            Answer.TimeToLive = Stream.ReadTimeSpan();
+
+            Answer.Length = Stream.ReadUShort();
 
             if (Stream.Length < Answer.Length)
                 throw new FormatException("Incomplete DNS Message, Missing Record Section.");

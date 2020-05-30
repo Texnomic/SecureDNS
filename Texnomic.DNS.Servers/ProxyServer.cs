@@ -197,19 +197,11 @@ namespace Texnomic.DNS.Servers
                             throw new ArgumentOutOfRangeException();
                     }
                 }
-                catch (Exception Error) when (Handler(Error))
+                catch (Exception Error)
                 {
                     Logger?.Error(Error, "{@Error} Occurred While Receiving Message.", Error);
 
                     Errored?.Invoke(this, new ErroredEventArgs(Error));
-                }
-                catch (Exception Error)
-                {
-                    Logger?.Fatal(Error, "Fatal {@Error} Occurred While Receiving Message.", Error);
-
-                    Errored?.Invoke(this, new ErroredEventArgs(Error));
-
-                    await StopAsync(CancellationToken);
                 }
             }
         }
@@ -229,38 +221,26 @@ namespace Texnomic.DNS.Servers
                 try
                 {
                     (Query, RemoteEndPoint) = await IncomingQueue.ReceiveAsync(CancellationToken)
-                                                                 .WithCancellation(CancellationToken);
+                        .WithCancellation(CancellationToken);
 
                     var Answer = await ResponsibilityChain.Execute(Query);
 
                     await OutgoingQueue.SendAsync((Answer, RemoteEndPoint), CancellationToken);
 
-                    Logger?.Information("Resolved {@Answer} For {@Domain} with {@ResponseCode} To {@RemoteEndPoint}.", Answer, Answer.Questions.First().Domain.Name, Answer.ResponseCode, RemoteEndPoint.ToString());
+                    Logger?.Information("Resolved {@Answer} For {@Domain} with {@ResponseCode} To {@RemoteEndPoint}.",
+                        Answer, Answer.Questions.First().Domain.Name, Answer.ResponseCode, RemoteEndPoint.ToString());
 
                     Resolved?.Invoke(this, new ResolvedEventArgs(Query, Answer, RemoteEndPoint));
                 }
-                catch (Exception Error) when (Handler(Error))
+                catch (ObjectDisposedException Error)
                 {
-                    Logger?.Error(Error, "{@Error} Occurred While Resolving Message.", Error);
+                    ResponsibilityChain = new ProxyResponsibilityChain(ProxyResponsibilityChainOptions, MiddlewareResolver);
 
-                    Errored?.Invoke(this, new ErroredEventArgs(Error));
-
-                    var ErrorMessage = new Message()
-                    {
-                        ID = Query.ID,
-                        MessageType = MessageType.Response,
-                        ResponseCode = ResponseCode.ServerFailure,
-                    };
-
-                    await OutgoingQueue.SendAsync((ErrorMessage, RemoteEndPoint), CancellationToken);
+                    await Handle(Error, Query, RemoteEndPoint);
                 }
                 catch (Exception Error)
                 {
-                    Logger?.Fatal(Error, "Fatal {@Error} Occurred While Resolving Message.", Error);
-
-                    Errored?.Invoke(this, new ErroredEventArgs(Error));
-
-                    await StopAsync(CancellationToken);
+                    await Handle(Error, Query, RemoteEndPoint);
                 }
             }
         }
@@ -285,42 +265,29 @@ namespace Texnomic.DNS.Servers
                     Answered?.Invoke(this, new AnsweredEventArgs(Answer, RemoteEndPoint));
 
                 }
-                catch (Exception Error) when (Handler(Error))
+                catch (Exception Error)
                 {
                     Logger?.Error(Error, "{@Error} Occurred While Sending Message.", Error);
 
                     Errored?.Invoke(this, new ErroredEventArgs(Error));
                 }
-                catch (Exception Error)
-                {
-                    Logger?.Fatal(Error, "Fatal {@Error} Occurred While Sending Message.", Error);
-
-                    Errored?.Invoke(this, new ErroredEventArgs(Error));
-
-                    await StopAsync(CancellationToken);
-                }
             }
         }
 
-
-        private static bool Handler(Exception Error)
+        private async Task Handle(Exception Error, IMessage Query, IPEndPoint RemoteEndPoint)
         {
-            switch (Error)
+            Logger?.Error(Error, "{@Error} Occurred While Resolving Message.", Error);
+
+            Errored?.Invoke(this, new ErroredEventArgs(Error));
+
+            var ErrorMessage = new Message()
             {
-                case TimeoutException Timeout:
-                case OperationCanceledException OperationCanceled:
-                case ArgumentNullException ArgumentNull:
-                case ArgumentOutOfRangeException ArgumentOutOfRange:
-                case InvalidOperationException InvalidOperation:
-                case CryptographicUnexpectedOperationException CryptographicUnexpectedOperation:
-                case SocketException SocketException when (SocketException.ErrorCode == 10060):
-                case FormatException FormatException:
-                    {
-                        return true;
-                    }
-                default:
-                    return false;
-            }
+                ID = Query.ID,
+                MessageType = MessageType.Response,
+                ResponseCode = ResponseCode.ServerFailure,
+            };
+
+            await OutgoingQueue.SendAsync((ErrorMessage, RemoteEndPoint), CancellationToken);
         }
 
         private bool IsDisposed;
