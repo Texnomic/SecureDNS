@@ -2,6 +2,19 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
+    <Version>0.3</Version>
+    <Authors>Texnomic</Authors>
+    <Company>Texnomic Ltd</Company>
+    <Copyright>Copyright © 2020</Copyright>
+    <Description>Texnomic SecureDNS Abstractions Library.</Description>
+    <PackageProjectUrl>https://github.com/Texnomic/SecureDNS</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Texnomic/SecureDNS</RepositoryUrl>
+    <PackageTags>alpha</PackageTags>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIcon>Logo.png</PackageIcon>
+    <RepositoryType>Github</RepositoryType>
+    <NeutralLanguage />
   </PropertyGroup>
 
 </Project>

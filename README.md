@@ -57,7 +57,7 @@ The [v0.3 Alpha Release](https://github.com/Texnomic/SecureDNS/releases/tag/v0.3
 - [x] ARM64 on Linux (kernel 4.14+)
 
 ## Launch
-The Project offically launched within my talk for [Cairo Security Camp](https://cairosecuritycamp.com/sessions/rebuilding-the-domain-name-system/) on September 22nd.
+The Project offically launched within my talk for [Cairo Security Camp](https://cairosecuritycamp.com/sessions/rebuilding-the-domain-name-system/) on September 22nd, 2019.
 
 >[Full Talk Video On YouTube](https://youtu.be/1Gxk40dmbFM)
 
