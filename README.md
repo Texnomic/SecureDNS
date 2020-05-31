@@ -2,7 +2,7 @@
 
 Building a Secure, Modern, Cross-Platform & Cross-Architecture DNS Server Using C# 8.0 & .NET Core 3.1.
 
-SecureDNS Project aims to implements all *secure* DNS Protocols regardless of being standardized or widely adopted; while maintaining backward compatibility with *unsecure* DNS Over UDP Protocol via Reverse Proxy.
+SecureDNS Project aims to implements all *secure* DNS Protocols regardless of being standardized or widely adopted; while maintaining backward compatibility with *unsecure* DNS-Over-UDP Protocol via Reverse Proxy.
 
 SecureDNS Project is implemented using modern [Clean-Architecture](https://www.amazon.com/Clean-Architecture-Craftsmans-Software-Structure/dp/0134494164) Patterns.
 
@@ -20,7 +20,7 @@ SecureDNS Project is implemented using modern [Clean-Architecture](https://www.a
 11. [Supported-By](#Supported-By)
 
 ## Releases
-The [v0.2 Alpha Release](https://github.com/Texnomic/SecureDNS/releases/tag/v0.2-alpha) is now available.
+The [v0.3 Alpha Release](https://github.com/Texnomic/SecureDNS/releases/tag/v0.3-alpha) is now available.
 
 ## Protocols
 - [x] [DNS Over Blockchain (ENS)](https://ens.domains/)
@@ -28,7 +28,7 @@ The [v0.2 Alpha Release](https://github.com/Texnomic/SecureDNS/releases/tag/v0.2
 - [X] [DNS Over TCP](https://tools.ietf.org/html/rfc1035)
 - [x] [DNS Over TLS](https://tools.ietf.org/html/rfc7858)
 - [x] [DNS Over HTTP/S](https://tools.ietf.org/html/rfc8484)
-- [X] [DNSCrypt](https://dnscrypt.info/)
+- [X] [DNSCrypt v2.0](https://dnscrypt.info/)
 
 ## Integrations
 1. [Ethereum Name Service](https://ens.domains/)
@@ -36,7 +36,7 @@ The [v0.2 Alpha Release](https://github.com/Texnomic/SecureDNS/releases/tag/v0.2
 3. [FilterLists](https://github.com/collinbarrett/FilterLists)
 4. [IANA Root Files](https://www.iana.org/domains/root/files)
 5. [ICANN Zone Data Service](https://czds.icann.org/home)
-6. Any Standard-Compliant Public `DoH` or `DoT` Resolvers.
+6. Standard-Compliant `DNSCrypt`, `DoH` or `DoT` Resolvers.
 
 ## Platforms
 - [x] Alpine: 3.10+
@@ -92,6 +92,7 @@ The Project offically launched within my talk for [Cairo Security Camp](https://
 14. [Colorful Console](http://colorfulconsole.com/)
 15. [Blazorise](https://blazorise.com/)
 16. [HtmlAgilityPack](https://html-agility-pack.net/)
+17. [LibSodium](https://github.com/jedisct1/libsodium)
 
 ## Donations
 * **PayPal**: https://www.paypal.me/texnomic
