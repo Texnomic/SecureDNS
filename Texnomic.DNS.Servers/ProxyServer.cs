@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
@@ -100,8 +99,6 @@ namespace Texnomic.DNS.Servers
 
         public async Task StopAsync(CancellationToken Token)
         {
-            UdpClient.Close();
-
             await Task.WhenAll(Workers);
 
             IncomingQueue.Complete();
@@ -120,8 +117,6 @@ namespace Texnomic.DNS.Servers
             }
             catch (Exception Error)
             {
-                //Logger?.Error(Error, "{@Error} Occurred While Deserializing Message.", Error);
-
                 Logger?.Error(Error, "{@Error} Occurred While Deserializing {@Bytes}.", Error, BitConverter.ToString(Bytes).Replace("-", ", 0x"));
 
                 Errored?.Invoke(this, new ErroredEventArgs(Error));
@@ -170,32 +165,16 @@ namespace Texnomic.DNS.Servers
 
                     var Message = Deserialize(Result.Buffer);
 
-                    switch (Message.MessageType)
-                    {
-                        case MessageType.Query:
-                            {
-                                await IncomingQueue.SendAsync((Message, Result.RemoteEndPoint), CancellationToken);
+                    await IncomingQueue.SendAsync((Message, Result.RemoteEndPoint), CancellationToken);
 
-                                Logger?.Verbose("Received {@Query} From {@RemoteEndPoint}.", Message,
-                                    Result.RemoteEndPoint.ToString());
+                    Logger?.Verbose("Received {@Query} From {@RemoteEndPoint}.", Message,
+                        Result.RemoteEndPoint.ToString());
 
-                                Queried?.Invoke(this, new QueriedEventArgs(Message, Result.RemoteEndPoint));
-
-                                break;
-                            }
-
-                        case MessageType.Response:
-                            {
-                                await OutgoingQueue.SendAsync((Message, Result.RemoteEndPoint), CancellationToken);
-
-                                Logger?.Debug("Queueing (Outgoing) Format Error {@Answer} To {@RemoteEndPoint}.", Message,
-                                    Result.RemoteEndPoint.ToString());
-
-                                break;
-                            }
-                        default:
-                            throw new ArgumentOutOfRangeException();
-                    }
+                    Queried?.Invoke(this, new QueriedEventArgs(Message, Result.RemoteEndPoint));
+                }
+                catch (OperationCanceledException)
+                {
+                    break;
                 }
                 catch (Exception Error)
                 {
@@ -232,15 +211,23 @@ namespace Texnomic.DNS.Servers
 
                     Resolved?.Invoke(this, new ResolvedEventArgs(Query, Answer, RemoteEndPoint));
                 }
+                catch (OperationCanceledException)
+                {
+                    break;
+                }
                 catch (ObjectDisposedException Error)
                 {
                     ResponsibilityChain = new ProxyResponsibilityChain(ProxyResponsibilityChainOptions, MiddlewareResolver);
 
-                    await Handle(Error, Query, RemoteEndPoint);
+                    var ErrorMessage = Handle(Error, Query.ID, "Resolving", ResponseCode.ServerFailure);
+
+                    await OutgoingQueue.SendAsync((ErrorMessage, RemoteEndPoint), CancellationToken);
                 }
                 catch (Exception Error)
                 {
-                    await Handle(Error, Query, RemoteEndPoint);
+                    var ErrorMessage = Handle(Error, Query.ID, "Resolving", ResponseCode.ServerFailure);
+
+                    await OutgoingQueue.SendAsync((ErrorMessage, RemoteEndPoint), CancellationToken);
                 }
             }
         }
@@ -265,6 +252,10 @@ namespace Texnomic.DNS.Servers
                     Answered?.Invoke(this, new AnsweredEventArgs(Answer, RemoteEndPoint));
 
                 }
+                catch (OperationCanceledException)
+                {
+                    break;
+                }
                 catch (Exception Error)
                 {
                     Logger?.Error(Error, "{@Error} Occurred While Sending Message.", Error);
@@ -274,20 +265,32 @@ namespace Texnomic.DNS.Servers
             }
         }
 
-        private async Task Handle(Exception Error, IMessage Query, IPEndPoint RemoteEndPoint)
+        private IMessage Handle(Exception Error, ushort ID, string Stage, ResponseCode Response)
         {
-            Logger?.Error(Error, "{@Error} Occurred While Resolving Message.", Error);
+            Logger?.Error(Error, $"{@Error} Occurred While {Stage} Message.", Error);
 
             Errored?.Invoke(this, new ErroredEventArgs(Error));
 
-            var ErrorMessage = new Message()
+            return new Message()
             {
-                ID = Query.ID,
+                ID = ID,
                 MessageType = MessageType.Response,
-                ResponseCode = ResponseCode.ServerFailure,
+                ResponseCode = Response,
             };
+        }
 
-            await OutgoingQueue.SendAsync((ErrorMessage, RemoteEndPoint), CancellationToken);
+        private IMessage Handle(Exception Error, byte[] Bytes, string Stage, ResponseCode Response)
+        {
+            Logger?.Error(Error, $"{@Error} Occurred While {Stage} {@Bytes}.", Error, BitConverter.ToString(Bytes).Replace("-", ", 0x"));
+
+            Errored?.Invoke(this, new ErroredEventArgs(Error));
+
+            return new Message()
+            {
+                ID = BitConverter.ToUInt16(Bytes.Slice(2)),
+                MessageType = MessageType.Response,
+                ResponseCode = Response
+            };
         }
 
         private bool IsDisposed;
@@ -314,5 +317,6 @@ namespace Texnomic.DNS.Servers
         {
             Dispose(false);
         }
+
     }
 }

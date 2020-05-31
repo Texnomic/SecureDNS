@@ -15,18 +15,6 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_1A9A88DF69D64896B04C491D8B7F5852"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_8E4B95827C654B84BE97F4553AF62386"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_E10535C6727B4C43AD40319D97B4835D"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -39,7 +27,7 @@
         "DisplayName" = "8:Debug"
         "IsDebugOnly" = "11:TRUE"
         "IsReleaseOnly" = "11:FALSE"
-        "OutputFilename" = "8:Debug\\Texnomic.SecureDNS.Terminal.Installer.msi"
+        "OutputFilename" = "8:Publish\\Texnomic.SecureDNS.Terminal.Installer.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -49,6 +37,17 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:FALSE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+                "Items"
+                {
+                }
+            }
         }
         "Release"
         {
@@ -65,6 +64,14 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+            }
         }
     }
     "Deployable"
@@ -96,46 +103,6 @@
         }
         "File"
         {
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1A9A88DF69D64896B04C491D8B7F5852"
-            {
-            "SourcePath" = "8:..\\Texnomic.SecureDNS.Terminal\\bin\\Publish\\Win-x64\\SecureDNS.Win-x64.exe"
-            "TargetName" = "8:SecureDNS.Win-x64.exe"
-            "Tag" = "8:"
-            "Folder" = "8:_4F58D4D6AEF447EE9A83F32A70203221"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_8E4B95827C654B84BE97F4553AF62386"
-            {
-            "SourcePath" = "8:..\\Texnomic.SecureDNS.Terminal\\AppSettings.json"
-            "TargetName" = "8:AppSettings.json"
-            "Tag" = "8:"
-            "Folder" = "8:_4F58D4D6AEF447EE9A83F32A70203221"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E10535C6727B4C43AD40319D97B4835D"
             {
             "SourcePath" = "8:..\\Texnomic.SecureDNS.Terminal\\SecureDNS.ico"
@@ -223,15 +190,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Texnomic SecureDNS Terminal"
-        "ProductCode" = "8:{FE3E0B25-75D7-4B17-B636-19EC21F3E5F8}"
-        "PackageCode" = "8:{7551C566-39B4-4EAF-A004-A4FC0458E6A5}"
+        "ProductCode" = "8:{3564A7C5-F151-4830-A1E7-250DD8D7F713}"
+        "PackageCode" = "8:{E2B80269-6C9F-4BFC-96A2-BC817CA908FC}"
         "UpgradeCode" = "8:{D6F79028-861C-4CDB-9C16-31C9F8900733}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:0.2"
+        "ProductVersion" = "8:0.3"
         "Manufacturer" = "8:Texnomic"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:https://github.com/Texnomic/SecureDNS"
@@ -344,30 +311,30 @@
         }
         "Shortcut"
         {
-            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_3866B2C8FA7B416D894F6477634515B8"
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_8CEC9A4F727F47ECAB8111C33C47C3B5"
             {
             "Name" = "8:SecureDNS Terminal"
             "Arguments" = "8:"
-            "Description" = "8:"
+            "Description" = "8:SecureDNS Terminal"
             "ShowCmd" = "3:1"
             "IconIndex" = "3:0"
             "Transitive" = "11:FALSE"
-            "Target" = "8:_1A9A88DF69D64896B04C491D8B7F5852"
-            "Folder" = "8:_FEF92F2742A348CA8DE82F87E448DC6D"
+            "Target" = "8:_345CD70979D04FD8AFA153EA39CFC3FE"
+            "Folder" = "8:_03E385DAF6834CEDB43470C425EA6433"
             "WorkingFolder" = "8:_4F58D4D6AEF447EE9A83F32A70203221"
             "Icon" = "8:_E10535C6727B4C43AD40319D97B4835D"
             "Feature" = "8:"
             }
-            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_C84AFE765CAC40228A3371B05362DC7F"
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_AFFD3374038C4B3BB38BB4C0B28C2116"
             {
             "Name" = "8:SecureDNS Terminal"
             "Arguments" = "8:"
-            "Description" = "8:"
+            "Description" = "8:SecureDNS Terminal"
             "ShowCmd" = "3:1"
             "IconIndex" = "3:0"
             "Transitive" = "11:FALSE"
-            "Target" = "8:_1A9A88DF69D64896B04C491D8B7F5852"
-            "Folder" = "8:_03E385DAF6834CEDB43470C425EA6433"
+            "Target" = "8:_345CD70979D04FD8AFA153EA39CFC3FE"
+            "Folder" = "8:_FEF92F2742A348CA8DE82F87E448DC6D"
             "WorkingFolder" = "8:_4F58D4D6AEF447EE9A83F32A70203221"
             "Icon" = "8:_E10535C6727B4C43AD40319D97B4835D"
             "Feature" = "8:"
@@ -771,6 +738,35 @@
         }
         "ProjectOutput"
         {
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_345CD70979D04FD8AFA153EA39CFC3FE"
+            {
+            "SourcePath" = "8:..\\Texnomic.SecureDNS.Terminal\\obj\\Debug\\netcoreapp3.1\\win-x64\\Texnomic.SecureDNS.Terminal.exe"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_4F58D4D6AEF447EE9A83F32A70203221"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            "ProjectOutputGroupRegister" = "3:1"
+            "OutputConfiguration" = "8:Release|Any CPU"
+            "OutputGroupCanonicalName" = "8:PublishItems"
+            "OutputProjectGuid" = "8:{66D712B8-4952-4BA9-980A-EB6618BD228C}"
+            "ShowKeyOutput" = "11:TRUE"
+            "PublishProfilePath" = "8:Properties\\PublishProfiles\\Win-x64-Installer.pubxml"
+                "ExcludeFilters"
+                {
+                }
+            }
         }
     }
 }
