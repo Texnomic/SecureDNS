@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Colorful;
@@ -24,7 +25,6 @@ using Texnomic.SecureDNS.Core.Options;
 using Texnomic.SecureDNS.Protocols;
 using Texnomic.SecureDNS.Terminal.Enums;
 using Texnomic.SecureDNS.Terminal.Options;
-using Texnomic.SecureDNS.Terminal.Properties;
 
 using Console = Colorful.Console;
 using Protocol = Texnomic.SecureDNS.Terminal.Enums.Protocol;
@@ -54,10 +54,26 @@ namespace Texnomic.SecureDNS.Terminal
             await HostBuilder.RunConsoleAsync();
         }
 
+        private static byte[] ReadResource(string Name)
+        {
+            var MainAssembly = Assembly.GetExecutingAssembly();
+
+            var ResourceName = MainAssembly.GetManifestResourceNames()
+                                        .Single(Resource => Resource.EndsWith(Name));
+
+            using var Stream = MainAssembly.GetManifestResourceStream(ResourceName);
+
+            var Buffer = new byte[Stream.Length];
+
+            Stream.Read(Buffer);
+
+            return Buffer;
+        }
+
         private static void BuildHost()
         {
             if(!File.Exists("AppSettings.json"))
-                File.WriteAllBytes("AppSettings.json", Resources.AppSettings);
+                File.WriteAllBytes("AppSettings.json", ReadResource("AppSettings.json"));
 
             HostBuilder = new HostBuilder()
                  .ConfigureAppConfiguration(ConfigureApp)
@@ -84,7 +100,7 @@ namespace Texnomic.SecureDNS.Terminal
         {
             Console.Title = "Texnomic SecureDNS";
 
-            var Speed = new Figlet(FigletFont.Load(Resources.Speed));
+            var Speed = new Figlet(FigletFont.Load(ReadResource("Speed.flf")));
 
             Console.WriteWithGradient(Speed.ToAscii(" Texnomic").ConcreteValue.ToArray(), System.Drawing.Color.Yellow, System.Drawing.Color.Fuchsia, 14);
 
@@ -99,7 +115,7 @@ namespace Texnomic.SecureDNS.Terminal
         }
         private static void ConfigureLogging(HostBuilderContext HostBuilderContext, ILoggingBuilder Logging)
         {
-            Logging.AddConsole();
+            //Logging.AddConsole();
         }
         private static void ConfigureLogger(HostBuilderContext HostBuilderContext, LoggerConfiguration LoggerConfiguration)
         {

@@ -22,6 +22,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="AppSettings.json" />
+    <None Remove="Fonts\Speed.flf" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="AppSettings.json" />
+    <EmbeddedResource Include="Fonts\Speed.flf" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Colorful.Console" Version="1.2.10" />
     <PackageReference Include="Destructurama.Attributed" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.4" />
@@ -73,9 +83,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="AppSettings.json">
+    <Resource Include="AppSettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </Resource>
   </ItemGroup>
 
 </Project>

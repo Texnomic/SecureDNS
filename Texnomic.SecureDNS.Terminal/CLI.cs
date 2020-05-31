@@ -6,8 +6,6 @@ using System.Threading.Tasks;
 using Texnomic.DNS.Servers;
 using Texnomic.SecureDNS.Terminal.Options;
 
-using Console = Colorful.Console;
-
 namespace Texnomic.SecureDNS.Terminal
 {
     public class CLI : IHostedService, IDisposable
@@ -26,9 +24,6 @@ namespace Texnomic.SecureDNS.Terminal
 
         public async Task StartAsync(CancellationToken CancellationToken)
         {
-            Server.Started += (Sender, Args) => Console.WriteLine(" Server Started.\n\r");
-            Server.Stopped += (Sender, Args) => Console.WriteLine("\n\r Server Stopped.");
-
             await Server.StartAsync(CancellationToken);
         }
 
