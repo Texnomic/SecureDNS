@@ -2,12 +2,30 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>0.3</Version>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Authors>Texnomic</Authors>
+    <Company>Texnomic Ltd</Company>
+    <Description>Texnomic ENS BaseRegistrar Library.</Description>
+    <PackageProjectUrl>https://github.com/Texnomic/SecureDNS</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Texnomic/SecureDNS</RepositoryUrl>
+    <PackageIcon>Logo.png</PackageIcon>
+    <RepositoryType>Github</RepositoryType>
+    <PackageTags>alpha</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Nethereum.Contracts" Version="3.7.1" />
     <PackageReference Include="Nethereum.RPC" Version="3.7.1" />
     <PackageReference Include="Nethereum.Web3" Version="3.7.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\docs\Logo.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

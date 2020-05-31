@@ -2,10 +2,29 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>0.3</Version>
+    <Authors>Texnomic</Authors>
+    <Company>Texnomic Ltd</Company>
+    <Description>Texnomic Sodium Library.</Description>
+    <Copyright>Copyright © 2020</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/Texnomic/SecureDNS</PackageProjectUrl>
+    <PackageIcon>Logo.png</PackageIcon>
+    <RepositoryUrl>https://github.com/Texnomic/SecureDNS</RepositoryUrl>
+    <RepositoryType>Github</RepositoryType>
+    <PackageTags>alpha</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="libsodium" Version="1.0.18" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\docs\Logo.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
