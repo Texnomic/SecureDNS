@@ -27,7 +27,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="AppSettings.json" />
+    <EmbeddedResource Include="AppSettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="Fonts\Speed.flf" />
   </ItemGroup>
 

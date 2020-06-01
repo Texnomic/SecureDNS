@@ -65,11 +65,15 @@ namespace Texnomic.DNS.Servers.Middlewares
                         {
                           new Answer()
                           {
+                              Type = RecordType.A,
+
+                              Class = RecordClass.Internet,
+
                               TimeToLive = TimeSpan.FromSeconds(Options.CurrentValue.TimeToLive),
 
                               Domain = Domain.FromString(Message.Questions.First().Domain.Name),
 
-                              Length = 32,
+                              Length = 4,
 
                               Record = new A()
                               {
