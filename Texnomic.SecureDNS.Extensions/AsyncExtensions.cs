@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Texnomic.SecureDNS.Protocols.Extensions
+namespace Texnomic.SecureDNS.Extensions
 {
     /// <summary>
     /// Helper class to run async methods within a sync process.
@@ -56,11 +56,13 @@ namespace Texnomic.SecureDNS.Protocols.Extensions
             return Action.Result;
         }
 
-        public static async Task<T> WithTimeout<T>(this Task<T> Action, CancellationToken CancellationToken)
+        public static async Task<T> WithTimeout<T>(this Task<T> Action, int Timeout)
         {
+            var CancellationTokenSource = new CancellationTokenSource(Timeout);
+
             var TaskCompletionSource = new TaskCompletionSource<bool>();
 
-            await using (CancellationToken.Register(() => TaskCompletionSource.TrySetResult(true)))
+            await using (CancellationTokenSource.Token.Register(() => TaskCompletionSource.TrySetResult(true)))
             {
                 if (Action != await Task.WhenAny(Action, TaskCompletionSource.Task))
                 {

@@ -11,7 +11,6 @@ using Microsoft.Extensions.Hosting;
 using Nethereum.Util;
 using Serilog;
 using Texnomic.DNS.Servers.Events;
-using Texnomic.DNS.Servers.Extensions;
 using Texnomic.DNS.Servers.Options;
 using Microsoft.Extensions.Options;
 using PipelineNet.MiddlewareResolver;
@@ -19,6 +18,7 @@ using Texnomic.DNS.Servers.ResponsibilityChain;
 using Texnomic.SecureDNS.Abstractions;
 using Texnomic.SecureDNS.Abstractions.Enums;
 using Texnomic.SecureDNS.Core;
+using Texnomic.SecureDNS.Extensions;
 using Texnomic.SecureDNS.Serialization;
 
 namespace Texnomic.DNS.Servers

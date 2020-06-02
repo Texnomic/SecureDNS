@@ -1,23 +1,20 @@
-﻿//#define Exclude_Check_For_Set_Modifications_In_Enumerator
-//#define Exclude_Check_For_Is_Disposed_In_Enumerator
-//#define Exclude_No_Hash_Array_Implementation
-//#define Exclude_Cache_Optimize_Resize
-
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-/// <summary>
-/// https://github.com/Motvin/FastHashSet
-/// </summary>
-namespace Texnomic.DNS.Servers.Extensions
+
+namespace Texnomic.SecureDNS.Extensions
 {
 	// didn't implement ISerializable and IDeserializationCallback
 	// these are implemented in the .NET HashSet
 	// the 7th HashSet constructor has params for serialization -implement that if serialization is implemented
 	// also add using System.Runtime.Serialization;
-
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
+	/// <see cref="https://github.com/Motvin/FastHashSet"/>
 	public class FastHashSet<T> : ICollection<T>, IEnumerable<T>, IEnumerable, IReadOnlyCollection<T>, ISet<T>
 	{
 		private const int MaxSlotsArraySize = int.MaxValue - 2;

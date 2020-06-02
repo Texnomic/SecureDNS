@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Texnomic.SecureDNS.Serialization.Extensions
+namespace Texnomic.SecureDNS.Extensions
 {
     public static class ByteExtensions
     {

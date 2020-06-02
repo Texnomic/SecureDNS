@@ -1,21 +1,29 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+
 using Colorful;
+
 using Common.Logging;
 using Common.Logging.Serilog;
+
 using Destructurama;
+
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+
 using PipelineNet.ChainsOfResponsibility;
 using PipelineNet.MiddlewareResolver;
+
 using Serilog;
+using Tmds.Systemd;
 using Texnomic.DNS.Servers;
 using Texnomic.DNS.Servers.Middlewares;
 using Texnomic.DNS.Servers.Options;
@@ -38,16 +46,22 @@ namespace Texnomic.SecureDNS.Terminal
         private static readonly string Stage = Environment.GetEnvironmentVariable("SecureDNS_ENVIRONMENT") ?? "Production";
 
         private static readonly IConfiguration Configurations = new ConfigurationBuilder()
-                                                                    .SetBasePath(Directory.GetCurrentDirectory())
-                                                                    .AddJsonFile("AppSettings.json", false, true)
-                                                                    .AddJsonFile($"AppSettings.{Stage}.json", true, true)
-                                                                    .AddUserSecrets<Program>(true, true)
-                                                                    .AddEnvironmentVariables()
-                                                                    .Build();
+                                                                                .SetBasePath(Directory.GetCurrentDirectory())
+                                                                                .AddJsonFile("AppSettings.json", false, true)
+                                                                                .AddJsonFile($"AppSettings.{Stage}.json", true, true)
+                                                                                .AddUserSecrets<Program>(true, true)
+                                                                                .AddEnvironmentVariables()
+                                                                                .Build();
+
+        private static readonly TerminalOptions Options = Configurations.GetSection("Terminal Options")
+                                                                                .Get<TerminalOptions>();
+
 
         public static async Task Main(string[] Arguments)
         {
             Splash();
+
+            Daemonize();
 
             BuildHost();
 
@@ -59,7 +73,7 @@ namespace Texnomic.SecureDNS.Terminal
             var MainAssembly = Assembly.GetExecutingAssembly();
 
             var ResourceName = MainAssembly.GetManifestResourceNames()
-                                        .Single(Resource => Resource.EndsWith(Name));
+                .Single(Resource => Resource.EndsWith(Name));
 
             using var Stream = MainAssembly.GetManifestResourceStream(ResourceName);
 
@@ -72,14 +86,14 @@ namespace Texnomic.SecureDNS.Terminal
 
         private static void BuildHost()
         {
-            if(!File.Exists("AppSettings.json"))
+            if (!File.Exists("AppSettings.json"))
                 File.WriteAllBytes("AppSettings.json", ReadResource("AppSettings.json"));
 
             HostBuilder = new HostBuilder()
-                 .ConfigureAppConfiguration(ConfigureApp)
-                 .ConfigureServices(ConfigureServices)
-                 .ConfigureLogging(ConfigureLogging)
-                 .UseSerilog(ConfigureLogger, writeToProviders: true);
+                .ConfigureAppConfiguration(ConfigureApp)
+                .ConfigureServices(ConfigureServices)
+                .ConfigureLogging(ConfigureLogging)
+                .UseSerilog(ConfigureLogger, writeToProviders: true);
 
             var Options = Configurations.GetSection("Terminal Options").Get<TerminalOptions>();
 
@@ -102,9 +116,11 @@ namespace Texnomic.SecureDNS.Terminal
 
             var Speed = new Figlet(FigletFont.Load(ReadResource("Speed.flf")));
 
-            Console.WriteWithGradient(Speed.ToAscii(" Texnomic").ConcreteValue.ToArray(), System.Drawing.Color.Yellow, System.Drawing.Color.Fuchsia, 14);
+            Console.WriteWithGradient(Speed.ToAscii(" Texnomic").ConcreteValue.ToArray(), System.Drawing.Color.Yellow,
+                System.Drawing.Color.Fuchsia, 14);
 
-            Console.WriteWithGradient(Speed.ToAscii(" SecureDNS").ConcreteValue.ToArray(), System.Drawing.Color.Yellow, System.Drawing.Color.Fuchsia, 14);
+            Console.WriteWithGradient(Speed.ToAscii(" SecureDNS").ConcreteValue.ToArray(), System.Drawing.Color.Yellow,
+                System.Drawing.Color.Fuchsia, 14);
 
             Console.WriteLine("");
         }
@@ -113,16 +129,26 @@ namespace Texnomic.SecureDNS.Terminal
         {
             Configuration.AddConfiguration(Configurations);
         }
+
         private static void ConfigureLogging(HostBuilderContext HostBuilderContext, ILoggingBuilder Logging)
         {
-            //Logging.AddConsole();
+            if (Options.Mode == Mode.Daemon)
+            {
+                Logging.AddJournal(JournalOptions =>
+                {
+                    JournalOptions.DropWhenBusy = true;
+                    JournalOptions.SyslogIdentifier = "SecureDNS";
+                });
+            }
         }
+
         private static void ConfigureLogger(HostBuilderContext HostBuilderContext, LoggerConfiguration LoggerConfiguration)
         {
             LoggerConfiguration.ReadFrom.Configuration(Configurations);
             LoggerConfiguration.Destructure.UsingAttributes();
             LoggerConfiguration.Enrich.WithThreadId();
         }
+
         private static void ConfigureServices(HostBuilderContext HostBuilderContext, IServiceCollection Services)
         {
             Services.Configure<ProxyResponsibilityChainOptions>(Configurations.GetSection("Proxy Responsibility Chain"));
@@ -145,8 +171,6 @@ namespace Texnomic.SecureDNS.Terminal
             Services.AddScoped<ILog, SerilogCommonLogger>();
             Services.AddScoped<IMiddlewareResolver, ServerMiddlewareActivator>();
             Services.AddScoped<IAsyncResponsibilityChain<IMessage, IMessage>, ProxyResponsibilityChain>();
-
-            var Options = Configurations.GetSection("Terminal Options").Get<TerminalOptions>();
 
             switch (Options.Protocol)
             {
@@ -181,6 +205,7 @@ namespace Texnomic.SecureDNS.Terminal
                     Services.AddHostedService<CLI>();
                     break;
                 case Mode.Daemon:
+                    Daemonize();
                     Services.AddHostedService<ProxyServer>();
                     break;
                 default:
@@ -190,5 +215,64 @@ namespace Texnomic.SecureDNS.Terminal
             }
         }
 
+        private static void Daemonize()
+        {
+            if (ServiceManager.IsRunningAsService) return;
+
+            CreateUnitFile();
+
+            ExecuteShell("systemctl daemon-reload");
+
+            ExecuteShell("systemctl start securedns.service");
+
+            Environment.Exit(0);
+        }
+
+        private static void CreateUnitFile()
+        {
+            const string UnitFile = "/etc/systemd/system/securedns.service";
+
+            if (File.Exists(UnitFile)) return;
+
+            var Lines = new[]
+            {
+                "[Unit]",
+                "[Service]",
+                $"WorkingDirectory={Environment.CurrentDirectory}",
+                $"ExecStart={Assembly.GetExecutingAssembly().Location}",
+                "[Install]",
+                "WantedBy=multi-user.target"
+            };
+
+            File.WriteAllLines(UnitFile, Lines);
+        }
+
+        private static string ExecuteShell(string Command)
+        {
+            var Shell = new Process()
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = "/bin/bash",
+                    Arguments = $"-c \"{Command}\"",
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                }
+            };
+
+            Shell.Start();
+
+            var Result = Shell.StandardOutput.ReadToEnd();
+
+            Shell.WaitForExit();
+
+            if(Shell.ExitCode != 0)
+                throw new ApplicationException($"Shell Command: \"{Command}\" Execution Failed.");
+
+            return Result;
+
+        }
     }
 }

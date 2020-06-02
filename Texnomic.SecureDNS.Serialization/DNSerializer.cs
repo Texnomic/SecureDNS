@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using Texnomic.SecureDNS.Abstractions;
 using Texnomic.SecureDNS.Abstractions.Enums;
 using Texnomic.SecureDNS.Core.Records;
-using Texnomic.SecureDNS.Serialization.Extensions;
+using Texnomic.SecureDNS.Extensions;
 
 namespace Texnomic.SecureDNS.Serialization
 {

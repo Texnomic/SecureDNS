@@ -3,7 +3,7 @@ using System.Text;
 using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Net;
-using Texnomic.SecureDNS.Serialization.Extensions;
+using Texnomic.SecureDNS.Extensions;
 
 namespace Texnomic.SecureDNS.Serialization
 {

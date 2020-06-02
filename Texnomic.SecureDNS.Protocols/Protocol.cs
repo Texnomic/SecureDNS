@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Texnomic.SecureDNS.Abstractions;
-using Texnomic.SecureDNS.Protocols.Extensions;
+using Texnomic.SecureDNS.Extensions;
 using Texnomic.SecureDNS.Serialization;
 
 namespace Texnomic.SecureDNS.Protocols

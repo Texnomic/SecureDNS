@@ -15,7 +15,7 @@ using Texnomic.SecureDNS.Core;
 using Texnomic.SecureDNS.Core.DataTypes;
 using Texnomic.SecureDNS.Core.Options;
 using Texnomic.SecureDNS.Core.Records;
-using Texnomic.SecureDNS.Protocols.Extensions;
+using Texnomic.SecureDNS.Extensions;
 using Texnomic.SecureDNS.Serialization;
 using Texnomic.Sodium;
 

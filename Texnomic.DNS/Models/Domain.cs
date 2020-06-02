@@ -5,14 +5,13 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BitStreams;
 using Destructurama.Attributed;
 using Texnomic.DNS.Abstractions;
 using Texnomic.DNS.Abstractions.Enums;
 using Texnomic.DNS.Extensions;
 using Texnomic.DNS.Records;
+using Texnomic.SecureDNS.Extensions;
 using Texnomic.SecureDNS.Serialization;
-using Texnomic.SecureDNS.Serialization.Extensions;
 
 namespace Texnomic.DNS.Models
 {

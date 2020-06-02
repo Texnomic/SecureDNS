@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 
 using Texnomic.SecureDNS.Core.Options;
+using Texnomic.SecureDNS.Extensions;
 
 namespace Texnomic.SecureDNS.Protocols
 {
@@ -35,11 +36,10 @@ namespace Texnomic.SecureDNS.Protocols
 
             await Client.SendAsync(Query, Query.Length, IPEndPoint);
 
-            var Task = Client.ReceiveAsync();
+            var Result = await Client.ReceiveAsync()
+                                     .WithTimeout(Options.CurrentValue.Timeout);
 
-            Task.Wait(Options.CurrentValue.Timeout);
-
-            return Task.IsCompletedSuccessfully ? Task.Result.Buffer : throw new TimeoutException();
+            return Result.Buffer;
         }
 
         protected override void Dispose(bool Disposing)

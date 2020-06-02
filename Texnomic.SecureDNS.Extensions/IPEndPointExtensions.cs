@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
 
-namespace Texnomic.SecureDNS.Protocols.Extensions
+namespace Texnomic.SecureDNS.Extensions
 {
     public static class IPEndPointExtensions
     {
