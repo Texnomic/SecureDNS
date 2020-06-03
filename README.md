@@ -12,7 +12,7 @@ SecureDNS Project is implemented using modern [Clean-Architecture](https://www.a
 3. [Integrations](#Integrations)
 4. [Resource Records](https://github.com/Texnomic/SecureDNS/wiki/Supported-Resource-Records)
 5. [Platforms](#Platforms)
-6. [Chips](#Chips)
+6. [Architecture](#Architecture)
 7. [Launch](#Launch)
 8. [Technology](#Technology)
 9. [Dependencies](#Dependencies)
@@ -56,7 +56,7 @@ The [v0.3 Alpha Release](https://github.com/Texnomic/SecureDNS/releases/tag/v0.3
 - [x] Windows Client: 7, 8.1, 10 (1607+)
 - [x] Windows Server: 2012 R2+
 
-## Chips
+## Architectures
 - [x] x64 on Windows, macOS, and Linux
 - [x] x86 on Windows
 - [x] ARM32 on Windows and Linux
