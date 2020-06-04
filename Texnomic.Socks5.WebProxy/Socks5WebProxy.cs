@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
 using Texnomic.Socks5.Options;
@@ -13,42 +14,41 @@ using Texnomic.Socks5.WebProxy.Options;
 
 namespace Texnomic.Socks5.WebProxy
 {
-    public class Socks5WebProxy : IWebProxy
+    public class Socks5WebProxy : IHostedService, IDisposable
     {
         private readonly IOptionsMonitor<Socks5WebProxyOptions> ProxyOptions;
         private readonly IOptionsMonitor<Socks5Options> Socks5Options;
         private Socket ServerSocket;
-        private CancellationTokenSource CancellationTokenSource;
-
-        public Uri GetProxy(Uri Destination) => ProxyOptions.CurrentValue.Uri;
-        public bool IsBypassed(Uri Host) => false;
-        public ICredentials Credentials { get; set; }
+        private CancellationToken CancellationToken;
 
         public Socks5WebProxy(IOptionsMonitor<Socks5WebProxyOptions> ProxyOptions, IOptionsMonitor<Socks5Options> Socks5Options)
         {
             this.ProxyOptions = ProxyOptions;
             this.Socks5Options = Socks5Options;
-            ProxyOptions.OnChange(Initialize);
-            Initialize(ProxyOptions.CurrentValue);
+            ProxyOptions.OnChange(async (ChangedOptions) => await StartAsync(CancellationToken));
         }
 
-        private void Initialize(Socks5WebProxyOptions Options)
+        public async Task StartAsync(CancellationToken Token)
         {
-            CancellationTokenSource = new CancellationTokenSource(Options.Timeout);
+            CancellationToken = Token;
 
-            ServerSocket = new Socket(Options.IPAddress.AddressFamily, Options.SocketType, Options.ProtocolType);
+            ServerSocket = new Socket(ProxyOptions.CurrentValue.IPAddress.AddressFamily, ProxyOptions.CurrentValue.SocketType, ProxyOptions.CurrentValue.ProtocolType);
 
-            ServerSocket.Bind(Options.IPEndPoint);
+            ServerSocket.Bind(ProxyOptions.CurrentValue.IPEndPoint);
 
-            ServerSocket.Listen(Options.BackLog);
+            ServerSocket.Listen(ProxyOptions.CurrentValue.BackLog);
 
-            Task.Factory.StartNew(ReceiveAsync, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default).Unwrap();
+            await Task.Factory.StartNew(ReceiveAsync, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default).Unwrap();
         }
 
+        public async Task StopAsync(CancellationToken Token)
+        {
+            throw new NotImplementedException();
+        }
 
         private async Task ReceiveAsync()
         {
-            while (ServerSocket.IsBound)
+            while (ServerSocket.IsBound && !CancellationToken.IsCancellationRequested)
             {
                 var ClientSocket = await ServerSocket.AcceptAsync();
 
@@ -58,16 +58,16 @@ namespace Texnomic.Socks5.WebProxy
 
                 Buffer = Buffer[..Size];
 
-                var Line = Encoding.UTF8.GetString(Buffer);
+                var Lines = Encoding.UTF8.GetString(Buffer);
 
-                var ProxyRequest = Line.Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
+                var ProxyRequest = Lines.Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
 
-                if (ProxyRequest.Length != 2) throw new Exception();
+                if (ProxyRequest.Length < 2) throw new Exception();
 
                 var Connect = ProxyRequest[0].Split(' ');
 
                 if (Connect.Length != 3) throw new Exception();
-                if (Connect[0] != "CONNECT") throw new Exception();
+                if (Connect[0] != "CONNECT" && Connect[0] != "GET") throw new Exception();
                 if (Connect[2] != "HTTP/1.1") throw new Exception();
 
                 var Host = ProxyRequest[1].Split(' ');
@@ -77,9 +77,11 @@ namespace Texnomic.Socks5.WebProxy
 
                 var EndPoint = Host[1].Split(':');
 
+                var Port = EndPoint.Length == 2 ? int.Parse(EndPoint[1]) : Connect[1].StartsWith("http://") ? 80 : 443;
+
                 var Socks5 = new Socks5(Socks5Options);
 
-                var Socks5Socket = await Socks5.Tunnel(EndPoint[0], int.Parse(EndPoint[1]));
+                var Socks5Socket = await Socks5.Connect(EndPoint[0], Port);
 
                 var ProxyResponse = Encoding.UTF8.GetBytes("HTTP/1.1 200 Connection established\r\nProxy-Agent: Texnomic-Socks5WebProxy\r\n\r\n");
 
@@ -91,7 +93,7 @@ namespace Texnomic.Socks5.WebProxy
             }
         }
 
-        private async Task Pipe(Socket Reader, Socket Writer)
+        private static async Task Pipe(Socket Reader, Socket Writer)
         {
             var Buffer = new byte[512];
 
@@ -108,5 +110,31 @@ namespace Texnomic.Socks5.WebProxy
 
             Writer.Close();
         }
+
+        private bool IsDisposed;
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool Disposing)
+        {
+            if (IsDisposed) return;
+
+            if (Disposing)
+            {
+                ServerSocket.Dispose();
+            }
+
+            IsDisposed = true;
+        }
+
+        ~Socks5WebProxy()
+        {
+            Dispose(false);
+        }
+
     }
 }

@@ -31,17 +31,17 @@ namespace Texnomic.Socks5
             Socket = new Socket(Options.SocketType, Options.ProtocolType);
 
             Socket = Options.Authentication == Authentication.NoAuthentication
-                        ? await Connect(Options.IPEndPoint)
-                        : await Connect(Options.IPEndPoint, Options.Username, Options.Password);
+                        ? await Hello(Options.IPEndPoint)
+                        : await Hello(Options.IPEndPoint, Options.Username, Options.Password);
 
             Initialized = true;
         }
 
-        private async Task<Socket> Connect(IPEndPoint IPEndPoint)
+        private async Task<Socket> Hello(IPEndPoint IPEndPoint)
         {
             await Socket.ConnectAsync(IPEndPoint);
 
-            await Socket.SendAsync(BuildHelloMessage(Authentication.NoAuthentication), SocketFlags.None);
+            await Socket.SendAsync(CreateHello(Authentication.NoAuthentication), SocketFlags.None);
 
             var Buffer = new byte[2];
 
@@ -56,11 +56,11 @@ namespace Texnomic.Socks5
             return Socket;
         }
 
-        private async Task<Socket> Connect(IPEndPoint IPEndPoint, string Username, string Password)
+        private async Task<Socket> Hello(IPEndPoint IPEndPoint, string Username, string Password)
         {
             await Socket.ConnectAsync(IPEndPoint);
 
-            await Socket.SendAsync(BuildHelloMessage(Authentication.UsernamePassword), SocketFlags.None);
+            await Socket.SendAsync(CreateHello(Authentication.UsernamePassword), SocketFlags.None);
 
             var Buffer = new byte[2];
 
@@ -72,7 +72,7 @@ namespace Texnomic.Socks5
 
             if (Buffer[1] != (byte)Authentication.UsernamePassword) throw new Exception();
 
-            await Socket.SendAsync(BuildAuthenticationMessage(Username, Password), SocketFlags.None);
+            await Socket.SendAsync(CreateAuthentication(Username, Password), SocketFlags.None);
 
             Buffer = new byte[2];
 
@@ -88,84 +88,68 @@ namespace Texnomic.Socks5
         }
 
 
-        public async Task<Socket> Tunnel(string Domain, int Port)
+        public async Task<Socket> Connect(string Domain, int Port)
         {
             if (!Initialized) await Initialize(Options.CurrentValue);
 
-            var Message = BuildRequestMessage(Command.Connect, Domain, Port);
+            var Message = CreateRequest(Command.Connect, Domain, Port);
+
+            //var Message = CreateRequest(Command.Resolve, Domain, Port);
 
             await Socket.SendAsync(Message, SocketFlags.None);
 
-            var Buffer = new byte[7 + Domain.Length];
+            var Buffer = new byte[22];
 
             var Size = await Socket.ReceiveAsync(Buffer, SocketFlags.None);
 
-            if (Buffer[0] != SocksVersion) throw new Exception();
-            if (Buffer[1] > 8) throw new Exception();
-            if (Buffer[1] != 0) throw new Exception();
-            if (Buffer[2] != 0) throw new Exception();
-            if (Buffer[3] != 1 && Buffer[3] != 3 && Buffer[3] != 4) throw new Exception();
+            Buffer = Buffer[..Size];
 
+            if (Buffer[0] != SocksVersion) throw new Exception();
+
+            var Reply = Buffer[1].AsEnum<Reply>();
+
+            if (Reply != Reply.Succeeded) throw new Exception();
+
+            if (Buffer[2] != 0) throw new Exception();
 
             var Address = Buffer[3].AsEnum<Address>();
 
-            switch (Address)
-            {
-                case Address.Domain:
-                    if (Size < 7 + Domain.Length) throw new Exception();
-                    break;
-                case Address.IPv4:
-                    if (Size < 10) throw new Exception();
-                    break;
-                case Address.IPv6:
-                    if (Size < 22) throw new Exception();
-                    break;
-                default:
-                    throw new Exception();
-            }
-
+            var ServerAddress = Address == Address.IPv4 ? new IPAddress(Buffer[4..8]) : new IPAddress(Buffer[4..20]);
 
             return Socket;
         }
 
-        public async Task<Socket> Tunnel(IPEndPoint IPEndPoint)
+        public async Task<Socket> Connect(IPEndPoint IPEndPoint)
         {
             if (!Initialized) await Initialize(Options.CurrentValue);
 
-            var Message = BuildRequestMessage(Command.Connect, IPEndPoint);
+            var Message = CreateRequest(Command.Connect, IPEndPoint);
 
             await Socket.SendAsync(Message, SocketFlags.None);
 
-            var Buffer = new byte[10];
+            var Buffer = new byte[22];
 
             var Size = await Socket.ReceiveAsync(Buffer, SocketFlags.None);
 
-            var IPAddress = IPEndPoint.AddressFamily == AddressFamily.InterNetwork ? Address.IPv4 : Address.IPv6;
+            Buffer = Buffer[..Size];
 
             if (Buffer[0] != SocksVersion) throw new Exception();
-            if (Buffer[1] > 8) throw new Exception();
-            if (Buffer[1] != 0) throw new Exception();
-            if (Buffer[2] != 0) throw new Exception();
-            if (Buffer[3] != 1 && Buffer[3] != 3 && Buffer[3] != 4) throw new Exception();
-            if(IPAddress != Buffer[3].AsEnum<Address>()) throw new Exception();
 
-            switch (IPAddress)
-            {
-                case Address.IPv4:
-                    if (Size < 10) throw new Exception();
-                    break;
-                case Address.IPv6:
-                    if (Size < 22) throw new Exception();
-                    break;
-                default:
-                    throw new Exception();
-            }
+            var Reply = Buffer[1].AsEnum<Reply>();
+
+            if (Reply != Reply.Succeeded) throw new Exception();
+
+            if (Buffer[2] != 0) throw new Exception();
+
+            var Address = Buffer[3].AsEnum<Address>();
+
+            var ServerAddress = Address == Address.IPv4 ? new IPAddress(Buffer[4..8]) : new IPAddress(Buffer[4..20]);
 
             return Socket;
         }
 
 
-        private static byte[] BuildHelloMessage(Authentication Authentication)
+        private static byte[] CreateHello(Authentication Authentication)
         {
             var Authenticated = Authentication == Authentication.UsernamePassword;
             var Size = Authentication == Authentication.UsernamePassword ? 4 : 3;
@@ -177,7 +161,18 @@ namespace Texnomic.Socks5
             return DnStream.ToArray();
         }
 
-        private static byte[] BuildRequestMessage(Command Command, IPEndPoint IPEndPoint)
+        private static byte[] CreateAuthentication(string Username, string Password)
+        {
+            var DnStream = new DnStream((ushort) (3 + Username.Length + Password.Length));
+            DnStream.WriteByte(SubNegotiationVersion);
+            DnStream.WriteByte((byte) Username.Length);
+            DnStream.WriteString(Username);
+            DnStream.WriteByte((byte) Password.Length);
+            DnStream.WriteString(Password);
+            return DnStream.ToArray();
+        }
+
+        private static byte[] CreateRequest(Command Command, IPEndPoint IPEndPoint)
         {
             var IPAddress = IPEndPoint.Address.GetAddressBytes();
             var IPAddressType = IPEndPoint.AddressFamily == AddressFamily.InterNetwork ? Address.IPv4 : Address.IPv6;
@@ -191,7 +186,7 @@ namespace Texnomic.Socks5
             return DnStream.ToArray();
         }
 
-        private static byte[] BuildRequestMessage(Command Command, string Domain, int Port)
+        private static byte[] CreateRequest(Command Command, string Domain, int Port)
         {
             var DnStream = new DnStream((ushort)(7 + Domain.Length));
             DnStream.WriteByte(SocksVersion);
@@ -201,17 +196,6 @@ namespace Texnomic.Socks5
             DnStream.WriteByte((byte)Domain.Length);
             DnStream.WriteString(Domain);
             DnStream.WriteUShort((ushort)Port);
-            return DnStream.ToArray();
-        }
-
-        private static byte[] BuildAuthenticationMessage(string Username, string Password)
-        {
-            var DnStream = new DnStream((ushort)(3 + Username.Length + Password.Length));
-            DnStream.WriteByte(SubNegotiationVersion);
-            DnStream.WriteByte((byte)Username.Length);
-            DnStream.WriteString(Username);
-            DnStream.WriteByte((byte)Password.Length);
-            DnStream.WriteString(Password);
             return DnStream.ToArray();
         }
     }

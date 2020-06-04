@@ -30,13 +30,13 @@ namespace Texnomic.SecureDNS.Tests.Tor
 
             var Client = new WebClient();
 
-            var NoTorIP = await Client.DownloadStringTaskAsync("https://httpbin.org/ip");
+            //var NoTorIP = await Client.DownloadStringTaskAsync("https://httpbin.org/ip");
 
             Client.Proxy = Proxy;
 
-            var TorIP = await Client.DownloadStringTaskAsync("https://httpbin.org/ip");
+            //var TorIP = await Client.DownloadStringTaskAsync("https://httpbin.org/ip");
 
-            var Cloudflare = await Client.DownloadStringTaskAsync("https://dns4torpnlfs2ifuz2s2yf3fc7rdmsbhm6rw75euj35pac6ap25zgqad.onion");
+            var Cloudflare = await Client.DownloadStringTaskAsync("http://dns4torpnlfs2ifuz2s2yf3fc7rdmsbhm6rw75euj35pac6ap25zgqad.onion");
         }
     }
 }

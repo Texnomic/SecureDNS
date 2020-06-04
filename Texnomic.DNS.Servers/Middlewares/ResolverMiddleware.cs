@@ -4,8 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using PipelineNet.Middleware;
 using Serilog;
+using Texnomic.DNS.Servers.Options;
 using Texnomic.SecureDNS.Abstractions;
 using Texnomic.SecureDNS.Abstractions.Enums;
 using Texnomic.SecureDNS.Core;
@@ -14,52 +16,77 @@ namespace Texnomic.DNS.Servers.Middlewares
 {
     public class ResolverMiddleware : IAsyncMiddleware<IMessage, IMessage>, IDisposable
     {
+        private readonly IOptionsMonitor<ResolverMiddlewareOptions> Options;
         private readonly IProtocol Protocol;
         private readonly ILogger Logger;
         private readonly MemoryCache MemoryCache;
-        private readonly Timer Timer;
+        private Timer CompactTimer;
+        private Timer StatusTimer;
 
-        public ResolverMiddleware(IProtocol Protocol, MemoryCache MemoryCache, ILogger Logger)
+        public ResolverMiddleware(IOptionsMonitor<ResolverMiddlewareOptions> ResolverMiddlewareOptions, IProtocol Protocol, MemoryCache MemoryCache, ILogger Logger)
         {
             this.Protocol = Protocol;
             this.Logger = Logger;
             this.MemoryCache = MemoryCache;
-            Timer = new Timer(60 * 60 * 1000);
-            Timer.Elapsed += Timer_Elapsed;
-            Timer.Start();
+            Options = ResolverMiddlewareOptions;
+            Options.OnChange(Onchange);
         }
 
-        private void Timer_Elapsed(object Sender, ElapsedEventArgs Args)
+        private void Onchange(ResolverMiddlewareOptions ResolverMiddlewareOptions)
         {
-            Logger.Information("Compacting 50% Of {@Count} From Memory Cache...", MemoryCache.Count);
+            if (!ResolverMiddlewareOptions.CacheEnabled) return;
 
-            MemoryCache.Compact(50.0);
+            CompactTimer = new Timer(ResolverMiddlewareOptions.CacheCompactTimeout);
+            CompactTimer.Elapsed += CompactTimer_Elapsed;
+            CompactTimer.Start();
+
+            StatusTimer = new Timer(ResolverMiddlewareOptions.CacheStatusTimeout);
+            StatusTimer.Elapsed += StatusTimer_Elapsed;
+            StatusTimer.Start();
+        }
+
+        private void CompactTimer_Elapsed(object Sender, ElapsedEventArgs Args)
+        {
+            Logger.Information("Compacting {@Percentage} Of {@Count} From Memory Cache...", Options.CurrentValue.CacheCompactPercentage, MemoryCache.Count);
+
+            MemoryCache.Compact(Options.CurrentValue.CacheCompactPercentage);
 
             Logger.Information("Compacted Memory Cache To {@Count}.", MemoryCache.Count);
         }
 
+        private void StatusTimer_Elapsed(object Sender, ElapsedEventArgs Args)
+        {
+            Logger.Information("Resolver Memory Cache Contains {@Count} Messages.", MemoryCache.Count);
+        }
+
         public async Task<IMessage> Run(IMessage Message, Func<IMessage, Task<IMessage>> Next)
         {
-            var Answers = GetCache(Message);
-
-            if (Answers == null)
+            if (Options.CurrentValue.CacheEnabled)
             {
-                Message = await Protocol.ResolveAsync(Message);
+                var Answers = GetCache(Message);
 
-                SetCache(Message);
+                if (Answers == null)
+                {
+                    Message = await Protocol.ResolveAsync(Message);
 
-                return await Next(Message);
-            }
-            else
-            {
+                    SetCache(Message);
+
+                    return await Next(Message);
+                }
+
                 Message = CreateAnswer(Message);
 
                 Message.Answers = Answers;
 
-                Logger.Information("Resolved Query {@ID} For {@Domain} From Cache.", Message.ID, Message.Questions.First().Domain.Name);
+                Logger.Information("Resolved Query {@ID} For {@Domain} From Cache.", Message.ID,
+                    Message.Questions.First().Domain.Name);
 
                 return await Next(Message);
             }
+
+            Message = await Protocol.ResolveAsync(Message);
+
+            return await Next(Message);
         }
 
         private void SetCache(IMessage Message)
@@ -102,7 +129,7 @@ namespace Texnomic.DNS.Servers.Middlewares
             if (Disposing)
             {
                 MemoryCache.Dispose();
-                Timer.Dispose();
+                CompactTimer.Dispose();
             }
 
             IsDisposed = true;

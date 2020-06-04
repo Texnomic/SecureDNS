@@ -153,6 +153,7 @@ namespace Texnomic.SecureDNS.Terminal
         {
             Services.Configure<ProxyResponsibilityChainOptions>(Configurations.GetSection("Proxy Responsibility Chain"));
             Services.Configure<HostTableMiddlewareOptions>(Configurations.GetSection("HostTable Middleware"));
+            Services.Configure<ResolverMiddlewareOptions>(Configurations.GetSection("Resolver Middleware"));
             Services.Configure<FilterListsMiddlewareOptions>(Configurations.GetSection("FilterLists Middleware"));
             Services.Configure<ProxyServerOptions>(Configurations.GetSection("Proxy Server"));
             Services.Configure<DNSCryptOptions>(Configurations.GetSection("DNSCrypt Protocol"));
