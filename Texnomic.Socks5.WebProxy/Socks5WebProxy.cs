@@ -38,7 +38,9 @@ namespace Texnomic.Socks5.WebProxy
 
             ServerSocket.Listen(ProxyOptions.CurrentValue.BackLog);
 
-            await Task.Factory.StartNew(ReceiveAsync, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default).Unwrap();
+            _ = Task.Factory.StartNew(ReceiveAsync, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default).Unwrap();
+
+            await Task.Yield();
         }
 
         public async Task StopAsync(CancellationToken Token)

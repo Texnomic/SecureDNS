@@ -61,8 +61,6 @@ namespace Texnomic.SecureDNS.Terminal
         {
             Splash();
 
-            Daemonize();
-
             BuildHost();
 
             await HostBuilder.RunConsoleAsync();

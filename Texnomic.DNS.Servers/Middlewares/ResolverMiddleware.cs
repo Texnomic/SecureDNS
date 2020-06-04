@@ -36,11 +36,11 @@ namespace Texnomic.DNS.Servers.Middlewares
         {
             if (!ResolverMiddlewareOptions.CacheEnabled) return;
 
-            CompactTimer = new Timer(ResolverMiddlewareOptions.CacheCompactTimeout);
+            CompactTimer = new Timer(ResolverMiddlewareOptions.CacheCompactTimeout * 60 * 60 * 1000);
             CompactTimer.Elapsed += CompactTimer_Elapsed;
             CompactTimer.Start();
 
-            StatusTimer = new Timer(ResolverMiddlewareOptions.CacheStatusTimeout);
+            StatusTimer = new Timer(ResolverMiddlewareOptions.CacheStatusTimeout * 60 * 60 * 1000);
             StatusTimer.Elapsed += StatusTimer_Elapsed;
             StatusTimer.Start();
         }
@@ -78,8 +78,7 @@ namespace Texnomic.DNS.Servers.Middlewares
 
                 Message.Answers = Answers;
 
-                Logger.Information("Resolved Query {@ID} For {@Domain} From Cache.", Message.ID,
-                    Message.Questions.First().Domain.Name);
+                Logger.Information("Resolved Query {@ID} For {@Domain} From Cache.", Message.ID, Message.Questions.First().Domain.Name);
 
                 return await Next(Message);
             }
