@@ -1,4 +1,4 @@
-![SecureDNS](https://raw.githubusercontent.com/Texnomic/SecureDNS/master/docs/Logo.png "SecureDNS")
+![SecureDNS](https://raw.githubusercontent.com/Texnomic/SecureDNS/master/docs/Logo.png "SecureDNS")</center>
 
 Building a Secure, Modern, Cross-Platform & Cross-Architecture DNS Server Using C# 8.0 & .NET Core 3.1.
 
@@ -23,6 +23,10 @@ SecureDNS Project is implemented using modern [Clean-Architecture](https://www.a
 ## Releases
 
 The [v0.3 Alpha Release](https://github.com/Texnomic/SecureDNS/releases/tag/v0.3-alpha) is now available.
+
+
+<center><iframe width="560" height="315" src="https://www.youtube.com/embed/24QwvJ1VTmQ" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></center>
+
 
 ## Protocols
 

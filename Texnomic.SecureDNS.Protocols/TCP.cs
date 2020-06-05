@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Nerdbank.Streams;
 using Texnomic.SecureDNS.Core.Options;
+using Texnomic.SecureDNS.Extensions;
 
 namespace Texnomic.SecureDNS.Protocols
 {
@@ -43,7 +44,7 @@ namespace Texnomic.SecureDNS.Protocols
 
             var QueryLength = BitConverter.GetBytes((ushort)Query.Length);
 
-            var PrefixedQuery = Concat(QueryLength, Query);
+            var PrefixedQuery = ArrayExtensions.Concat(QueryLength, Query);
 
             await PipeWriter.WriteAsync(PrefixedQuery);
 
@@ -74,21 +75,7 @@ namespace Texnomic.SecureDNS.Protocols
         }
 
 
-        private static T[] Concat<T>(params T[][] Arrays)
-        {
-            var Result = new T[Arrays.Sum(A => A.Length)];
 
-            var Offset = 0;
-
-            foreach (var Array in Arrays)
-            {
-                Array.CopyTo(Result, Offset);
-
-                Offset += Array.Length;
-            }
-
-            return Result;
-        }
 
         protected override void Dispose(bool Disposing)
         {

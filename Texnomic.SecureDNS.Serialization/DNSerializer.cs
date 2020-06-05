@@ -65,6 +65,9 @@ namespace Texnomic.SecureDNS.Serialization
 
             if (Message.MessageType == MessageType.Query) return Message;
 
+            if(Message.Truncated)
+                throw new FormatException("Truncated DNS Message.");
+
             if (Message.ResponseCode == ResponseCode.NoError &&            
                 Message.AnswersCount == 0 &&
                 Message.AuthorityCount == 0 &&
