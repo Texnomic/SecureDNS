@@ -3,10 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
+
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
+
 using PipelineNet.Middleware;
+
 using Serilog;
+
 using Texnomic.DNS.Servers.Options;
 using Texnomic.SecureDNS.Abstractions;
 using Texnomic.SecureDNS.Abstractions.Enums;
@@ -74,9 +78,7 @@ namespace Texnomic.DNS.Servers.Middlewares
                     return await Next(Message);
                 }
 
-                Message = CreateAnswer(Message);
-
-                Message.Answers = Answers;
+                Message = CreateAnswer(Message, Answers);
 
                 Logger.Information("Resolved Query {@ID} For {@Domain} From Cache.", Message.ID, Message.Questions.First().Domain.Name);
 
@@ -102,14 +104,22 @@ namespace Texnomic.DNS.Servers.Middlewares
             return MemoryCache.Get<List<IAnswer>>($"{Message.Questions.First().Domain.Name}:{Message.Questions.First().Type}");
         }
 
-        private static IMessage CreateAnswer(IMessage Query)
+        private static IMessage CreateAnswer(IMessage Query, IReadOnlyCollection<IAnswer> Answers)
         {
             return new Message()
             {
                 ID = Query.ID,
                 MessageType = MessageType.Response,
+                OperationCode = OperationCode.Query,
+                AuthoritativeAnswer = AuthoritativeAnswer.Cache,
+                Truncated = false,
+                RecursionDesired = Query.RecursionDesired,
+                RecursionAvailable = Query.RecursionAvailable,
                 ResponseCode = ResponseCode.NoError,
+                QuestionsCount = Query.QuestionsCount,
+                AnswersCount = (ushort)Answers.Count,
                 Questions = Query.Questions,
+                Answers = Answers
             };
         }
 
