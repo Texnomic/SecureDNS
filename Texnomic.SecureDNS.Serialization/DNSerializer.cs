@@ -65,9 +65,10 @@ namespace Texnomic.SecureDNS.Serialization
 
             if (Message.MessageType == MessageType.Query) return Message;
 
-            if (Message.AnswersCount == 0 &&
-               Message.AuthorityCount == 0 &&
-               Message.AdditionalCount == 0)
+            if (Message.ResponseCode == ResponseCode.NoError &&            
+                Message.AnswersCount == 0 &&
+                Message.AuthorityCount == 0 &&
+                Message.AdditionalCount == 0)
                 throw new FormatException("Incomplete DNS Message, Response Must Have At Least 1 Answer Record.");
 
             Message.Answers = GetAnswers(in Stream, Message.AnswersCount);
@@ -570,13 +571,13 @@ namespace Texnomic.SecureDNS.Serialization
 
         private static void Set(in DnStream Stream, in Dictionary<string, ushort> Pointers, ReadOnlySpan<string> Labels)
         {
-            foreach (var Label in Labels)
+            for (var Index = 0; Index < Labels.Length; Index++)
             {
-                var SubDomain = string.Join('.', Labels.Slice(Labels.IndexOf(Label)).ToArray());
+                var SubDomain = string.Join('.', Labels[Index..].ToArray());
 
                 if (Pointers.ContainsKey(SubDomain))
                 {
-                    Stream.WriteBits(2, (byte)LabelType.Compressed);
+                    Stream.WriteBits(2, (byte) LabelType.Compressed);
 
                     var Bytes = new byte[2];
 
@@ -592,11 +593,11 @@ namespace Texnomic.SecureDNS.Serialization
                 {
                     Pointers.Add(SubDomain, Stream.BytePosition);
 
-                    Stream.WriteBits(2, (byte)LabelType.Normal);
+                    Stream.WriteBits(2, (byte) LabelType.Normal);
 
-                    Stream.WriteBits(6, (byte)Label.Length);
+                    Stream.WriteBits(6, (byte) Labels[Index].Length);
 
-                    Stream.WriteString(Label);
+                    Stream.WriteString(Labels[Index]);
                 }
             }
 
