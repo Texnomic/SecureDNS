@@ -13,12 +13,12 @@ using Texnomic.SecureDNS.Abstractions;
 using Texnomic.SecureDNS.Abstractions.Enums;
 using Texnomic.SecureDNS.Core;
 using Texnomic.SecureDNS.Core.DataTypes;
-using Texnomic.SecureDNS.Core.Options;
 using Texnomic.SecureDNS.Core.Records;
 using Texnomic.SecureDNS.Serialization;
 
 using OwnerFunction = Nethereum.ENS.ENSRegistry.ContractDefinition.OwnerFunction;
 using AvailableFunction =Texnomic.ENS.BaseRegistrar.ContractDefinition.AvailableFunction;
+using ENSOptions = Texnomic.SecureDNS.Protocols.Options.ENSOptions;
 using NameExpiresFunction = Texnomic.ENS.BaseRegistrar.ContractDefinition.NameExpiresFunction;
 
 namespace Texnomic.SecureDNS.Protocols

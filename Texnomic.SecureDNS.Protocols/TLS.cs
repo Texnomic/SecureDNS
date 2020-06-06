@@ -1,106 +1,70 @@
-﻿using System;
-using System.Buffers;
-using System.IO.Pipelines;
-using System.Linq;
+﻿using System.Buffers.Binary;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+
 using Microsoft.Extensions.Options;
-using Nerdbank.Streams;
-using Texnomic.SecureDNS.Core.Options;
+
+using Texnomic.SecureDNS.Protocols.Options;
+
 
 namespace Texnomic.SecureDNS.Protocols
 {
     public class TLS : Protocol
     {
-        private readonly IOptionsMonitor<TLSOptions> Options;
-        private readonly TcpClient TcpClient;
-
-        private SslStream SslStream;
-        private PipeReader PipeReader;
-        private PipeWriter PipeWriter;
+        private readonly IOptionsMonitor<TLSOptions> Options; 
 
         public TLS(IOptionsMonitor<TLSOptions> TLSOptions)
         {
             Options = TLSOptions;
-
-            TcpClient = new TcpClient();
-        }
-
-        protected override async ValueTask InitializeAsync()
-        {
-            await TcpClient.ConnectAsync(Options.CurrentValue.Host, Options.CurrentValue.Port);
-
-            SslStream = new SslStream(TcpClient.GetStream(), true, ValidateServerCertificate)
-            {
-                ReadTimeout = Options.CurrentValue.Timeout,
-                WriteTimeout = Options.CurrentValue.Timeout
-            };
-
-            await SslStream.AuthenticateAsClientAsync(Options.CurrentValue.Host);
-
-            PipeReader = SslStream.UsePipeReader();
-
-            PipeWriter = SslStream.UsePipeWriter();
         }
 
         public override async ValueTask<byte[]> ResolveAsync(byte[] Query)
         {
-            if (!TcpClient.Connected || !SslStream.CanWrite) await InitializeAsync();
-
-            var QueryLength = BitConverter.GetBytes((ushort)Query.Length);
-
-            var PrefixedQuery = Concat(QueryLength, Query);
-
-            await PipeWriter.WriteAsync(PrefixedQuery);
-
-            await PipeWriter.CompleteAsync();
-
-            var Task = PipeReader.ReadAsync().AsTask();
-
-            Task.Wait(Options.CurrentValue.Timeout);
-
-            if (Task.IsCompleted)
+            using var Socket = new Socket(SocketType.Stream, ProtocolType.Tcp)
             {
-                var Result = Task.Result;
+                ReceiveTimeout = (int) Options.CurrentValue.Timeout.TotalMilliseconds,
+                SendTimeout = (int) Options.CurrentValue.Timeout.TotalMilliseconds
+            };
 
-                await PipeReader.CompleteAsync();
+            await Socket.ConnectAsync(Options.CurrentValue.IPv4EndPoint);
 
-                var Buffer = Result.Buffer.Length > 14
-                    ? Result.Buffer.Slice(2)
-                    : throw new OperationCanceledException();
+            await using var NetworkStream = new NetworkStream(Socket);
 
-                return Buffer.ToArray();
-            }
+            var SslStream = new SslStream(NetworkStream, true, ValidateServerCertificate)
+            {
+                ReadTimeout = (int) Options.CurrentValue.Timeout.TotalMilliseconds,
+                WriteTimeout = (int) Options.CurrentValue.Timeout.TotalMilliseconds,
+            };
 
-            PipeReader.CancelPendingRead();
+            await SslStream.AuthenticateAsClientAsync(Options.CurrentValue.CommonName);
 
-            await PipeReader.CompleteAsync();
+            var Prefix = new byte[2];
 
-            throw new TimeoutException();
+            BinaryPrimitives.WriteUInt16BigEndian(Prefix, (ushort) Query.Length);
+
+            await SslStream.WriteAsync(Prefix);
+
+            await SslStream.WriteAsync(Query);
+
+            await SslStream.ReadAsync(Prefix);
+
+            var Size = BinaryPrimitives.ReadUInt16BigEndian(Prefix);
+
+            var Buffer = new byte[Size];
+
+            await SslStream.ReadAsync(Buffer);
+
+            return Buffer;
         }
 
 
         private bool ValidateServerCertificate(object Sender, X509Certificate Certificate, X509Chain Chain, SslPolicyErrors SslPolicyErrors)
         {
-            return string.IsNullOrEmpty(Options.CurrentValue.PublicKey) ? SslPolicyErrors == SslPolicyErrors.None : SslPolicyErrors == SslPolicyErrors.None && Certificate.GetPublicKeyString() == Options.CurrentValue.PublicKey;
-        }
+            var X509Certificate2 = new X509Certificate2(Certificate);
 
-        private static T[] Concat<T>(params T[][] Arrays)
-        {
-            var Result = new T[Arrays.Sum(A => A.Length)];
-
-            var Offset = 0;
-
-            foreach (var Array in Arrays)
-            {
-                Array.CopyTo(Result, Offset);
-
-                Offset += Array.Length;
-            }
-
-            return Result;
+            return string.IsNullOrEmpty(Options.CurrentValue.Thumbprint) ? SslPolicyErrors == SslPolicyErrors.None : SslPolicyErrors == SslPolicyErrors.None &&X509Certificate2.Thumbprint == Options.CurrentValue.Thumbprint;
         }
 
         protected override void Dispose(bool Disposing)
@@ -109,8 +73,7 @@ namespace Texnomic.SecureDNS.Protocols
 
             if (Disposing)
             {
-                SslStream.Dispose();
-                TcpClient.Dispose();
+          
             }
 
             IsDisposed = true;

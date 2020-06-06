@@ -19,6 +19,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Texnomic.SecureDNS.Abstractions\Texnomic.SecureDNS.Abstractions.csproj" />
     <ProjectReference Include="..\Texnomic.SecureDNS.Core\Texnomic.SecureDNS.Core.csproj" />
+    <ProjectReference Include="..\Texnomic.SecureDNS.Protocols\Texnomic.SecureDNS.Protocols.csproj" />
     <ProjectReference Include="..\Texnomic.SecureDNS.Serialization\Texnomic.SecureDNS.Serialization.csproj" />
     <ProjectReference Include="..\Texnomic.Socks5.WebProxy\Texnomic.Socks5.WebProxy.csproj" />
   </ItemGroup>

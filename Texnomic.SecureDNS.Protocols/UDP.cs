@@ -1,12 +1,8 @@
-﻿using System;
-using System.Net;
-using System.Net.Sockets;
+﻿using System.Net.Sockets;
 using System.Threading.Tasks;
-
 using Microsoft.Extensions.Options;
+using Texnomic.SecureDNS.Protocols.Options;
 
-using Texnomic.SecureDNS.Core.Options;
-using Texnomic.SecureDNS.Extensions;
 
 namespace Texnomic.SecureDNS.Protocols
 {
@@ -14,32 +10,28 @@ namespace Texnomic.SecureDNS.Protocols
     {
         private readonly IOptionsMonitor<UDPOptions> Options;
 
-        private IPEndPoint IPEndPoint;
-
         public UDP(IOptionsMonitor<UDPOptions> Options)
         {
             this.Options = Options;
-
-            this.Options.OnChange(OptionsOnChange);
-
-            IPEndPoint = new IPEndPoint(IPAddress.Parse(Options.CurrentValue.Host), Options.CurrentValue.Port);
-        }
-
-        private void OptionsOnChange(UDPOptions UDPOptions)
-        {
-            IPEndPoint = new IPEndPoint(IPAddress.Parse(UDPOptions.Host), UDPOptions.Port);
         }
 
         public override async ValueTask<byte[]> ResolveAsync(byte[] Query)
         {
-            using var Client = new UdpClient();
+            using var Socket = new Socket(SocketType.Dgram, ProtocolType.Udp)
+            {
+                ReceiveTimeout = (int) Options.CurrentValue.Timeout.TotalMilliseconds,
+                SendTimeout = (int) Options.CurrentValue.Timeout.TotalMilliseconds
+            };
 
-            await Client.SendAsync(Query, Query.Length, IPEndPoint);
+            await Socket.ConnectAsync(Options.CurrentValue.IPv4EndPoint);
 
-            var Result = await Client.ReceiveAsync()
-                                     .WithTimeout(Options.CurrentValue.Timeout);
+            var Buffer = new byte[1024];
 
-            return Result.Buffer;
+            await Socket.SendAsync(Query, SocketFlags.None);
+
+            var Size = await Socket.ReceiveAsync(Buffer, SocketFlags.None);
+
+            return Buffer[..Size];
         }
 
         protected override void Dispose(bool Disposing)

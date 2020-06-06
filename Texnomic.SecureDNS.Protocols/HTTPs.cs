@@ -7,7 +7,8 @@ using Microsoft.Extensions.Options;
 using Polly;
 using Polly.Retry;
 using RestSharp;
-using Texnomic.SecureDNS.Core.Options;
+using Texnomic.SecureDNS.Protocols.Options;
+
 
 namespace Texnomic.SecureDNS.Protocols
 {

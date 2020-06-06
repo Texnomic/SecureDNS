@@ -1,27 +1,24 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-
 using Colorful;
-
 using Common.Logging;
 using Common.Logging.Serilog;
-
 using Destructurama;
-
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-
 using PipelineNet.ChainsOfResponsibility;
 using PipelineNet.MiddlewareResolver;
-
 using Serilog;
 using Tmds.Systemd;
 using Texnomic.DNS.Servers;
@@ -29,8 +26,8 @@ using Texnomic.DNS.Servers.Middlewares;
 using Texnomic.DNS.Servers.Options;
 using Texnomic.DNS.Servers.ResponsibilityChain;
 using Texnomic.SecureDNS.Abstractions;
-using Texnomic.SecureDNS.Core.Options;
 using Texnomic.SecureDNS.Protocols;
+using Texnomic.SecureDNS.Protocols.Options;
 using Texnomic.SecureDNS.Terminal.Enums;
 using Texnomic.SecureDNS.Terminal.Options;
 
@@ -45,7 +42,7 @@ namespace Texnomic.SecureDNS.Terminal
 
         private static readonly string Stage = Environment.GetEnvironmentVariable("SecureDNS_ENVIRONMENT") ?? "Production";
 
-        private static readonly IConfiguration Configurations = new ConfigurationBuilder()
+        private static readonly IConfigurationRoot Configurations = new ConfigurationBuilder()
                                                                                 .SetBasePath(Directory.GetCurrentDirectory())
                                                                                 .AddJsonFile("AppSettings.json", false, true)
                                                                                 .AddJsonFile($"AppSettings.{Stage}.json", true, true)

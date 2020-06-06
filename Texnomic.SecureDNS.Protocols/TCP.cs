@@ -1,81 +1,51 @@
-﻿using System;
-using System.Buffers;
-using System.IO.Pipelines;
-using System.Linq;
+﻿using System.Buffers.Binary;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+
 using Microsoft.Extensions.Options;
-using Nerdbank.Streams;
-using Texnomic.SecureDNS.Core.Options;
-using Texnomic.SecureDNS.Extensions;
+
+using Texnomic.SecureDNS.Protocols.Options;
+
 
 namespace Texnomic.SecureDNS.Protocols
 {
     public class TCP : Protocol
     {
         private readonly IOptionsMonitor<TCPOptions> Options;
-        private readonly TcpClient TcpClient;
-
-        private NetworkStream NetworkStream;
-        private PipeReader PipeReader;
-        private PipeWriter PipeWriter;
 
         public TCP(IOptionsMonitor<TCPOptions> TCPOptions)
         {
             Options = TCPOptions;
-
-            TcpClient = new TcpClient();
-        }
-
-        protected override async ValueTask InitializeAsync()
-        {
-            await TcpClient.ConnectAsync(Options.CurrentValue.Host, Options.CurrentValue.Port);
-
-            NetworkStream = TcpClient.GetStream();
-
-            PipeReader = NetworkStream.UsePipeReader();
-
-            PipeWriter = NetworkStream.UsePipeWriter();
         }
 
         public override async ValueTask<byte[]> ResolveAsync(byte[] Query)
         {
-            if (!TcpClient.Connected || !NetworkStream.CanWrite) await InitializeAsync();
-
-            var QueryLength = BitConverter.GetBytes((ushort)Query.Length);
-
-            var PrefixedQuery = ArrayExtensions.Concat(QueryLength, Query);
-
-            await PipeWriter.WriteAsync(PrefixedQuery);
-
-            await PipeWriter.CompleteAsync();
-
-            var Task = PipeReader.ReadAsync().AsTask();
-
-            Task.Wait(Options.CurrentValue.Timeout);
-
-            if (Task.IsCompleted)
+            using var Socket = new Socket(SocketType.Stream, ProtocolType.Tcp)
             {
-                var Result = Task.Result;
+                ReceiveTimeout = (int)Options.CurrentValue.Timeout.TotalMilliseconds,
+                SendTimeout = (int)Options.CurrentValue.Timeout.TotalMilliseconds
+            };
 
-                await PipeReader.CompleteAsync();
+            await Socket.ConnectAsync(Options.CurrentValue.IPv4EndPoint);
 
-                var Buffer = Result.Buffer.Length > 14
-                    ? Result.Buffer.Slice(2)
-                    : throw new OperationCanceledException();
+            var Prefix = new byte[2];
 
-                return Buffer.ToArray();
-            }
+            BinaryPrimitives.WriteUInt16BigEndian(Prefix, (ushort)Query.Length);
 
-            PipeReader.CancelPendingRead();
+            await Socket.SendAsync(Prefix, SocketFlags.None);
 
-            await PipeReader.CompleteAsync();
+            await Socket.SendAsync(Query, SocketFlags.None);
 
-            throw new TimeoutException();
+            await Socket.ReceiveAsync(Prefix, SocketFlags.None);
+
+            var Size = BinaryPrimitives.ReadUInt16BigEndian(Prefix);
+
+            var Buffer = new byte[Size];
+
+            await Socket.ReceiveAsync(Buffer, SocketFlags.None);
+
+            return Buffer;
         }
-
-
-
 
         protected override void Dispose(bool Disposing)
         {
@@ -83,8 +53,7 @@ namespace Texnomic.SecureDNS.Protocols
 
             if (Disposing)
             {
-                NetworkStream.Dispose();
-                TcpClient.Dispose();
+
             }
 
             IsDisposed = true;

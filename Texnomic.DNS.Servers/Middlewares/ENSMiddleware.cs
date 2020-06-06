@@ -6,7 +6,7 @@ using Common.Logging;
 using Microsoft.Extensions.Options;
 using Serilog;
 using Texnomic.SecureDNS.Abstractions;
-using Texnomic.SecureDNS.Core.Options;
+using Texnomic.SecureDNS.Protocols.Options;
 
 
 namespace Texnomic.DNS.Servers.Middlewares

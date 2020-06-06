@@ -1,6 +1,6 @@
 ﻿using Texnomic.SecureDNS.Abstractions;
 
-namespace Texnomic.SecureDNS.Core.Options
+namespace Texnomic.SecureDNS.Protocols.Options
 {
     public class DNSCryptOptions : IOptions
     {

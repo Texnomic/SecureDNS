@@ -13,7 +13,7 @@ using Texnomic.SecureDNS.Abstractions;
 using Texnomic.SecureDNS.Abstractions.Enums;
 using Texnomic.SecureDNS.Core;
 using Texnomic.SecureDNS.Core.DataTypes;
-using Texnomic.SecureDNS.Core.Options;
+using Texnomic.SecureDNS.Protocols.Options;
 using Texnomic.SecureDNS.Core.Records;
 using Texnomic.SecureDNS.Extensions;
 using Texnomic.SecureDNS.Serialization;
