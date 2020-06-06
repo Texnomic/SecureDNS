@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -28,19 +29,19 @@ namespace Texnomic.SecureDNS.Protocols
     /// </summary>
     public sealed class DNSCrypt : Protocol
     {
-        private readonly IPEndPoint IPEndPoint;
+        private readonly IOptionsMonitor<DNSCryptOptions> Options;
+
+        private IPEndPoint IPEndPoint;
 
         private ICertificate Certificate;
 
-        private readonly byte[] PublicKey;
+        private byte[] PublicKey;
 
-        private readonly byte[] SecretKey;
+        private byte[] SecretKey;
 
         private byte[] SharedKey;
 
-        private readonly DNSCryptStamp Stamp;
-
-        private readonly IOptionsMonitor<DNSCryptOptions> Options;
+        private DNSCryptStamp Stamp;
 
         private bool IsInitialized;
 
@@ -48,6 +49,13 @@ namespace Texnomic.SecureDNS.Protocols
         {
             Options = DNSCryptOptions;
 
+            Options.OnChange(async (ChangedOptions) => await InitializeAsync());
+
+            IsInitialized = false;
+        }
+
+        protected override async ValueTask InitializeAsync()
+        {
             Stamp = DnSerializer.Deserialize(Options.CurrentValue.Stamp).Value as DNSCryptStamp;
 
             IPEndPoint = IPEndPoint.Parse(Stamp.Address);
@@ -56,11 +64,6 @@ namespace Texnomic.SecureDNS.Protocols
 
             PublicKey = Curve25519.ScalarMultiplicationBase(SecretKey);
 
-            IsInitialized = false;
-        }
-
-        protected override async ValueTask InitializeAsync()
-        {
             var Query = new Message()
             {
                 ID = BitConverter.ToUInt16(Random.Generate(2)),
@@ -79,19 +82,25 @@ namespace Texnomic.SecureDNS.Protocols
                 }
             };
 
-            var SerializedQuery = DnSerializer.Serialize(Query);
+            var RawQuery = DnSerializer.Serialize(Query);
 
-            using var Client = new UdpClient();
+            using var Socket = new Socket(SocketType.Dgram, ProtocolType.Udp)
+            {
+                ReceiveTimeout = Options.CurrentValue.Timeout,
+                SendTimeout = Options.CurrentValue.Timeout
+            };
 
-            await Client.SendAsync(SerializedQuery, SerializedQuery.Length, IPEndPoint);
+            await Socket.ConnectAsync(IPEndPoint);
 
-            var Task = Client.ReceiveAsync();
+            await Socket.SendAsync(RawQuery, SocketFlags.None);
 
-            Task.Wait(Options.CurrentValue.Timeout);
+            var RawAnswer = new byte[1024];
 
-            var SerializedAnswer = Task.IsCompletedSuccessfully ? Task.Result.Buffer : throw new TimeoutException();
+            var Size = await Socket.ReceiveAsync(RawAnswer, SocketFlags.None);
 
-            var AnswerMessage = DnSerializer.Deserialize(SerializedAnswer);
+            RawAnswer = RawAnswer[..Size];
+
+            var AnswerMessage = DnSerializer.Deserialize(RawAnswer);
 
             var IsValid = VerifyServer(AnswerMessage);
 
@@ -147,21 +156,6 @@ namespace Texnomic.SecureDNS.Protocols
             return Pad;
         }
 
-        private static T[] Concat<T>(params T[][] Arrays)
-        {
-            var Result = new T[Arrays.Sum(A => A.Length)];
-
-            var Offset = 0;
-
-            foreach (var Array in Arrays)
-            {
-                Array.CopyTo(Result, Offset);
-
-                Offset += Array.Length;
-            }
-
-            return Result;
-        }
 
         public override async ValueTask<byte[]> ResolveAsync(byte[] Query)
         {
@@ -171,25 +165,39 @@ namespace Texnomic.SecureDNS.Protocols
 
             var ClientNoncePad = new byte[12];
 
-            var PaddedClientNonce = Concat(ClientNonce, ClientNoncePad);
+            var PaddedClientNonce = ArrayExtensions.Concat(ClientNonce, ClientNoncePad);
 
             var QueryPad = GenerateQueryPad(Query.Length);
 
-            var PaddedQuery = Concat(Query, QueryPad);
+            var PaddedQuery = ArrayExtensions.Concat(Query, QueryPad);
 
             var EncryptedQuery = Encrypt(ref PaddedQuery, ref PaddedClientNonce);
 
-            var QueryPacket = Concat(Certificate.ClientMagic, PublicKey, ClientNonce, EncryptedQuery);
+            var QueryPacket = ArrayExtensions.Concat(Certificate.ClientMagic, PublicKey, ClientNonce, EncryptedQuery);
 
-            using var Client = new UdpClient();
+            using var Socket = new Socket(SocketType.Stream, ProtocolType.Tcp)
+            {
+                ReceiveTimeout = Options.CurrentValue.Timeout,
+                SendTimeout = Options.CurrentValue.Timeout
+            };
 
-            await Client.SendAsync(QueryPacket, QueryPacket.Length, IPEndPoint);
+            await Socket.ConnectAsync(IPEndPoint);
+            
+            var Prefix = new byte[2];
 
-            var Task = Client.ReceiveAsync();
+            BinaryPrimitives.WriteUInt16BigEndian(Prefix, (ushort) QueryPacket.Length);
 
-            Task.Wait(Options.CurrentValue.Timeout);
+            await Socket.SendAsync(Prefix, SocketFlags.None);
 
-            var AnswerPacket = Task.IsCompletedSuccessfully ? Task.Result.Buffer : throw new TimeoutException();
+            await Socket.SendAsync(QueryPacket, SocketFlags.None);
+
+            await Socket.ReceiveAsync(Prefix, SocketFlags.None);
+
+            var Size = BinaryPrimitives.ReadUInt16BigEndian(Prefix);
+
+            var AnswerPacket = new byte[Size];
+
+            await Socket.ReceiveAsync(AnswerPacket, SocketFlags.None);
 
             var ClientMagic = Encoding.ASCII.GetString(AnswerPacket[..8]);
 
@@ -201,7 +209,7 @@ namespace Texnomic.SecureDNS.Protocols
 
             var ServerNonce = AnswerPacket[20..32];
 
-            var Nonce = Concat(ClientNonce, ServerNonce);
+            var Nonce = ArrayExtensions.Concat(ClientNonce, ServerNonce);
 
             var EncryptedAnswer = AnswerPacket[32..];
 
