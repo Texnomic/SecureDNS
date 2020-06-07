@@ -85,7 +85,7 @@ namespace Texnomic.SecureDNS.Servers.Proxy
                 Workers.Add(Task.Factory.StartNew(SendAsync, CancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default).Unwrap());
             }
 
-            Logger?.Information("Server Started with {@Threads} Threads. Listening On {@IPEndPoint}", Options.CurrentValue.Threads, Options.CurrentValue.IPEndPoint.ToString());
+            Logger?.Information("UDP Server Started with {@Threads} Threads. Listening On {@IPEndPoint}", Options.CurrentValue.Threads, Options.CurrentValue.IPEndPoint.ToString());
 
             Started?.Invoke(this, EventArgs.Empty);
 

@@ -1,17 +1,24 @@
 ﻿using System;
+using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Net.WebSockets;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
+
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+
 using Nethereum.Util;
+
 using PipelineNet.MiddlewareResolver;
+
 using Serilog;
+
 using Texnomic.SecureDNS.Abstractions;
 using Texnomic.SecureDNS.Abstractions.Enums;
 using Texnomic.SecureDNS.Core;
@@ -30,8 +37,8 @@ namespace Texnomic.SecureDNS.Servers.Proxy
         private readonly IOptionsMonitor<ProxyServerOptions> Options;
         private readonly IMiddlewareResolver MiddlewareResolver;
         private readonly IOptionsMonitor<ProxyResponsibilityChainOptions> ProxyResponsibilityChainOptions;
-        private readonly BufferBlock<(IMessage, IPEndPoint)> IncomingQueue;
-        private readonly BufferBlock<(IMessage, IPEndPoint)> OutgoingQueue;
+        private readonly BufferBlock<(IMessage, Socket)> IncomingQueue;
+        private readonly BufferBlock<(IMessage, Socket)> OutgoingQueue;
 
         public event EventHandler<QueriedEventArgs> Queried;
         public event EventHandler<ResolvedEventArgs> Resolved;
@@ -42,7 +49,7 @@ namespace Texnomic.SecureDNS.Servers.Proxy
 
         private CancellationToken CancellationToken;
 
-        private UdpClient UdpClient;
+        private TcpListener TcpListener;
 
         public TCPServer(IOptionsMonitor<ProxyResponsibilityChainOptions> ProxyResponsibilityChainOptions,
             IOptionsMonitor<ProxyServerOptions> ProxyServerOptions,
@@ -59,24 +66,20 @@ namespace Texnomic.SecureDNS.Servers.Proxy
 
             Workers = new List<Task>();
 
-            IncomingQueue = new BufferBlock<(IMessage, IPEndPoint)>();
+            IncomingQueue = new BufferBlock<(IMessage, Socket)>();
 
-            OutgoingQueue = new BufferBlock<(IMessage, IPEndPoint)>();
+            OutgoingQueue = new BufferBlock<(IMessage, Socket)>();
         }
 
         public async Task StartAsync(CancellationToken Token)
         {
             CancellationToken = Token;
 
-            UdpClient = new UdpClient();
+            TcpListener = new TcpListener(Options.CurrentValue.IPEndPoint);
 
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                //https://stackoverflow.com/questions/5199026/c-sharp-async-udp-listener-socketexception
-                UdpClient.Client.IOControl(-1744830452, new byte[4], null);
-            }
+            //TcpListener.Server.Bind(Options.CurrentValue.IPEndPoint);
 
-            UdpClient.Client.Bind(Options.CurrentValue.IPEndPoint);
+            TcpListener.Start();
 
             for (var I = 0; I < Options.CurrentValue.Threads; I++)
             {
@@ -85,7 +88,7 @@ namespace Texnomic.SecureDNS.Servers.Proxy
                 Workers.Add(Task.Factory.StartNew(SendAsync, CancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default).Unwrap());
             }
 
-            Logger?.Information("Server Started with {@Threads} Threads. Listening On {@IPEndPoint}", Options.CurrentValue.Threads, Options.CurrentValue.IPEndPoint.ToString());
+            Logger?.Information("TCP Server Started with {@Threads} Threads. Listening On {@IPEndPoint}", Options.CurrentValue.Threads, Options.CurrentValue.IPEndPoint.ToString());
 
             Started?.Invoke(this, EventArgs.Empty);
 
@@ -156,21 +159,30 @@ namespace Texnomic.SecureDNS.Servers.Proxy
         {
             Thread.CurrentThread.Name = "Receiver";
 
+
             while (!CancellationToken.IsCancellationRequested)
             {
                 try
                 {
-                    var Result = await UdpClient.ReceiveAsync()
-                        .WithCancellation(CancellationToken);
+                    var ClientSocket = await TcpListener.AcceptSocketAsync();
 
-                    var Message = Deserialize(Result.Buffer);
+                    var Prefix = new byte[2];
 
-                    await IncomingQueue.SendAsync((Message, Result.RemoteEndPoint), CancellationToken);
+                    await ClientSocket.ReceiveAsync(Prefix, SocketFlags.None);
 
-                    Logger?.Verbose("Received {@Query} From {@RemoteEndPoint}.", Message,
-                        Result.RemoteEndPoint.ToString());
+                    var Size = BinaryPrimitives.ReadUInt16BigEndian(Prefix);
 
-                    Queried?.Invoke(this, new QueriedEventArgs(Message, Result.RemoteEndPoint));
+                    var Buffer = new byte[Size];
+
+                    await ClientSocket.ReceiveAsync(Buffer, SocketFlags.None);
+
+                    var Query = Deserialize(Buffer);
+
+                    await IncomingQueue.SendAsync((Query, ClientSocket), CancellationToken);
+
+                    Logger?.Verbose("Received {@Query} From {@RemoteEndPoint}.", Query, ClientSocket.RemoteEndPoint.ToString());
+
+                    Queried?.Invoke(this, new QueriedEventArgs(Query, (IPEndPoint)ClientSocket.RemoteEndPoint));
                 }
                 catch (OperationCanceledException)
                 {
@@ -193,23 +205,22 @@ namespace Texnomic.SecureDNS.Servers.Proxy
 
             IMessage Query = null;
 
-            IPEndPoint RemoteEndPoint = null;
+            Socket ClientSocket = null;
 
             while (!CancellationToken.IsCancellationRequested)
             {
                 try
                 {
-                    (Query, RemoteEndPoint) = await IncomingQueue.ReceiveAsync(CancellationToken)
-                        .WithCancellation(CancellationToken);
+                    (Query, ClientSocket) = await IncomingQueue.ReceiveAsync(CancellationToken).WithCancellation(CancellationToken);
 
                     var Answer = await ResponsibilityChain.Execute(Query);
 
-                    await OutgoingQueue.SendAsync((Answer, RemoteEndPoint), CancellationToken);
+                    await OutgoingQueue.SendAsync((Answer, ClientSocket), CancellationToken);
 
                     Logger?.Information("Resolved {@Answer} For {@Domain} with {@ResponseCode} To {@RemoteEndPoint}.",
-                        Answer, Answer.Questions.First().Domain.Name, Answer.ResponseCode, RemoteEndPoint.ToString());
+                        Answer, Answer.Questions.First().Domain.Name, Answer.ResponseCode, ClientSocket.RemoteEndPoint.ToString());
 
-                    Resolved?.Invoke(this, new ResolvedEventArgs(Query, Answer, RemoteEndPoint));
+                    Resolved?.Invoke(this, new ResolvedEventArgs(Query, Answer, (IPEndPoint)ClientSocket.RemoteEndPoint));
                 }
                 catch (OperationCanceledException)
                 {
@@ -221,13 +232,13 @@ namespace Texnomic.SecureDNS.Servers.Proxy
 
                     var ErrorMessage = Handle(Error, Query.ID, "Resolving", ResponseCode.ServerFailure);
 
-                    await OutgoingQueue.SendAsync((ErrorMessage, RemoteEndPoint), CancellationToken);
+                    await OutgoingQueue.SendAsync((ErrorMessage, ClientSocket), CancellationToken);
                 }
                 catch (Exception Error)
                 {
                     var ErrorMessage = Handle(Error, Query.ID, "Resolving", ResponseCode.ServerFailure);
 
-                    await OutgoingQueue.SendAsync((ErrorMessage, RemoteEndPoint), CancellationToken);
+                    await OutgoingQueue.SendAsync((ErrorMessage, ClientSocket), CancellationToken);
                 }
             }
         }
@@ -240,16 +251,21 @@ namespace Texnomic.SecureDNS.Servers.Proxy
             {
                 try
                 {
-                    var (Answer, RemoteEndPoint) = await OutgoingQueue.ReceiveAsync(CancellationToken)
-                                                                            .WithCancellation(CancellationToken);
+                    var (Answer, ClientSocket) = await OutgoingQueue.ReceiveAsync(CancellationToken).WithCancellation(CancellationToken);
 
                     var Bytes = Serialize(Answer);
 
-                    await UdpClient.SendAsync(Bytes, Bytes.Length, RemoteEndPoint);
+                    var Prefix = new byte[2];
 
-                    Logger?.Verbose("Sent {@Answer} To {@RemoteEndPoint}.", Answer, RemoteEndPoint.ToString());
+                    BinaryPrimitives.WriteUInt16BigEndian(Prefix, (ushort)Bytes.Length);
 
-                    Answered?.Invoke(this, new AnsweredEventArgs(Answer, RemoteEndPoint));
+                    await ClientSocket.SendAsync(Prefix, SocketFlags.None);
+
+                    await ClientSocket.SendAsync(Bytes, SocketFlags.None);
+
+                    Logger?.Verbose("Sent {@Answer} To {@RemoteEndPoint}.", Answer, ClientSocket.RemoteEndPoint.ToString());
+
+                    Answered?.Invoke(this, new AnsweredEventArgs(Answer, (IPEndPoint)ClientSocket.RemoteEndPoint));
 
                 }
                 catch (OperationCanceledException)
@@ -307,7 +323,7 @@ namespace Texnomic.SecureDNS.Servers.Proxy
 
             if (Disposing)
             {
-                UdpClient.Dispose();
+                TcpListener.Stop();
             }
 
             IsDisposed = true;

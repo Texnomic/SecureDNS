@@ -14,22 +14,30 @@ namespace Texnomic.SecureDNS.Terminal
 
         private readonly UDPServer UDPServer;
 
+        private readonly TCPServer TCPServer;
 
-        public CLI(IOptionsMonitor<TerminalOptions> TerminalOptions, UDPServer UDPServer)
+
+        public CLI(IOptionsMonitor<TerminalOptions> TerminalOptions, UDPServer UDPServer, TCPServer TCPServer)
         {
             Options = TerminalOptions;
 
             this.UDPServer = UDPServer;
+
+            this.TCPServer = TCPServer;
         }
 
         public async Task StartAsync(CancellationToken CancellationToken)
         {
             await UDPServer.StartAsync(CancellationToken);
+
+            await TCPServer.StartAsync(CancellationToken);
         }
 
         public async Task StopAsync(CancellationToken CancellationToken)
         {
             await UDPServer.StopAsync(CancellationToken);
+
+            await TCPServer.StopAsync(CancellationToken);
         }
 
 
@@ -49,6 +57,7 @@ namespace Texnomic.SecureDNS.Terminal
             if (Disposing)
             {
                 UDPServer.Dispose();
+                TCPServer.Dispose();
             }
 
             IsDisposed = true;

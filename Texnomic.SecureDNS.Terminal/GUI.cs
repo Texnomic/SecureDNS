@@ -26,11 +26,13 @@ namespace Texnomic.SecureDNS.Terminal
 
         private readonly UDPServer UDPServer;
 
+        private readonly TCPServer TCPServer;
+
         private readonly Timer StatusTimer;
 
         private readonly CancellationTokenSource CancellationTokenSource;
 
-        public GUI(IOptionsMonitor<TerminalOptions> TerminalOptions, IOptionsMonitor<ProxyServerOptions> ProxyServerOptions, UDPServer UDPServer)
+        public GUI(IOptionsMonitor<TerminalOptions> TerminalOptions, IOptionsMonitor<ProxyServerOptions> ProxyServerOptions, UDPServer UDPServer, TCPServer TCPServer)
         {
             Console.ReplaceAllColorsWithDefaults();
 
@@ -39,6 +41,8 @@ namespace Texnomic.SecureDNS.Terminal
             ServerOptions = ProxyServerOptions;
 
             this.UDPServer = UDPServer;
+
+            this.TCPServer = TCPServer;
 
             StatusTimer = new Timer(1000);
 
@@ -132,6 +136,8 @@ namespace Texnomic.SecureDNS.Terminal
 
             StatusTimer.Elapsed += (Sender, Args) => StatusListView.SetSource(UDPServer.Status().Distinct().ToList());
 
+            StatusTimer.Elapsed += (Sender, Args) => StatusListView.SetSource(TCPServer.Status().Distinct().ToList());
+
             Window.Add(ServerBindingLabel,
                 ServerBindingText,
                 StartButton,
@@ -163,6 +169,8 @@ namespace Texnomic.SecureDNS.Terminal
 
             await UDPServer.StopAsync(CancellationTokenSource.Token);
 
+            await TCPServer.StopAsync(CancellationTokenSource.Token);
+
             Application.RequestStop();
         }
 
@@ -176,6 +184,8 @@ namespace Texnomic.SecureDNS.Terminal
                 if (Available)
                 {
                     await UDPServer.StartAsync(CancellationTokenSource.Token);
+
+                    await TCPServer.StartAsync(CancellationTokenSource.Token);
 
                     MessageBox.Query(40, 7, "Information", "Server Started.", "OK");
                 }
@@ -197,6 +207,8 @@ namespace Texnomic.SecureDNS.Terminal
                 CancellationTokenSource.Cancel();
 
                 await UDPServer.StopAsync(CancellationTokenSource.Token);
+
+                await TCPServer.StopAsync(CancellationTokenSource.Token);
 
                 MessageBox.Query(40, 7, "Information", "Server Stopped.", "OK");
             }
@@ -241,6 +253,7 @@ namespace Texnomic.SecureDNS.Terminal
             {
                 CancellationTokenSource.Dispose();
                 UDPServer.Dispose();
+                TCPServer.Dispose();
                 StatusTimer.Dispose();
             }
 

@@ -113,7 +113,7 @@ namespace Texnomic.SecureDNS.Middlewares
                 AuthoritativeAnswer = AuthoritativeAnswer.Cache,
                 Truncated = false,
                 RecursionDesired = Query.RecursionDesired,
-                RecursionAvailable = Query.RecursionAvailable,
+                RecursionAvailable = Query.RecursionDesired, //Answering By True if Requested.
                 ResponseCode = ResponseCode.NoError,
                 QuestionsCount = Query.QuestionsCount,
                 AnswersCount = (ushort)Answers.Count,

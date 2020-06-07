@@ -197,18 +197,22 @@ namespace Texnomic.SecureDNS.Terminal
             {
                 case Mode.GUI:
                     Services.AddScoped<UDPServer>();
+                    Services.AddScoped<TCPServer>();
                     Services.AddHostedService<GUI>();
                     break;
                 case Mode.CLI:
                     Services.AddScoped<UDPServer>();
+                    Services.AddScoped<TCPServer>();
                     Services.AddHostedService<CLI>();
                     break;
                 case Mode.Daemon:
                     Daemonize();
                     Services.AddHostedService<UDPServer>();
+                    Services.AddHostedService<TCPServer>();
                     break;
                 default:
                     Services.AddScoped<UDPServer>();
+                    Services.AddScoped<TCPServer>();
                     Services.AddHostedService<GUI>();
                     break;
             }
