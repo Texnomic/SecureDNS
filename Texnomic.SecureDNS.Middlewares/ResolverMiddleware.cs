@@ -61,65 +61,51 @@ namespace Texnomic.SecureDNS.Middlewares
 
         public async Task<IMessage> Run(IMessage Message, Func<IMessage, Task<IMessage>> Next)
         {
-            if (Options.CurrentValue.CacheEnabled)
+            if (!Options.CurrentValue.CacheEnabled)
+                return await Next(Message);
+
+            var Question = Message.Questions.First();
+
+            var Cached = GetCache(Question.Domain, Question.Type);
+
+            if (Cached == null)
             {
-                var Answers = GetCache(Message);
+                Message = await Protocol.ResolveAsync(Message);
 
-                if (Answers == null)
-                {
-                    Message = await Protocol.ResolveAsync(Message);
-
-                    SetCache(Message);
-
-                    return await Next(Message);
-                }
-
-                Message = CreateAnswer(Message, Answers);
-
-                Logger.Information("Resolved Query {@ID} For {@Domain} From Cache.", Message.ID, Message.Questions.First().Domain.Name);
+                SetCache(Message);
 
                 return await Next(Message);
             }
 
-            Message = await Protocol.ResolveAsync(Message);
+            Cached.ID = Message.ID;
+
+            Message = Cached;
+
+            Logger.Information("Resolved Query {@ID} For {@Domain} From Cache.", Message.ID, Question.Domain.Name);
 
             return await Next(Message);
         }
 
         private void SetCache(IMessage Message)
         {
+            if (Message.Truncated) return;
+
             if (Message.ResponseCode != ResponseCode.NoError) return;
 
-            if (Message.AnswersCount == 0) return;
+            if (Message.AnswersCount == 0 &&
+                Message.AuthorityCount == 0 &&
+                Message.AdditionalCount == 0)
+                return;
 
             var TimeToLive = Message.Answers.First().TimeToLive;
 
             if (TimeToLive != null)
-                MemoryCache.Set($"{Message.Questions.First().Domain.Name}:{Message.Questions.First().Type}", Message.Answers, (TimeSpan)TimeToLive);
+                MemoryCache.Set($"{Message.Questions.First().Domain.Name}:{Message.Questions.First().Type}", Message, (TimeSpan)TimeToLive);
         }
 
-        private List<IAnswer> GetCache(IMessage Message)
+        private IMessage GetCache(IDomain Domain, RecordType Type)
         {
-            return MemoryCache.Get<List<IAnswer>>($"{Message.Questions.First().Domain.Name}:{Message.Questions.First().Type}");
-        }
-
-        private static IMessage CreateAnswer(IMessage Query, IReadOnlyCollection<IAnswer> Answers)
-        {
-            return new Message()
-            {
-                ID = Query.ID,
-                MessageType = MessageType.Response,
-                OperationCode = OperationCode.Query,
-                AuthoritativeAnswer = AuthoritativeAnswer.Cache,
-                Truncated = false,
-                RecursionDesired = Query.RecursionDesired,
-                RecursionAvailable = Query.RecursionDesired, //Answering By True if Requested.
-                ResponseCode = ResponseCode.NoError,
-                QuestionsCount = Query.QuestionsCount,
-                AnswersCount = (ushort)Answers.Count,
-                Questions = Query.Questions,
-                Answers = Answers
-            };
+            return MemoryCache.Get<IMessage>($"{Domain.Name}:{Type}");
         }
 
         private bool IsDisposed;
