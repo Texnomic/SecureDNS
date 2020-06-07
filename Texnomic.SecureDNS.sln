@@ -11,7 +11,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
-		_config.yml = _config.yml
 		FilterLists.xlsx = FilterLists.xlsx
 		LICENSE = LICENSE
 		README.md = README.md
@@ -73,9 +72,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.Socks5", "Texnomic
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.Socks5.WebProxy", "Texnomic.Socks5.WebProxy\Texnomic.Socks5.WebProxy.csproj", "{5EDF1E76-B357-43B7-8042-F24FF89EE00A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Texnomic.SecureDNS.Middlewares", "Texnomic.SecureDNS.Middlewares\Texnomic.SecureDNS.Middlewares.csproj", "{C50DF768-B4CB-42C2-B69F-68F28C725ABB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.SecureDNS.Middlewares", "Texnomic.SecureDNS.Middlewares\Texnomic.SecureDNS.Middlewares.csproj", "{C50DF768-B4CB-42C2-B69F-68F28C725ABB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Texnomic.SecureDNS.Servers", "Texnomic.SecureDNS.Servers\Texnomic.SecureDNS.Servers.csproj", "{FF242BFC-F980-419C-94CF-360954404284}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.SecureDNS.Servers", "Texnomic.SecureDNS.Servers\Texnomic.SecureDNS.Servers.csproj", "{FF242BFC-F980-419C-94CF-360954404284}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
