@@ -1,7 +1,7 @@
 ﻿using System;
 using PipelineNet.MiddlewareResolver;
 
-namespace Texnomic.DNS.Servers.Middlewares
+namespace Texnomic.SecureDNS.Middlewares
 {
     public class ServerMiddlewareActivator : IMiddlewareResolver
     {

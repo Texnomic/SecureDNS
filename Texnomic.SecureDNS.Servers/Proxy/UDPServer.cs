@@ -8,22 +8,22 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using Microsoft.Extensions.Hosting;
-using Nethereum.Util;
-using Serilog;
-using Texnomic.DNS.Servers.Events;
-using Texnomic.DNS.Servers.Options;
 using Microsoft.Extensions.Options;
+using Nethereum.Util;
 using PipelineNet.MiddlewareResolver;
-using Texnomic.DNS.Servers.ResponsibilityChain;
+using Serilog;
 using Texnomic.SecureDNS.Abstractions;
 using Texnomic.SecureDNS.Abstractions.Enums;
 using Texnomic.SecureDNS.Core;
 using Texnomic.SecureDNS.Extensions;
+using Texnomic.SecureDNS.Middlewares.Events;
+using Texnomic.SecureDNS.Middlewares.Options;
 using Texnomic.SecureDNS.Serialization;
+using Texnomic.SecureDNS.Servers.Proxy.ResponsibilityChain;
 
-namespace Texnomic.DNS.Servers
+namespace Texnomic.SecureDNS.Servers.Proxy
 {
-    public sealed class ProxyServer : IHostedService, IDisposable
+    public sealed class UDPServer : IHostedService, IDisposable
     {
         private readonly ILogger Logger;
         private readonly List<Task> Workers;
@@ -44,7 +44,7 @@ namespace Texnomic.DNS.Servers
 
         private UdpClient UdpClient;
 
-        public ProxyServer(IOptionsMonitor<ProxyResponsibilityChainOptions> ProxyResponsibilityChainOptions,
+        public UDPServer(IOptionsMonitor<ProxyResponsibilityChainOptions> ProxyResponsibilityChainOptions,
             IOptionsMonitor<ProxyServerOptions> ProxyServerOptions,
             IMiddlewareResolver MiddlewareResolver,
             ILogger Logger)
@@ -313,7 +313,7 @@ namespace Texnomic.DNS.Servers
             IsDisposed = true;
         }
 
-        ~ProxyServer()
+        ~UDPServer()
         {
             Dispose(false);
         }

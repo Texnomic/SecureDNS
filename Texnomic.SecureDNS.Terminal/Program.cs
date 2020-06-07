@@ -18,13 +18,13 @@ using PipelineNet.ChainsOfResponsibility;
 using PipelineNet.MiddlewareResolver;
 using Serilog;
 using Tmds.Systemd;
-using Texnomic.DNS.Servers;
-using Texnomic.DNS.Servers.Middlewares;
-using Texnomic.DNS.Servers.Options;
-using Texnomic.DNS.Servers.ResponsibilityChain;
 using Texnomic.SecureDNS.Abstractions;
+using Texnomic.SecureDNS.Middlewares;
+using Texnomic.SecureDNS.Middlewares.Options;
 using Texnomic.SecureDNS.Protocols;
 using Texnomic.SecureDNS.Protocols.Options;
+using Texnomic.SecureDNS.Servers.Proxy;
+using Texnomic.SecureDNS.Servers.Proxy.ResponsibilityChain;
 using Texnomic.SecureDNS.Terminal.Enums;
 using Texnomic.SecureDNS.Terminal.Options;
 
@@ -196,19 +196,19 @@ namespace Texnomic.SecureDNS.Terminal
             switch (Options.Mode)
             {
                 case Mode.GUI:
-                    Services.AddScoped<ProxyServer>();
+                    Services.AddScoped<UDPServer>();
                     Services.AddHostedService<GUI>();
                     break;
                 case Mode.CLI:
-                    Services.AddScoped<ProxyServer>();
+                    Services.AddScoped<UDPServer>();
                     Services.AddHostedService<CLI>();
                     break;
                 case Mode.Daemon:
                     Daemonize();
-                    Services.AddHostedService<ProxyServer>();
+                    Services.AddHostedService<UDPServer>();
                     break;
                 default:
-                    Services.AddScoped<ProxyServer>();
+                    Services.AddScoped<UDPServer>();
                     Services.AddHostedService<GUI>();
                     break;
             }

@@ -1,15 +1,16 @@
-﻿using PipelineNet.Middleware;
+﻿using Serilog;
+
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Common.Logging;
 using Microsoft.Extensions.Options;
-using Serilog;
+using PipelineNet.Middleware;
 using Texnomic.SecureDNS.Abstractions;
+using Texnomic.SecureDNS.Protocols;
 using Texnomic.SecureDNS.Protocols.Options;
 
-
-namespace Texnomic.DNS.Servers.Middlewares
+namespace Texnomic.SecureDNS.Middlewares
 {
     public class ENSMiddleware : IAsyncMiddleware<IMessage, IMessage>
     {
@@ -20,7 +21,7 @@ namespace Texnomic.DNS.Servers.Middlewares
         {
             this.Logger = Logger;
 
-            ENS = new SecureDNS.Protocols.ENS(Options, Log);
+            ENS = new Protocols.ENS(Options, Log);
         }
 
         public async Task<IMessage> Run(IMessage Message, Func<IMessage, Task<IMessage>> Next)

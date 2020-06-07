@@ -6,16 +6,16 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using PipelineNet.Middleware;
 using Serilog;
-using Texnomic.SecureDNS.Abstractions;
-using Texnomic.DNS.Servers.Options;
 using Texnomic.FilterLists;
 using Texnomic.FilterLists.Enums;
 using Texnomic.FilterLists.Models;
+using Texnomic.SecureDNS.Abstractions;
 using Texnomic.SecureDNS.Abstractions.Enums;
 using Texnomic.SecureDNS.Core;
 using Texnomic.SecureDNS.Extensions;
+using Texnomic.SecureDNS.Middlewares.Options;
 
-namespace Texnomic.DNS.Servers.Middlewares
+namespace Texnomic.SecureDNS.Middlewares
 {
     public class FilterListsMiddleware : IAsyncMiddleware<IMessage, IMessage>
     {

@@ -2,7 +2,7 @@
 using System.Net;
 using System.Text.Json.Serialization;
 
-namespace Texnomic.DNS.Servers.Options
+namespace Texnomic.SecureDNS.Middlewares.Options
 {
     public class ProxyServerOptions
     {

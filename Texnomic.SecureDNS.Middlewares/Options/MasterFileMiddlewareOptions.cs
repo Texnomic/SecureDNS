@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Texnomic.SecureDNS.Abstractions;
 
-namespace Texnomic.DNS.Servers.Options
+namespace Texnomic.SecureDNS.Middlewares.Options
 {
     public class MasterFileMiddlewareOptions
     {

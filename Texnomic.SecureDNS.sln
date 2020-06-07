@@ -33,10 +33,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.DNS.Abstractions",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.SecureDNS.Terminal", "Texnomic.SecureDNS.Terminal\Texnomic.SecureDNS.Terminal.csproj", "{66D712B8-4952-4BA9-980A-EB6618BD228C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.DNS.Servers", "Texnomic.DNS.Servers\Texnomic.DNS.Servers.csproj", "{D1EEFB21-54EE-438B-8AD7-ABBD735C1901}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.DNS.Servers.Tests", "Texnomic.DNS.Servers.Tests\Texnomic.DNS.Servers.Tests.csproj", "{E06C729A-DC27-479E-8A2B-6A83EAE7F5F4}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.SecureDNS.Data.Abstractions", "Texnomic.SecureDNS.Data.Abstractions\Texnomic.SecureDNS.Data.Abstractions.csproj", "{0D389991-63B0-4BE7-BFBD-B333A39768F8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.FilterLists", "Texnomic.FilterLists\Texnomic.FilterLists.csproj", "{C4C6C7A3-CA58-45C7-AAB7-67E519075A6F}"
@@ -71,11 +67,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.Sodium", "Texnomic
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Texnomic.SecureDNS.Terminal.Installer-x86", "Texnomic.SecureDNS.Terminal.Installer-x86\Texnomic.SecureDNS.Terminal.Installer-x86.vdproj", "{F1D61498-0F83-4F06-8FF2-D87894169E92}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Texnomic.SecureDNS.Extensions", "Texnomic.SecureDNS.Extensions\Texnomic.SecureDNS.Extensions.csproj", "{3DD341B6-447F-46E3-8D0F-01D9CDFDCCB9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.SecureDNS.Extensions", "Texnomic.SecureDNS.Extensions\Texnomic.SecureDNS.Extensions.csproj", "{3DD341B6-447F-46E3-8D0F-01D9CDFDCCB9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Texnomic.Socks5", "Texnomic.Socks5\Texnomic.Socks5.csproj", "{24F1AEAB-8D29-4C07-844D-A24BE7AF4417}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.Socks5", "Texnomic.Socks5\Texnomic.Socks5.csproj", "{24F1AEAB-8D29-4C07-844D-A24BE7AF4417}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Texnomic.Socks5.WebProxy", "Texnomic.Socks5.WebProxy\Texnomic.Socks5.WebProxy.csproj", "{5EDF1E76-B357-43B7-8042-F24FF89EE00A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.Socks5.WebProxy", "Texnomic.Socks5.WebProxy\Texnomic.Socks5.WebProxy.csproj", "{5EDF1E76-B357-43B7-8042-F24FF89EE00A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Texnomic.SecureDNS.Middlewares", "Texnomic.SecureDNS.Middlewares\Texnomic.SecureDNS.Middlewares.csproj", "{C50DF768-B4CB-42C2-B69F-68F28C725ABB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Texnomic.SecureDNS.Servers", "Texnomic.SecureDNS.Servers\Texnomic.SecureDNS.Servers.csproj", "{FF242BFC-F980-419C-94CF-360954404284}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -119,14 +119,6 @@ Global
 		{66D712B8-4952-4BA9-980A-EB6618BD228C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{66D712B8-4952-4BA9-980A-EB6618BD228C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{66D712B8-4952-4BA9-980A-EB6618BD228C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D1EEFB21-54EE-438B-8AD7-ABBD735C1901}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D1EEFB21-54EE-438B-8AD7-ABBD735C1901}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D1EEFB21-54EE-438B-8AD7-ABBD735C1901}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D1EEFB21-54EE-438B-8AD7-ABBD735C1901}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E06C729A-DC27-479E-8A2B-6A83EAE7F5F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E06C729A-DC27-479E-8A2B-6A83EAE7F5F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E06C729A-DC27-479E-8A2B-6A83EAE7F5F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E06C729A-DC27-479E-8A2B-6A83EAE7F5F4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0D389991-63B0-4BE7-BFBD-B333A39768F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0D389991-63B0-4BE7-BFBD-B333A39768F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0D389991-63B0-4BE7-BFBD-B333A39768F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -203,6 +195,14 @@ Global
 		{5EDF1E76-B357-43B7-8042-F24FF89EE00A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5EDF1E76-B357-43B7-8042-F24FF89EE00A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5EDF1E76-B357-43B7-8042-F24FF89EE00A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C50DF768-B4CB-42C2-B69F-68F28C725ABB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C50DF768-B4CB-42C2-B69F-68F28C725ABB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C50DF768-B4CB-42C2-B69F-68F28C725ABB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C50DF768-B4CB-42C2-B69F-68F28C725ABB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FF242BFC-F980-419C-94CF-360954404284}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF242BFC-F980-419C-94CF-360954404284}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF242BFC-F980-419C-94CF-360954404284}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF242BFC-F980-419C-94CF-360954404284}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

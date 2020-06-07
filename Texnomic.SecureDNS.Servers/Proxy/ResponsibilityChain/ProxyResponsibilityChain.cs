@@ -3,11 +3,11 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using PipelineNet.ChainsOfResponsibility;
 using PipelineNet.MiddlewareResolver;
-using Texnomic.DNS.Servers.Options;
 using Texnomic.SecureDNS.Abstractions;
 using Texnomic.SecureDNS.Abstractions.Enums;
+using Texnomic.SecureDNS.Middlewares.Options;
 
-namespace Texnomic.DNS.Servers.ResponsibilityChain
+namespace Texnomic.SecureDNS.Servers.Proxy.ResponsibilityChain
 {
     public class ProxyResponsibilityChain : AsyncResponsibilityChain<IMessage, IMessage>
     {

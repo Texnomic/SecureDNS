@@ -3,20 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
-
+using Serilog;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-
 using PipelineNet.Middleware;
-
-using Serilog;
-
-using Texnomic.DNS.Servers.Options;
 using Texnomic.SecureDNS.Abstractions;
 using Texnomic.SecureDNS.Abstractions.Enums;
 using Texnomic.SecureDNS.Core;
+using Texnomic.SecureDNS.Middlewares.Options;
 
-namespace Texnomic.DNS.Servers.Middlewares
+namespace Texnomic.SecureDNS.Middlewares
 {
     public class ResolverMiddleware : IAsyncMiddleware<IMessage, IMessage>, IDisposable
     {

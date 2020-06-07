@@ -1,11 +1,11 @@
-﻿using PipelineNet.Middleware;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using PipelineNet.Middleware;
 using Texnomic.SecureDNS.Abstractions;
 
-namespace Texnomic.DNS.Servers.Options
+namespace Texnomic.SecureDNS.Middlewares.Options
 {
     public class ProxyResponsibilityChainOptions
     {

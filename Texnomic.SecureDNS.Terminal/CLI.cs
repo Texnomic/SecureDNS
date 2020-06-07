@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Texnomic.DNS.Servers;
+using Texnomic.SecureDNS.Servers.Proxy;
 using Texnomic.SecureDNS.Terminal.Options;
 
 namespace Texnomic.SecureDNS.Terminal
@@ -12,24 +12,24 @@ namespace Texnomic.SecureDNS.Terminal
     {
         private readonly IOptionsMonitor<TerminalOptions> Options;
 
-        private readonly ProxyServer Server;
+        private readonly UDPServer UDPServer;
 
 
-        public CLI(IOptionsMonitor<TerminalOptions> TerminalOptions, ProxyServer ProxyServer)
+        public CLI(IOptionsMonitor<TerminalOptions> TerminalOptions, UDPServer UDPServer)
         {
             Options = TerminalOptions;
 
-            Server = ProxyServer;
+            this.UDPServer = UDPServer;
         }
 
         public async Task StartAsync(CancellationToken CancellationToken)
         {
-            await Server.StartAsync(CancellationToken);
+            await UDPServer.StartAsync(CancellationToken);
         }
 
         public async Task StopAsync(CancellationToken CancellationToken)
         {
-            await Server.StopAsync(CancellationToken);
+            await UDPServer.StopAsync(CancellationToken);
         }
 
 
@@ -48,7 +48,7 @@ namespace Texnomic.SecureDNS.Terminal
 
             if (Disposing)
             {
-                Server.Dispose();
+                UDPServer.Dispose();
             }
 
             IsDisposed = true;

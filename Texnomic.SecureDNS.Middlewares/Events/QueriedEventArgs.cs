@@ -2,7 +2,7 @@
 using System.Net;
 using Texnomic.SecureDNS.Abstractions;
 
-namespace Texnomic.DNS.Servers.Events
+namespace Texnomic.SecureDNS.Middlewares.Events
 {
     public class QueriedEventArgs : EventArgs
     {

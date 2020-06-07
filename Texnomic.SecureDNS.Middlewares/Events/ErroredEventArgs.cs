@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Texnomic.DNS.Servers.Events
+namespace Texnomic.SecureDNS.Middlewares.Events
 {
     public class ErroredEventArgs : EventArgs
     {

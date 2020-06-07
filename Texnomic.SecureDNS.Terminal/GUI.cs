@@ -1,22 +1,20 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
-using System.Net;
 using System.Net.NetworkInformation;
 using System.Threading.Tasks;
-using Destructurama;
-using Serilog;
 using Terminal.Gui;
 using Texnomic.SecureDNS.Terminal.Options;
 using Microsoft.Extensions.Hosting;
 using System.Threading;
 using Microsoft.Extensions.Options;
-using Texnomic.DNS.Servers;
+using Texnomic.SecureDNS.Middlewares.Options;
+using Texnomic.SecureDNS.Servers.Proxy;
 
 using Attribute = Terminal.Gui.Attribute;
 using Console = Colorful.Console;
 using Timer = System.Timers.Timer;
-using Texnomic.DNS.Servers.Options;
+
 
 namespace Texnomic.SecureDNS.Terminal
 {
@@ -26,13 +24,13 @@ namespace Texnomic.SecureDNS.Terminal
 
         private readonly IOptionsMonitor<ProxyServerOptions> ServerOptions;
 
-        private readonly ProxyServer Server;
+        private readonly UDPServer UDPServer;
 
         private readonly Timer StatusTimer;
 
         private readonly CancellationTokenSource CancellationTokenSource;
 
-        public GUI(IOptionsMonitor<TerminalOptions> TerminalOptions, IOptionsMonitor<ProxyServerOptions> ProxyServerOptions, ProxyServer ProxyServer)
+        public GUI(IOptionsMonitor<TerminalOptions> TerminalOptions, IOptionsMonitor<ProxyServerOptions> ProxyServerOptions, UDPServer UDPServer)
         {
             Console.ReplaceAllColorsWithDefaults();
 
@@ -40,7 +38,7 @@ namespace Texnomic.SecureDNS.Terminal
 
             ServerOptions = ProxyServerOptions;
 
-            Server = ProxyServer;
+            this.UDPServer = UDPServer;
 
             StatusTimer = new Timer(1000);
 
@@ -132,7 +130,7 @@ namespace Texnomic.SecureDNS.Terminal
                 Height = 15,
             };
 
-            StatusTimer.Elapsed += (Sender, Args) => StatusListView.SetSource(Server.Status().Distinct().ToList());
+            StatusTimer.Elapsed += (Sender, Args) => StatusListView.SetSource(UDPServer.Status().Distinct().ToList());
 
             Window.Add(ServerBindingLabel,
                 ServerBindingText,
@@ -163,7 +161,7 @@ namespace Texnomic.SecureDNS.Terminal
 
             CancellationTokenSource.Cancel();
 
-            await Server.StopAsync(CancellationTokenSource.Token);
+            await UDPServer.StopAsync(CancellationTokenSource.Token);
 
             Application.RequestStop();
         }
@@ -177,7 +175,7 @@ namespace Texnomic.SecureDNS.Terminal
 
                 if (Available)
                 {
-                    await Server.StartAsync(CancellationTokenSource.Token);
+                    await UDPServer.StartAsync(CancellationTokenSource.Token);
 
                     MessageBox.Query(40, 7, "Information", "Server Started.", "OK");
                 }
@@ -198,7 +196,7 @@ namespace Texnomic.SecureDNS.Terminal
             {
                 CancellationTokenSource.Cancel();
 
-                await Server.StopAsync(CancellationTokenSource.Token);
+                await UDPServer.StopAsync(CancellationTokenSource.Token);
 
                 MessageBox.Query(40, 7, "Information", "Server Stopped.", "OK");
             }
@@ -242,7 +240,7 @@ namespace Texnomic.SecureDNS.Terminal
             if (Disposing)
             {
                 CancellationTokenSource.Dispose();
-                Server.Dispose();
+                UDPServer.Dispose();
                 StatusTimer.Dispose();
             }
 

@@ -59,9 +59,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Texnomic.DNS.Servers\Texnomic.DNS.Servers.csproj" />
     <ProjectReference Include="..\Texnomic.SecureDNS.Core\Texnomic.SecureDNS.Core.csproj" />
     <ProjectReference Include="..\Texnomic.SecureDNS.Protocols\Texnomic.SecureDNS.Protocols.csproj" />
+    <ProjectReference Include="..\Texnomic.SecureDNS.Servers\Texnomic.SecureDNS.Servers.csproj" />
   </ItemGroup>
 
   <ItemGroup>

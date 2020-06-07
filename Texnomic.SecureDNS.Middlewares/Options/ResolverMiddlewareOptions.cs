@@ -1,4 +1,4 @@
-﻿namespace Texnomic.DNS.Servers.Options
+﻿namespace Texnomic.SecureDNS.Middlewares.Options
 {
     public class ResolverMiddlewareOptions
     {

@@ -1,19 +1,19 @@
-﻿using Microsoft.Extensions.Options;
-using PipelineNet.Middleware;
+﻿using System;
 using Serilog;
-using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
+using PipelineNet.Middleware;
 using Texnomic.SecureDNS.Abstractions;
-using Texnomic.DNS.Servers.Options;
-using System.Linq;
 using Texnomic.SecureDNS.Abstractions.Enums;
 using Texnomic.SecureDNS.Core;
 using Texnomic.SecureDNS.Core.DataTypes;
 using Texnomic.SecureDNS.Core.Records;
+using Texnomic.SecureDNS.Middlewares.Options;
 
-namespace Texnomic.DNS.Servers.Middlewares
+namespace Texnomic.SecureDNS.Middlewares
 {
     public class HostTableMiddleware : IAsyncMiddleware<IMessage, IMessage>
     {
