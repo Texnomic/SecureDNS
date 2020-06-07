@@ -96,7 +96,10 @@ namespace Texnomic.DNS.Servers.Middlewares
 
             if (Message.AnswersCount == 0) return;
 
-            MemoryCache.Set($"{Message.Questions.First().Domain.Name}:{Message.Questions.First().Type}", Message.Answers, Message.Answers.First().TimeToLive);
+            var TimeToLive = Message.Answers.First().TimeToLive;
+
+            if (TimeToLive != null)
+                MemoryCache.Set($"{Message.Questions.First().Domain.Name}:{Message.Questions.First().Type}", Message.Answers, (TimeSpan)TimeToLive);
         }
 
         private List<IAnswer> GetCache(IMessage Message)

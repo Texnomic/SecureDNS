@@ -712,7 +712,7 @@ namespace Texnomic.SecureDNS.Serialization
         {
             if (Answer.Type == RecordType.OPT)
             {
-                Set(in Stream, (PseudoRecord)Answer);
+                Set(in Stream, in Pointers, (PseudoRecord)Answer);
 
                 return;
             }
@@ -1220,9 +1220,9 @@ namespace Texnomic.SecureDNS.Serialization
             return PseudoRecord;
         }
 
-        private static void Set(in DnStream Stream, in PseudoRecord PseudoRecord)
+        private static void Set(in DnStream Stream, in Dictionary<string, ushort> Pointers, in PseudoRecord PseudoRecord)
         {
-            Stream.WriteByte(0);
+            Set(in Stream, in Pointers, PseudoRecord.Domain);
             Stream.WriteUShort((ushort)PseudoRecord.Type);
             Stream.WriteUShort(PseudoRecord.Size);
             Stream.WriteByte((byte)PseudoRecord.ExtendedType);
