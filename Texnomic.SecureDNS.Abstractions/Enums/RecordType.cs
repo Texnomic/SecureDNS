@@ -8,6 +8,11 @@ namespace Texnomic.SecureDNS.Abstractions.Enums
     /// </summary>
     public enum RecordType : ushort
     {
+        /// <summary>
+        /// Transaction Signatures
+        /// </summary>
+        SIG0 = 0,
+
         /// <summary> 
         /// IPv4 Address
         /// </summary>

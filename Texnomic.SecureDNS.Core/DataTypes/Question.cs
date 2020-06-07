@@ -9,6 +9,6 @@ namespace Texnomic.SecureDNS.Core.DataTypes
 
         public RecordType Type { get; set; }
 
-        public RecordClass Class { get; set; }
+        public RecordClass? Class { get; set; }
     }
 }

@@ -65,10 +65,10 @@ namespace Texnomic.SecureDNS.Serialization
 
             if (Message.MessageType == MessageType.Query) return Message;
 
-            if(Message.Truncated)
+            if (Message.Truncated)
                 throw new FormatException("Truncated DNS Message.");
 
-            if (Message.ResponseCode == ResponseCode.NoError &&            
+            if (Message.ResponseCode == ResponseCode.NoError &&
                 Message.AnswersCount == 0 &&
                 Message.AuthorityCount == 0 &&
                 Message.AdditionalCount == 0)
@@ -511,8 +511,6 @@ namespace Texnomic.SecureDNS.Serialization
         {
             Set(in Stream, in Pointers, Domain.Labels.ToArray());
         }
-
-
         private static ushort SizeOf(in SortedSet<string> Pointers, IDomain Domain)
         {
             return SizeOf(in Pointers, Domain.Labels.ToArray());
@@ -580,7 +578,7 @@ namespace Texnomic.SecureDNS.Serialization
 
                 if (Pointers.ContainsKey(SubDomain))
                 {
-                    Stream.WriteBits(2, (byte) LabelType.Compressed);
+                    Stream.WriteBits(2, (byte)LabelType.Compressed);
 
                     var Bytes = new byte[2];
 
@@ -596,9 +594,9 @@ namespace Texnomic.SecureDNS.Serialization
                 {
                     Pointers.Add(SubDomain, Stream.BytePosition);
 
-                    Stream.WriteBits(2, (byte) LabelType.Normal);
+                    Stream.WriteBits(2, (byte)LabelType.Normal);
 
-                    Stream.WriteBits(6, (byte) Labels[Index].Length);
+                    Stream.WriteBits(6, (byte)Labels[Index].Length);
 
                     Stream.WriteString(Labels[Index]);
                 }
@@ -611,9 +609,9 @@ namespace Texnomic.SecureDNS.Serialization
         {
             ushort Size = 0;
 
-            foreach (var Label in Labels)
+            for (var Index = 0; Index < Labels.Length; Index++)
             {
-                var SubDomain = string.Join('.', Labels.Slice(Labels.IndexOf(Label)).ToArray());
+                var SubDomain = string.Join('.', Labels[Index..].ToArray());
 
                 if (Pointers.Contains(SubDomain))
                 {
@@ -624,7 +622,7 @@ namespace Texnomic.SecureDNS.Serialization
 
                 Pointers.Add(SubDomain);
 
-                Size += (ushort)(1 + Label.Length);
+                Size += (ushort)(1 + Labels[Index].Length);
             }
 
             Size += 1;
@@ -681,10 +679,20 @@ namespace Texnomic.SecureDNS.Serialization
                 Domain = GetDomain(in Stream),
             };
 
-            if (Stream.Length < Stream.BytePosition + 6)
-                throw new FormatException("Incomplete DNS Message, Missing Answer Body.");
+            if (Stream.Length < Stream.BytePosition + 2)
+                throw new FormatException("Incomplete DNS Message, Missing Answer Record Type.");
 
             Answer.Type = Stream.ReadUShort().AsEnum<RecordType>();
+
+            if (Answer.Type == RecordType.OPT)
+            {
+                Stream.Seek((ushort)(Stream.BytePosition - 3));
+
+                return GetPseudoRecord(in Stream);
+            }
+
+            if (Stream.Length < Stream.BytePosition + 2)
+                throw new FormatException("Incomplete DNS Message, Missing Answer Record Class.");
 
             Answer.Class = Stream.ReadUShort().AsEnum<RecordClass>();
 
@@ -702,13 +710,22 @@ namespace Texnomic.SecureDNS.Serialization
 
         private static void Set(in DnStream Stream, in Dictionary<string, ushort> Pointers, IAnswer Answer)
         {
+            if (Answer.Type == RecordType.OPT)
+            {
+                Set(in Stream, (PseudoRecord)Answer);
+
+                return;
+            }
+
             Set(in Stream, in Pointers, Answer.Domain);
 
             Stream.WriteUShort((byte)Answer.Type);
 
-            Stream.WriteUShort((byte)Answer.Class);
+            if (Answer.Class != null)
+                Stream.WriteUShort((byte)Answer.Class);
 
-            Stream.WriteTimeSpan(Answer.TimeToLive);
+            if (Answer.TimeToLive != null)
+                Stream.WriteTimeSpan((TimeSpan)Answer.TimeToLive);
 
             Stream.WriteUShort(Answer.Length);
 
@@ -717,6 +734,11 @@ namespace Texnomic.SecureDNS.Serialization
 
         private static ushort SizeOf(in SortedSet<string> Pointers, IAnswer Answer)
         {
+            if (Answer.Type == RecordType.OPT)
+            {
+                return SizeOf((PseudoRecord)Answer);
+            }
+
             ushort Size = 0;
 
             Size += SizeOf(in Pointers, Answer.Domain);
@@ -1170,6 +1192,55 @@ namespace Texnomic.SecureDNS.Serialization
         private static ushort SizeOf(in DNSKEY DNSKEY)
         {
             return (ushort)(4 + DNSKEY.PublicKey.Bytes.Length);
+        }
+
+        #endregion
+
+        #region OPT
+
+        private static PseudoRecord GetPseudoRecord(in DnStream Stream)
+        {
+            var PseudoRecord = new PseudoRecord()
+            {
+                Domain = GetDomain(in Stream),
+                Type = Stream.ReadUShort().AsEnum<RecordType>(),
+                Size = Stream.ReadUShort(),
+                ExtendedType = ((ushort)Stream.ReadByte()).AsEnum<RecordType>(),
+                Version = Stream.ReadByte(),
+                DNSSEC = Stream.ReadBit().AsBool(),
+                Zero = (ushort)(Stream.ReadBits(7) + Stream.ReadByte()),
+                Length = Stream.ReadUShort()
+            };
+
+            if (PseudoRecord.Length != 0)
+            {
+                PseudoRecord.Data = Stream.ReadBytes(PseudoRecord.Length).ToArray();
+            }
+
+            return PseudoRecord;
+        }
+
+        private static void Set(in DnStream Stream, in PseudoRecord PseudoRecord)
+        {
+            Stream.WriteByte(0);
+            Stream.WriteUShort((ushort)PseudoRecord.Type);
+            Stream.WriteUShort(PseudoRecord.Size);
+            Stream.WriteByte((byte)PseudoRecord.ExtendedType);
+            Stream.WriteByte(PseudoRecord.Version);
+            Stream.WriteBit(PseudoRecord.DNSSEC.AsByte());
+            Stream.WriteBits(7, 0);
+            Stream.WriteByte(0);
+            Stream.WriteUShort(PseudoRecord.Length);
+
+            if (PseudoRecord.Length != 0)
+            {
+                Stream.WriteBytes(PseudoRecord.Data);
+            }
+        }
+
+        private static ushort SizeOf(in PseudoRecord PseudoRecord)
+        {
+            return (ushort)(11 + PseudoRecord.Length);
         }
 
         #endregion

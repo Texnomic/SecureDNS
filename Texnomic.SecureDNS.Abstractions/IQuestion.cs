@@ -8,6 +8,6 @@ namespace Texnomic.SecureDNS.Abstractions
 
         RecordType Type { get; set; }
 
-        RecordClass Class { get; set; }
+        RecordClass? Class { get; set; }
     }
 }
