@@ -1,12 +1,9 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Colorful;
 using Common.Logging;
@@ -40,23 +37,29 @@ namespace Texnomic.SecureDNS.Terminal
     {
         private static IHostBuilder HostBuilder;
 
-        private static readonly string Stage = Environment.GetEnvironmentVariable("SecureDNS_ENVIRONMENT") ?? "Production";
+        private static string Stage;
 
-        private static readonly IConfigurationRoot Configurations = new ConfigurationBuilder()
-                                                                                .SetBasePath(Directory.GetCurrentDirectory())
-                                                                                .AddJsonFile("AppSettings.json", false, true)
-                                                                                .AddJsonFile($"AppSettings.{Stage}.json", true, true)
-                                                                                .AddUserSecrets<Program>(true, true)
-                                                                                .AddEnvironmentVariables()
-                                                                                .Build();
+        private static IConfigurationRoot Configurations;
 
-        private static readonly TerminalOptions Options = Configurations.GetSection("Terminal Options")
-                                                                                .Get<TerminalOptions>();
+        private static TerminalOptions Options;
 
 
         public static async Task Main(string[] Arguments)
         {
             Splash();
+
+            Stage = Environment.GetEnvironmentVariable("SecureDNS_ENVIRONMENT") ?? "Production";
+
+            Configurations = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("AppSettings.json", false, true)
+                .AddJsonFile($"AppSettings.{Stage}.json", true, true)
+                .AddUserSecrets<Program>(true, true)
+                .AddEnvironmentVariables()
+                .Build();
+
+
+            Options = Configurations.GetSection("Terminal Options").Get<TerminalOptions>();
 
             BuildHost();
 

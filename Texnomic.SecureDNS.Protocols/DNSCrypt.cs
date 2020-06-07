@@ -41,8 +41,6 @@ namespace Texnomic.SecureDNS.Protocols
 
         private byte[] SharedKey;
 
-        private DNSCryptStamp Stamp;
-
         private bool IsInitialized;
 
         public DNSCrypt(IOptionsMonitor<DNSCryptOptions> DNSCryptOptions)
@@ -56,9 +54,7 @@ namespace Texnomic.SecureDNS.Protocols
 
         protected override async ValueTask InitializeAsync()
         {
-            Stamp = DnSerializer.Deserialize(Options.CurrentValue.Stamp).Value as DNSCryptStamp;
-
-            IPEndPoint = IPEndPoint.Parse(Stamp.Address);
+            IPEndPoint = IPEndPoint.Parse(Options.CurrentValue.DNSCryptStamp.Address);
 
             SecretKey = Random.Generate(32);
 
@@ -77,7 +73,7 @@ namespace Texnomic.SecureDNS.Protocols
                     {
                         Type = RecordType.TXT,
                         Class = RecordClass.Internet,
-                        Domain = Domain.FromString(Stamp.ProviderName)
+                        Domain = Domain.FromString(Options.CurrentValue.DNSCryptStamp.ProviderName)
                     }
                 }
             };
@@ -86,8 +82,8 @@ namespace Texnomic.SecureDNS.Protocols
 
             using var Socket = new Socket(SocketType.Dgram, ProtocolType.Udp)
             {
-                ReceiveTimeout = Options.CurrentValue.Timeout,
-                SendTimeout = Options.CurrentValue.Timeout
+                ReceiveTimeout = (int) Options.CurrentValue.Timeout.TotalMilliseconds,
+                SendTimeout = (int) Options.CurrentValue.Timeout.TotalMilliseconds
             };
 
             await Socket.ConnectAsync(IPEndPoint);
@@ -122,7 +118,7 @@ namespace Texnomic.SecureDNS.Protocols
 
                 var Bytes = DnSerializer.Serialize(Certificate);
 
-                var Result = Ed25519.Verify(Certificate.Signature, Bytes[73..], Stamp.PublicKey);
+                var Result = Ed25519.Verify(Certificate.Signature, Bytes[73..], Options.CurrentValue.DNSCryptStamp.PublicKey);
 
                 if (Result) return true;
             }
@@ -177,15 +173,15 @@ namespace Texnomic.SecureDNS.Protocols
 
             using var Socket = new Socket(SocketType.Stream, ProtocolType.Tcp)
             {
-                ReceiveTimeout = Options.CurrentValue.Timeout,
-                SendTimeout = Options.CurrentValue.Timeout
+                ReceiveTimeout = (int)Options.CurrentValue.Timeout.TotalMilliseconds,
+                SendTimeout = (int)Options.CurrentValue.Timeout.TotalMilliseconds
             };
 
             await Socket.ConnectAsync(IPEndPoint);
-            
+
             var Prefix = new byte[2];
 
-            BinaryPrimitives.WriteUInt16BigEndian(Prefix, (ushort) QueryPacket.Length);
+            BinaryPrimitives.WriteUInt16BigEndian(Prefix, (ushort)QueryPacket.Length);
 
             await Socket.SendAsync(Prefix, SocketFlags.None);
 

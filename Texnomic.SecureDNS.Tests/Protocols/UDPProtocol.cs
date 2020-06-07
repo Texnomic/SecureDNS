@@ -32,7 +32,8 @@ namespace Texnomic.SecureDNS.Tests.Protocols
         {
             var UDPOptions = new UDPOptions()
             {
-                IPv4EndPoint = new IPEndPoint(IPAddress.Parse("1.1.1.1"), 53),
+                IPv4Address = "1.1.1.1",
+                Port = 53,
                 Timeout = new TimeSpan(0, 0, 0, 10)
             };
 

@@ -6,11 +6,11 @@ namespace Texnomic.SecureDNS.Protocols.Options
 {
     public class HTTPsOptions : IOptions
     {
-        public int Retries { get; set; } = 3;
+        public int Retries { get; set; }
 
-        public bool AllowRedirects { get; set; } = false;
+        public bool AllowRedirects { get; set; }
 
-        public Uri Uri { get; set; } = new Uri($"https://dns.google:443/");
+        public Uri Uri { get; set; }
 
         public WebProxy WebProxy { get; set; }
 

@@ -1,4 +1,7 @@
-﻿using Texnomic.SecureDNS.Abstractions;
+﻿using System;
+using Texnomic.SecureDNS.Abstractions;
+using Texnomic.SecureDNS.Core.DataTypes;
+using Texnomic.SecureDNS.Serialization;
 
 namespace Texnomic.SecureDNS.Protocols.Options
 {
@@ -6,6 +9,8 @@ namespace Texnomic.SecureDNS.Protocols.Options
     {
         public string Stamp { get; set; }
 
-        public int Timeout { get; set; } = 2000;
+        public TimeSpan Timeout { get; set; }
+
+        public DNSCryptStamp DNSCryptStamp => DnSerializer.Deserialize(Stamp).Value as DNSCryptStamp;
     }
 }

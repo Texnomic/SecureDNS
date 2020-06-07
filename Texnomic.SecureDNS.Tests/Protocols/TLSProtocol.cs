@@ -32,7 +32,8 @@ namespace Texnomic.SecureDNS.Tests.Protocols
         {
             var TLSOptions = new TLSOptions()
             {
-                IPv4EndPoint = new IPEndPoint(IPAddress.Parse("1.1.1.1"), 853),
+                IPv4Address = "1.1.1.1",
+                Port = 853,
                 Timeout = new TimeSpan(0, 0, 0, 10),
                 CommonName = "cloudflare-dns.com",
                 Thumbprint = "6656840172B4FBBCD6D0A4A103491E93004D195F"

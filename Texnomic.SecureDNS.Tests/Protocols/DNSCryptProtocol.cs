@@ -33,7 +33,7 @@ namespace Texnomic.SecureDNS.Tests.Protocols
             var DNSCryptOptions = new DNSCryptOptions()
             {
                 Stamp = "sdns://AQYAAAAAAAAADTkuOS45LjEwOjg0NDMgZ8hHuMh1jNEgJFVDvnVnRt803x2EwAuMRwNo34Idhj4ZMi5kbnNjcnlwdC1jZXJ0LnF1YWQ5Lm5ldA",
-                Timeout = 5000
+                Timeout = new TimeSpan(0,0,5)
             };
 
             var DNSCryptOptionsMonitor = Mock.Of<IOptionsMonitor<DNSCryptOptions>>(Options => Options.CurrentValue == DNSCryptOptions);
