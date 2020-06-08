@@ -1,4 +1,7 @@
-![SecureDNS](https://raw.githubusercontent.com/Texnomic/SecureDNS/master/docs/Logo.png "SecureDNS")
+﻿<div style="text-align:center">
+<img src="https://raw.githubusercontent.com/Texnomic/SecureDNS/master/docs/Logo.png" alt="SecureDNS" />
+</div>
+
 
 Building a Secure, Modern, Cross-Platform & Cross-Architecture DNS Server Using C# 8.0 & .NET Core 3.1.
 
@@ -22,56 +25,61 @@ SecureDNS Project is implemented using modern [Clean-Architecture](https://www.a
 
 ## Releases
 
-The [v0.3 Alpha Release](https://github.com/Texnomic/SecureDNS/releases/tag/v0.3-alpha) is now available.
+![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/texnomic/securedns?include_prereleases&style=for-the-badge)
 
-[![SecureDNS](https://raw.githubusercontent.com/Texnomic/SecureDNS/master/docs/YouTube.png)](https://www.youtube.com/embed/24QwvJ1VTmQ)
+<div style="text-align:center">
+<a href="https://www.youtube.com/embed/24QwvJ1VTmQ">
+<img src="https://raw.githubusercontent.com/Texnomic/SecureDNS/master/docs/YouTube.png" />
+</a>
+</div>
+
 
 
 ## Protocols
 
-- [x] [DNS Over Blockchain (ENS)](https://ens.domains/)
-- [ ] [DNS Over Blockchain (HandShake)](https://handshake.org/)
-- [X] [DNS Over UDP](https://tools.ietf.org/html/rfc1035)
-- [ ] [DNS Over UDP Over Tor](https://tools.ietf.org/html/rfc1035)
-- [X] [DNS Over TCP](https://tools.ietf.org/html/rfc1035)
-- [ ] [DNS Over TCP Over Tor](https://tools.ietf.org/html/rfc1035)
-- [x] [DNS Over TLS](https://tools.ietf.org/html/rfc7858)
-- [ ] [DNS Over TLS Over Tor](https://tools.ietf.org/html/rfc7858)
-- [x] [DNS Over HTTPs](https://tools.ietf.org/html/rfc8484)
-- [ ] [DNS Over HTTPs Over Tor](https://tools.ietf.org/html/rfc8484)
-- [X] [DNSCrypt v2.0](https://dnscrypt.info/)
-- [ ] [DNSCrypt v2.0 Over Tor](https://dnscrypt.info/)
+- ✔ [DNS Over Blockchain (ENS)](https://ens.domains/)
+- ✔ [DNS Over UDP](https://tools.ietf.org/html/rfc1035)
+- ✔ [DNS Over TCP](https://tools.ietf.org/html/rfc1035)
+- ✔ [DNS Over TLS](https://tools.ietf.org/html/rfc7858)
+- ✔ [DNS Over HTTPs](https://tools.ietf.org/html/rfc8484)
+- ✔ [DNSCrypt v2.0](https://dnscrypt.info/)
+- ⏳ [DNS Over Blockchain (HandShake)](https://handshake.org/)
+- ⏳ [DNS Over UDP Over Tor](https://tools.ietf.org/html/rfc1035)
+- ⏳ [DNS Over TCP Over Tor](https://tools.ietf.org/html/rfc1035)
+- ⏳ [DNS Over TLS Over Tor](https://tools.ietf.org/html/rfc7858)
+- ⏳ [DNS Over HTTPs Over Tor](https://tools.ietf.org/html/rfc8484)
+- ⏳ [DNSCrypt v2.0 Over Tor](https://dnscrypt.info/)
 
 ## Integrations
 
-- [x] [Ethereum Name Service](https://ens.domains/)
-- [x] [Ethereum Name Service DNS Resolver](https://github.com/ensdomains/resolvers)
-- [x] [FilterLists](https://github.com/collinbarrett/FilterLists)
-- [x] [Tor Project](https://www.torproject.org/)
-- [x] Standard-Compliant DNS Resolvers
-- [ ] [IANA Root Files](https://www.iana.org/domains/root/files)
-- [ ] [ICANN Zone Data Service](https://czds.icann.org/home)
+- ✔ [Ethereum Name Service](https://ens.domains/)
+- ✔ [Ethereum Name Service DNS Resolver](https://github.com/ensdomains/resolvers)
+- ✔ [FilterLists](https://github.com/collinbarrett/FilterLists)
+- ✔ [Tor Project](https://www.torproject.org/)
+- ✔ Standard-Compliant DNS Resolvers
+- ⏳ [IANA Root Files](https://www.iana.org/domains/root/files)
+- ⏳ [ICANN Zone Data Service](https://czds.icann.org/home)
 
 
 ## Platforms
 
-- [x] Alpine: 3.10+
-- [x] Debian: 9+
-- [x] Ubuntu: 16.04+
-- [x] Fedora: 29+
-- [x] RHEL: 6+
-- [x] openSUSE: 15+
-- [x] SUSE Enterprise Linux (SLES): 12 SP2+
-- [x] macOS: 10.13+
-- [x] Windows Client: 7, 8.1, 10 (1607+)
-- [x] Windows Server: 2012 R2+
+- ✔ Alpine: 3.10+
+- ✔ Debian: 9+
+- ✔ Ubuntu: 16.04+
+- ✔ Fedora: 29+
+- ✔ RHEL: 6+
+- ✔ openSUSE: 15+
+- ✔ SUSE Enterprise Linux (SLES): 12 SP2+
+- ✔ macOS: 10.13+
+- ✔ Windows Client: 7, 8.1, 10 (1607+)
+- ✔ Windows Server: 2012 R2+
 
 ## Architectures
 
-- [x] x64 on Windows, macOS, and Linux
-- [x] x86 on Windows, macOS, and Linux
-- [x] ARM32 on Windows and Linux
-- [x] ARM64 on Windows and Linux
+- ✔ x64 on Windows, macOS, and Linux
+- ✔ x86 on Windows, macOS, and Linux
+- ✔ ARM32 on Windows and Linux
+- ✔ ARM64 on Windows and Linux
 
 ## Launch
 

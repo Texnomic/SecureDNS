@@ -92,10 +92,7 @@ namespace Texnomic.SecureDNS.Middlewares
 
             if (Message.ResponseCode != ResponseCode.NoError) return;
 
-            if (Message.AnswersCount == 0 &&
-                Message.AuthorityCount == 0 &&
-                Message.AdditionalCount == 0)
-                return;
+            if (Message.AnswersCount == 0) return;
 
             var TimeToLive = Message.Answers.First().TimeToLive;
 
