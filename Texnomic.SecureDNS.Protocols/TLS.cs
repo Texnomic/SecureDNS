@@ -5,7 +5,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Options;
-
+using Texnomic.SecureDNS.Extensions;
 using Texnomic.SecureDNS.Protocols.Options;
 
 
@@ -13,7 +13,7 @@ namespace Texnomic.SecureDNS.Protocols
 {
     public class TLS : Protocol
     {
-        private readonly IOptionsMonitor<TLSOptions> Options; 
+        private readonly IOptionsMonitor<TLSOptions> Options;
 
         public TLS(IOptionsMonitor<TLSOptions> TLSOptions)
         {
@@ -24,8 +24,8 @@ namespace Texnomic.SecureDNS.Protocols
         {
             using var Socket = new Socket(SocketType.Stream, ProtocolType.Tcp)
             {
-                ReceiveTimeout = (int) Options.CurrentValue.Timeout.TotalMilliseconds,
-                SendTimeout = (int) Options.CurrentValue.Timeout.TotalMilliseconds
+                ReceiveTimeout = (int)Options.CurrentValue.Timeout.TotalMilliseconds,
+                SendTimeout = (int)Options.CurrentValue.Timeout.TotalMilliseconds
             };
 
             await Socket.ConnectAsync(Options.CurrentValue.IPv4EndPoint);
@@ -34,15 +34,15 @@ namespace Texnomic.SecureDNS.Protocols
 
             var SslStream = new SslStream(NetworkStream, true, ValidateServerCertificate)
             {
-                ReadTimeout = (int) Options.CurrentValue.Timeout.TotalMilliseconds,
-                WriteTimeout = (int) Options.CurrentValue.Timeout.TotalMilliseconds,
+                ReadTimeout = (int)Options.CurrentValue.Timeout.TotalMilliseconds,
+                WriteTimeout = (int)Options.CurrentValue.Timeout.TotalMilliseconds,
             };
 
             await SslStream.AuthenticateAsClientAsync(Options.CurrentValue.CommonName);
 
             var Prefix = new byte[2];
 
-            BinaryPrimitives.WriteUInt16BigEndian(Prefix, (ushort) Query.Length);
+            BinaryPrimitives.WriteUInt16BigEndian(Prefix, (ushort)Query.Length);
 
             await SslStream.WriteAsync(Prefix);
 
@@ -53,8 +53,8 @@ namespace Texnomic.SecureDNS.Protocols
             var Size = BinaryPrimitives.ReadUInt16BigEndian(Prefix);
 
             var Buffer = new byte[Size];
-
-            await SslStream.ReadAsync(Buffer);
+            
+            await SslStream.ReliableReadAsync(Buffer);
 
             return Buffer;
         }
@@ -64,7 +64,7 @@ namespace Texnomic.SecureDNS.Protocols
         {
             var X509Certificate2 = new X509Certificate2(Certificate);
 
-            return string.IsNullOrEmpty(Options.CurrentValue.Thumbprint) ? SslPolicyErrors == SslPolicyErrors.None : SslPolicyErrors == SslPolicyErrors.None &&X509Certificate2.Thumbprint == Options.CurrentValue.Thumbprint;
+            return string.IsNullOrEmpty(Options.CurrentValue.Thumbprint) ? SslPolicyErrors == SslPolicyErrors.None : SslPolicyErrors == SslPolicyErrors.None && X509Certificate2.Thumbprint == Options.CurrentValue.Thumbprint;
         }
 
         protected override void Dispose(bool Disposing)
@@ -73,7 +73,7 @@ namespace Texnomic.SecureDNS.Protocols
 
             if (Disposing)
             {
-          
+
             }
 
             IsDisposed = true;

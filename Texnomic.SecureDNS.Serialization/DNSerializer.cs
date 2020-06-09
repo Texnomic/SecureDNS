@@ -63,10 +63,11 @@ namespace Texnomic.SecureDNS.Serialization
 
             Message.Questions = GetQuestions(in Stream, Message.QuestionsCount);
 
-            if (Message.MessageType == MessageType.Query) return Message;
+            if (Message.MessageType == MessageType.Query) 
+                return Message;
 
-            if (Message.Truncated)
-                throw new FormatException("Truncated DNS Message.");
+            if (Message.Truncated) 
+                return Message;
 
             if (Message.ResponseCode == ResponseCode.NoError &&
                 Message.AnswersCount == 0 &&
@@ -112,6 +113,12 @@ namespace Texnomic.SecureDNS.Serialization
             Stream.WriteUShort((ushort)Message.Additional.Count());
 
             Set(in Stream, in Pointers, Message.Questions);
+
+            if (Message.MessageType == MessageType.Query)
+                return Stream.ToArray();
+
+            if (Message.Truncated) 
+                return Stream.ToArray();
 
             Set(in Stream, in Pointers, Message.Answers);
 
@@ -710,9 +717,9 @@ namespace Texnomic.SecureDNS.Serialization
 
         private static void Set(in DnStream Stream, in Dictionary<string, ushort> Pointers, IAnswer Answer)
         {
-            if (Answer.Type == RecordType.OPT)
+            if (Answer is PseudoRecord PseudoRecord)
             {
-                Set(in Stream, in Pointers, (PseudoRecord)Answer);
+                Set(in Stream, in Pointers, PseudoRecord);
 
                 return;
             }
@@ -734,9 +741,9 @@ namespace Texnomic.SecureDNS.Serialization
 
         private static ushort SizeOf(in SortedSet<string> Pointers, IAnswer Answer)
         {
-            if (Answer.Type == RecordType.OPT)
+            if (Answer is PseudoRecord PseudoRecord)
             {
-                return SizeOf((PseudoRecord)Answer);
+                return SizeOf(PseudoRecord);
             }
 
             ushort Size = 0;

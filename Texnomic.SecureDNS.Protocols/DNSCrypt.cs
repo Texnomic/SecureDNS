@@ -82,8 +82,8 @@ namespace Texnomic.SecureDNS.Protocols
 
             using var Socket = new Socket(SocketType.Dgram, ProtocolType.Udp)
             {
-                ReceiveTimeout = (int) Options.CurrentValue.Timeout.TotalMilliseconds,
-                SendTimeout = (int) Options.CurrentValue.Timeout.TotalMilliseconds
+                ReceiveTimeout = (int)Options.CurrentValue.Timeout.TotalMilliseconds,
+                SendTimeout = (int)Options.CurrentValue.Timeout.TotalMilliseconds
             };
 
             await Socket.ConnectAsync(IPEndPoint);
@@ -192,16 +192,16 @@ namespace Texnomic.SecureDNS.Protocols
             var Size = BinaryPrimitives.ReadUInt16BigEndian(Prefix);
 
             var AnswerPacket = new byte[Size];
-
-            await Socket.ReceiveAsync(AnswerPacket, SocketFlags.None);
-
+            
+            await Socket.ReliableReceiveAsync(AnswerPacket);
+            
             var ClientMagic = Encoding.ASCII.GetString(AnswerPacket[..8]);
 
             if (ClientMagic != "r6fnvWj8")
-                throw new CryptographicUnexpectedOperationException("Invalid Client Magic Received.");
+                throw new FormatException("Invalid DNSCrypt Client Magic Received.");
 
             if (!ClientNonce.SequenceEqual(AnswerPacket[8..20]))
-                throw new CryptographicUnexpectedOperationException("Invalid Client Nonce Received.");
+                throw new FormatException("Invalid DNSCrypt Client Nonce Received.");
 
             var ServerNonce = AnswerPacket[20..32];
 
@@ -211,11 +211,11 @@ namespace Texnomic.SecureDNS.Protocols
 
             var DecryptedAnswer = Decrypt(ref EncryptedAnswer, ref Nonce);
 
-            if (DecryptedAnswer == null)
-                throw new CryptographicUnexpectedOperationException("DNSCrypt Decryption Failed.");
+            //if (DecryptedAnswer == null)
+            //    throw new CryptographicUnexpectedOperationException("DNSCrypt Decryption Failed.");
 
-            if (DecryptedAnswer.Length <= Query.Length)
-                throw new CryptographicUnexpectedOperationException("DNSCrypt Decryption Failed.");
+            //if (DecryptedAnswer.Length <= Query.Length)
+            //    throw new CryptographicUnexpectedOperationException("DNSCrypt Decryption Failed.");
 
             return DecryptedAnswer;
         }

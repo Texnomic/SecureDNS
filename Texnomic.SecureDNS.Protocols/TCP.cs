@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 
 using Microsoft.Extensions.Options;
 
+using Texnomic.SecureDNS.Extensions;
 using Texnomic.SecureDNS.Protocols.Options;
 
 
@@ -42,7 +43,7 @@ namespace Texnomic.SecureDNS.Protocols
 
             var Buffer = new byte[Size];
 
-            await Socket.ReceiveAsync(Buffer, SocketFlags.None);
+            await Socket.ReliableReceiveAsync(Buffer);
 
             return Buffer;
         }
