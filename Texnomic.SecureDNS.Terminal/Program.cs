@@ -162,9 +162,9 @@ namespace Texnomic.SecureDNS.Terminal
             Services.Configure<UDPOptions>(Configurations.GetSection("UDP Protocol"));
             Services.Configure<TerminalOptions>(Configurations.GetSection("Terminal Options"));
 
-            Services.AddSingleton<MemoryCache>();
-            Services.AddSingleton<HostTableMiddleware>();
-            Services.AddSingleton<FilterListsMiddleware>();
+            Services.AddScoped<MemoryCache>();
+            Services.AddScoped<HostTableMiddleware>();
+            Services.AddScoped<FilterListsMiddleware>();
             Services.AddScoped<ENSMiddleware>();
             Services.AddScoped<ResolverMiddleware>();
             Services.AddScoped<ILog, SerilogCommonLogger>();

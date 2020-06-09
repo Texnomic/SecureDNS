@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -33,12 +34,6 @@ namespace Texnomic.SecureDNS.Servers.Proxy
         private readonly BufferBlock<(IMessage, IPEndPoint)> IncomingQueue;
         private readonly BufferBlock<(IMessage, IPEndPoint)> OutgoingQueue;
 
-        public event EventHandler<QueriedEventArgs> Queried;
-        public event EventHandler<ResolvedEventArgs> Resolved;
-        public event EventHandler<AnsweredEventArgs> Answered;
-        public event EventHandler<EventArgs> Started;
-        public event EventHandler<EventArgs> Stopped;
-        public event EventHandler<ErroredEventArgs> Errored;
 
         private CancellationToken CancellationToken;
 
@@ -87,8 +82,6 @@ namespace Texnomic.SecureDNS.Servers.Proxy
 
             Logger?.Information("UDP Server Started with {@Threads} Threads. Listening On {@IPEndPoint}", Options.CurrentValue.Threads, Options.CurrentValue.IPEndPoint.ToString());
 
-            Started?.Invoke(this, EventArgs.Empty);
-
             await Task.Yield();
         }
 
@@ -105,8 +98,6 @@ namespace Texnomic.SecureDNS.Servers.Proxy
             OutgoingQueue.Complete();
 
             Logger?.Information("Server Stopped.");
-
-            Stopped?.Invoke(this, EventArgs.Empty);
         }
 
         private IMessage Deserialize(byte[] Bytes)
@@ -118,8 +109,6 @@ namespace Texnomic.SecureDNS.Servers.Proxy
             catch (Exception Error)
             {
                 Logger?.Error(Error, "{@Error} Occurred While Deserializing {@Bytes}.", Error, BitConverter.ToString(Bytes).Replace("-", ", 0x"));
-
-                Errored?.Invoke(this, new ErroredEventArgs(Error));
 
                 return new Message()
                 {
@@ -139,8 +128,6 @@ namespace Texnomic.SecureDNS.Servers.Proxy
             {
                 Logger?.Error(Error, "{@Error} Occurred While Serializing {@Message}.", Error, Message);
 
-                Errored?.Invoke(this, new ErroredEventArgs(Error));
-
                 var ErrorMessage = new Message()
                 {
                     ID = Message.ID,
@@ -156,21 +143,19 @@ namespace Texnomic.SecureDNS.Servers.Proxy
         {
             Thread.CurrentThread.Name = "Receiver";
 
+
             while (!CancellationToken.IsCancellationRequested)
             {
                 try
                 {
                     var Result = await UdpClient.ReceiveAsync()
-                        .WithCancellation(CancellationToken);
+                                                .WithCancellation(CancellationToken);
 
                     var Message = Deserialize(Result.Buffer);
 
                     await IncomingQueue.SendAsync((Message, Result.RemoteEndPoint), CancellationToken);
 
-                    Logger?.Verbose("Received {@Query} From {@RemoteEndPoint}.", Message,
-                        Result.RemoteEndPoint.ToString());
-
-                    Queried?.Invoke(this, new QueriedEventArgs(Message, Result.RemoteEndPoint));
+                    Logger?.Verbose("Received {@Query} From {@RemoteEndPoint}.", Message, Result.RemoteEndPoint.ToString());
                 }
                 catch (OperationCanceledException)
                 {
@@ -179,8 +164,6 @@ namespace Texnomic.SecureDNS.Servers.Proxy
                 catch (Exception Error)
                 {
                     Logger?.Error(Error, "{@Error} Occurred While Receiving Message.", Error);
-
-                    Errored?.Invoke(this, new ErroredEventArgs(Error));
                 }
             }
         }
@@ -200,16 +183,13 @@ namespace Texnomic.SecureDNS.Servers.Proxy
                 try
                 {
                     (Query, RemoteEndPoint) = await IncomingQueue.ReceiveAsync(CancellationToken)
-                        .WithCancellation(CancellationToken);
+                                                                 .WithCancellation(CancellationToken);
 
                     var Answer = await ResponsibilityChain.Execute(Query);
 
                     await OutgoingQueue.SendAsync((Answer, RemoteEndPoint), CancellationToken);
 
-                    Logger?.Information("Resolved {@Answer} For {@Domain} with {@ResponseCode} To {@RemoteEndPoint}.",
-                        Answer, Answer.Questions.First().Domain.Name, Answer.ResponseCode, RemoteEndPoint.ToString());
-
-                    Resolved?.Invoke(this, new ResolvedEventArgs(Query, Answer, RemoteEndPoint));
+                    Logger?.Information("Resolved {@Answer} For {@Domain} with {@ResponseCode} To {@RemoteEndPoint}.", Answer, Answer.Questions.First().Domain.Name, Answer.ResponseCode, RemoteEndPoint.ToString());
                 }
                 catch (OperationCanceledException)
                 {
@@ -241,15 +221,13 @@ namespace Texnomic.SecureDNS.Servers.Proxy
                 try
                 {
                     var (Answer, RemoteEndPoint) = await OutgoingQueue.ReceiveAsync(CancellationToken)
-                                                                            .WithCancellation(CancellationToken);
+                                                                             .WithCancellation(CancellationToken);
 
                     var Bytes = Serialize(Answer);
 
                     await UdpClient.SendAsync(Bytes, Bytes.Length, RemoteEndPoint);
 
                     Logger?.Verbose("Sent {@Answer} To {@RemoteEndPoint}.", Answer, RemoteEndPoint.ToString());
-
-                    Answered?.Invoke(this, new AnsweredEventArgs(Answer, RemoteEndPoint));
 
                 }
                 catch (OperationCanceledException)
@@ -259,8 +237,6 @@ namespace Texnomic.SecureDNS.Servers.Proxy
                 catch (Exception Error)
                 {
                     Logger?.Error(Error, "{@Error} Occurred While Sending Message.", Error);
-
-                    Errored?.Invoke(this, new ErroredEventArgs(Error));
                 }
             }
         }
@@ -268,8 +244,6 @@ namespace Texnomic.SecureDNS.Servers.Proxy
         private IMessage Handle(Exception Error, ushort ID, string Stage, ResponseCode Response)
         {
             Logger?.Error(Error, $"{@Error} Occurred While {Stage} Message.", Error);
-
-            Errored?.Invoke(this, new ErroredEventArgs(Error));
 
             return new Message()
             {
@@ -282,8 +256,6 @@ namespace Texnomic.SecureDNS.Servers.Proxy
         private IMessage Handle(Exception Error, byte[] Bytes, string Stage, ResponseCode Response)
         {
             Logger?.Error(Error, $"{@Error} Occurred While {Stage} {@Bytes}.", Error, BitConverter.ToString(Bytes).Replace("-", ", 0x"));
-
-            Errored?.Invoke(this, new ErroredEventArgs(Error));
 
             return new Message()
             {
