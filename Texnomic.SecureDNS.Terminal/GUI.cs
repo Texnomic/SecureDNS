@@ -24,15 +24,15 @@ namespace Texnomic.SecureDNS.Terminal
 
         private readonly IOptionsMonitor<ProxyServerOptions> ServerOptions;
 
-        private readonly UDPServer UDPServer;
+        private readonly UDPServer2 UDPServer;
 
-        private readonly TCPServer TCPServer;
+        private readonly TCPServer2 TCPServer;
 
         private readonly Timer StatusTimer;
 
         private readonly CancellationTokenSource CancellationTokenSource;
 
-        public GUI(IOptionsMonitor<TerminalOptions> TerminalOptions, IOptionsMonitor<ProxyServerOptions> ProxyServerOptions, UDPServer UDPServer, TCPServer TCPServer)
+        public GUI(IOptionsMonitor<TerminalOptions> TerminalOptions, IOptionsMonitor<ProxyServerOptions> ProxyServerOptions, UDPServer2 UDPServer, TCPServer2 TCPServer)
         {
             Console.ReplaceAllColorsWithDefaults();
 
@@ -134,9 +134,9 @@ namespace Texnomic.SecureDNS.Terminal
                 Height = 15,
             };
 
-            StatusTimer.Elapsed += (Sender, Args) => StatusListView.SetSource(UDPServer.Status().Distinct().ToList());
+            //StatusTimer.Elapsed += (Sender, Args) => StatusListView.SetSource(UDPServer.Status().Distinct().ToList());
 
-            StatusTimer.Elapsed += (Sender, Args) => StatusListView.SetSource(TCPServer.Status().Distinct().ToList());
+            //StatusTimer.Elapsed += (Sender, Args) => StatusListView.SetSource(TCPServer.Status().Distinct().ToList());
 
             Window.Add(ServerBindingLabel,
                 ServerBindingText,

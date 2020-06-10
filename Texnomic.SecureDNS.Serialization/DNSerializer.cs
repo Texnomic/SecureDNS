@@ -63,10 +63,10 @@ namespace Texnomic.SecureDNS.Serialization
 
             Message.Questions = GetQuestions(in Stream, Message.QuestionsCount);
 
-            if (Message.MessageType == MessageType.Query) 
+            if (Message.MessageType == MessageType.Query)
                 return Message;
 
-            if (Message.Truncated) 
+            if (Message.Truncated)
                 return Message;
 
             if (Message.ResponseCode == ResponseCode.NoError &&
@@ -117,7 +117,7 @@ namespace Texnomic.SecureDNS.Serialization
             if (Message.MessageType == MessageType.Query)
                 return Stream.ToArray();
 
-            if (Message.Truncated) 
+            if (Message.Truncated)
                 return Stream.ToArray();
 
             Set(in Stream, in Pointers, Message.Answers);
@@ -554,7 +554,13 @@ namespace Texnomic.SecureDNS.Serialization
                         }
                     case LabelType.Compressed:
                         {
-                            var Pointer = (ushort)(Stream.ReadBits(6) + Stream.ReadByte());
+                            var RawPointer = new[]
+                            {
+                                Stream.ReadBits(6),
+                                Stream.ReadByte()
+                            };
+
+                            var Pointer = BinaryPrimitives.ReadUInt16BigEndian(RawPointer);
 
                             if (Pointer >= Stream.BytePosition - 2)
                                 throw new ArgumentOutOfRangeException(nameof(Pointer), Pointer, "Compressed Label Infinite Loop Detected.");

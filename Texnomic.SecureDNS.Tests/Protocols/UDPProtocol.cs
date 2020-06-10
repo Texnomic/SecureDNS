@@ -44,7 +44,7 @@ namespace Texnomic.SecureDNS.Tests.Protocols
 
             RequestMessage = new Message()
             {
-                ID = (ushort) new Random().Next(),
+                ID = (ushort)new Random().Next(),
                 RecursionDesired = true
             };
         }
@@ -64,9 +64,9 @@ namespace Texnomic.SecureDNS.Tests.Protocols
 
             foreach (var Attribute in Attributes)
             {
-                var TestDomain = ((TestPropertyAttribute) Attribute).Name;
+                var TestDomain = ((TestPropertyAttribute)Attribute).Name;
 
-                var TestRecord = Enum.Parse<RecordType>(((TestPropertyAttribute) Attribute).Value);
+                var TestRecord = Enum.Parse<RecordType>(((TestPropertyAttribute)Attribute).Value);
 
                 RequestMessage.Questions = new List<IQuestion>()
                 {

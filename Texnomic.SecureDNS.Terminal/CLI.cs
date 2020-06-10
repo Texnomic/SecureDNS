@@ -12,12 +12,12 @@ namespace Texnomic.SecureDNS.Terminal
     {
         private readonly IOptionsMonitor<TerminalOptions> Options;
 
-        private readonly UDPServer UDPServer;
+        private readonly UDPServer2 UDPServer;
 
-        private readonly TCPServer TCPServer;
+        private readonly TCPServer2 TCPServer;
 
 
-        public CLI(IOptionsMonitor<TerminalOptions> TerminalOptions, UDPServer UDPServer, TCPServer TCPServer)
+        public CLI(IOptionsMonitor<TerminalOptions> TerminalOptions, UDPServer2 UDPServer, TCPServer2 TCPServer)
         {
             Options = TerminalOptions;
 
