@@ -26,20 +26,19 @@ SecureDNS Project is implemented using modern [Clean-Architecture](https://www.a
 
 ## Releases
 
-[![GitHub Release](https://img.shields.io/github/v/release/Texnomic/SecureDNS?logo=GitHub&include_prereleases&label=GitHub%20Release%20|%20Terminal%20Edition)](https://github.com/Texnomic/SecureDNS/releases)
-
-![NuGet](https://img.shields.io/nuget/vpre/Texnomic.Sodium?logo=NuGet&label=NuGet%20%7C%20Texnomic.Sodium&logoColor=blue&color=blue)
-![NuGet](https://img.shields.io/nuget/vpre/Texnomic.Socks5?logo=NuGet&label=NuGet%20%7C%20%09Texnomic.Socks5&logoColor=blue&color=blue)
-![NuGet](https://img.shields.io/nuget/vpre/Texnomic.FilterLists?logo=NuGet&label=NuGet%20%7C%20%09Texnomic.FilterLists&logoColor=blue&color=blue)
-![NuGet](https://img.shields.io/nuget/vpre/Texnomic.ENS.BaseRegistrar?logo=NuGet&label=NuGet%20%7C%20%09Texnomic.ENS.BaseRegistrar&logoColor=blue&color=blue)
-![NuGet](https://img.shields.io/nuget/vpre/Texnomic.ENS.PublicResolver?logo=NuGet&label=NuGet%20%7C%20%09Texnomic.ENS.PublicResolver&logoColor=blue&color=blue)
-![NuGet](https://img.shields.io/nuget/vpre/Texnomic.SecureDNS.Abstractions?logo=NuGet&label=NuGet%20%7C%20Texnomic.SecureDNS.Abstractions&logoColor=blue&color=blue) 
-![NuGet](https://img.shields.io/nuget/vpre/Texnomic.SecureDNS.Core?logo=NuGet&label=NuGet%20%7C%20Texnomic.SecureDNS.Core&logoColor=blue&color=blue)
-![NuGet](https://img.shields.io/nuget/vpre/Texnomic.SecureDNS.Protocols?logo=NuGet&label=NuGet%20%7C%20Texnomic.SecureDNS.Protocols&logoColor=blue&color=blue)
-![NuGet](https://img.shields.io/nuget/vpre/Texnomic.SecureDNS.Serialization?logo=NuGet&label=NuGet%20%7C%20Texnomic.SecureDNS.Serialization&logoColor=blue&color=blue)
-![NuGet](https://img.shields.io/nuget/vpre/Texnomic.SecureDNS.Middlewares?logo=NuGet&label=NuGet%20%7C%20%09Texnomic.SecureDNS.Middlewares&logoColor=blue&color=blue)
-![NuGet](https://img.shields.io/nuget/vpre/Texnomic.SecureDNS.Servers?logo=NuGet&label=NuGet%20%7C%20%09Texnomic.SecureDNS.Servers&logoColor=blue&color=blue)
-![NuGet](https://img.shields.io/nuget/vpre/Texnomic.SecureDNS.Extensions?logo=NuGet&label=NuGet%20%7C%20%09Texnomic.SecureDNS.Extensions&logoColor=blue&color=blue)
+- [![GitHub Release](https://img.shields.io/github/v/release/Texnomic/SecureDNS?logo=GitHub&include_prereleases&label=GitHub%20Release%20|%20Terminal%20Edition)](https://github.com/Texnomic/SecureDNS/releases)
+- ![NuGet](https://img.shields.io/nuget/vpre/Texnomic.Sodium?logo=NuGet&label=NuGet%20%7C%20Texnomic.Sodium&logoColor=blue&color=blue)
+- ![NuGet](https://img.shields.io/nuget/vpre/Texnomic.Socks5?logo=NuGet&label=NuGet%20%7C%20%09Texnomic.Socks5&logoColor=blue&color=blue)
+- ![NuGet](https://img.shields.io/nuget/vpre/Texnomic.FilterLists?logo=NuGet&label=NuGet%20%7C%20%09Texnomic.FilterLists&logoColor=blue&color=blue)
+- ![NuGet](https://img.shields.io/nuget/vpre/Texnomic.ENS.BaseRegistrar?logo=NuGet&label=NuGet%20%7C%20%09Texnomic.ENS.BaseRegistrar&logoColor=blue&color=blue)
+- ![NuGet](https://img.shields.io/nuget/vpre/Texnomic.ENS.PublicResolver?logo=NuGet&label=NuGet%20%7C%20%09Texnomic.ENS.PublicResolver&logoColor=blue&color=blue)
+- ![NuGet](https://img.shields.io/nuget/vpre/Texnomic.SecureDNS.Abstractions?logo=NuGet&label=NuGet%20%7C%20Texnomic.SecureDNS.Abstractions&logoColor=blue&color=blue) 
+- ![NuGet](https://img.shields.io/nuget/vpre/Texnomic.SecureDNS.Core?logo=NuGet&label=NuGet%20%7C%20Texnomic.SecureDNS.Core&logoColor=blue&color=blue)
+- ![NuGet](https://img.shields.io/nuget/vpre/Texnomic.SecureDNS.Protocols?logo=NuGet&label=NuGet%20%7C%20Texnomic.SecureDNS.Protocols&logoColor=blue&color=blue)
+- ![NuGet](https://img.shields.io/nuget/vpre/Texnomic.SecureDNS.Serialization?logo=NuGet&label=NuGet%20%7C%20Texnomic.SecureDNS.Serialization&logoColor=blue&color=blue)
+- ![NuGet](https://img.shields.io/nuget/vpre/Texnomic.SecureDNS.Middlewares?logo=NuGet&label=NuGet%20%7C%20%09Texnomic.SecureDNS.Middlewares&logoColor=blue&color=blue)
+- ![NuGet](https://img.shields.io/nuget/vpre/Texnomic.SecureDNS.Servers?logo=NuGet&label=NuGet%20%7C%20%09Texnomic.SecureDNS.Servers&logoColor=blue&color=blue)
+- ![NuGet](https://img.shields.io/nuget/vpre/Texnomic.SecureDNS.Extensions?logo=NuGet&label=NuGet%20%7C%20%09Texnomic.SecureDNS.Extensions&logoColor=blue&color=blue)
 
 <div style="text-align:center"><a href="https://www.youtube.com/embed/24QwvJ1VTmQ"><img src="https://raw.githubusercontent.com/Texnomic/SecureDNS/master/docs/YouTube.png" /></a></div>
 
@@ -133,7 +132,7 @@ The Project offically launched within my talk for [Cairo Security Camp](https://
 
 ## Donations
 
-* ![PayPal](https://img.shields.io/static/v1?logo=PayPal&label=PayPal&message=https://www.paypal.me/texnomic&color=blue)
+* [![PayPal](https://img.shields.io/static/v1?logo=PayPal&label=PayPal&message=https://www.paypal.me/texnomic&color=blue)](https://www.paypal.me/texnomic)
 * ![Bitcoin](https://img.shields.io/static/v1?logo=Bitcoin&label=BTC&message=13wMqy8yg9yhJAAP2AXu8A2De1ptAYh6s4&color=orange)
 * ![Ethereum](https://img.shields.io/static/v1?logo=Ethereum&label=Ethereum&message=0xfE171b1C5C5584b65ec58a6FA2009f6ECeE812D7&color=black&logoColor=black)
 
