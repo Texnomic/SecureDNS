@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>0.3</Version>
+    <Version>0.3-alpha</Version>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Authors>Texnomic</Authors>
     <Company>Texnomic Ltd</Company>
@@ -11,7 +11,7 @@
     <PackageProjectUrl>https://github.com/Texnomic/SecureDNS</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Texnomic/SecureDNS</RepositoryUrl>
     <RepositoryType>Github</RepositoryType>
-    <PackageTags>alpha</PackageTags>
+    <PackageTags>dns sdns https udp tcp dnscrypt dou dot doh</PackageTags>
     <Copyright>Copyright © 2020</Copyright>
     <PackageIcon>Logo.png</PackageIcon>
   </PropertyGroup>

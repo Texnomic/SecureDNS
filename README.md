@@ -24,14 +24,18 @@ SecureDNS Project is implemented using modern [Clean-Architecture](https://www.a
 ## Releases
 
 ![GitHub Release](https://img.shields.io/github/v/release/Texnomic/SecureDNS?include_prereleases&label=GitHub%20Release%20|%20Terminal%20Edition&style=flat-square) 
+![NuGet](https://img.shields.io/nuget/vpre/Texnomic.Sodium?label=NuGet%20%7C%20Texnomic.Sodium&style=flat-square)
+![NuGet](https://img.shields.io/nuget/vpre/Texnomic.Socks5?label=NuGet%20%7C%20%09Texnomic.Socks5&style=flat-square)
+![NuGet](https://img.shields.io/nuget/vpre/Texnomic.FilterLists?label=NuGet%20%7C%20%09Texnomic.FilterLists&style=flat-square)
+![NuGet](https://img.shields.io/nuget/vpre/Texnomic.ENS.BaseRegistrar?label=NuGet%20%7C%20%09Texnomic.ENS.BaseRegistrar&style=flat-square)
+![NuGet](https://img.shields.io/nuget/vpre/Texnomic.ENS.PublicResolver?label=NuGet%20%7C%20%09Texnomic.ENS.PublicResolver&style=flat-square)
 ![NuGet](https://img.shields.io/nuget/vpre/Texnomic.SecureDNS.Abstractions?label=NuGet%20%7C%20Texnomic.SecureDNS.Abstractions&style=flat-square) 
 ![NuGet](https://img.shields.io/nuget/vpre/Texnomic.SecureDNS.Core?label=NuGet%20%7C%20Texnomic.SecureDNS.Core&style=flat-square)
-![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/Texnomic.SecureDNS.Protocols?label=NuGet%20%7C%20Texnomic.SecureDNS.Protocols&style=flat-square)
-![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/Texnomic.SecureDNS.Serialization?label=NuGet%20%7C%20Texnomic.SecureDNS.Serialization&style=flat-square)
-![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/Texnomic.Sodium?label=NuGet%20%7C%20Texnomic.Sodium&style=flat-square)
-![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/Texnomic.FilterLists?label=NuGet%20%7C%20%09Texnomic.FilterLists&style=flat-square)
-![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/Texnomic.ENS.BaseRegistrar?label=NuGet%20%7C%20%09Texnomic.ENS.BaseRegistrar&style=flat-square)
-![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/Texnomic.ENS.PublicResolver?label=NuGet%20%7C%20%09Texnomic.ENS.PublicResolver&style=flat-square)
+![NuGet](https://img.shields.io/nuget/vpre/Texnomic.SecureDNS.Protocols?label=NuGet%20%7C%20Texnomic.SecureDNS.Protocols&style=flat-square)
+![NuGet](https://img.shields.io/nuget/vpre/Texnomic.SecureDNS.Serialization?label=NuGet%20%7C%20Texnomic.SecureDNS.Serialization&style=flat-square)
+![NuGet](https://img.shields.io/nuget/vpre/Texnomic.SecureDNS.Middlewares?label=NuGet%20%7C%20%09Texnomic.SecureDNS.Middlewares&style=flat-square)
+![NuGet](https://img.shields.io/nuget/vpre/Texnomic.SecureDNS.Servers?label=NuGet%20%7C%20%09Texnomic.SecureDNS.Servers&style=flat-square)
+![NuGet](https://img.shields.io/nuget/vpre/Texnomic.SecureDNS.Extensions?label=NuGet%20%7C%20%09Texnomic.SecureDNS.Extensions&style=flat-square)
 
 <div style="text-align:center"><a href="https://www.youtube.com/embed/24QwvJ1VTmQ"><img src="https://raw.githubusercontent.com/Texnomic/SecureDNS/master/docs/YouTube.png" /></a></div>
 

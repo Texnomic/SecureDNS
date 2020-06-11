@@ -2,6 +2,18 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
+    <Version>0.3-alpha</Version>
+    <Authors>Texnomic</Authors>
+    <Company>Texnomic Ltd</Company>
+    <Description>Texnomic SecureDNS Middlewares Library.</Description>
+    <Copyright>Copyright © 2020</Copyright>
+    <PackageProjectUrl>https://github.com/Texnomic/SecureDNS</PackageProjectUrl>
+    <PackageIcon>Logo.png</PackageIcon>
+    <RepositoryUrl>https://github.com/Texnomic/SecureDNS</RepositoryUrl>
+    <RepositoryType>Github</RepositoryType>
+    <PackageTags>dns sdns https udp tcp dnscrypt dou dot doh</PackageTags>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,6 +25,13 @@
     <ProjectReference Include="..\Texnomic.FilterLists\Texnomic.FilterLists.csproj" />
     <ProjectReference Include="..\Texnomic.SecureDNS.Abstractions\Texnomic.SecureDNS.Abstractions.csproj" />
     <ProjectReference Include="..\Texnomic.SecureDNS.Protocols\Texnomic.SecureDNS.Protocols.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\docs\Logo.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

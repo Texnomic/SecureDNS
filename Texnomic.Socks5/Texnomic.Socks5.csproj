@@ -2,11 +2,30 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
+    <Version>0.3-alpha</Version>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Texnomic</Authors>
+    <Company>Texnomic Ltd</Company>
+    <Description>Texnomic Socks5 Library.</Description>
+    <Copyright>Copyright © 2020</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/Texnomic/SecureDNS</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Texnomic/SecureDNS</RepositoryUrl>
+    <PackageTags>dns sdns https udp tcp dnscrypt dou dot doh socks socks5</PackageTags>
+    <RepositoryType>Github</RepositoryType>
+    <PackageIcon>Logo.png</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Texnomic.SecureDNS.Extensions\Texnomic.SecureDNS.Extensions.csproj" />
     <ProjectReference Include="..\Texnomic.SecureDNS.Serialization\Texnomic.SecureDNS.Serialization.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\docs\Logo.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
