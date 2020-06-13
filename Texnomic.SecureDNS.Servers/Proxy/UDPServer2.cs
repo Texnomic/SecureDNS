@@ -15,8 +15,8 @@ using Serilog;
 using Texnomic.SecureDNS.Abstractions.Enums;
 using Texnomic.SecureDNS.Core;
 using Texnomic.SecureDNS.Extensions;
-using Texnomic.SecureDNS.Middlewares.Options;
 using Texnomic.SecureDNS.Serialization;
+using Texnomic.SecureDNS.Servers.Proxy.Options;
 using Texnomic.SecureDNS.Servers.Proxy.ResponsibilityChain;
 
 namespace Texnomic.SecureDNS.Servers.Proxy
@@ -63,12 +63,12 @@ namespace Texnomic.SecureDNS.Servers.Proxy
 
             Server.Client.Bind(Options.CurrentValue.IPEndPoint);
 
-            for (var I = 0; I < Options.CurrentValue.Threads; I++)
+            for (var I = 0; I < ProxyServerOptions.Threads; I++)
             {
                 Threads.Add(Task.Factory.StartNew(ResolveAsync, CancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default).Unwrap());
             }
 
-            Logger?.Information("UDP Server Started with {@Threads} Threads. Listening On {@IPEndPoint}", Options.CurrentValue.Threads, Options.CurrentValue.IPEndPoint.ToString());
+            Logger?.Information("UDP Server Started with {@Threads} Threads. Listening On {@IPEndPoint}", ProxyServerOptions.Threads, Options.CurrentValue.IPEndPoint.ToString());
 
             await Task.Yield();
         }

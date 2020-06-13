@@ -10,7 +10,7 @@ using System.Threading;
 using Microsoft.Extensions.Options;
 using Texnomic.SecureDNS.Middlewares.Options;
 using Texnomic.SecureDNS.Servers.Proxy;
-
+using Texnomic.SecureDNS.Servers.Proxy.Options;
 using Attribute = Terminal.Gui.Attribute;
 using Console = Colorful.Console;
 using Timer = System.Timers.Timer;

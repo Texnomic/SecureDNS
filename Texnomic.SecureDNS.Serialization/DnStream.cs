@@ -120,8 +120,7 @@ namespace Texnomic.SecureDNS.Serialization
         public byte ReadByte()
         {
             var Byte = Raw.Span[ByteIndex];
-
-
+            
             ByteIndex += 1;
 
             return Byte;

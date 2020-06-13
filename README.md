@@ -1,6 +1,5 @@
 ﻿<div style="text-align:center"><img src="https://raw.githubusercontent.com/Texnomic/SecureDNS/master/docs/Logo.png" alt="SecureDNS" /></div>
 
-
 [![Twitter Follow](https://img.shields.io/twitter/follow/Texnomic?color=black&logoColor=blue&style=social)](https://twitter.com/texnomic)
 [![YouTube Video Views](https://img.shields.io/youtube/views/24QwvJ1VTmQ?label=YouTube%20%7C%20SecureDNS&style=social)](https://youtu.be/24QwvJ1VTmQ)
 
@@ -26,13 +25,14 @@ SecureDNS Project is implemented using modern [Clean-Architecture](https://www.a
 
 ## Releases
 
-- [![GitHub Release](https://img.shields.io/github/v/release/Texnomic/SecureDNS?logo=GitHub&include_prereleases&label=GitHub%20Release%20|%20Terminal%20Edition)](https://github.com/Texnomic/SecureDNS/releases)
+- ![GitHub Release](https://img.shields.io/github/v/release/Texnomic/SecureDNS?logo=GitHub&include_prereleases&label=GitHub%20Release%20|%20Terminal%20Edition)
+- ![GitHub Downloads](https://img.shields.io/github/downloads/Texnomic/SecureDNS/total?color=Orange&label=GitHub%20Downloads%20%7C%20Terminal%20Edition&logo=GitHub)
 - ![NuGet](https://img.shields.io/nuget/vpre/Texnomic.Sodium?logo=NuGet&label=NuGet%20%7C%20Texnomic.Sodium&logoColor=blue&color=blue)
 - ![NuGet](https://img.shields.io/nuget/vpre/Texnomic.Socks5?logo=NuGet&label=NuGet%20%7C%20%09Texnomic.Socks5&logoColor=blue&color=blue)
 - ![NuGet](https://img.shields.io/nuget/vpre/Texnomic.FilterLists?logo=NuGet&label=NuGet%20%7C%20%09Texnomic.FilterLists&logoColor=blue&color=blue)
 - ![NuGet](https://img.shields.io/nuget/vpre/Texnomic.ENS.BaseRegistrar?logo=NuGet&label=NuGet%20%7C%20%09Texnomic.ENS.BaseRegistrar&logoColor=blue&color=blue)
 - ![NuGet](https://img.shields.io/nuget/vpre/Texnomic.ENS.PublicResolver?logo=NuGet&label=NuGet%20%7C%20%09Texnomic.ENS.PublicResolver&logoColor=blue&color=blue)
-- ![NuGet](https://img.shields.io/nuget/vpre/Texnomic.SecureDNS.Abstractions?logo=NuGet&label=NuGet%20%7C%20Texnomic.SecureDNS.Abstractions&logoColor=blue&color=blue) 
+- ![NuGet](https://img.shields.io/nuget/vpre/Texnomic.SecureDNS.Abstractions?logo=NuGet&label=NuGet%20%7C%20Texnomic.SecureDNS.Abstractions&logoColor=blue&color=blue)
 - ![NuGet](https://img.shields.io/nuget/vpre/Texnomic.SecureDNS.Core?logo=NuGet&label=NuGet%20%7C%20Texnomic.SecureDNS.Core&logoColor=blue&color=blue)
 - ![NuGet](https://img.shields.io/nuget/vpre/Texnomic.SecureDNS.Protocols?logo=NuGet&label=NuGet%20%7C%20Texnomic.SecureDNS.Protocols&logoColor=blue&color=blue)
 - ![NuGet](https://img.shields.io/nuget/vpre/Texnomic.SecureDNS.Serialization?logo=NuGet&label=NuGet%20%7C%20Texnomic.SecureDNS.Serialization&logoColor=blue&color=blue)
@@ -41,8 +41,6 @@ SecureDNS Project is implemented using modern [Clean-Architecture](https://www.a
 - ![NuGet](https://img.shields.io/nuget/vpre/Texnomic.SecureDNS.Extensions?logo=NuGet&label=NuGet%20%7C%20%09Texnomic.SecureDNS.Extensions&logoColor=blue&color=blue)
 
 <div style="text-align:center"><a href="https://www.youtube.com/embed/24QwvJ1VTmQ"><img src="https://raw.githubusercontent.com/Texnomic/SecureDNS/master/docs/YouTube.png" /></a></div>
-
-
 
 ## Protocols
 
@@ -69,7 +67,6 @@ SecureDNS Project is implemented using modern [Clean-Architecture](https://www.a
 - ⏳ [IANA Root Files](https://www.iana.org/domains/root/files)
 - ⏳ [ICANN Zone Data Service](https://czds.icann.org/home)
 
-
 ## Platforms
 
 - ![Windows Client](https://img.shields.io/static/v1?logo=Windows&label=Windows%20Client&message=7%2C+8.1%2C+10+%281607%2B%29&color=0078D6&logoColor=0078D6)
@@ -82,7 +79,6 @@ SecureDNS Project is implemented using modern [Clean-Architecture](https://www.a
 - ![RHEL](https://img.shields.io/static/v1?logo=Red%20Hat&label=Red%20Hat%20Enterprise%20Linux&message=15%2B&color=EE0000&logoColor=EE0000)
 - ![openSUSE](https://img.shields.io/static/v1?logo=openSUSE&label=openSUSE&message=15%2B&color=73BA25&logoColor=73BA25)
 - ![SUSE](https://img.shields.io/static/v1?logo=openSUSE&label=SUSE%20Enterprise&message=12%20SP2%2B&color=73BA25&logoColor=73BA25)
-
 
 ## Architectures
 

@@ -2,7 +2,7 @@
 using System.Net;
 using System.Text.Json.Serialization;
 
-namespace Texnomic.SecureDNS.Middlewares.Options
+namespace Texnomic.SecureDNS.Servers.Proxy.Options
 {
     public class ProxyServerOptions
     {
@@ -13,6 +13,6 @@ namespace Texnomic.SecureDNS.Middlewares.Options
         [JsonIgnore]
         public IPEndPoint IPEndPoint => new IPEndPoint(IPAddress.Parse(Address), Port);
 
-        public int Threads { get; set; } = Environment.ProcessorCount;
+        public static int Threads => Environment.ProcessorCount;
     }
 }

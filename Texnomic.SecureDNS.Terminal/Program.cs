@@ -24,6 +24,7 @@ using Texnomic.SecureDNS.Middlewares.Options;
 using Texnomic.SecureDNS.Protocols;
 using Texnomic.SecureDNS.Protocols.Options;
 using Texnomic.SecureDNS.Servers.Proxy;
+using Texnomic.SecureDNS.Servers.Proxy.Options;
 using Texnomic.SecureDNS.Servers.Proxy.ResponsibilityChain;
 using Texnomic.SecureDNS.Terminal.Enums;
 using Texnomic.SecureDNS.Terminal.Options;

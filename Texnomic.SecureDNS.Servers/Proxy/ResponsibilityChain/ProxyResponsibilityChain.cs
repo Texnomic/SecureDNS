@@ -5,7 +5,7 @@ using PipelineNet.ChainsOfResponsibility;
 using PipelineNet.MiddlewareResolver;
 using Texnomic.SecureDNS.Abstractions;
 using Texnomic.SecureDNS.Abstractions.Enums;
-using Texnomic.SecureDNS.Middlewares.Options;
+using Texnomic.SecureDNS.Servers.Proxy.Options;
 
 namespace Texnomic.SecureDNS.Servers.Proxy.ResponsibilityChain
 {
