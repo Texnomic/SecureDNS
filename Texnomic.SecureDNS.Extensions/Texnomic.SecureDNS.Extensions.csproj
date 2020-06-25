@@ -1,9 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <PackageTags>dns sdns https udp tcp dnscrypt dou dot doh</PackageTags>
-    <Version>0.3-alpha</Version>
+    <Version>0.3.1-alpha</Version>
     <Authors>Texnomic</Authors>
     <Company>Texnomic Ltd</Company>
     <Description>Texnomic SecureDNS Extensions Library.</Description>
@@ -15,12 +14,11 @@
     <RepositoryType>Github</RepositoryType>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
-
   <ItemGroup>
     <None Include="..\docs\Logo.png">
       <Pack>True</Pack>
-      <PackagePath></PackagePath>
+      <PackagePath>
+      </PackagePath>
     </None>
   </ItemGroup>
-
 </Project>

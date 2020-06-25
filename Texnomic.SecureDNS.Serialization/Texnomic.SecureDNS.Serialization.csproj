@@ -1,9 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>0.3-alpha</Version>
+    <Version>0.3.1-alpha</Version>
     <Authors>Texnomic</Authors>
     <Company>Texnomic Ltd</Company>
     <Product>Texnomic.SecureDNS.Serialization</Product>
@@ -15,20 +14,19 @@
     <RepositoryUrl>https://github.com/Texnomic/SecureDNS</RepositoryUrl>
     <RepositoryType>Github</RepositoryType>
     <PackageTags>dns sdns https udp tcp dnscrypt dou dot doh</PackageTags>
-    <NeutralLanguage></NeutralLanguage>
+    <NeutralLanguage>
+    </NeutralLanguage>
   </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Texnomic.SecureDNS.Abstractions\Texnomic.SecureDNS.Abstractions.csproj" />
     <ProjectReference Include="..\Texnomic.SecureDNS.Core\Texnomic.SecureDNS.Core.csproj" />
     <ProjectReference Include="..\Texnomic.SecureDNS.Extensions\Texnomic.SecureDNS.Extensions.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <None Include="..\docs\Logo.png">
       <Pack>True</Pack>
-      <PackagePath></PackagePath>
+      <PackagePath>
+      </PackagePath>
     </None>
   </ItemGroup>
-
 </Project>

@@ -1,9 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>0.3-alpha</Version>
+    <Version>0.3.1-alpha</Version>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Authors>Texnomic</Authors>
     <Company>Texnomic Ltd</Company>
@@ -15,18 +14,16 @@
     <PackageTags>dns sdns https udp tcp dnscrypt dou dot doh ens</PackageTags>
     <Copyright>Copyright © 2020</Copyright>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Nethereum.Contracts" Version="3.7.1" />
     <PackageReference Include="Nethereum.RPC" Version="3.7.1" />
     <PackageReference Include="Nethereum.Web3" Version="3.7.1" />
   </ItemGroup>
-
   <ItemGroup>
     <None Include="..\docs\Logo.png">
       <Pack>True</Pack>
-      <PackagePath></PackagePath>
+      <PackagePath>
+      </PackagePath>
     </None>
   </ItemGroup>
-
 </Project>

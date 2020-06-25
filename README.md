@@ -40,7 +40,7 @@ SecureDNS Project is implemented using modern [Clean-Architecture](https://www.a
 - ![NuGet](https://img.shields.io/nuget/vpre/Texnomic.SecureDNS.Servers?logo=NuGet&label=NuGet%20%7C%20%09Texnomic.SecureDNS.Servers&logoColor=blue&color=blue)
 - ![NuGet](https://img.shields.io/nuget/vpre/Texnomic.SecureDNS.Extensions?logo=NuGet&label=NuGet%20%7C%20%09Texnomic.SecureDNS.Extensions&logoColor=blue&color=blue)
 
-<div style="text-align:center"><a href="https://www.youtube.com/embed/24QwvJ1VTmQ"><img src="https://raw.githubusercontent.com/Texnomic/SecureDNS/master/docs/YouTube.png" /></a></div>
+<div style="text-align:center"><a href="https://www.youtube.com/embed/24QwvJ1VTmQ"><img src="https://raw.githubusercontent.com/Texnomic/SecureDNS/master/docs/YouTube.png" /></a><img src="https://raw.githubusercontent.com/Texnomic/SecureDNS/master/docs/WinGet.png" /></div>
 
 ## Protocols
 

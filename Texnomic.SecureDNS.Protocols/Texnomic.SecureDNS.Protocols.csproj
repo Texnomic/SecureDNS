@@ -1,9 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>0.3-alpha</Version>
+    <Version>0.3.1-alpha</Version>
     <Authors>Texnomic</Authors>
     <Company>Texnomic Ltd</Company>
     <Description>Texnomic SecureDNS Protocols Library.</Description>
@@ -14,7 +13,6 @@
     <RepositoryType>Github</RepositoryType>
     <PackageTags>dns sdns https udp tcp dnscrypt dou dot doh</PackageTags>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Common.Logging" Version="3.4.1" />
     <PackageReference Include="Common.Logging.Serilog" Version="4.4.0" />
@@ -27,7 +25,6 @@
     <PackageReference Include="Serilog.Sinks.ILogger" Version="1.0.3" />
     <PackageReference Include="System.Threading.Tasks.Dataflow" Version="4.11.1" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Texnomic.SecureDNS.Abstractions\Texnomic.SecureDNS.Abstractions.csproj" />
     <ProjectReference Include="..\Texnomic.SecureDNS.Core\Texnomic.SecureDNS.Core.csproj" />
@@ -35,16 +32,14 @@
     <ProjectReference Include="..\Texnomic.SecureDNS.Serialization\Texnomic.SecureDNS.Serialization.csproj" />
     <ProjectReference Include="..\Texnomic.Sodium\Texnomic.Sodium.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <Folder Include="DataTypes\" />
   </ItemGroup>
-
   <ItemGroup>
     <None Include="..\docs\Logo.png">
       <Pack>True</Pack>
-      <PackagePath></PackagePath>
+      <PackagePath>
+      </PackagePath>
     </None>
   </ItemGroup>
-
 </Project>

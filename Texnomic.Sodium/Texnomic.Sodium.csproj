@@ -1,9 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>0.3-alpha</Version>
+    <Version>0.3.1-alpha</Version>
     <Authors>Texnomic</Authors>
     <Company>Texnomic Ltd</Company>
     <Description>Texnomic Sodium Library.</Description>
@@ -15,16 +14,14 @@
     <RepositoryType>Github</RepositoryType>
     <PackageTags>dns sdns https udp tcp dnscrypt dou dot doh libsodium sodium</PackageTags>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="libsodium" Version="1.0.18" />
   </ItemGroup>
-
   <ItemGroup>
     <None Include="..\docs\Logo.png">
       <Pack>True</Pack>
-      <PackagePath></PackagePath>
+      <PackagePath>
+      </PackagePath>
     </None>
   </ItemGroup>
-
 </Project>
