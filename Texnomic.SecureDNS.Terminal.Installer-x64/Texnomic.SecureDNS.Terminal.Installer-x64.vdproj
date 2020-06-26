@@ -198,15 +198,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Texnomic SecureDNS Terminal"
-        "ProductCode" = "8:{3564A7C5-F151-4830-A1E7-250DD8D7F713}"
-        "PackageCode" = "8:{F0D648BC-C7F0-472E-97F5-4A5F2396BECD}"
+        "ProductCode" = "8:{6890EF9A-8DC1-41AB-91BA-F00379C4756C}"
+        "PackageCode" = "8:{D4668DAA-46B9-4E0A-8A45-23AE4AA990E1}"
         "UpgradeCode" = "8:{D6F79028-861C-4CDB-9C16-31C9F8900733}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:0.3"
+        "ProductVersion" = "8:0.3.1"
         "Manufacturer" = "8:Texnomic"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:https://github.com/Texnomic/SecureDNS"
@@ -748,7 +748,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_345CD70979D04FD8AFA153EA39CFC3FE"
             {
-            "SourcePath" = "8:..\\Texnomic.SecureDNS.Terminal\\obj\\Release\\netcoreapp3.1\\win-x64\\Texnomic.SecureDNS.Terminal.exe"
+            "SourcePath" = "8:..\\Texnomic.SecureDNS.Terminal\\obj\\Debug\\netcoreapp3.1\\win-x64\\Texnomic.SecureDNS.Terminal.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_4F58D4D6AEF447EE9A83F32A70203221"

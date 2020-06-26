@@ -8,17 +8,19 @@
     <Company>Texnomic Ltd</Company>
     <Product>Texnomic SecureDNS Terminal</Product>
     <Copyright>Texnomic Ltd, Copyrights 2020</Copyright>
-    <AssemblyVersion>0.3.0.0</AssemblyVersion>
+    <AssemblyVersion>0.3.1.0</AssemblyVersion>
     <FileVersion>0.3.0.0</FileVersion>
     <RepositoryUrl>https://github.com/Texnomic/SecureDNS</RepositoryUrl>
     <RepositoryType>Github</RepositoryType>
     <ApplicationIcon>SecureDNS.ico</ApplicationIcon>
     <Description>https://github.com/Texnomic/SecureDNS</Description>
-    <Version>0.3</Version>
+    <Version>0.3.1-alpha</Version>
     <PackageIcon>SecureDNS.ico</PackageIcon>
     <PackageIconUrl />
     <PackageTags>Alpha</PackageTags>
     <PackageId>Texnomic SecureDNS Terminal</PackageId>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/Texnomic/SecureDNS</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
@@ -91,5 +93,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="..\Tools\signtool.exe sign /sha1 &quot;33261449de13599f046617dd18994bab0e4346a8&quot; /tr http://time.certum.pl /fd sha256 /v $(TargetPath)" />
+  </Target>
 
 </Project>
