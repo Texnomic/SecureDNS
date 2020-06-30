@@ -18,8 +18,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Texnomic.DNS\Texnomic.DNS.csproj" />
+    <ProjectReference Include="..\Texnomic.SecureDNS.Abstractions\Texnomic.SecureDNS.Abstractions.csproj" />
     <ProjectReference Include="..\Texnomic.SecureDNS.Data.Abstractions\Texnomic.SecureDNS.Data.Abstractions.csproj" />
+    <ProjectReference Include="..\Texnomic.SecureDNS.Serialization\Texnomic.SecureDNS.Serialization.csproj" />
   </ItemGroup>
 
 </Project>

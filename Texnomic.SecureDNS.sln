@@ -5,8 +5,6 @@ VisualStudioVersion = 16.0.28902.138
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.SecureDNS", "Texnomic.SecureDNS\Texnomic.SecureDNS.csproj", "{8E7071ED-9877-4A23-A4DF-5C2362952317}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.DNS", "Texnomic.DNS\Texnomic.DNS.csproj", "{1FADB21E-BCA7-4A87-A7EE-AC31D928C124}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C1A98404-2B7E-4FC8-BD0E-E2C0C1B829C6}"
 	ProjectSection(SolutionItems) = preProject
 		.gitattributes = .gitattributes
@@ -20,15 +18,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.SecureDNS.Tests", "Texnomic.SecureDNS.Tests\Texnomic.SecureDNS.Tests.csproj", "{827EC308-B997-40BB-8D38-3B0C6959570D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.DNS.Tests", "Texnomic.DNS.Tests\Texnomic.DNS.Tests.csproj", "{F45A4331-4CC4-4977-B3AB-B534F7A15F0C}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.SecureDNS.Automation", "Texnomic.SecureDNS.Automation\Texnomic.SecureDNS.Automation.csproj", "{01A6E760-91EB-481F-8243-9C2D3DFFDFA8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.SecureDNS.Automation.Tests", "Texnomic.SecureDNS.Automation.Tests\Texnomic.SecureDNS.Automation.Tests.csproj", "{EFB5C48D-C4C6-479D-92BD-1F19029F5CC1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.SecureDNS.Data", "Texnomic.SecureDNS.Data\Texnomic.SecureDNS.Data.csproj", "{10DECCB9-F189-416F-ABCE-29A53E273EBD}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.DNS.Abstractions", "Texnomic.DNS.Abstractions\Texnomic.DNS.Abstractions.csproj", "{4785617B-AD42-4EBE-A93E-06A4B15A99BB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.SecureDNS.Terminal", "Texnomic.SecureDNS.Terminal\Texnomic.SecureDNS.Terminal.csproj", "{66D712B8-4952-4BA9-980A-EB6618BD228C}"
 EndProject
@@ -87,24 +81,12 @@ Global
 		{8E7071ED-9877-4A23-A4DF-5C2362952317}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8E7071ED-9877-4A23-A4DF-5C2362952317}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8E7071ED-9877-4A23-A4DF-5C2362952317}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1FADB21E-BCA7-4A87-A7EE-AC31D928C124}.All|Any CPU.ActiveCfg = Release|Any CPU
-		{1FADB21E-BCA7-4A87-A7EE-AC31D928C124}.All|Any CPU.Build.0 = Release|Any CPU
-		{1FADB21E-BCA7-4A87-A7EE-AC31D928C124}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1FADB21E-BCA7-4A87-A7EE-AC31D928C124}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1FADB21E-BCA7-4A87-A7EE-AC31D928C124}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1FADB21E-BCA7-4A87-A7EE-AC31D928C124}.Release|Any CPU.Build.0 = Release|Any CPU
 		{827EC308-B997-40BB-8D38-3B0C6959570D}.All|Any CPU.ActiveCfg = Release|Any CPU
 		{827EC308-B997-40BB-8D38-3B0C6959570D}.All|Any CPU.Build.0 = Release|Any CPU
 		{827EC308-B997-40BB-8D38-3B0C6959570D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{827EC308-B997-40BB-8D38-3B0C6959570D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{827EC308-B997-40BB-8D38-3B0C6959570D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{827EC308-B997-40BB-8D38-3B0C6959570D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F45A4331-4CC4-4977-B3AB-B534F7A15F0C}.All|Any CPU.ActiveCfg = Release|Any CPU
-		{F45A4331-4CC4-4977-B3AB-B534F7A15F0C}.All|Any CPU.Build.0 = Release|Any CPU
-		{F45A4331-4CC4-4977-B3AB-B534F7A15F0C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F45A4331-4CC4-4977-B3AB-B534F7A15F0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F45A4331-4CC4-4977-B3AB-B534F7A15F0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F45A4331-4CC4-4977-B3AB-B534F7A15F0C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{01A6E760-91EB-481F-8243-9C2D3DFFDFA8}.All|Any CPU.ActiveCfg = Release|Any CPU
 		{01A6E760-91EB-481F-8243-9C2D3DFFDFA8}.All|Any CPU.Build.0 = Release|Any CPU
 		{01A6E760-91EB-481F-8243-9C2D3DFFDFA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -123,12 +105,6 @@ Global
 		{10DECCB9-F189-416F-ABCE-29A53E273EBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{10DECCB9-F189-416F-ABCE-29A53E273EBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{10DECCB9-F189-416F-ABCE-29A53E273EBD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4785617B-AD42-4EBE-A93E-06A4B15A99BB}.All|Any CPU.ActiveCfg = Release|Any CPU
-		{4785617B-AD42-4EBE-A93E-06A4B15A99BB}.All|Any CPU.Build.0 = Release|Any CPU
-		{4785617B-AD42-4EBE-A93E-06A4B15A99BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4785617B-AD42-4EBE-A93E-06A4B15A99BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4785617B-AD42-4EBE-A93E-06A4B15A99BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4785617B-AD42-4EBE-A93E-06A4B15A99BB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{66D712B8-4952-4BA9-980A-EB6618BD228C}.All|Any CPU.ActiveCfg = Release|Any CPU
 		{66D712B8-4952-4BA9-980A-EB6618BD228C}.All|Any CPU.Build.0 = Release|Any CPU
 		{66D712B8-4952-4BA9-980A-EB6618BD228C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU

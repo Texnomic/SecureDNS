@@ -5,9 +5,11 @@ using System.IO;
 using System.Net;
 using System.Reflection;
 using Texnomic.SecureDNS.Data.Identity;
-using Texnomic.DNS.Models;
+using Texnomic.SecureDNS.Core;
+using Texnomic.SecureDNS.Core.DataTypes;
 using Texnomic.SecureDNS.Data.Abstractions;
 using Texnomic.SecureDNS.Data.Models;
+using Texnomic.SecureDNS.Serialization;
 
 namespace Texnomic.SecureDNS.Data
 {
@@ -31,6 +33,7 @@ namespace Texnomic.SecureDNS.Data
             OptionsBuilder.UseLazyLoadingProxies();
 
             var Directory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
             OptionsBuilder.UseSqlite($"Data Source={Directory}\\SecureDNS.sqlite;");
         }
 
@@ -71,7 +74,7 @@ namespace Texnomic.SecureDNS.Data
 
             ModelBuilder.Entity<Cache>()
                         .Property(Cache => Cache.Response)
-                        .HasConversion(Value => Value.ToArray(), Value => Message.FromArray(Value));
+                        .HasConversion(Value => DnSerializer.Serialize(Value), Value => DnSerializer.Deserialize(Value));
 
             ModelBuilder.Entity<Cache>()
                         .Property(Cache => Cache.Timestamp)

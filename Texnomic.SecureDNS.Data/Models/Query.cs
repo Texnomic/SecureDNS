@@ -1,16 +1,16 @@
 ﻿using System.Linq;
 using System.Net;
-using Texnomic.DNS.Abstractions.Enums;
-using Texnomic.DNS.Models;
-using Texnomic.DNS.Records;
+using Texnomic.SecureDNS.Abstractions;
+using Texnomic.SecureDNS.Abstractions.Enums;
+using Texnomic.SecureDNS.Core.Records;
 
 namespace Texnomic.SecureDNS.Data.Models
 {
     public class Query
     {
         public IPEndPoint IPEndPoint { get; set; }
-        public Message Request { get; set; }
-        public Message Response { get; set; }
+        public IMessage Request { get; set; }
+        public IMessage Response { get; set; }
 
         public string IPAddress => IPEndPoint.Address.ToString();
         public string Port => IPEndPoint.Port.ToString();
@@ -18,7 +18,7 @@ namespace Texnomic.SecureDNS.Data.Models
         public string Resolve => Response.Answers
                                          .Where(Record => Record.Type == RecordType.A || Record.Type == RecordType.PTR)
                                          .Cast<A>()
-                                         .Select(Record => Record.Address.Value)
+                                         .Select(Record => Record.Address)
                                          .First()
                                          .ToString();
     }

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Texnomic.DNS.Models;
+using Texnomic.SecureDNS.Core.DataTypes;
 using Texnomic.SecureDNS.Data;
 using Texnomic.SecureDNS.Data.Models;
 

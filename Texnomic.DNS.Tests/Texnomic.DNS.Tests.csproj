@@ -16,9 +16,4 @@
     <PackageReference Include="MSTest.TestFramework" Version="2.1.2" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Texnomic.DNS.Abstractions\Texnomic.DNS.Abstractions.csproj" />
-    <ProjectReference Include="..\Texnomic.DNS\Texnomic.DNS.csproj" />
-  </ItemGroup>
-
 </Project>
