@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Management.Automation;
 using System.Net;
@@ -21,19 +22,19 @@ namespace Texnomic.SecureDNS.Automation
 
                 await PSInstance.AddScript("Import-Module NetAdapter").InvokeAsync();
 
-                var PSDataCollection = await PSInstance.AddScript("Get-NetAdapter -Physical | ForEach-Object { @{ Index = $_.ifIndex; Name = $_.Name; Description = $_.InterfaceDescription; Status = $_.Status; Mac = $_.MacAddress; Speed = $_.LinkSpeed; IP = $(Get-NetIPAddress -InterfaceIndex $_.ifIndex | Select -ExpandProperty IPv4Address); DNS = $(Get-DnsClientServerAddress -AddressFamily IPv4 -InterfaceIndex $_.ifIndex | Select -ExpandProperty ServerAddresses) } } | ConvertTo-Json")
+                var PSDataCollection = await PSInstance.AddScript("Get-NetAdapter -Physical | ForEach-Object { @{ Index = $_.ifIndex; Name = $_.Name; Description = $_.InterfaceDescription; Status = $_.Status; Mac = $_.MacAddress; Speed = $_.LinkSpeed; IP = $(Get-NetIPAddress -InterfaceIndex $_.ifIndex | Select -ExpandProperty IPv4Address); NameServers = $(Get-DnsClientServerAddress -AddressFamily IPv4 -InterfaceIndex $_.ifIndex | Select -ExpandProperty ServerAddresses) } } | ConvertTo-Json")
                                                        .InvokeAsync();
 
                 var Json = PSDataCollection.FirstOrDefault()?.BaseObject as string;
 
-                return JsonConvert.DeserializeObject<Adapter[]>(Json);
+                return JsonConvert.DeserializeObject<Adapter[]>(Json ?? string.Empty);
             }
         }
 
 
-        public static class DNS
+        public static class NameServers
         {
-            public static async Task<bool> Set(IPAddress[] IPAddresses)
+            public static async Task<bool> Set(IEnumerable<IPAddress> IPAddresses)
             {
                 try
                 {
@@ -43,7 +44,9 @@ namespace Texnomic.SecureDNS.Automation
 
                     await PSInstance.AddScript("Import-Module NetAdapter, DnsClient").InvokeAsync();
 
-                    var Result = await PSInstance.AddScript("Get-NetAdapter -Physical | ForEach-Object { Set-DnsClientServerAddress $_.Name -ServerAddresses (\"127.0.0.1\") }")
+                    PSInstance.AddParameter("Addresses", string.Join(',', IPAddresses.Select(IP => IP.ToString())));
+
+                    await PSInstance.AddScript("Get-NetAdapter -Physical | ForEach-Object { Set-DnsClientServerAddress $_.Name -ServerAddresses ( $Addresses ) }")
                                                  .InvokeAsync();
 
                     return !PSInstance.HadErrors;
@@ -65,7 +68,7 @@ namespace Texnomic.SecureDNS.Automation
 
                     await PSInstance.AddScript("Import-Module NetAdapter, DnsClient").InvokeAsync();
 
-                    var Result = await PSInstance.AddScript("Get-NetAdapter -Physical | ForEach-Object { Set-DnsClientServerAddress $_.Name -ResetServerAddresses }")
+                    await PSInstance.AddScript("Get-NetAdapter -Physical | ForEach-Object { Set-DnsClientServerAddress $_.Name -ResetServerAddresses }")
                                                  .InvokeAsync();
 
                     return !PSInstance.HadErrors;

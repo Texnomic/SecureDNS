@@ -1,4 +1,8 @@
-﻿namespace Texnomic.SecureDNS.Automation.Models
+﻿using System;
+using System.Collections.Generic;
+using System.Net;
+
+namespace Texnomic.SecureDNS.Automation.Models
 {
     public class Adapter
     {
@@ -6,7 +10,7 @@
 
         public string Description { get; set; }
 
-        public dynamic DNS { get; set; }
+        public dynamic NameServers { get; set; }
 
         public int Index { get; set; }
 

@@ -20,12 +20,12 @@ namespace Texnomic.SecureDNS.Automation.Tests
         }
 
         [TestClass]
-        public class DNS
+        public class NameServers
         {
             [TestMethod]
             public async Task Set()
             {
-                var Result = await Automation.Network.DNS.Set(new[] { IPAddress.Parse("127.0.0.1") });
+                var Result = await Automation.Network.NameServers.Set(new[] { IPAddress.Parse("127.0.0.1") });
 
                 Assert.AreEqual(true, Result);
             }
@@ -33,7 +33,7 @@ namespace Texnomic.SecureDNS.Automation.Tests
             [TestMethod]
             public async Task Reset()
             {
-                var Result =  await Automation.Network.DNS.Reset();
+                var Result =  await Automation.Network.NameServers.Reset();
 
                 Assert.AreEqual(true, Result);
             }
