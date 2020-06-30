@@ -5,20 +5,21 @@ using Texnomic.SecureDNS.Abstractions.Enums;
 
 namespace Texnomic.SecureDNS.Core.DataTypes
 {
+    #nullable enable
     public class PseudoRecord : IPseudoRecord
     {
-        public IDomain Domain { get; set; }
+        public IDomain? Domain { get; set; }
 
         public RecordType Type { get; set; }
 
         [NotLogged] 
-        public RecordClass? Class { get; set; } = null;
+        public RecordClass? Class { get; set; }
 
         [NotLogged]
-        public TimeSpan? TimeToLive { get; set; } = null;
+        public TimeSpan? TimeToLive { get; set; }
 
         [NotLogged] 
-        public IRecord? Record { get; set; } = null;
+        public IRecord? Record { get; set; }
 
         public ushort Size { get; set; }
 
@@ -32,7 +33,7 @@ namespace Texnomic.SecureDNS.Core.DataTypes
 
         public ushort Length { get; set; }
 
-        public byte[] Data { get; set; }
+        public byte[]? Data { get; set; }
 
     }
 }

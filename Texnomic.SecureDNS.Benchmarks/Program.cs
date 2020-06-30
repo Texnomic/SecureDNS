@@ -1,9 +1,5 @@
-﻿using System;
-using System.Linq;
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
-using BinarySerialization;
-using Texnomic.DNS.Models;
 using Texnomic.SecureDNS.Serialization;
 
 namespace Texnomic.SecureDNS.Benchmarks
@@ -41,13 +37,6 @@ namespace Texnomic.SecureDNS.Benchmarks
             0x23
         };
 
-        private readonly BinarySerializer Serializer = new BinarySerializer();
-
-        [Benchmark]
-        public void BinarySerializer()
-        {
-            var ResponseMessage = Serializer.Deserialize<Message>(ResponseBytes);
-        }
 
         [Benchmark]
         public void MySerializer()

@@ -4,6 +4,7 @@ using Texnomic.SecureDNS.Abstractions;
 
 namespace Texnomic.SecureDNS.Core.DataTypes
 {
+    #nullable enable
     public class Answer : Question, IAnswer
     {
         [LogAsScalar(true)]
