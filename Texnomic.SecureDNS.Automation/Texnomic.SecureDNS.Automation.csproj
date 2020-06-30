@@ -11,4 +11,8 @@
     <PackageReference Include="System.Management.Automation" Version="7.0.2" />
   </ItemGroup>
 
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="if $(ConfigurationName) == Release (..\Tools\signtool.exe sign /sha1 &quot;33261449de13599f046617dd18994bab0e4346a8&quot; /tr http://time.certum.pl /fd sha256 /v $(TargetPath))" />
+  </Target>
+
 </Project>

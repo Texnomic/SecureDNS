@@ -3,6 +3,9 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+Texnomic.SecureDNS.Terminal.Installer-cache/
+Texnomic.SecureDNS.Terminal.Installer-SetupFiles/
+
 #NuGet
 nuget.config
 

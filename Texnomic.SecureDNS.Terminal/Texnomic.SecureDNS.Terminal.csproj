@@ -24,11 +24,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="AppSettings.Development.json" />
     <None Remove="AppSettings.json" />
+    <None Remove="AppSettings.Production.json" />
     <None Remove="Fonts\Speed.flf" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="AppSettings.Production.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AppSettings.Development.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="AppSettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
@@ -95,7 +103,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="..\Tools\signtool.exe sign /sha1 &quot;33261449de13599f046617dd18994bab0e4346a8&quot; /tr http://time.certum.pl /fd sha256 /v $(TargetPath)" />
+    <Exec Command="if $(ConfigurationName) == Release (..\Tools\signtool.exe sign /sha1 &quot;33261449de13599f046617dd18994bab0e4346a8&quot; /tr http://time.certum.pl /fd sha256 /v $(TargetPath))" />
   </Target>
 
 </Project>
