@@ -12,6 +12,7 @@ $Projects = @(
     "D:\Repositories\Texnomic.SecureDNS\Texnomic.SecureDNS.Core",
     "D:\Repositories\Texnomic.SecureDNS\Texnomic.SecureDNS.Serialization",
     "D:\Repositories\Texnomic.SecureDNS\Texnomic.Socks5",
+	"D:\Repositories\Texnomic.SecureDNS\Texnomic.Socks5.WebProxy",
     "D:\Repositories\Texnomic.SecureDNS\Texnomic.SecureDNS.Protocols",
     "D:\Repositories\Texnomic.SecureDNS\Texnomic.SecureDNS.Middlewares",
     "D:\Repositories\Texnomic.SecureDNS\Texnomic.SecureDNS.Servers"

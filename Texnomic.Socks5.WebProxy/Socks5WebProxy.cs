@@ -45,7 +45,7 @@ namespace Texnomic.Socks5.WebProxy
 
         public async Task StopAsync(CancellationToken Token)
         {
-            throw new NotImplementedException();
+            await Task.Yield();
         }
 
         private async Task ReceiveAsync()

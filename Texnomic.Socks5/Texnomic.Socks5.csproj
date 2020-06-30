@@ -13,6 +13,7 @@
     <PackageTags>dns sdns https udp tcp dnscrypt dou dot doh socks socks5</PackageTags>
     <RepositoryType>Github</RepositoryType>
     <PackageIcon>Logo.png</PackageIcon>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Texnomic.SecureDNS.Extensions\Texnomic.SecureDNS.Extensions.csproj" />
