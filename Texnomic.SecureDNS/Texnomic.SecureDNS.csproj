@@ -44,7 +44,7 @@
     <PackageReference Include="Blazorise.Bootstrap" Version="0.9.0.3" />
     <PackageReference Include="Blazorise.Icons.FontAwesome" Version="0.9.0.3" />
     <PackageReference Include="Blazorise.Sidebar" Version="0.9.0.3" />
-    <PackageReference Include="ElectronNET.API" Version="9.31.1" />
+    <PackageReference Include="ElectronNET.API" Version="9.31.2" />
     <PackageReference Include="FlexLabs.EntityFrameworkCore.Upsert" Version="3.1.0" />
     <PackageReference Include="Hangfire" Version="1.7.11" />
     <PackageReference Include="Hangfire.SQLite" Version="1.4.2" />
