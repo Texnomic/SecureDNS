@@ -17,7 +17,7 @@
   <ItemGroup>
     <PackageReference Include="Nethereum.Contracts" Version="3.8.0" />
     <PackageReference Include="Nethereum.RPC" Version="3.7.1" />
-    <PackageReference Include="Nethereum.Web3" Version="3.7.1" />
+    <PackageReference Include="Nethereum.Web3" Version="3.8.0" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\docs\Logo.png">
