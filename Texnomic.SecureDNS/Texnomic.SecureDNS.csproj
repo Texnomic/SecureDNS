@@ -42,7 +42,7 @@
   <ItemGroup>
     <PackageReference Include="AsyncEnumerator" Version="4.0.2" />
     <PackageReference Include="Blazorise.Bootstrap" Version="0.9.1.1" />
-    <PackageReference Include="Blazorise.Icons.FontAwesome" Version="0.9.0.3" />
+    <PackageReference Include="Blazorise.Icons.FontAwesome" Version="0.9.1.1" />
     <PackageReference Include="Blazorise.Sidebar" Version="0.9.1.1" />
     <PackageReference Include="ElectronNET.API" Version="9.31.2" />
     <PackageReference Include="FlexLabs.EntityFrameworkCore.Upsert" Version="3.1.0" />
@@ -72,7 +72,7 @@
     <PackageReference Include="Serilog.Enrichers.Thread" Version="3.1.0" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="3.0.1" />
     <PackageReference Include="Serilog.Formatting.Compact" Version="1.1.0" />
-    <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.1-dev-00209" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.1-dev-00237" />
     <PackageReference Include="Serilog.Sinks.Seq" Version="4.0.0" />
     <PackageReference Include="Syncfusion.Blazor" Version="18.1.0.56" />
     <PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="3.0.79" />
