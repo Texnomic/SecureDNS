@@ -42,7 +42,7 @@ namespace Texnomic.SecureDNS.Serialization
 
         public int Find(ReadOnlySpan<byte> Bytes)
         {
-            return Raw.Span.IndexOf(Bytes);
+            return Raw.Span.SequenceCompareTo(Bytes);
         }
 
 

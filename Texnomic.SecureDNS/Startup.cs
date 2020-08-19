@@ -21,7 +21,7 @@ namespace Texnomic.SecureDNS
 {
     public class Startup
     {
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         public Startup(IConfiguration Configuration)
         {
@@ -51,7 +51,7 @@ namespace Texnomic.SecureDNS
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder App, IWebHostEnvironment Env, IServiceProvider ServiceProvider, IConfiguration Configuration, DatabaseContext DatabaseContext)
+        public void Configure(IApplicationBuilder App, IWebHostEnvironment Env, IServiceProvider ServiceProvider, DatabaseContext DatabaseContext)
         {
             if (Env.IsDevelopment())
             {
@@ -95,7 +95,7 @@ namespace Texnomic.SecureDNS
             ElectronizeAsync().ConfigureAwait(false);
         }
 
-        public async Task ElectronizeAsync()
+        private static async Task ElectronizeAsync()
         {
             var Options = new BrowserWindowOptions
             {
