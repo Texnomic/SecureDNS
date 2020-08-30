@@ -33,7 +33,7 @@ namespace Texnomic.SecureDNS.Tests.Protocols
         {
             var TCPOptions = new TCPOptions()
             {
-                IPv4Address = "1.1.1.1",
+                IPv4Address = "9.9.9.9",
                 Port = 53,
                 Timeout = new TimeSpan(0, 0, 0, 10)
             };
