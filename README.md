@@ -3,6 +3,7 @@
 [![Twitter Follow](https://img.shields.io/twitter/follow/Texnomic?color=black&logoColor=blue&style=social)](https://twitter.com/texnomic)
 [![YouTube Video Views](https://img.shields.io/youtube/views/24QwvJ1VTmQ?label=YouTube%20%7C%20SecureDNS&style=social)](https://youtu.be/24QwvJ1VTmQ)
 [![Slack](https://img.shields.io/static/v1?logo=Slack&label=Slack&message=Channel&color=73BA25&logoColor=4A154B)](https://join.slack.com/t/texnomicsecuredns/shared_invite/zt-h110u1u8-5VwSZsQSHL13s62xAZjI2Q)
+[![Facebook](https://img.shields.io/static/v1?logo=Facebook&label=Facebook&message=Page&color=73BA25&logoColor=1877FF2)](https://www.facebook.com/Texnomic-Secure-DNS-114240320331170)
 
 Building a Secure, Modern, Cross-Platform & Cross-Architecture DNS Server Using C# 8.0 & .NET Core 3.1.
 
