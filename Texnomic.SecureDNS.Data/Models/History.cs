@@ -3,11 +3,10 @@ using Texnomic.SecureDNS.Abstractions;
 
 namespace Texnomic.SecureDNS.Data.Models
 {
-    public class Cache
+    public class History
     {
-        public int ID { get; set; }
-        public IDomain Domain { get; set; }
-        public IMessage Response { get; set; }
+        public ushort ID { get; set; }
+        public IMessage Message { get; set; }
         public DateTime Timestamp { get; set; }
     }
 }

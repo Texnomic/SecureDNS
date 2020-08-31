@@ -16,7 +16,7 @@ namespace Texnomic.SecureDNS.Data
     public class DatabaseContext : IdentityDbContext<User, Role, Guid, UserClaim, UserRole, UserLogin, RoleClaim, UserToken>, IDatabaseContext
     {
         public virtual DbSet<Configuration> Configurations { get; set; }
-        public virtual DbSet<Cache> Cache { get; set; }
+        public virtual DbSet<History> Cache { get; set; }
         public virtual DbSet<Resolver> Resolvers { get; set; }
         public virtual DbSet<Host> Hosts { get; set; }
         public virtual DbSet<Blacklist> Blacklists { get; set; }
@@ -64,19 +64,19 @@ namespace Texnomic.SecureDNS.Data
             ModelBuilder.Entity<UserToken>().ToTable("UserTokens");
             ModelBuilder.Entity<UserToken>().Property(Property => Property.UserId).HasColumnName("UserID");
 
-            ModelBuilder.Entity<Cache>()
+            ModelBuilder.Entity<History>()
                         .HasIndex(Cache => Cache.Domain)
                         .IsUnique();
 
-            ModelBuilder.Entity<Cache>()
+            ModelBuilder.Entity<History>()
                         .Property(Cache => Cache.Domain)
                         .HasConversion(Value => Value.ToString(), Value => Domain.FromString(Value));
 
-            ModelBuilder.Entity<Cache>()
+            ModelBuilder.Entity<History>()
                         .Property(Cache => Cache.Response)
                         .HasConversion(Value => DnSerializer.Serialize(Value), Value => DnSerializer.Deserialize(Value));
 
-            ModelBuilder.Entity<Cache>()
+            ModelBuilder.Entity<History>()
                         .Property(Cache => Cache.Timestamp)
                         .HasConversion(Value => Value.ToString(), Value => DateTime.Parse(Value));
 
