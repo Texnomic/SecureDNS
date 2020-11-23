@@ -46,7 +46,7 @@
     <PackageReference Include="Blazorise.Sidebar" Version="0.9.1.2" />
     <PackageReference Include="ElectronNET.API" Version="9.31.2" />
     <PackageReference Include="FlexLabs.EntityFrameworkCore.Upsert" Version="3.1.0" />
-    <PackageReference Include="Hangfire" Version="1.7.12" />
+    <PackageReference Include="Hangfire" Version="1.7.18" />
     <PackageReference Include="Hangfire.SQLite" Version="1.4.2" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="3.1.7" />
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
