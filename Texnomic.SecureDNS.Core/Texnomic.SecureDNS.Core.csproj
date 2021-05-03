@@ -19,7 +19,7 @@
     <PackageReference Include="Common.Logging.Serilog" Version="4.4.0" />
     <PackageReference Include="Destructurama.Attributed" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="5.0.0" />
-    <PackageReference Include="Nerdbank.Streams" Version="2.6.81" />
+    <PackageReference Include="Nerdbank.Streams" Version="2.7.74" />
     <PackageReference Include="Nethereum.ENS" Version="3.8.0" />
     <PackageReference Include="Nethereum.Web3" Version="3.8.0" />
     <PackageReference Include="NSec.Cryptography" Version="20.2.0" />
