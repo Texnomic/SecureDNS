@@ -64,16 +64,16 @@ namespace Texnomic.SecureDNS.Data
             ModelBuilder.Entity<UserToken>().ToTable("UserTokens");
             ModelBuilder.Entity<UserToken>().Property(Property => Property.UserId).HasColumnName("UserID");
 
-            ModelBuilder.Entity<History>()
-                        .HasIndex(Cache => Cache.Domain)
-                        .IsUnique();
+            //ModelBuilder.Entity<History>()
+            //            .HasIndex(Cache => Cache.Domain)
+            //            .IsUnique();
+
+            //ModelBuilder.Entity<History>()
+            //            .Property(Cache => Cache.Domain)
+            //            .HasConversion(Value => Value.ToString(), Value => Domain.FromString(Value));
 
             ModelBuilder.Entity<History>()
-                        .Property(Cache => Cache.Domain)
-                        .HasConversion(Value => Value.ToString(), Value => Domain.FromString(Value));
-
-            ModelBuilder.Entity<History>()
-                        .Property(Cache => Cache.Response)
+                        .Property(Cache => Cache.Message)
                         .HasConversion(Value => DnSerializer.Serialize(Value), Value => DnSerializer.Deserialize(Value));
 
             ModelBuilder.Entity<History>()

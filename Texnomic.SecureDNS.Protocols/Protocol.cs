@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Texnomic.SecureDNS.Abstractions;
@@ -9,6 +10,10 @@ namespace Texnomic.SecureDNS.Protocols
 {
     public abstract class Protocol : IProtocol
     {
+        protected bool IsInitialized;
+
+        protected CancellationTokenSource CancellationTokenSource;
+
         protected virtual void OptionsOnChange(IOptions Options)
         {
             throw new NotImplementedException();

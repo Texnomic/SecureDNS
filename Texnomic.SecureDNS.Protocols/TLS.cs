@@ -1,10 +1,16 @@
-﻿using System.Buffers.Binary;
+﻿using System.Buffers;
+using System.Buffers.Binary;
+using System.IO.Pipelines;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Options;
+
+using Nerdbank.Streams;
+
 using Texnomic.SecureDNS.Extensions;
 using Texnomic.SecureDNS.Protocols.Options;
 
@@ -15,46 +21,76 @@ namespace Texnomic.SecureDNS.Protocols
     {
         private readonly IOptionsMonitor<TLSOptions> Options;
 
+        private Socket Socket;
+
+        private NetworkStream NetworkStream;
+
+        private SslStream SslStream;
+
+        private byte[] Prefix;
+
+        private readonly SemaphoreSlim SemaphoreSlim;
+
         public TLS(IOptionsMonitor<TLSOptions> TLSOptions)
         {
             Options = TLSOptions;
+
+            Options.OnChange(OptionsOnChange);
+
+            SemaphoreSlim = new SemaphoreSlim(1);
+
+            IsInitialized = false;
+        }
+
+        private void OptionsOnChange(TLSOptions TLSOptions)
+        {
+            _ = InitializeAsync();
+        }
+
+        protected override async ValueTask InitializeAsync()
+        {
+            await SemaphoreSlim.WaitAsync();
+
+            CancellationTokenSource = new CancellationTokenSource(Options.CurrentValue.Timeout);
+
+            Socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
+
+            Prefix = new byte[2];
+
+            await Socket.ConnectAsync(Options.CurrentValue.IPv4EndPoint);
+
+            NetworkStream = new NetworkStream(Socket);
+
+            SslStream = new SslStream(NetworkStream, true, ValidateServerCertificate);
+
+            await SslStream.AuthenticateAsClientAsync(Options.CurrentValue.CommonName);
+
+            IsInitialized = true;
+
+            SemaphoreSlim.Release();
         }
 
         public override async ValueTask<byte[]> ResolveAsync(byte[] Query)
         {
-            using var Socket = new Socket(SocketType.Stream, ProtocolType.Tcp)
-            {
-                ReceiveTimeout = (int)Options.CurrentValue.Timeout.TotalMilliseconds,
-                SendTimeout = (int)Options.CurrentValue.Timeout.TotalMilliseconds
-            };
+            if (!IsInitialized) await InitializeAsync();
 
-            await Socket.ConnectAsync(Options.CurrentValue.IPv4EndPoint);
-
-            await using var NetworkStream = new NetworkStream(Socket);
-
-            var SslStream = new SslStream(NetworkStream, true, ValidateServerCertificate)
-            {
-                ReadTimeout = (int)Options.CurrentValue.Timeout.TotalMilliseconds,
-                WriteTimeout = (int)Options.CurrentValue.Timeout.TotalMilliseconds,
-            };
-
-            await SslStream.AuthenticateAsClientAsync(Options.CurrentValue.CommonName);
-
-            var Prefix = new byte[2];
+            await SemaphoreSlim.WaitAsync();
 
             BinaryPrimitives.WriteUInt16BigEndian(Prefix, (ushort)Query.Length);
 
-            await SslStream.WriteAsync(Prefix);
+            await SslStream.WriteAsync(Prefix, CancellationTokenSource.Token);
 
-            await SslStream.WriteAsync(Query);
+            await SslStream.WriteAsync(Query, CancellationTokenSource.Token);
 
-            await SslStream.ReadAsync(Prefix);
+            await SslStream.ReadAsync(Prefix, CancellationTokenSource.Token);
 
             var Size = BinaryPrimitives.ReadUInt16BigEndian(Prefix);
 
             var Buffer = new byte[Size];
-            
-            await SslStream.ReliableReadAsync(Buffer);
+
+            await SslStream.ReadAsync(Buffer, CancellationTokenSource.Token);
+
+            SemaphoreSlim.Release();
 
             return Buffer;
         }
@@ -73,7 +109,9 @@ namespace Texnomic.SecureDNS.Protocols
 
             if (Disposing)
             {
-
+                SslStream.Dispose();
+                NetworkStream.Dispose();
+                Socket.Dispose();
             }
 
             IsDisposed = true;

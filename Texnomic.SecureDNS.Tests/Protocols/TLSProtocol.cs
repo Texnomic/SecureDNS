@@ -53,7 +53,7 @@ namespace Texnomic.SecureDNS.Tests.Protocols
 
         [TestMethod]
         [TestProperty("rdweb.wvd.microsoft.com", "A")]
-        [TestProperty(" mountaineerpublishing.com", "MX")]
+        [TestProperty("facebook.com", "A")]
         public async Task ResolveAsync()
         {
             var Type = GetType();
@@ -66,9 +66,11 @@ namespace Texnomic.SecureDNS.Tests.Protocols
 
             foreach (var Attribute in Attributes)
             {
-                var TestDomain = ((TestPropertyAttribute) Attribute).Name;
+                var TestAttribute = (TestPropertyAttribute)Attribute;
 
-                var TestRecord = Enum.Parse<RecordType>(((TestPropertyAttribute) Attribute).Value);
+                var TestDomain = TestAttribute.Name;
+
+                var TestRecord = Enum.Parse<RecordType>(TestAttribute.Value);
 
                 RequestMessage.Questions = new List<IQuestion>()
                 {
@@ -83,8 +85,8 @@ namespace Texnomic.SecureDNS.Tests.Protocols
                 ResponseMessage = await Resolver.ResolveAsync(RequestMessage);
 
                 Assert.AreEqual(RequestMessage.ID, ResponseMessage.ID);
-                //Assert.IsNotNull(ResponseMessage.Questions);
-                //Assert.IsNotNull(ResponseMessage.Answers);
+                Assert.IsNotNull(ResponseMessage.Questions);
+                Assert.IsNotNull(ResponseMessage.Answers);
                 //Assert.IsInstanceOfType(ResponseMessage.Answers.Last().Record, typeof(SecureDNS.Core.Records.A));
             }
         }
