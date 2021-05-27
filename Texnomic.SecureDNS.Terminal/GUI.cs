@@ -91,15 +91,17 @@ namespace Texnomic.SecureDNS.Terminal
             {
                 X = Pos.AnchorEnd(37),
                 Y = Pos.AnchorEnd(1),
-                Clicked = async () => await StartServerAsync()
             };
+
+            StartButton.Clicked += async () => await StartServerAsync();
 
             var StopButton = new Button("Stop Server")
             {
                 X = Pos.AnchorEnd(16),
                 Y = Pos.AnchorEnd(1),
-                Clicked = async () => await StopServerAsync()
             };
+
+            StopButton.Clicked += async () => await StopServerAsync();
 
             var MenuBar = new MenuBar(new[]
             {

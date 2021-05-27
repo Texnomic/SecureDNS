@@ -23,12 +23,12 @@ namespace Texnomic.FilterLists
 
         private static bool ResultPredicate(IRestResponse Response)
         {
-            return Response.ErrorException != null;
+            return Response.IsSuccessful;
         }
 
         public async Task<List<FilterList>> GetListsAsync()
         {
-            var RestRequest = new RestRequest("https://filterlists.com/api/v1/lists/", Method.GET);
+            var RestRequest = new RestRequest("https://filterlists.com/api/directory/lists", Method.GET);
 
             RestClient.UseSerializer<NewtonsoftJsonSerializer>();
 

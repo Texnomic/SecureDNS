@@ -5,7 +5,7 @@
 [![Slack](https://img.shields.io/static/v1?logo=Slack&label=Slack&message=Channel&color=73BA25&logoColor=4A154B)](https://join.slack.com/t/texnomicsecuredns/shared_invite/zt-h110u1u8-5VwSZsQSHL13s62xAZjI2Q)
 [![Facebook](https://img.shields.io/static/v1?logo=Facebook&label=Facebook&message=Page&color=73BA25&logoColor=1877FF2)](https://www.facebook.com/Texnomic-Secure-DNS-114240320331170)
 
-Building a Secure, Modern, Cross-Platform & Cross-Architecture DNS Server Using C# 8.0 & .NET Core 3.1.
+Building a Secure, Modern, Cross-Platform & Cross-Architecture DNS Server Using C# 8.0 & .NET 5.0.
 
 SecureDNS Project aims to implements all *secure* DNS Protocols regardless of being standardized or widely adopted; while maintaining backward compatibility with *unsecure* DNS-Over-UDP Protocol via Reverse Proxy.
 
@@ -101,8 +101,8 @@ The Project offically launched within my talk for [Cairo Security Camp](https://
 ## Technology
 
 1. [C# 8.0](https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-8)
-2. [.NET Core 3.1](https://dotnet.microsoft.com/download/dotnet-core/3.0)
-3. [ASP.NET Core 3.1](https://dotnet.microsoft.com/download/dotnet-core/3.0)
+2. [.NET 5.0](https://dotnet.microsoft.com/download/dotnet/5.0)
+3. [ASP.NET Core 5.0](https://dotnet.microsoft.com/download/dotnet/5.0)
 4. [PowerShell Core 7.0](https://github.com/PowerShell/PowerShell)
 5. [Entity Framework Core 3.1](https://docs.microsoft.com/en-us/ef/core/)
 6. [Blazor aka Razor Components](https://dotnet.microsoft.com/apps/aspnet/web-apps/client)
