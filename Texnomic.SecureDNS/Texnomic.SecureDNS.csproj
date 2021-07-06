@@ -42,7 +42,7 @@
   <ItemGroup>
     <PackageReference Include="AsyncEnumerator" Version="4.0.2" />
     <PackageReference Include="Blazorise.Bootstrap" Version="0.9.3.6" />
-    <PackageReference Include="Blazorise.Icons.FontAwesome" Version="0.9.3.6" />
+    <PackageReference Include="Blazorise.Icons.FontAwesome" Version="0.9.3.10" />
     <PackageReference Include="Blazorise.Sidebar" Version="0.9.3.6" />
     <PackageReference Include="ElectronNET.API" Version="11.5.1" />
     <PackageReference Include="FlexLabs.EntityFrameworkCore.Upsert" Version="4.0.0" />
