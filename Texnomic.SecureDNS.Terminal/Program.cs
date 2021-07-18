@@ -42,7 +42,9 @@ namespace Texnomic.SecureDNS.Terminal
 
         private static string ApplicationData;
 
-        private const string AppSettingsFile = "AppSettings.json";
+        private static string AppSettingsFile;
+
+        private static string AppSettingsStageFile;
 
         private static IConfigurationRoot Configurations;
 
@@ -57,9 +59,15 @@ namespace Texnomic.SecureDNS.Terminal
 
             ApplicationData = Stage == "Production" ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "Texnomic", "SecureDNS - Terminal Edition") : Environment.CurrentDirectory;
 
-            Directory.CreateDirectory(ApplicationData);
+            if(!Directory.Exists(ApplicationData)) Directory.CreateDirectory(ApplicationData);
 
-            if (!File.Exists(Path.Combine(ApplicationData, AppSettingsFile)))
+            AppSettingsFile = Path.Combine(ApplicationData, "AppSettings.json");
+
+            AppSettingsStageFile = Path.Combine(ApplicationData, $"AppSettings.{Stage}.json");
+
+            Console.WriteLine(AppSettingsFile);
+
+            if (!File.Exists(AppSettingsFile))
             {
                 await File.WriteAllBytesAsync(Path.Combine(ApplicationData, AppSettingsFile), ReadResource(AppSettingsFile));
                 await File.WriteAllBytesAsync(Path.Combine(ApplicationData, "AppSettings.Production.json"), ReadResource("AppSettings.Production.json"));
@@ -69,7 +77,7 @@ namespace Texnomic.SecureDNS.Terminal
             Configurations = new ConfigurationBuilder()
             .SetBasePath(ApplicationData)
             .AddJsonFile(AppSettingsFile, false, true)
-            .AddJsonFile($"AppSettings.{Stage}.json", true, true)
+            .AddJsonFile(AppSettingsStageFile, true, true)
             .AddUserSecrets<Program>(true, true)
             .AddEnvironmentVariables()
             .Build();

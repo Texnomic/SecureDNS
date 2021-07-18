@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
@@ -14,7 +13,7 @@
     <RepositoryType>Github</RepositoryType>
     <ApplicationIcon>SecureDNS.ico</ApplicationIcon>
     <Description>https://github.com/Texnomic/SecureDNS</Description>
-    <Version>0.3.1-alpha</Version>
+    <Version>0.4.0.0</Version>
     <PackageIcon>SecureDNS.ico</PackageIcon>
     <PackageIconUrl />
     <PackageTags>Alpha</PackageTags>
@@ -22,14 +21,12 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/Texnomic/SecureDNS</PackageProjectUrl>
   </PropertyGroup>
-
   <ItemGroup>
     <None Remove="AppSettings.Development.json" />
     <None Remove="AppSettings.json" />
     <None Remove="AppSettings.Production.json" />
     <None Remove="Fonts\Speed.flf" />
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Include="AppSettings.Production.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -42,7 +39,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Fonts\Speed.flf" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Colorful.Console" Version="1.2.15" />
     <PackageReference Include="Destructurama.Attributed" Version="2.0.0" />
@@ -50,7 +46,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.2" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="5.0.1" />
     <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="5.0.1" />
@@ -61,19 +57,17 @@
     <PackageReference Include="Serilog.Enrichers.Thread" Version="3.1.0" />
     <PackageReference Include="Serilog.Extensions.Hosting" Version="4.1.2" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="3.0.1" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="4.0.0" />
     <PackageReference Include="Serilog.Sinks.Seq" Version="5.0.1" />
     <PackageReference Include="Terminal.Gui" Version="1.1.1" />
     <PackageReference Include="Tmds.Systemd" Version="0.8.0" />
     <PackageReference Include="Tmds.Systemd.Logging" Version="0.8.0" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Texnomic.SecureDNS.Core\Texnomic.SecureDNS.Core.csproj" />
     <ProjectReference Include="..\Texnomic.SecureDNS.Protocols\Texnomic.SecureDNS.Protocols.csproj" />
     <ProjectReference Include="..\Texnomic.SecureDNS.Servers\Texnomic.SecureDNS.Servers.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
@@ -81,29 +75,25 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Update="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-
   <ItemGroup>
     <None Include="SecureDNS.ico">
       <Pack>True</Pack>
-      <PackagePath></PackagePath>
+      <PackagePath>
+      </PackagePath>
     </None>
   </ItemGroup>
-
   <ItemGroup>
     <Resource Include="AppSettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
-
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="if $(ConfigurationName) == Release (..\Tools\signtool.exe sign /sha1 &quot;33261449de13599f046617dd18994bab0e4346a8&quot; /tr http://time.certum.pl /fd sha256 /v $(TargetPath))" />
   </Target>
-
 </Project>

@@ -26,6 +26,8 @@ nuget.config
 x64/
 x86/
 bld/
+Builds/
+Scripts/
 [Bb]in/
 [Oo]bj/
 [Ll]og/
