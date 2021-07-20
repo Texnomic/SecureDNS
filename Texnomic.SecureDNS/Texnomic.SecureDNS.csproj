@@ -75,7 +75,7 @@
     <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.1-dev-00237" />
     <PackageReference Include="Serilog.Sinks.Seq" Version="5.0.1" />
     <PackageReference Include="Syncfusion.Blazor" Version="19.2.0.47" />
-    <PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="5.2.3" />
+    <PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="5.2.4" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Texnomic.SecureDNS.Core\Texnomic.SecureDNS.Core.csproj" />
