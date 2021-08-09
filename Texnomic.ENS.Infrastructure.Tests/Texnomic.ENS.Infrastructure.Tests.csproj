@@ -17,7 +17,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Nethereum.Accounts" Version="3.8.0" />
-    <PackageReference Include="Nethereum.ENS" Version="3.8.0" />
+    <PackageReference Include="Nethereum.ENS" Version="4.0.3" />
   </ItemGroup>
 
   <ItemGroup>
