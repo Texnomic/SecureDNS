@@ -16,7 +16,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Nethereum.Contracts" Version="3.8.0" />
-    <PackageReference Include="Nethereum.RPC" Version="3.8.0" />
+    <PackageReference Include="Nethereum.RPC" Version="4.0.3" />
     <PackageReference Include="Nethereum.Web3" Version="3.8.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
