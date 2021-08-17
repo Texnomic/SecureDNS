@@ -13,6 +13,6 @@ namespace Texnomic.SecureDNS.Servers.Proxy.Options
         [JsonIgnore]
         public IPEndPoint IPEndPoint => new IPEndPoint(IPAddress.Parse(Address), Port);
 
-        public static int Threads => Environment.ProcessorCount;
+        public static int Threads { get; set; } = Environment.ProcessorCount;
     }
 }
