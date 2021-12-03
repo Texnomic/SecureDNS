@@ -5,7 +5,6 @@ using System.IO;
 using System.Net;
 using System.Reflection;
 using Texnomic.SecureDNS.Data.Identity;
-using Texnomic.SecureDNS.Core;
 using Texnomic.SecureDNS.Core.DataTypes;
 using Texnomic.SecureDNS.Data.Abstractions;
 using Texnomic.SecureDNS.Data.Models;

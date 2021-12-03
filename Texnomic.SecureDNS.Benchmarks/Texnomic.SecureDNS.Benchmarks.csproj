@@ -2,12 +2,12 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.13.1" />
-    <PackageReference Include="BinarySerializer" Version="8.6.0" />
+    <PackageReference Include="BinarySerializer" Version="8.6.1.2" />
   </ItemGroup>
 
   <ItemGroup>

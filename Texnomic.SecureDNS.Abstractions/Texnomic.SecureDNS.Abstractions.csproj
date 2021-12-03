@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <Version>0.3.1-alpha</Version>
     <Authors>Texnomic</Authors>
     <Company>Texnomic Ltd</Company>

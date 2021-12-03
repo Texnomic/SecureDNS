@@ -7,7 +7,6 @@ using Common.Logging;
 using Microsoft.Extensions.Options;
 using PipelineNet.Middleware;
 using Texnomic.SecureDNS.Abstractions;
-using Texnomic.SecureDNS.Protocols;
 using Texnomic.SecureDNS.Protocols.Options;
 
 namespace Texnomic.SecureDNS.Middlewares

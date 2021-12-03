@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Version>0.3.1-alpha</Version>
     <Authors>Texnomic</Authors>
@@ -14,7 +14,7 @@
     <Copyright>Copyright © 2020</Copyright>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Nethereum.Web3" Version="4.0.5" />
+    <PackageReference Include="Nethereum.Web3" Version="4.1.1" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\docs\Logo.png">

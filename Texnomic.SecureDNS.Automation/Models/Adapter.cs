@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-
-namespace Texnomic.SecureDNS.Automation.Models
+﻿namespace Texnomic.SecureDNS.Automation.Models
 {
     public class Adapter
     {

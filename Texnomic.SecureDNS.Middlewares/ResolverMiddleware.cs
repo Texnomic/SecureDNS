@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
@@ -9,7 +8,6 @@ using Microsoft.Extensions.Options;
 using PipelineNet.Middleware;
 using Texnomic.SecureDNS.Abstractions;
 using Texnomic.SecureDNS.Abstractions.Enums;
-using Texnomic.SecureDNS.Core;
 using Texnomic.SecureDNS.Middlewares.Options;
 
 namespace Texnomic.SecureDNS.Middlewares

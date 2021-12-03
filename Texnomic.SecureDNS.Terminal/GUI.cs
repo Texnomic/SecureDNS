@@ -8,7 +8,6 @@ using Texnomic.SecureDNS.Terminal.Options;
 using Microsoft.Extensions.Hosting;
 using System.Threading;
 using Microsoft.Extensions.Options;
-using Texnomic.SecureDNS.Middlewares.Options;
 using Texnomic.SecureDNS.Servers.Proxy;
 using Texnomic.SecureDNS.Servers.Proxy.Options;
 using Attribute = Terminal.Gui.Attribute;
@@ -93,7 +92,7 @@ namespace Texnomic.SecureDNS.Terminal
                 Y = Pos.AnchorEnd(1),
             };
 
-            StartButton.Clicked += async () => await StartServerAsync();
+            StartButton.Clicked += () => StartServerAsync().RunSynchronously();
 
             var StopButton = new Button("Stop Server")
             {
@@ -101,17 +100,17 @@ namespace Texnomic.SecureDNS.Terminal
                 Y = Pos.AnchorEnd(1),
             };
 
-            StopButton.Clicked += async () => await StopServerAsync();
+            StopButton.Clicked += () => StopServerAsync().RunSynchronously();
 
             var MenuBar = new MenuBar(new[]
             {
                 new MenuBarItem ("SecureDNS", new  []
                 {
-                    new MenuItem ("Start", "Server", async () => await StartServerAsync()),
+                    new MenuItem ("Start", "Server", StartServerAsync().RunSynchronously),
 
-                    new MenuItem ("Stop", "Server", async () => await StopServerAsync()),
+                    new MenuItem ("Stop", "Server", StopServerAsync().RunSynchronously),
 
-                    new MenuItem ("Quit", "System", Application.RequestStop),
+                    new MenuItem ("Quit", "System", () => Application.RequestStop()),
                 }),
 
                 //new MenuBarItem ("Seq", new  []
@@ -169,9 +168,9 @@ namespace Texnomic.SecureDNS.Terminal
 
             CancellationTokenSource.Cancel();
 
-            await UDPServer.StopAsync(CancellationTokenSource.Token);
+            await UDPServer.StopAsync(CancellationTokenSource.Token).ConfigureAwait(false);
 
-            await TCPServer.StopAsync(CancellationTokenSource.Token);
+            await TCPServer.StopAsync(CancellationTokenSource.Token).ConfigureAwait(false);
 
             Application.RequestStop();
         }
@@ -185,9 +184,9 @@ namespace Texnomic.SecureDNS.Terminal
 
                 if (Available)
                 {
-                    await UDPServer.StartAsync(CancellationTokenSource.Token);
+                    await UDPServer.StartAsync(CancellationTokenSource.Token).ConfigureAwait(false);
 
-                    await TCPServer.StartAsync(CancellationTokenSource.Token);
+                    await TCPServer.StartAsync(CancellationTokenSource.Token).ConfigureAwait(false);
 
                     MessageBox.Query(40, 7, "Information", "Server Started.", "OK");
                 }
@@ -208,9 +207,9 @@ namespace Texnomic.SecureDNS.Terminal
             {
                 CancellationTokenSource.Cancel();
 
-                await UDPServer.StopAsync(CancellationTokenSource.Token);
+                await UDPServer.StopAsync(CancellationTokenSource.Token).ConfigureAwait(false);
 
-                await TCPServer.StopAsync(CancellationTokenSource.Token);
+                await TCPServer.StopAsync(CancellationTokenSource.Token).ConfigureAwait(false);
 
                 MessageBox.Query(40, 7, "Information", "Server Stopped.", "OK");
             }

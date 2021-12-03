@@ -124,7 +124,7 @@ namespace Texnomic.SecureDNS.Middlewares
 
             var Lists = await Client.GetListsAsync();
 
-            Lists = Lists.Where(List => List.Syntax == Syntax.Hosts)
+            Lists = Lists.Where(List => List.Syntax == Syntax.Hosts || List.Syntax == Syntax.Domains)
                          .Where(List => IDs.Contains(List.ID))           
                          .ToList();
 

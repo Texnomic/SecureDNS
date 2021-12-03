@@ -10,9 +10,6 @@ using Nethereum.Hex.HexConvertors.Extensions;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using Nethereum.Web3;
-using Texnomic.DNS.Abstractions.Enums;
-using Texnomic.DNS.Models;
-using Texnomic.DNS.Records;
 using Texnomic.ENS.PublicResolver.ContractDefinition;
 using PublicResolverService = Texnomic.ENS.PublicResolver.PublicResolverService;
 
@@ -47,20 +44,20 @@ namespace Texnomic.ENS.Infrastructure.Tests
             PublicResolverService = new PublicResolverService(Web3, PublicResolverAddress);
         }
 
-        [TestMethod]
-        public async Task Demo()
-        {
-            var RegistrarTransactionReceipt = await Register();
-            var SetResolverTransactionReceipt = await SetResolver();
-            var SetAddressTransactionReceipt = await SetAddress();
-            var SetARecordTransactionReceipt = await SetARecord();
-            var SetTextTransactionReceipt = await SetTxtRecord();
+        //[TestMethod]
+        //public async Task Demo()
+        //{
+        //    var RegistrarTransactionReceipt = await Register();
+        //    var SetResolverTransactionReceipt = await SetResolver();
+        //    var SetAddressTransactionReceipt = await SetAddress();
+        //    var SetARecordTransactionReceipt = await SetARecord();
+        //    var SetTextTransactionReceipt = await SetTxtRecord();
 
-            var Address = await QueryAddress();
-            var Value = await GetTxtRecord();
-            var HasARecord = await HasRecord();
-            var ARecord = await GetARecord();
-        }
+        //    var Address = await QueryAddress();
+        //    var Value = await GetTxtRecord();
+        //    var HasARecord = await HasRecord();
+        //    var ARecord = await GetARecord();
+        //}
 
 
         public async Task<TransactionReceipt> Register()
@@ -118,96 +115,96 @@ namespace Texnomic.ENS.Infrastructure.Tests
         }
 
 
-        public async Task<TransactionReceipt> SetARecord()
-        {
-            var Answer = new Answer()
-            {
-                Domain = DNS.Models.Domain.FromString($"{Domain}.eth"),
+        //public async Task<TransactionReceipt> SetARecord()
+        //{
+        //    var Answer = new Answer()
+        //    {
+        //        Domain = DNS.Models.Domain.FromString($"{Domain}.eth"),
 
-                Type = RecordType.A,
+        //        Type = RecordType.A,
 
-                Class = RecordClass.Internet,
+        //        Class = RecordClass.Internet,
 
-                TimeToLive = new TimeToLive()
-                {
-                    Value = new TimeSpan(1, 0, 0, 0)
-                },
+        //        TimeToLive = new TimeToLive()
+        //        {
+        //            Value = new TimeSpan(1, 0, 0, 0)
+        //        },
 
-                Record = new A()
-                {
-                    Address = new IPv4Address()
-                    {
-                        Value = IPAddress.Parse("127.0.0.1")
-                    }
-                }
-            };
+        //        Record = new A()
+        //        {
+        //            Address = new IPv4Address()
+        //            {
+        //                Value = IPAddress.Parse("127.0.0.1")
+        //            }
+        //        }
+        //    };
 
-            var SetDNSRecordsFunction = new SetDNSRecordsFunction()
-            {
-                Node = EnsUtil.GetNameHash($"{Domain}.eth").HexToByteArray(),
-                Data = Answer.ToArray(),
-                FromAddress = OwnerAddress,
-                Gas = new HexBigInteger(100000),
-                GasPrice = new HexBigInteger(100000),
-            };
+        //    var SetDNSRecordsFunction = new SetDNSRecordsFunction()
+        //    {
+        //        Node = EnsUtil.GetNameHash($"{Domain}.eth").HexToByteArray(),
+        //        Data = Answer.ToArray(),
+        //        FromAddress = OwnerAddress,
+        //        Gas = new HexBigInteger(100000),
+        //        GasPrice = new HexBigInteger(100000),
+        //    };
 
-            return await PublicResolverService.SetDNSRecordsRequestAndWaitForReceiptAsync(SetDNSRecordsFunction);
-        }
+        //    return await PublicResolverService.SetDNSRecordsRequestAndWaitForReceiptAsync(SetDNSRecordsFunction);
+        //}
 
-        public async Task<TransactionReceipt> SetTxtRecord()
-        {
-            var SetTextFunction = new SetTextFunction()
-            {
-                Node = EnsUtil.GetNameHash($"{Domain}.eth").HexToByteArray(),
-                Key = "MyKey",
-                Value = "MyValue",
-                FromAddress = OwnerAddress
-            };
+        //public async Task<TransactionReceipt> SetTxtRecord()
+        //{
+        //    var SetTextFunction = new SetTextFunction()
+        //    {
+        //        Node = EnsUtil.GetNameHash($"{Domain}.eth").HexToByteArray(),
+        //        Key = "MyKey",
+        //        Value = "MyValue",
+        //        FromAddress = OwnerAddress
+        //    };
 
-            return await PublicResolverService.SetTextRequestAndWaitForReceiptAsync(SetTextFunction);
-        }
-
-
-        public async Task<string> GetTxtRecord()
-        {
-            var TextFunction = new TextFunction()
-            {
-                Node = EnsUtil.GetNameHash($"{Domain}.eth").HexToByteArray(),
-                Key = "MyKey"
-            };
-
-            return await PublicResolverService.TextQueryAsync(TextFunction);
-        }
+        //    return await PublicResolverService.SetTextRequestAndWaitForReceiptAsync(SetTextFunction);
+        //}
 
 
-        public async Task<bool> HasRecord()
-        {
-            var Name = Encoding.ASCII.GetString(DNS.Models.Domain.FromString($"{Domain}.eth").ToArray());
+        //public async Task<string> GetTxtRecord()
+        //{
+        //    var TextFunction = new TextFunction()
+        //    {
+        //        Node = EnsUtil.GetNameHash($"{Domain}.eth").HexToByteArray(),
+        //        Key = "MyKey"
+        //    };
 
-            var HasDNSRecordsFunction = new HasDNSRecordsFunction()
-            {
-                Node = EnsUtil.GetNameHash($"{Domain}.eth").HexToByteArray(),
-                Name = EnsUtil.GetLabelHash(Name).HexToByteArray(),
-            };
-
-            return await PublicResolverService.HasDNSRecordsQueryAsync(HasDNSRecordsFunction);
-        }
+        //    return await PublicResolverService.TextQueryAsync(TextFunction);
+        //}
 
 
-        public async Task<Answer> GetARecord()
-        {
-            var Name = Encoding.ASCII.GetString(DNS.Models.Domain.FromString($"{Domain}.eth").ToArray());
+        //public async Task<bool> HasRecord()
+        //{
+        //    var Name = Encoding.ASCII.GetString(DNS.Models.Domain.FromString($"{Domain}.eth").ToArray());
 
-            var DNSRecordFunction = new DnsRecordFunction()
-            {
-                Node = EnsUtil.GetNameHash($"{Domain}.eth").HexToByteArray(),
-                Name = EnsUtil.GetLabelHash(Name).HexToByteArray(),
-                Resource = 1
-            };
+        //    var HasDNSRecordsFunction = new HasDNSRecordsFunction()
+        //    {
+        //        Node = EnsUtil.GetNameHash($"{Domain}.eth").HexToByteArray(),
+        //        Name = EnsUtil.GetLabelHash(Name).HexToByteArray(),
+        //    };
 
-            var Bytes = await PublicResolverService.DnsRecordQueryAsync(DNSRecordFunction);
+        //    return await PublicResolverService.HasDNSRecordsQueryAsync(HasDNSRecordsFunction);
+        //}
 
-            return await Answer.FromArrayAsync(Bytes);
-        }
+
+        //public async Task<Answer> GetARecord()
+        //{
+        //    var Name = Encoding.ASCII.GetString(DNS.Models.Domain.FromString($"{Domain}.eth").ToArray());
+
+        //    var DNSRecordFunction = new DnsRecordFunction()
+        //    {
+        //        Node = EnsUtil.GetNameHash($"{Domain}.eth").HexToByteArray(),
+        //        Name = EnsUtil.GetLabelHash(Name).HexToByteArray(),
+        //        Resource = 1
+        //    };
+
+        //    var Bytes = await PublicResolverService.DnsRecordQueryAsync(DNSRecordFunction);
+
+        //    return await Answer.FromArrayAsync(Bytes);
+        //}
     }
 }

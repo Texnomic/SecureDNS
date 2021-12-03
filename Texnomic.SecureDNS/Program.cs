@@ -1,4 +1,3 @@
-using System;
 using Serilog;
 using System.IO;
 using ElectronNET.API;

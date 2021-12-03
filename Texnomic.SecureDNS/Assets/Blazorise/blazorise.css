@@ -36,7 +36,7 @@
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
-        font-size: var(--b-tooltip-font-size, var(--b-font-size-sm, 0.875rem));
+        font-size: var(--b-tooltip-font-size, 0.875rem);
         padding: .4rem .8rem;
         background: rgba(128, 128, 128, 0.9);
         border-radius: var(--b-tooltip-border-radius, 4px);

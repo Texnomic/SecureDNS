@@ -1,8 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
-using Texnomic.SecureDNS.Data.Abstractions.Identity;
-
-namespace Texnomic.SecureDNS.Data.Abstractions
+﻿namespace Texnomic.SecureDNS.Data.Abstractions
 {
     public interface IDatabaseContext
     {

@@ -5,8 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Options;
-
-using Texnomic.SecureDNS.Extensions;
 using Texnomic.SecureDNS.Protocols.Options;
 
 

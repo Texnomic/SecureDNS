@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Texnomic.FilterLists.Enums
+﻿namespace Texnomic.FilterLists.Enums
 {
     public enum Languages : int
     {

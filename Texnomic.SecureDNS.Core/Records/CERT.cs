@@ -1,6 +1,5 @@
 ﻿using Destructurama.Attributed;
 using Texnomic.SecureDNS.Abstractions;
-using Texnomic.SecureDNS.Core.DataTypes;
 
 namespace Texnomic.SecureDNS.Core.Records
 {

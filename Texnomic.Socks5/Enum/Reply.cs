@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Texnomic.Socks5.Enum
+﻿namespace Texnomic.Socks5.Enum
 {
     internal enum Reply: byte
     {
