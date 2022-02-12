@@ -19,15 +19,15 @@
     <PackageReference Include="Common.Logging.Serilog" Version="4.4.0" />
     <PackageReference Include="Destructurama.Attributed" Version="3.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
-    <PackageReference Include="Nerdbank.Streams" Version="2.8.54" />
+    <PackageReference Include="Nerdbank.Streams" Version="2.8.57" />
     <PackageReference Include="NSec.Cryptography" Version="20.2.0" />
     <PackageReference Include="PipelineNet" Version="0.9.0" />
-    <PackageReference Include="Polly" Version="7.2.2" />
+    <PackageReference Include="Polly" Version="7.2.3" />
     <PackageReference Include="Rebex.Elliptic.Curve25519" Version="1.2.1" />
     <PackageReference Include="Rebex.Elliptic.Ed25519" Version="1.2.1" />
-    <PackageReference Include="RestSharp" Version="106.13.0" />
+    <PackageReference Include="RestSharp" Version="107.3.0" />
     <PackageReference Include="Serilog.Sinks.ILogger" Version="1.0.3" />
-    <PackageReference Include="System.Text.Json" Version="6.0.0" />
+    <PackageReference Include="System.Text.Json" Version="6.0.2" />
     <PackageReference Include="System.Threading.Tasks.Dataflow" Version="6.0.0" />
   </ItemGroup>
   <ItemGroup>
