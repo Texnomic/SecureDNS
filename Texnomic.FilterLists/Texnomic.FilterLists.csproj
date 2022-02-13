@@ -1,12 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <LangVersion>8.0</LangVersion>
-    <Version>0.3.1-alpha</Version>
+	  <ImplicitUsings>enable</ImplicitUsings>
+	  <Version>0.3.1-alpha</Version>
     <Authors>Texnomic</Authors>
     <Company>Texnomic Ltd</Company>
     <Description>Texnomic FilterLists Library.</Description>
-    <Copyright>Copyright © 2020</Copyright>
+    <Copyright>Copyright © 2022</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/Texnomic/SecureDNS</PackageProjectUrl>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
@@ -15,11 +15,6 @@
     <PackageTags>dns sdns https udp tcp dnscrypt dou dot doh filterlists</PackageTags>
     <PackageIcon>Logo.png</PackageIcon>
   </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="Polly" Version="7.2.3" />
-    <PackageReference Include="RestSharp" Version="107.3.0" />
-  </ItemGroup>
   <ItemGroup>
     <None Include="..\docs\Logo.png">
       <Pack>True</Pack>

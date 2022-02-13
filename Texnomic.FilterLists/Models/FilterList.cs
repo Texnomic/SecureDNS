@@ -1,70 +1,64 @@
-﻿using System;
-using System.Collections.Generic;
-using Newtonsoft.Json;
-using Texnomic.FilterLists.Enums;
+﻿namespace Texnomic.FilterLists.Models;
 
-namespace Texnomic.FilterLists.Models
+public class FilterList
 {
-    public class FilterList
-    {
-        [JsonProperty("id")] 
-        public int ID { get; set; }
+    [JsonPropertyName("id")] 
+    public int ID { get; set; }
 
-        [JsonProperty("description")] 
-        public string Description { get; set; }
+    [JsonPropertyName("description")] 
+    public string Description { get; set; }
 
-        [JsonProperty("homeUrl")] 
-        public string HomeUrl { get; set; }
+    [JsonPropertyName("homeUrl")] 
+    public string HomeUrl { get; set; }
 
-        [JsonProperty("languageIds")]
-        public List<Languages> Languages { get; set; }
+    [JsonPropertyName("languageIds")]
+    public List<Languages> Languages { get; set; }
 
-        [JsonProperty("licenseId")] 
-        public int LicenseId { get; set; }
+    [JsonPropertyName("licenseId")] 
+    public int LicenseId { get; set; }
 
-        [JsonProperty("maintainerIds")]
-        public List<Maintainers> Maintainers { get; set; }
+    [JsonPropertyName("maintainerIds")]
+    public List<Maintainers> Maintainers { get; set; }
 
-        [JsonProperty("name")] 
-        public string Name { get; set; }
+    [JsonPropertyName("name")] 
+    public string Name { get; set; }
 
-        [JsonProperty("submissionUrl")] 
-        public string SubmissionUrl { get; set; }
+    [JsonPropertyName("submissionUrl")] 
+    public string SubmissionUrl { get; set; }
 
-        [JsonProperty("syntaxId")]
-        public Syntax? Syntax { get; set; }
+    [JsonPropertyName("syntaxId")]
+    public Syntax? Syntax { get; set; }
 
-        [JsonProperty("tagIds")]
-        public List<Tags> Tags { get; set; }
+    [JsonPropertyName("tagIds")]
+    public List<Tags> Tags { get; set; }
 
-        [JsonProperty("viewUrl")] 
-        public string ViewUrl { get; set; }
+    [JsonPropertyName("viewUrl")] 
+    public string ViewUrl { get; set; }
 
-        [JsonProperty("descriptionSourceUrl")] 
-        public string DescriptionSourceUrl { get; set; }
+    [JsonPropertyName("descriptionSourceUrl")] 
+    public string DescriptionSourceUrl { get; set; }
 
-        [JsonProperty("issuesUrl")] 
-        public string IssuesUrl { get; set; }
+    [JsonPropertyName("issuesUrl")] 
+    public string IssuesUrl { get; set; }
 
-        [JsonProperty("forumUrl")] 
-        public string ForumUrl { get; set; }
+    [JsonPropertyName("forumUrl")] 
+    public string ForumUrl { get; set; }
 
-        [JsonProperty("publishedDate")] 
-        public DateTime? PublishedDate { get; set; }
+    [JsonPropertyName("publishedDate")] 
+    public DateTime? PublishedDate { get; set; }
 
-        [JsonProperty("viewUrlMirrors")] 
-        public List<string> ViewUrlMirrors { get; set; }
+    [JsonPropertyName("viewUrlMirrors")] 
+    public List<string> ViewUrlMirrors { get; set; }
 
-        [JsonProperty("donateUrl")] 
-        public string DonateUrl { get; set; }
+    [JsonPropertyName("donateUrl")] 
+    public string DonateUrl { get; set; }
 
-        [JsonProperty("emailAddress")] 
-        public string EmailAddress { get; set; }
+    [JsonPropertyName("emailAddress")] 
+    public string EmailAddress { get; set; }
 
-        [JsonProperty("chatUrl")] 
-        public string ChatUrl { get; set; }
+    [JsonPropertyName("chatUrl")] 
+    public string ChatUrl { get; set; }
 
-        [JsonProperty("policyUrl")] 
-        public string PolicyUrl { get; set; }
-    }
+    [JsonPropertyName("policyUrl")] 
+    public string PolicyUrl { get; set; }
 }
