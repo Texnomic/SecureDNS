@@ -1,28 +1,28 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-	  <ImplicitUsings>enable</ImplicitUsings>
-	  <Version>0.3.1-alpha</Version>
-    <Authors>Texnomic</Authors>
-    <Company>Texnomic Ltd</Company>
-    <Description>Texnomic FilterLists Library.</Description>
-    <Copyright>Copyright © 2022</Copyright>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/Texnomic/SecureDNS</PackageProjectUrl>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <RepositoryType>Github</RepositoryType>
-    <RepositoryUrl>https://github.com/Texnomic/SecureDNS</RepositoryUrl>
-    <PackageTags>dns sdns https udp tcp dnscrypt dou dot doh filterlists</PackageTags>
-    <PackageIcon>Logo.png</PackageIcon>
-  </PropertyGroup>
-  <ItemGroup>
-    <None Include="..\docs\Logo.png">
-      <Pack>True</Pack>
-      <PackagePath>
-      </PackagePath>
-    </None>
-  </ItemGroup>
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="if $(ConfigurationName) == Release (..\Tools\signtool.exe sign /sha1 &quot;33261449de13599f046617dd18994bab0e4346a8&quot; /tr http://time.certum.pl /fd sha256 /v $(TargetPath))" />
-  </Target>
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Version>0.4.0-alpha</Version>
+		<Authors>Texnomic</Authors>
+		<Company>Texnomic Ltd</Company>
+		<Description>Texnomic FilterLists Library.</Description>
+		<Copyright>Copyright © 2022</Copyright>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageProjectUrl>https://github.com/Texnomic/SecureDNS</PackageProjectUrl>
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+		<RepositoryType>Github</RepositoryType>
+		<RepositoryUrl>https://github.com/Texnomic/SecureDNS</RepositoryUrl>
+		<PackageTags>dns sdns https udp tcp dnscrypt dou dot doh filterlists</PackageTags>
+		<PackageIcon>Logo.png</PackageIcon>
+	</PropertyGroup>
+	<ItemGroup>
+		<None Include="..\docs\Logo.png">
+			<Pack>True</Pack>
+			<PackagePath>
+			</PackagePath>
+		</None>
+	</ItemGroup>
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Exec Command="if $(ConfigurationName) == Release (..\Tools\signtool.exe sign /sha1 &quot;33261449de13599f046617dd18994bab0e4346a8&quot; /tr http://time.certum.pl /fd sha256 /v $(TargetPath))" />
+	</Target>
 </Project>

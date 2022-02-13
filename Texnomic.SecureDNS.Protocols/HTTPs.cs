@@ -1,12 +1,8 @@
-﻿using System;
-using System.Net;
-using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
+﻿using System.Net;
+using System.Net.Http.Headers;
+
 using Microsoft.Extensions.Options;
-using Polly;
-using Polly.Retry;
-using RestSharp;
+
 using Texnomic.SecureDNS.Protocols.Options;
 
 
@@ -18,53 +14,47 @@ namespace Texnomic.SecureDNS.Protocols
     public class HTTPs : Protocol
     {
         private readonly IOptionsMonitor<HTTPsOptions> Options;
-        private readonly RestClient RestClient;
-        private readonly AsyncRetryPolicy<IRestResponse> RetryPolicy;
+
+        private readonly HttpClient HttpClient;
+
+        private readonly MediaTypeHeaderValue ContentType;
 
         public HTTPs(IOptionsMonitor<HTTPsOptions> HTTPsOptions)
         {
             Options = HTTPsOptions;
 
-            ServicePointManager.ServerCertificateValidationCallback += ValidateServerCertificate;
+            var Handler = new HttpClientHandler()
+            {
+                AutomaticDecompression = DecompressionMethods.GZip
+            };
 
-            RestClient = new RestClient();
+            HttpClient = new HttpClient(Handler)
+            {
+                BaseAddress = new Uri($"{Options.CurrentValue.Uri}/dns-query")
+            };
 
-            RestClient.AddDefaultHeader("Cache-Control", "no-cache");
+            HttpClient.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
 
-            RestClient.AddDefaultHeader("Accept", "application/dns-message");
+            HttpClient.DefaultRequestHeaders.Add("Accept", "application/dns-message");
 
-            RestClient.Proxy = Options.CurrentValue.WebProxy;
+            ContentType = new MediaTypeHeaderValue("application/dns-message");
 
-            RestClient.FollowRedirects = Options.CurrentValue.AllowRedirects;
-
-            RetryPolicy = Policy.HandleResult<IRestResponse>(ResultPredicate)
-                                .RetryAsync(Options.CurrentValue.Retries);
-        }
-
-        private static bool ResultPredicate(IRestResponse Response)
-        {
-            return Response.ErrorException != null;
+            if (Options.CurrentValue.WebProxy is not null)
+                HttpClient.DefaultProxy = Options.CurrentValue.WebProxy;
         }
 
         public override async ValueTask<byte[]> ResolveAsync(byte[] Query)
         {
-            var Request = new RestRequest(new Uri(Options.CurrentValue.Uri, "/dns-query"), Method.POST);
+            var Content = new ByteArrayContent(Query);
 
-            Request.AddParameter("application/dns-message", Query, "application/dns-message", ParameterType.RequestBody);
+            Content.Headers.ContentType = ContentType;
 
-            var Response = await RetryPolicy.ExecuteAsync(() => RestClient.ExecutePostAsync(Request));
+            var Response = await HttpClient.PostAsync(string.Empty, Content);
 
-            if (Response.ErrorException != null) 
-                throw Response.ErrorException;
+            Response.EnsureSuccessStatusCode();
 
-            return Response.RawBytes;
+            return await Response.Content.ReadAsByteArrayAsync();
         }
-
-        private bool ValidateServerCertificate(object Sender, X509Certificate Certificate, X509Chain Chain, SslPolicyErrors SslPolicyErrors)
-        {
-            return string.IsNullOrEmpty(Options.CurrentValue.PublicKey) ? SslPolicyErrors == SslPolicyErrors.None : SslPolicyErrors == SslPolicyErrors.None && Certificate.GetPublicKeyString() == Options.CurrentValue.PublicKey;
-        }
-
 
         protected override void Dispose(bool Disposing)
         {
@@ -72,7 +62,7 @@ namespace Texnomic.SecureDNS.Protocols
 
             if (Disposing)
             {
-                RestClient.ClearHandlers();
+                HttpClient.Dispose();
             }
 
             IsDisposed = true;
