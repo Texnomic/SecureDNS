@@ -17,7 +17,7 @@
   <ItemGroup>
     <PackageReference Include="Nethereum.Contracts" Version="4.1.1" />
     <PackageReference Include="Nethereum.RPC" Version="4.1.1" />
-    <PackageReference Include="Nethereum.Web3" Version="4.1.1" />
+    <PackageReference Include="Nethereum.Web3" Version="4.6.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
   <ItemGroup>
