@@ -15,7 +15,7 @@
     <PackageTags>dns sdns https udp tcp dnscrypt dou dot doh libsodium sodium</PackageTags>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="libsodium" Version="1.0.18.1" />
+    <PackageReference Include="libsodium" Version="1.0.18.2" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\docs\Logo.png">
