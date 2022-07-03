@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using Texnomic.SecureDNS.Abstractions;
 
-namespace Texnomic.SecureDNS.Middlewares.Options
+namespace Texnomic.SecureDNS.Middlewares.Options;
+
+public class MasterFileMiddlewareOptions
 {
-    public class MasterFileMiddlewareOptions
-    {
-        public List<IAnswer> Answers { get; set; }
-    }
+    public List<IAnswer> Answers { get; set; }
 }

@@ -1,4 +1,3 @@
-﻿namespace Texnomic.ENS.BaseRegistrar.ContractDefinition
-{
-    public partial class TransferPeriodEndsOutputDto : TransferPeriodEndsOutputDtoBase { }
-}
+﻿namespace Texnomic.ENS.BaseRegistrar.ContractDefinition;
+
+public partial class TransferPeriodEndsOutputDto : TransferPeriodEndsOutputDtoBase { }

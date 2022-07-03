@@ -1,11 +1,10 @@
 ﻿using Nethereum.ABI.FunctionEncoding.Attributes;
 
-namespace Texnomic.ENS.BaseRegistrar.ContractDefinition
+namespace Texnomic.ENS.BaseRegistrar.ContractDefinition;
+
+[FunctionOutput]
+public class IsOwnerOutputDtoBase : IFunctionOutputDTO
 {
-    [FunctionOutput]
-    public class IsOwnerOutputDtoBase : IFunctionOutputDTO
-    {
-        [Parameter("bool", "", 1)]
-        public virtual bool ReturnValue1 { get; set; }
-    }
+    [Parameter("bool", "", 1)]
+    public virtual bool ReturnValue1 { get; set; }
 }

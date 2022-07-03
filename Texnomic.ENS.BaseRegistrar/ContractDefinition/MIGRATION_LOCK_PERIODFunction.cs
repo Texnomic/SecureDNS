@@ -1,4 +1,3 @@
-﻿namespace Texnomic.ENS.BaseRegistrar.ContractDefinition
-{
-    public partial class MigrationLockPeriodFunction : MigrationLockPeriodFunctionBase { }
-}
+﻿namespace Texnomic.ENS.BaseRegistrar.ContractDefinition;
+
+public partial class MigrationLockPeriodFunction : MigrationLockPeriodFunctionBase { }

@@ -1,9 +1,8 @@
-﻿namespace Texnomic.Socks5.Enum
+﻿namespace Texnomic.Socks5.Enum;
+
+internal enum Address : byte
 {
-    internal enum Address : byte
-    {
-        IPv4 = 1,
-        Domain = 3,
-        IPv6 = 4
-    }
+    IPv4 = 1,
+    Domain = 3,
+    IPv6 = 4
 }

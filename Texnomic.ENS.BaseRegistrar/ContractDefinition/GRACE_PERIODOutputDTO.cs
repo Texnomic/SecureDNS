@@ -1,4 +1,3 @@
-﻿namespace Texnomic.ENS.BaseRegistrar.ContractDefinition
-{
-    public partial class GracePeriodOutputDto : GracePeriodOutputDtoBase { }
-}
+﻿namespace Texnomic.ENS.BaseRegistrar.ContractDefinition;
+
+public partial class GracePeriodOutputDto : GracePeriodOutputDtoBase { }

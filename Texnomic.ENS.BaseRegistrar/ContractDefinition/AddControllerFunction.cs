@@ -1,4 +1,3 @@
-﻿namespace Texnomic.ENS.BaseRegistrar.ContractDefinition
-{
-    public partial class AddControllerFunction : AddControllerFunctionBase { }
-}
+﻿namespace Texnomic.ENS.BaseRegistrar.ContractDefinition;
+
+public partial class AddControllerFunction : AddControllerFunctionBase { }

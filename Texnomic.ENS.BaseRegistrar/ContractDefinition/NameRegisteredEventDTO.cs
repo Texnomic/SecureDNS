@@ -1,4 +1,3 @@
-﻿namespace Texnomic.ENS.BaseRegistrar.ContractDefinition
-{
-    public partial class NameRegisteredEventDto : NameRegisteredEventDtoBase { }
-}
+﻿namespace Texnomic.ENS.BaseRegistrar.ContractDefinition;
+
+public partial class NameRegisteredEventDto : NameRegisteredEventDtoBase { }

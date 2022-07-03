@@ -1,14 +1,12 @@
 ﻿using System;
 
-namespace Texnomic.SecureDNS.Abstractions
+namespace Texnomic.SecureDNS.Abstractions;
+#nullable enable
+public interface IAnswer : IQuestion
 {
-    #nullable enable
-    public interface IAnswer : IQuestion
-    {
-        TimeSpan? TimeToLive { get; set; }
+    TimeSpan? TimeToLive { get; set; }
 
-        ushort Length { get; set; }
+    ushort Length { get; set; }
 
-        IRecord? Record { get; set; }
-    }
+    IRecord? Record { get; set; }
 }

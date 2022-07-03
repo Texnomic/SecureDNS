@@ -1,9 +1,8 @@
-﻿namespace Texnomic.SecureDNS.Abstractions
-{
-    public interface ICharacterString
-    {
-        byte Length { get; set; }
+﻿namespace Texnomic.SecureDNS.Abstractions;
 
-        string Value { get; set; }
-    }
+public interface ICharacterString
+{
+    byte Length { get; set; }
+
+    string Value { get; set; }
 }

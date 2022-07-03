@@ -1,17 +1,16 @@
 ﻿using System;
 using Texnomic.SecureDNS.Abstractions.Enums;
 
-namespace Texnomic.SecureDNS.Abstractions
+namespace Texnomic.SecureDNS.Abstractions;
+
+public interface IDnStamp
 {
-    public interface IDnStamp
+    StampProtocol Protocol { get; set; }
+
+    IStamp Value { get; set; }
+
+    static IDnStamp FromString(string Stamp)
     {
-        StampProtocol Protocol { get; set; }
-
-        IStamp Value { get; set; }
-
-        static IDnStamp FromString(string Stamp)
-        {
-            throw new NotImplementedException();
-        }
+        throw new NotImplementedException();
     }
 }

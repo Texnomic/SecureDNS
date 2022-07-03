@@ -1,10 +1,9 @@
-﻿namespace Texnomic.SecureDNS.Middlewares.Options
+﻿namespace Texnomic.SecureDNS.Middlewares.Options;
+
+public class FilterListsMiddlewareOptions
 {
-    public class FilterListsMiddlewareOptions
+    public int[] IDs { get; set; } = new int[]
     {
-        public int[] IDs { get; set; } = new int[]
-        {
-            10, 685
-        };
-    }
+        10, 685
+    };
 }

@@ -1,4 +1,3 @@
-﻿namespace Texnomic.ENS.BaseRegistrar.ContractDefinition
-{
-    public partial class ApprovalForAllEventDto : ApprovalForAllEventDtoBase { }
-}
+﻿namespace Texnomic.ENS.BaseRegistrar.ContractDefinition;
+
+public partial class ApprovalForAllEventDto : ApprovalForAllEventDtoBase { }

@@ -8,90 +8,89 @@ using Microsoft.Extensions.Options;
 using Texnomic.SecureDNS.Protocols.Options;
 
 
-namespace Texnomic.SecureDNS.Protocols
+namespace Texnomic.SecureDNS.Protocols;
+
+public class TCP : Protocol
 {
-    public class TCP : Protocol
+    private readonly IOptionsMonitor<TCPOptions> Options;
+
+    public TCP(IOptionsMonitor<TCPOptions> TCPOptions)
     {
-        private readonly IOptionsMonitor<TCPOptions> Options;
+        Options = TCPOptions;
+    }
 
-        public TCP(IOptionsMonitor<TCPOptions> TCPOptions)
+    public override async ValueTask<byte[]> ResolveAsync(byte[] Query)
+    {
+        using var Socket = new Socket(SocketType.Stream, ProtocolType.Tcp)
         {
-            Options = TCPOptions;
-        }
+            ReceiveTimeout = (int)Options.CurrentValue.Timeout.TotalMilliseconds,
+            SendTimeout = (int)Options.CurrentValue.Timeout.TotalMilliseconds
+        };
 
-        public override async ValueTask<byte[]> ResolveAsync(byte[] Query)
+        //await Socket.ConnectAsync(Options.CurrentValue.IPv4EndPoint);
+
+        //var Prefix = new byte[2];
+
+        //BinaryPrimitives.WriteUInt16BigEndian(Prefix, (ushort)Query.Length);
+
+        //await Socket.SendAsync(Prefix, SocketFlags.None);
+
+        //await Socket.SendAsync(Query, SocketFlags.None);
+
+        //await Socket.ReceiveAsync(Prefix, SocketFlags.None);
+
+        //var Size = BinaryPrimitives.ReadUInt16BigEndian(Prefix);
+
+        //var Buffer = new byte[Size];
+
+        //await Socket.ReliableReceiveAsync(Buffer);
+
+        //return Buffer;
+
+        await Socket.ConnectAsync(Options.CurrentValue.IPv4EndPoint);
+
+        var Stream = new NetworkStream(Socket);
+
+        var Reader = PipeReader.Create(Stream);
+
+        var Writer = PipeWriter.Create(Stream);
+
+        var CancellationTokenSource = new CancellationTokenSource(Options.CurrentValue.Timeout);
+
+        var Prefix = new byte[2];
+
+        BinaryPrimitives.WriteUInt16BigEndian(Prefix, (ushort)Query.Length);
+
+        await Writer.WriteAsync(Prefix, CancellationTokenSource.Token);
+
+        await Writer.WriteAsync(Query, CancellationTokenSource.Token);
+
+        await Writer.FlushAsync(CancellationTokenSource.Token);
+
+        while (true)
         {
-            using var Socket = new Socket(SocketType.Stream, ProtocolType.Tcp)
+            var Result = await Reader.ReadAsync(CancellationTokenSource.Token);
+
+            if (Result.IsCompleted)
             {
-                ReceiveTimeout = (int)Options.CurrentValue.Timeout.TotalMilliseconds,
-                SendTimeout = (int)Options.CurrentValue.Timeout.TotalMilliseconds
-            };
+                var Size = BinaryPrimitives.ReadUInt16BigEndian(Result.Buffer.FirstSpan.Slice(0, 2));
 
-            //await Socket.ConnectAsync(Options.CurrentValue.IPv4EndPoint);
-
-            //var Prefix = new byte[2];
-
-            //BinaryPrimitives.WriteUInt16BigEndian(Prefix, (ushort)Query.Length);
-
-            //await Socket.SendAsync(Prefix, SocketFlags.None);
-
-            //await Socket.SendAsync(Query, SocketFlags.None);
-
-            //await Socket.ReceiveAsync(Prefix, SocketFlags.None);
-
-            //var Size = BinaryPrimitives.ReadUInt16BigEndian(Prefix);
-
-            //var Buffer = new byte[Size];
-
-            //await Socket.ReliableReceiveAsync(Buffer);
-
-            //return Buffer;
-
-            await Socket.ConnectAsync(Options.CurrentValue.IPv4EndPoint);
-
-            var Stream = new NetworkStream(Socket);
-
-            var Reader = PipeReader.Create(Stream);
-
-            var Writer = PipeWriter.Create(Stream);
-
-            var CancellationTokenSource = new CancellationTokenSource(Options.CurrentValue.Timeout);
-
-            var Prefix = new byte[2];
-
-            BinaryPrimitives.WriteUInt16BigEndian(Prefix, (ushort)Query.Length);
-
-            await Writer.WriteAsync(Prefix, CancellationTokenSource.Token);
-
-            await Writer.WriteAsync(Query, CancellationTokenSource.Token);
-
-            await Writer.FlushAsync(CancellationTokenSource.Token);
-
-            while (true)
-            {
-                var Result = await Reader.ReadAsync(CancellationTokenSource.Token);
-
-                if (Result.IsCompleted)
-                {
-                    var Size = BinaryPrimitives.ReadUInt16BigEndian(Result.Buffer.FirstSpan.Slice(0, 2));
-
-                    return Result.Buffer.FirstSpan.Slice(2, Size).ToArray();
-                }
-
-                await Task.Delay(100, CancellationTokenSource.Token);
-            }
-        }
-
-        protected override void Dispose(bool Disposing)
-        {
-            if (IsDisposed) return;
-
-            if (Disposing)
-            {
-
+                return Result.Buffer.FirstSpan.Slice(2, Size).ToArray();
             }
 
-            IsDisposed = true;
+            await Task.Delay(100, CancellationTokenSource.Token);
         }
+    }
+
+    protected override void Dispose(bool Disposing)
+    {
+        if (IsDisposed) return;
+
+        if (Disposing)
+        {
+
+        }
+
+        IsDisposed = true;
     }
 }

@@ -2,18 +2,15 @@
 using Destructurama.Attributed;
 using Texnomic.SecureDNS.Abstractions;
 
-namespace Texnomic.SecureDNS.Core.DataTypes
+namespace Texnomic.SecureDNS.Core.DataTypes;
+#nullable enable
+public class Answer : Question, IAnswer
 {
-    #nullable enable
-    public class Answer : Question, IAnswer
-    {
-        [LogAsScalar(true)]
-        public TimeSpan? TimeToLive { get; set; }
+    [LogAsScalar(true)]
+    public TimeSpan? TimeToLive { get; set; }
 
-        [NotLogged]
-        public ushort Length { get; set; }
+    [NotLogged]
+    public ushort Length { get; set; }
 
-        public IRecord? Record { get; set; }
-    }
-
+    public IRecord? Record { get; set; }
 }

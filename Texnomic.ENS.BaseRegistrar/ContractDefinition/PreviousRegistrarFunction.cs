@@ -1,4 +1,3 @@
-﻿namespace Texnomic.ENS.BaseRegistrar.ContractDefinition
-{
-    public partial class PreviousRegistrarFunction : PreviousRegistrarFunctionBase { }
-}
+﻿namespace Texnomic.ENS.BaseRegistrar.ContractDefinition;
+
+public partial class PreviousRegistrarFunction : PreviousRegistrarFunctionBase { }
