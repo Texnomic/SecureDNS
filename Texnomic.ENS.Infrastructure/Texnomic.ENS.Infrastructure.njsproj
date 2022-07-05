@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{74da0a9a-fea2-4367-b5e0-c6514da8513d}</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <ProjectView>ShowAllFiles</ProjectView>
+    <ProjectView>ProjectFiles</ProjectView>
     <StartupFile>truffle-config.js</StartupFile>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -36,7 +36,6 @@
     <Content Include="package-lock.json" />
     <Content Include="package.json" />
     <Content Include="truffle-config.js" />
-    <Content Include="Migrations\1_InitialMigration.js" />
     <Content Include="build\contracts\ABIResolver.json" />
     <Content Include="build\contracts\AddrResolver.json" />
     <Content Include="build\contracts\Buffer.json" />
@@ -62,7 +61,6 @@
     <Folder Include="build\contracts" />
     <Folder Include="Contracts" />
     <Folder Include="Contracts\Profiles" />
-    <Folder Include="Migrations" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsToolsV2.targets" />
