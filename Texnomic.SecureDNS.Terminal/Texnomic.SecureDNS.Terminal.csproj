@@ -13,7 +13,7 @@
     <RepositoryType>Github</RepositoryType>
     <ApplicationIcon>SecureDNS.ico</ApplicationIcon>
     <Description>https://github.com/Texnomic/SecureDNS</Description>
-    <Version>0.3.1</Version>
+    <Version>0.4.0</Version>
     <PackageIcon>SecureDNS.ico</PackageIcon>
     <PackageIconUrl />
     <PackageTags>Alpha</PackageTags>

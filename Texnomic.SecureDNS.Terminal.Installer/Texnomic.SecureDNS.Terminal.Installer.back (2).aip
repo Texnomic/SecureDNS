@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DOCUMENT Type="Advanced Installer" CreateVersion="17.1.2" version="19.1" Modules="professional" RootPath="." Language="en" Id="{E041E014-DEC7-41F9-A458-5E7665753FF3}">
+<DOCUMENT Type="Advanced Installer" CreateVersion="17.1.2" version="17.7" Modules="professional" RootPath="." Language="en" Id="{E041E014-DEC7-41F9-A458-5E7665753FF3}">
   <COMPONENT cid="caphyon.advinst.msicomp.ProjectOptionsComponent">
     <ROW Name="AssetGenConvertedAttrNames" Value="true"/>
     <ROW Name="AssetGenDestFolderPath" Value="Generated Assets" ValueType="1"/>
@@ -12,7 +12,6 @@
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiPropsComponent">
     <ROW Property="AI_BITMAP_DISPLAY_MODE" Value="0"/>
-    <ROW Property="AI_CURRENT_YEAR" Value="2022" ValueLocId="-"/>
     <ROW Property="AI_EXTERNALUIUNINSTALLERNAME" MultiBuildValue="DefaultBuild:aiui"/>
     <ROW Property="AI_FINDEXE_TITLE" Value="Select the installation package for [|ProductName]" ValueLocId="AI.Property.FindExeTitle"/>
     <ROW Property="AI_PRODUCTNAME_ARP" Value="[|ProductName]"/>
@@ -27,12 +26,12 @@
     <ROW Property="ARPURLINFOABOUT" Value="https://github.com/Texnomic/SecureDNS"/>
     <ROW Property="ARPURLUPDATEINFO" Value="https://github.com/Texnomic/SecureDNS/releases"/>
     <ROW Property="AiPreferFastOem" MultiBuildValue="DefaultBuild:1"/>
-    <ROW Property="BannerBitmap" Value="banner.jpg" Type="1" MsiKey="BannerBitmap"/>
+    <ROW Property="BannerBitmap" Value="banner" Type="1" MsiKey="BannerBitmap"/>
     <ROW Property="Manufacturer" Value="Texnomic"/>
-    <ROW Property="ProductCode" Value="1033:{7DF3189A-AEC7-4937-AF43-6AD4BB951478} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{3F5BFC1B-B3C0-42A5-B664-54DA5CB7880D} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="SecureDNS Terminal Edition"/>
-    <ROW Property="ProductVersion" Value="0.4.1" Type="32"/>
+    <ROW Property="ProductVersion" Value="0.3.1" Type="32"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND;AI_SETUPEXEPATH;SETUPEXEDIR"/>
     <ROW Property="UpgradeCode" Value="{F74511F7-18F1-4DEB-9F18-85AAA692DA9B}"/>
     <ROW Property="WindowsType9X" MultiBuildValue="DefaultBuild:Windows 9x/ME" ValueLocId="-"/>
@@ -67,7 +66,7 @@
     <ROW Directory="zhHant_Dir" Directory_Parent="AI_Bin32_Dir" DefaultDir="zh-Hant"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCompsComponent">
-    <ROW Component="AI_CustomARPName" ComponentId="{E27C61E1-3F2B-4833-975D-D5B1722B170C}" Directory_="APPDIR" Attributes="4" KeyPath="DisplayName" Options="1"/>
+    <ROW Component="AI_CustomARPName" ComponentId="{944AD9D4-93F3-48AD-BC75-35CAC78389B0}" Directory_="APPDIR" Attributes="4" KeyPath="DisplayName" Options="1"/>
     <ROW Component="AI_ExePath" ComponentId="{F7002B55-17D2-48FF-B97A-6C59A9B26F45}" Directory_="APPDIR" Attributes="260" KeyPath="AI_ExePath"/>
     <ROW Component="APIMSWincorexstatel210.dll" ComponentId="{28249806-D56A-4EC0-8979-53B0BEAE7F2D}" Directory_="AI_Bin32_Dir" Attributes="0" Condition="NOT VersionNT64" KeyPath="APIMSWincorexstatel210.dll"/>
     <ROW Component="APPDIR" ComponentId="{F1BB9E37-B9D7-4B38-BFB6-0D3903772E3F}" Directory_="APPDIR" Attributes="0"/>
@@ -1221,7 +1220,7 @@
     <ROW BootstrOptKey="GlobalOptions" DownloadFolder="[AppDataFolder][|Manufacturer]\[|ProductName]\prerequisites" Options="2"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BuildComponent">
-    <ROW BuildKey="DefaultBuild" BuildName="Release" BuildOrder="1" BuildType="0" PackageFolder="Texnomic.SecureDNS.Terminal.Installer-SetupFiles" PackageFileName="Installer" Languages="en" InstallationType="2" CabsLocation="1" CompressCabs="false" UseLzma="true" LzmaMethod="2" LzmaCompressionLevel="2" PackageType="1" FilesInsideExe="true" ExeIconPath="..\docs\Icon.ico" CreateMd5="true" ExtractionFolder="[AppDataFolder][|Manufacturer]\[|ProductName] [|ProductVersion]\install" ExtUI="true" UseLargeSchema="true" ExeName="Installer" MsiPackageType="AI_ALL"/>
+    <ROW BuildKey="DefaultBuild" BuildName="Release" BuildOrder="1" BuildType="1" PackageFolder="Texnomic.SecureDNS.Terminal.Installer-SetupFiles" PackageFileName="Installer" Languages="en" InstallationType="2" CabsLocation="1" CompressCabs="false" UseLzma="true" LzmaMethod="2" LzmaCompressionLevel="2" PackageType="1" FilesInsideExe="true" ExeIconPath="..\docs\Icon.ico" CreateMd5="true" ExtractionFolder="[AppDataFolder][|Manufacturer]\[|ProductName] [|ProductVersion]\install" ExtUI="true" UseLargeSchema="true" ExeName="Installer" MsiPackageType="AI_ALL"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.DictionaryComponent">
     <ROW Path="&lt;AI_DICTS&gt;ui.ail"/>
@@ -1239,7 +1238,6 @@
     <ROW Fragment="SequenceDialogs.aip" Path="&lt;AI_THEMES&gt;light\fragments\SequenceDialogs.aip"/>
     <ROW Fragment="Sequences.aip" Path="&lt;AI_FRAGS&gt;Sequences.aip"/>
     <ROW Fragment="StaticUIStrings.aip" Path="&lt;AI_FRAGS&gt;StaticUIStrings.aip"/>
-    <ROW Fragment="Themes.aip" Path="&lt;AI_FRAGS&gt;Themes.aip"/>
     <ROW Fragment="UI.aip" Path="&lt;AI_THEMES&gt;light\fragments\UI.aip"/>
     <ROW Fragment="Validation.aip" Path="&lt;AI_FRAGS&gt;Validation.aip"/>
     <ROW Fragment="VerifyRemoveDlg.aip" Path="&lt;AI_THEMES&gt;light\fragments\VerifyRemoveDlg.aip"/>
