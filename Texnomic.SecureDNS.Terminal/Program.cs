@@ -69,7 +69,7 @@ namespace Texnomic.SecureDNS.Terminal
 
             if (!File.Exists(AppSettingsFile))
             {
-                await File.WriteAllBytesAsync(Path.Combine(ApplicationData, AppSettingsFile), ReadResource(AppSettingsFile));
+                await File.WriteAllBytesAsync(Path.Combine(ApplicationData, AppSettingsFile), ReadResource("AppSettings.json"));
                 await File.WriteAllBytesAsync(Path.Combine(ApplicationData, "AppSettings.Production.json"), ReadResource("AppSettings.Production.json"));
                 await File.WriteAllBytesAsync(Path.Combine(ApplicationData, "AppSettings.Development.json"), ReadResource("AppSettings.Development.json"));
             }

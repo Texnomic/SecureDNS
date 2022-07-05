@@ -33,7 +33,6 @@ public sealed class TCPServer2 : IHostedService, IDisposable
 
     private CancellationToken CancellationToken;
 
-    private int Affinity;
 
     public TCPServer2(IOptionsMonitor<ProxyResponsibilityChainOptions> ProxyResponsibilityChainOptions,
         IOptionsMonitor<ProxyServerOptions> ProxyServerOptions,
@@ -51,8 +50,6 @@ public sealed class TCPServer2 : IHostedService, IDisposable
         Threads = new List<Task>();
 
         TcpListener = new TcpListener(Options.CurrentValue.IPEndPoint);
-
-        Affinity = 0;
     }
 
     public async Task StartAsync(CancellationToken Token)
@@ -83,15 +80,7 @@ public sealed class TCPServer2 : IHostedService, IDisposable
 
     private async Task ResolveAsync()
     {
-        var AffinityPointer = (0b00000001 << Affinity++);
-
-        var ProcessThread = Process.GetCurrentProcess().Threads[Thread.CurrentThread.ManagedThreadId];
-
-        ProcessThread.ProcessorAffinity = (IntPtr)AffinityPointer;
-
-        ProcessThread.PriorityLevel = ThreadPriorityLevel.Highest;
-
-        Logger?.Debug("TCP Server Started Thread {@Thread} with Affinity {@Affinity} & Priority {@Priority}.", Thread.CurrentThread.ManagedThreadId, AffinityPointer, ThreadPriorityLevel.Highest);
+        Logger?.Debug("TCP Server Started Thread {@Thread}.", Environment.CurrentManagedThreadId);
 
         var ProxyResponsibilityChain = new ProxyResponsibilityChain(ProxyResponsibilityChainOptions, MiddlewareResolver);
 
