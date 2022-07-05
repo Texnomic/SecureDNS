@@ -9,6 +9,12 @@
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <UserSecretsId>70d8f4a6-4148-4aca-a794-d1b8ccdf410c</UserSecretsId>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
   <ItemGroup>
     <Content Remove="wwwroot\lib\blazorise\blazorise.bootstrap.css" />
     <Content Remove="wwwroot\lib\blazorise\blazorise.bootstrap.js" />

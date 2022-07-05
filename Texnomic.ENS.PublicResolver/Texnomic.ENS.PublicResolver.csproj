@@ -13,6 +13,12 @@
     <PackageTags>dns sdns https udp tcp dnscrypt dou dot doh ens</PackageTags>
     <Copyright>Copyright © 2020</Copyright>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Nethereum.Web3" Version="4.6.1" />
   </ItemGroup>

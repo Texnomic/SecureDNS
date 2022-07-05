@@ -14,6 +14,12 @@
     <RepositoryType>Github</RepositoryType>
     <PackageTags>dns sdns https udp tcp dnscrypt dou dot doh libsodium sodium</PackageTags>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="libsodium" Version="1.0.18.2" />
   </ItemGroup>
