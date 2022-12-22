@@ -79,7 +79,7 @@
     <PackageReference Include="Serilog.Formatting.Compact" Version="1.1.0" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="3.3.0" />
     <PackageReference Include="Serilog.Sinks.Seq" Version="5.1.1" />
-    <PackageReference Include="Syncfusion.Blazor" Version="20.2.0.36" />
+    <PackageReference Include="Syncfusion.Blazor" Version="20.4.0.38" />
     <PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="6.14.2" />
   </ItemGroup>
   <ItemGroup>
