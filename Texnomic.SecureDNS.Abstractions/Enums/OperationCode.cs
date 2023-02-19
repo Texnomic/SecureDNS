@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Texnomic.SecureDNS.Abstractions.Enums;
+﻿namespace Texnomic.SecureDNS.Abstractions.Enums;
 
 public enum OperationCode : byte
 {

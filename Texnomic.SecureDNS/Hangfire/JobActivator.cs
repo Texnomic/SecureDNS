@@ -1,20 +1,18 @@
 ﻿using Hangfire;
-using System;
 
-namespace Texnomic.SecureDNS.Hangfire
+namespace Texnomic.SecureDNS.Hangfire;
+
+public class HangfireJobActivator : JobActivator
 {
-    public class HangfireJobActivator : JobActivator
+    private readonly IServiceProvider ServiceProvider;
+
+    public HangfireJobActivator(IServiceProvider ServiceProvider)
     {
-        private readonly IServiceProvider ServiceProvider;
+        this.ServiceProvider = ServiceProvider;
+    }
 
-        public HangfireJobActivator(IServiceProvider ServiceProvider)
-        {
-            this.ServiceProvider = ServiceProvider;
-        }
-
-        public override object ActivateJob(Type Type)
-        {
-            return ServiceProvider.GetService(Type);
-        }
+    public override object ActivateJob(Type Type)
+    {
+        return ServiceProvider.GetService(Type);
     }
 }

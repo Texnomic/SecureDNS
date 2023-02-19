@@ -1,97 +1,80 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <LangVersion>8.0</LangVersion>
-    <OutputType>Exe</OutputType>
-    <!--<PublishTrimmed>true</PublishTrimmed>-->
-    <!--<PublishSingleFile>true</PublishSingleFile>-->
-    <!--<PublishReadyToRun>true</PublishReadyToRun>-->
-    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
-    <UserSecretsId>70d8f4a6-4148-4aca-a794-d1b8ccdf410c</UserSecretsId>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DebugType>embedded</DebugType>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DebugType>embedded</DebugType>
-  </PropertyGroup>
-  <ItemGroup>
-    <Content Remove="wwwroot\lib\blazorise\blazorise.bootstrap.css" />
-    <Content Remove="wwwroot\lib\blazorise\blazorise.bootstrap.js" />
-    <Content Remove="wwwroot\lib\blazorise\blazorise.bulma.css" />
-    <Content Remove="wwwroot\lib\blazorise\blazorise.bulma.js" />
-    <Content Remove="wwwroot\lib\blazorise\blazorise.charts.js" />
-    <Content Remove="wwwroot\lib\blazorise\blazorise.css" />
-    <Content Remove="wwwroot\lib\blazorise\blazorise.frolic.css" />
-    <Content Remove="wwwroot\lib\blazorise\blazorise.frolic.js" />
-    <Content Remove="wwwroot\lib\blazorise\blazorise.js" />
-    <Content Remove="wwwroot\lib\blazorise\blazorise.material.css" />
-    <Content Remove="wwwroot\lib\blazorise\blazorise.material.js" />
-    <Content Remove="wwwroot\lib\blazorise\blazorise.sidebar.css" />
-    <Content Remove="wwwroot\lib\blazorise\blazorise.snackbar.css" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="wwwroot\lib\blazorise\blazorise.bootstrap.css" />
-    <None Include="wwwroot\lib\blazorise\blazorise.bootstrap.js" />
-    <None Include="wwwroot\lib\blazorise\blazorise.bulma.css" />
-    <None Include="wwwroot\lib\blazorise\blazorise.bulma.js" />
-    <None Include="wwwroot\lib\blazorise\blazorise.charts.js" />
-    <None Include="wwwroot\lib\blazorise\blazorise.css" />
-    <None Include="wwwroot\lib\blazorise\blazorise.frolic.css" />
-    <None Include="wwwroot\lib\blazorise\blazorise.frolic.js" />
-    <None Include="wwwroot\lib\blazorise\blazorise.js" />
-    <None Include="wwwroot\lib\blazorise\blazorise.material.css" />
-    <None Include="wwwroot\lib\blazorise\blazorise.material.js" />
-    <None Include="wwwroot\lib\blazorise\blazorise.sidebar.css" />
-    <None Include="wwwroot\lib\blazorise\blazorise.snackbar.css" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="AsyncEnumerator" Version="4.0.2" />
-    <PackageReference Include="Blazorise.Bootstrap" Version="1.0.5" />
-    <PackageReference Include="Blazorise.Icons.FontAwesome" Version="1.0.5" />
-    <PackageReference Include="Blazorise.Sidebar" Version="1.0.5" />
-    <PackageReference Include="ElectronNET.API" Version="13.5.1" />
-    <PackageReference Include="FlexLabs.EntityFrameworkCore.Upsert" Version="6.0.1" />
-    <PackageReference Include="Hangfire" Version="1.7.30" />
-    <PackageReference Include="Hangfire.SQLite" Version="1.4.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.6" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.6" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.6" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.6" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.6">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="6.0.6" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.6" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Design" Version="1.1.6" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.6" />
-    <PackageReference Include="morelinq" Version="3.3.2" />
-    <PackageReference Include="Serilog.AspNetCore" Version="5.0.0" />
-    <PackageReference Include="Serilog.Enrichers.AspnetcoreHttpcontext" Version="1.1.0" />
-    <PackageReference Include="Serilog.Enrichers.Environment" Version="2.2.0" />
-    <PackageReference Include="Serilog.Enrichers.Memory" Version="1.0.4" />
-    <PackageReference Include="Serilog.Enrichers.Process" Version="2.0.2" />
-    <PackageReference Include="Serilog.Enrichers.Thread" Version="3.1.0" />
-    <PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0" />
-    <PackageReference Include="Serilog.Formatting.Compact" Version="1.1.0" />
-    <PackageReference Include="Serilog.Settings.Configuration" Version="3.3.0" />
-    <PackageReference Include="Serilog.Sinks.Seq" Version="5.1.1" />
-    <PackageReference Include="Syncfusion.Blazor" Version="20.2.0.36" />
-    <PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="6.14.2" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Texnomic.SecureDNS.Core\Texnomic.SecureDNS.Core.csproj" />
-    <ProjectReference Include="..\Texnomic.SecureDNS.Data\Texnomic.SecureDNS.Data.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Update="Electron.Manifest.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="if $(ConfigurationName) == Release (..\Tools\signtool.exe sign /sha1 &quot;33261449de13599f046617dd18994bab0e4346a8&quot; /tr http://time.certum.pl /fd sha256 /v $(TargetPath))" />
-  </Target>
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net7.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+
+		<Version>0.5.0-alpha</Version>
+		<Authors>Texnomic</Authors>
+		<Company>Texnomic</Company>
+		<Copyright>Texnomic, Copyrights © 2023</Copyright>
+
+		<RepositoryUrl>https://github.com/Texnomic/SecureDNS</RepositoryUrl>
+		<RepositoryType>Github</RepositoryType>
+
+		<PackageIcon>SecureDNS.ico</PackageIcon>
+		<PackageTags>Alpha</PackageTags>
+		<PackageId>$(ProjectName)</PackageId>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageProjectUrl>https://github.com/Texnomic/SecureDNS</PackageProjectUrl>
+		<PackageTags>dns sdns https udp tcp dnscrypt dou dot doh</PackageTags>
+
+		<Product>$(ProjectName)</Product>
+		<Description>$(ProjectName)</Description>
+		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
+		<UserSecretsId>70d8f4a6-4148-4aca-a794-d1b8ccdf410c</UserSecretsId>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<DebugType>embedded</DebugType>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<DebugType>embedded</DebugType>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="AsyncEnumerator" Version="4.0.2" />
+		<PackageReference Include="Blazorise.Bootstrap" Version="1.2.0" />
+		<PackageReference Include="Blazorise.Icons.FontAwesome" Version="1.2.0" />
+		<PackageReference Include="Blazorise.Sidebar" Version="1.2.0" />
+		<PackageReference Include="ElectronNET.API" Version="13.5.1" />
+		<PackageReference Include="FlexLabs.EntityFrameworkCore.Upsert" Version="7.0.0" />
+		<PackageReference Include="Hangfire" Version="1.7.33" />
+		<PackageReference Include="Hangfire.SQLite" Version="1.4.2" />
+		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="7.0.3" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.3" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="7.0.3" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.3" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.3">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="7.0.3" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.3" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Design" Version="1.1.6" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
+		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.4" />
+		<PackageReference Include="morelinq" Version="3.3.2" />
+		<PackageReference Include="Serilog.AspNetCore" Version="6.1.0" />
+		<PackageReference Include="Serilog.Enrichers.AspnetcoreHttpcontext" Version="1.1.0" />
+		<PackageReference Include="Serilog.Enrichers.Environment" Version="2.2.0" />
+		<PackageReference Include="Serilog.Enrichers.Memory" Version="1.0.4" />
+		<PackageReference Include="Serilog.Enrichers.Process" Version="2.0.2" />
+		<PackageReference Include="Serilog.Enrichers.Thread" Version="3.1.0" />
+		<PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0" />
+		<PackageReference Include="Serilog.Formatting.Compact" Version="1.1.0" />
+		<PackageReference Include="Serilog.Settings.Configuration" Version="3.4.0" />
+		<PackageReference Include="Serilog.Sinks.Seq" Version="5.2.2" />
+		<PackageReference Include="Syncfusion.Blazor" Version="20.4.0.50" />
+		<PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="7.18.4" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Texnomic.SecureDNS.Core\Texnomic.SecureDNS.Core.csproj" />
+		<ProjectReference Include="..\Texnomic.SecureDNS.Data\Texnomic.SecureDNS.Data.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<Content Update="Electron.Manifest.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
 </Project>

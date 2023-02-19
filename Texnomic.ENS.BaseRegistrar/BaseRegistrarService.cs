@@ -1,8 +1,6 @@
-﻿using System.Threading.Tasks;
-using System.Numerics;
+﻿using System.Numerics;
 using Nethereum.RPC.Eth.DTOs;
 using Nethereum.Contracts.ContractHandlers;
-using System.Threading;
 using Nethereum.Web3;
 using Texnomic.ENS.BaseRegistrar.ContractDefinition;
 

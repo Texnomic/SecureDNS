@@ -1,12 +1,10 @@
-﻿using System;
-using Texnomic.SecureDNS.Abstractions;
+﻿using Texnomic.SecureDNS.Abstractions;
 
-namespace Texnomic.SecureDNS.Data.Models
+namespace Texnomic.SecureDNS.Data.Models;
+
+public class History
 {
-    public class History
-    {
-        public ushort ID { get; set; }
-        public IMessage Message { get; set; }
-        public DateTime Timestamp { get; set; }
-    }
+    public ushort ID { get; set; }
+    public IMessage Message { get; set; }
+    public DateTime Timestamp { get; set; }
 }

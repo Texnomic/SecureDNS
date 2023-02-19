@@ -1,36 +1,41 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>0.4.0-alpha</Version>
-    <Authors>Texnomic</Authors>
-    <Company>Texnomic Ltd</Company>
-    <Description>Texnomic Sodium Library.</Description>
-    <Copyright>Copyright © 2020</Copyright>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/Texnomic/SecureDNS</PackageProjectUrl>
-    <PackageIcon>Logo.png</PackageIcon>
-    <RepositoryUrl>https://github.com/Texnomic/SecureDNS</RepositoryUrl>
-    <RepositoryType>Github</RepositoryType>
-    <PackageTags>dns sdns https udp tcp dnscrypt dou dot doh libsodium sodium</PackageTags>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DebugType>embedded</DebugType>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DebugType>embedded</DebugType>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="libsodium" Version="1.0.18.2" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\docs\Logo.png">
-      <Pack>True</Pack>
-      <PackagePath>
-      </PackagePath>
-    </None>
-  </ItemGroup>
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="if $(ConfigurationName) == Release (..\Tools\signtool.exe sign /sha1 &quot;d4518c71443aebbc0429ec005774bc01176a2dbb&quot; /tr http://time.certum.pl /fd sha256 /v $(TargetPath))" />
-  </Target>
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+
+		<Version>0.5.0-alpha</Version>
+		<Authors>Texnomic</Authors>
+		<Company>Texnomic</Company>
+		<Copyright>Texnomic, Copyrights © 2023</Copyright>
+
+		<RepositoryUrl>https://github.com/Texnomic/SecureDNS</RepositoryUrl>
+		<RepositoryType>Github</RepositoryType>
+
+		<PackageIcon>Logo.png</PackageIcon>
+		<PackageTags>Alpha</PackageTags>
+		<PackageId>$(ProjectName)</PackageId>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageProjectUrl>https://github.com/Texnomic/SecureDNS</PackageProjectUrl>
+		<PackageTags>dns sdns https udp tcp dnscrypt dou dot doh</PackageTags>
+
+		<Product>$(ProjectName)</Product>
+		<Description>$(ProjectName)</Description>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<DebugType>embedded</DebugType>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<DebugType>embedded</DebugType>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="libsodium" Version="1.0.18.4" />
+	</ItemGroup>
+	<ItemGroup>
+		<None Include="..\docs\Logo.png">
+			<Pack>True</Pack>
+			<PackagePath>
+			</PackagePath>
+		</None>
+	</ItemGroup>
 </Project>

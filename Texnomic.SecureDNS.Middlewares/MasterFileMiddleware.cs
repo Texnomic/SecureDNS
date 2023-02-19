@@ -1,7 +1,4 @@
-﻿using System;
-using Serilog;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Serilog;
 using Microsoft.Extensions.Options;
 using PipelineNet.Middleware;
 using Texnomic.SecureDNS.Abstractions;

@@ -1,25 +1,40 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DebugType>embedded</DebugType>
-  </PropertyGroup>
+		<Version>0.5.0-alpha</Version>
+		<Authors>Texnomic</Authors>
+		<Company>Texnomic</Company>
+		<Copyright>Texnomic, Copyrights © 2023</Copyright>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DebugType>embedded</DebugType>
-  </PropertyGroup>
+		<RepositoryUrl>https://github.com/Texnomic/SecureDNS</RepositoryUrl>
+		<RepositoryType>Github</RepositoryType>
 
-  <ItemGroup>
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.43" />
-    <PackageReference Include="RestSharp" Version="108.0.1" />
-    <PackageReference Include="YamlDotNet" Version="11.2.1" />
-  </ItemGroup>
+		<PackageIcon>SecureDNS.ico</PackageIcon>
+		<PackageTags>Alpha</PackageTags>
+		<PackageId>$(ProjectName)</PackageId>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageProjectUrl>https://github.com/Texnomic/SecureDNS</PackageProjectUrl>
+		<PackageTags>dns sdns https udp tcp dnscrypt dou dot doh</PackageTags>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="if $(ConfigurationName) == Release (..\Tools\signtool.exe sign /sha1 &quot;33261449de13599f046617dd18994bab0e4346a8&quot; /tr http://time.certum.pl /fd sha256 /v $(TargetPath))" />
-  </Target>
+		<Product>$(ProjectName)</Product>
+		<Description>$(ProjectName)</Description>
+	</PropertyGroup>
 
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<DebugType>embedded</DebugType>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<DebugType>embedded</DebugType>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="HtmlAgilityPack" Version="1.11.46" />
+		<PackageReference Include="RestSharp" Version="108.0.3" />
+		<PackageReference Include="YamlDotNet" Version="13.0.0" />
+	</ItemGroup>
 </Project>

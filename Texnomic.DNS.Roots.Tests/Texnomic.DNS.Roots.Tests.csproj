@@ -1,25 +1,42 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+	<PropertyGroup>
+		<IsPackable>false</IsPackable>
+		<TargetFramework>net7.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 
-    <IsPackable>false</IsPackable>
+		<Version>0.5.0-alpha</Version>
+		<Authors>Texnomic</Authors>
+		<Company>Texnomic</Company>
+		<Copyright>Texnomic, Copyrights © 2023</Copyright>
 
-    <LangVersion>8.0</LangVersion>
-  </PropertyGroup>
+		<RepositoryUrl>https://github.com/Texnomic/SecureDNS</RepositoryUrl>
+		<RepositoryType>Github</RepositoryType>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
-    <PackageReference Include="MSTest.TestAdapter" Version="2.2.10" />
-    <PackageReference Include="MSTest.TestFramework" Version="2.2.10" />
-    <PackageReference Include="coverlet.collector" Version="3.1.2">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
+		<PackageIcon>SecureDNS.ico</PackageIcon>
+		<PackageTags>Alpha</PackageTags>
+		<PackageId>$(ProjectName)</PackageId>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageProjectUrl>https://github.com/Texnomic/SecureDNS</PackageProjectUrl>
+		<PackageTags>dns sdns https udp tcp dnscrypt dou dot doh</PackageTags>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Texnomic.DNS.Roots\Texnomic.DNS.Roots.csproj" />
-  </ItemGroup>
+		<Product>$(ProjectName)</Product>
+		<Description>$(ProjectName)</Description>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.1" />
+		<PackageReference Include="MSTest.TestAdapter" Version="3.0.2" />
+		<PackageReference Include="MSTest.TestFramework" Version="3.0.2" />
+		<PackageReference Include="coverlet.collector" Version="3.2.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Texnomic.DNS.Roots\Texnomic.DNS.Roots.csproj" />
+	</ItemGroup>
 
 </Project>

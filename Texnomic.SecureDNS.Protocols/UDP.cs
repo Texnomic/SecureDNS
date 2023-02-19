@@ -1,6 +1,4 @@
 ﻿using System.Net.Sockets;
-using System.Threading.Tasks;
-
 using Microsoft.Extensions.Options;
 using Texnomic.SecureDNS.Extensions;
 using Texnomic.SecureDNS.Protocols.Options;

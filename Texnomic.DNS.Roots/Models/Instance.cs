@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Texnomic.DNS.Roots.Models;
+﻿namespace Texnomic.DNS.Roots.Models;
 
 public class Instance
 {

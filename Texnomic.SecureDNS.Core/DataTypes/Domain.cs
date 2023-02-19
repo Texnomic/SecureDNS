@@ -1,5 +1,4 @@
 ﻿using Destructurama.Attributed;
-using System.Collections.Generic;
 using Texnomic.SecureDNS.Abstractions;
 
 namespace Texnomic.SecureDNS.Core.DataTypes;

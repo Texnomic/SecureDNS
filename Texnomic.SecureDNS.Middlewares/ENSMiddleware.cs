@@ -1,9 +1,4 @@
-﻿using Serilog;
-
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Common.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using PipelineNet.Middleware;
 using Texnomic.SecureDNS.Abstractions;
@@ -16,11 +11,11 @@ public class ENSMiddleware : IAsyncMiddleware<IMessage, IMessage>
     private readonly ILogger Logger;
     private readonly SecureDNS.Protocols.ENS ENS;
 
-    public ENSMiddleware(IOptionsMonitor<ENSOptions> Options, ILogger Logger, ILog Log) : base()
+    public ENSMiddleware(IOptionsMonitor<ENSOptions> Options, ILogger Logger) : base()
     {
         this.Logger = Logger;
 
-        ENS = new Protocols.ENS(Options, Log);
+        ENS = new Protocols.ENS(Options, Logger);
     }
 
     public async Task<IMessage> Run(IMessage Message, Func<IMessage, Task<IMessage>> Next)
@@ -30,7 +25,7 @@ public class ENSMiddleware : IAsyncMiddleware<IMessage, IMessage>
 
         var Response = await ENS.ResolveAsync(Message);
 
-        Logger.Information("Resolved ENS Query {@ID} For {@Domain}.", Message.ID, Message.Questions.First().Domain.Name);
+        Logger.LogInformation("Resolved ENS Query {@ID} For {@Domain}.", Message.ID, Message.Questions.First().Domain.Name);
 
         return Response;
     }

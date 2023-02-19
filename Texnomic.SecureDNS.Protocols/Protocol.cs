@@ -1,8 +1,4 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-
-using Texnomic.SecureDNS.Abstractions;
+﻿using Texnomic.SecureDNS.Abstractions;
 using Texnomic.SecureDNS.Extensions;
 using Texnomic.SecureDNS.Serialization;
 

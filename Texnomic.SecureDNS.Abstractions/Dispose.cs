@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Texnomic.SecureDNS.Abstractions;
+﻿namespace Texnomic.SecureDNS.Abstractions;
 
 public class Disposable : IDisposable
 {

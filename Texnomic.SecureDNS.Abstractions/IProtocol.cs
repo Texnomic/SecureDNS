@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-
-namespace Texnomic.SecureDNS.Abstractions;
+﻿namespace Texnomic.SecureDNS.Abstractions;
 
 public interface IProtocol : IDisposable
 {

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace Texnomic.SecureDNS.Extensions;
+﻿namespace Texnomic.SecureDNS.Extensions;
 
 /// <summary>
 /// Helper class to run async methods within a sync process.

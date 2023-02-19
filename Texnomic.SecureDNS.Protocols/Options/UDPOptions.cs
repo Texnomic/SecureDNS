@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using Texnomic.SecureDNS.Abstractions;
 
 namespace Texnomic.SecureDNS.Protocols.Options;

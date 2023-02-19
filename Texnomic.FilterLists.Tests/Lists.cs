@@ -1,22 +1,19 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Texnomic.FilterLists.Models;
 
-namespace Texnomic.FilterLists.Tests
+namespace Texnomic.FilterLists.Tests;
+
+[TestClass]
+public class FilterLists
 {
-    [TestClass]
-    public class FilterLists
+    [TestMethod]
+    public async Task GetLists()
     {
-        [TestMethod]
-        public async Task GetLists()
-        {
-            var Client = new FilterListsClient();
+        var Client = new FilterListsClient();
 
-            var Lists = await Client.GetListsAsync();
+        var Lists = await Client.GetListsAsync();
 
-            Assert.IsNotNull(Lists);
-            Assert.IsInstanceOfType(Lists,typeof(List<FilterList>));
-        }
+        Assert.IsNotNull(Lists);
+        Assert.IsInstanceOfType(Lists,typeof(List<FilterList>));
     }
 }

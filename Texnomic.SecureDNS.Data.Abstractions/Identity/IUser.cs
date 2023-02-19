@@ -1,9 +1,6 @@
-﻿using System;
+﻿namespace Texnomic.SecureDNS.Data.Abstractions.Identity;
 
-namespace Texnomic.SecureDNS.Data.Abstractions.Identity
+public interface IUser
 {
-    public interface IUser
-    {
-        Guid Id { get; set; }
-    }
+    Guid Id { get; set; }
 }

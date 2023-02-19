@@ -1,5 +1,4 @@
-﻿using System;
-using PipelineNet.MiddlewareResolver;
+﻿using PipelineNet.MiddlewareResolver;
 
 namespace Texnomic.SecureDNS.Middlewares;
 

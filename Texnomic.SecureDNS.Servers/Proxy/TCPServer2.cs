@@ -1,10 +1,5 @@
-﻿using System;
-using System.Buffers.Binary;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Buffers.Binary;
 using System.Net.Sockets;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using PipelineNet.MiddlewareResolver;
@@ -16,8 +11,6 @@ using Texnomic.SecureDNS.Extensions;
 using Texnomic.SecureDNS.Serialization;
 using Texnomic.SecureDNS.Servers.Proxy.Options;
 using Texnomic.SecureDNS.Servers.Proxy.ResponsibilityChain;
-using Process = System.Diagnostics.Process;
-using ThreadPriorityLevel = System.Diagnostics.ThreadPriorityLevel;
 
 
 namespace Texnomic.SecureDNS.Servers.Proxy;

@@ -1,38 +1,45 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <Version>0.4.0-alpha</Version>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Authors>Texnomic</Authors>
-    <Company>Texnomic Ltd</Company>
-    <Description>Texnomic Socks5 Library.</Description>
-    <Copyright>Copyright © 2020</Copyright>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/Texnomic/SecureDNS</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/Texnomic/SecureDNS</RepositoryUrl>
-    <PackageTags>dns sdns https udp tcp dnscrypt dou dot doh socks socks5</PackageTags>
-    <RepositoryType>Github</RepositoryType>
-    <PackageIcon>Logo.png</PackageIcon>
-    <SignAssembly>false</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DebugType>embedded</DebugType>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DebugType>embedded</DebugType>
-  </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Texnomic.SecureDNS.Extensions\Texnomic.SecureDNS.Extensions.csproj" />
-    <ProjectReference Include="..\Texnomic.SecureDNS.Serialization\Texnomic.SecureDNS.Serialization.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\docs\Logo.png">
-      <Pack>True</Pack>
-      <PackagePath>
-      </PackagePath>
-    </None>
-  </ItemGroup>
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="if $(ConfigurationName) == Release (..\Tools\signtool.exe sign /sha1 &quot;33261449de13599f046617dd18994bab0e4346a8&quot; /tr http://time.certum.pl /fd sha256 /v $(TargetPath))" />
-  </Target>
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+
+		<Version>0.5.0-alpha</Version>
+		<Authors>Texnomic</Authors>
+		<Company>Texnomic</Company>
+		<Copyright>Texnomic, Copyrights © 2023</Copyright>
+
+		<RepositoryUrl>https://github.com/Texnomic/SecureDNS</RepositoryUrl>
+		<RepositoryType>Github</RepositoryType>
+
+		<PackageIcon>SecureDNS.ico</PackageIcon>
+		<PackageTags>Alpha</PackageTags>
+		<PackageId>$(ProjectName)</PackageId>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageProjectUrl>https://github.com/Texnomic/SecureDNS</PackageProjectUrl>
+		<PackageTags>dns sdns https udp tcp dnscrypt dou dot doh</PackageTags>
+
+		<Product>$(ProjectName)</Product>
+		<Description>$(ProjectName)</Description>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<DebugType>embedded</DebugType>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<DebugType>embedded</DebugType>
+	</PropertyGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Texnomic.SecureDNS.Extensions\Texnomic.SecureDNS.Extensions.csproj" />
+		<ProjectReference Include="..\Texnomic.SecureDNS.Serialization\Texnomic.SecureDNS.Serialization.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<None Include="..\docs\Logo.png">
+			<Pack>True</Pack>
+			<PackagePath>
+			</PackagePath>
+		</None>
+	</ItemGroup>
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Exec Command="if $(ConfigurationName) == Release (..\Tools\signtool.exe sign /sha1 &quot;33261449de13599f046617dd18994bab0e4346a8&quot; /tr http://time.certum.pl /fd sha256 /v $(TargetPath))" />
+	</Target>
 </Project>

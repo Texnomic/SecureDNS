@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Texnomic.SecureDNS.Middlewares.Options;
+﻿namespace Texnomic.SecureDNS.Middlewares.Options;
 
 public class HostTableMiddlewareOptions
 {

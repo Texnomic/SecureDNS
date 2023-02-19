@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Texnomic.SecureDNS.Abstractions;
+﻿using Texnomic.SecureDNS.Abstractions;
 
 namespace Texnomic.SecureDNS.Middlewares.Options;
 

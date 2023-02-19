@@ -1,6 +1,4 @@
-﻿using System;
-using System.Net.Security;
-using System.Threading.Tasks;
+﻿using System.Net.Security;
 
 namespace Texnomic.SecureDNS.Extensions;
 

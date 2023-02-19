@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Common.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Nethereum.ENS;
 using Nethereum.ENS.ENSRegistry.ContractDefinition;
@@ -31,9 +27,9 @@ public class ENS : Protocol
     private readonly ENSRegistryService ENSRegistryService;
     private readonly BaseRegistrarService BaseRegistrarService;
 
-    public ENS(IOptionsMonitor<ENSOptions> ENSOptions, ILog Log)
+    public ENS(IOptionsMonitor<ENSOptions> ENSOptions, ILogger Logger)
     {
-        Web3 = new Web3(ENSOptions.CurrentValue.Web3.ToString(), Log);
+        Web3 = new Web3(ENSOptions.CurrentValue.Web3.ToString(), Logger);
         EnsUtil = new EnsUtil();
         ENSService = new ENSService(Web3);
         ENSRegistryService = new ENSRegistryService(Web3, ENSService.EnsRegistryAddress);

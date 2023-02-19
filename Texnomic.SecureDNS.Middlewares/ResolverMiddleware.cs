@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Timers;
+﻿using System.Timers;
 using Serilog;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
@@ -9,6 +6,7 @@ using PipelineNet.Middleware;
 using Texnomic.SecureDNS.Abstractions;
 using Texnomic.SecureDNS.Abstractions.Enums;
 using Texnomic.SecureDNS.Middlewares.Options;
+using Timer = System.Timers.Timer;
 
 namespace Texnomic.SecureDNS.Middlewares;
 

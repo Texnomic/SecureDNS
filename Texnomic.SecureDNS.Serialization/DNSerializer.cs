@@ -1,9 +1,6 @@
-﻿using System;
-using System.Linq;
-using System.Buffers.Binary;
+﻿using System.Buffers.Binary;
 using Texnomic.SecureDNS.Core;
 using Texnomic.SecureDNS.Core.DataTypes;
-using System.Collections.Generic;
 using Texnomic.SecureDNS.Abstractions;
 using Texnomic.SecureDNS.Abstractions.Enums;
 using Texnomic.SecureDNS.Core.Records;

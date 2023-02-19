@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Texnomic.SecureDNS.Extensions;
+﻿namespace Texnomic.SecureDNS.Extensions;
 
 public static class ShortExtensions
 {

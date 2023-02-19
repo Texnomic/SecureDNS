@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Text.Json.Serialization;
 
 namespace Texnomic.SecureDNS.Servers.Proxy.Options;

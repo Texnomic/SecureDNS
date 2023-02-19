@@ -1,5 +1,4 @@
-﻿using System;
-using Destructurama.Attributed;
+﻿using Destructurama.Attributed;
 using Texnomic.SecureDNS.Abstractions;
 
 namespace Texnomic.SecureDNS.Core.Records;
