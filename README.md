@@ -131,8 +131,6 @@ The Project offically launched within my talk for [Cairo Security Camp](https://
 ## Donations
 
 * [![PayPal](https://img.shields.io/static/v1?logo=PayPal&label=PayPal&message=https://www.paypal.me/texnomic&color=blue)](https://www.paypal.me/texnomic)
-* ![Bitcoin](https://img.shields.io/static/v1?logo=Bitcoin&label=BTC&message=13wMqy8yg9yhJAAP2AXu8A2De1ptAYh6s4&color=orange)
-* ![Ethereum](https://img.shields.io/static/v1?logo=Ethereum&label=Ethereum&message=0xfE171b1C5C5584b65ec58a6FA2009f6ECeE812D7&color=black&logoColor=black)
 
 ## Supported-By
 
