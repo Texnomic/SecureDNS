@@ -5,7 +5,7 @@
 [![Slack](https://img.shields.io/static/v1?logo=Slack&label=Slack&message=Channel&color=73BA25&logoColor=4A154B)](https://join.slack.com/t/texnomicsecuredns/shared_invite/zt-h110u1u8-5VwSZsQSHL13s62xAZjI2Q)
 [![Facebook](https://img.shields.io/static/v1?logo=Facebook&label=Facebook&message=Page&color=73BA25&logoColor=1877FF2)](https://www.facebook.com/Texnomic-Secure-DNS-114240320331170)
 
-Building a Secure, Modern, Cross-Platform & Cross-Architecture DNS Server Using .NET 6.0.
+Building a Secure, Modern, Cross-Platform & Cross-Architecture DNS Server Using .NET 7.0.
 
 SecureDNS Project aims to implements all *secure* DNS Protocols regardless of being standardized or widely adopted; while maintaining backward compatibility with *unsecure* DNS-Over-UDP Protocol via Reverse Proxy.
 
