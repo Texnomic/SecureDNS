@@ -20,10 +20,9 @@ SecureDNS Project is implemented using modern [Clean-Architecture](https://www.a
 5. [Platforms](#Platforms)
 6. [Architecture](#Architecture)
 7. [Launch](#Launch)
-8. [Technology](#Technology)
-9. [Dependencies](#Dependencies)
-10. [Donations](#Donations)
-11. [Supported-By](#Supported-By)
+8. [Dependencies](#Dependencies)
+9. [Donations](#Donations)
+10. [Supported-By](#Supported-By)
 
 ## Releases
 
@@ -97,16 +96,6 @@ The Project offically launched within my talk for [Cairo Security Camp](https://
 [![PowerPoint](https://img.shields.io/static/v1?logo=Microsoft%20PowerPoint&label=Rebuilding%20Domain%20Name%20System&message=Presentation&color=B7472A&logoColor=B7472A)](https://raw.githubusercontent.com/Texnomic/SecureDNS/master/docs/Rebuilding.DNS.pptx)
 
 >This talk will cover the DNS protocol since its inception in 1986 and taking a deep-dive into the inherit lack of security at its core design and how all modern operating systems using insecure standards, Then we will explain alternative secure implementation like DNS Over TLS and DNS Over HTTP/S. Then we will shift-gears to developing an all-new modern DNS Server Reference-Implementation with a myriad of possibilities for retaking control like Black/Sink-holing, Threat Hunting/Intelligence and way more! Finally, we will launch a GitHub-based Open-Source Project containing DNS Server Reference-Implementation for the First-Time & Exclusively in Cairo Security Camp!
-
-## Technology
-
-1. [C# 8.0](https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-8)
-2. [.NET 5.0](https://dotnet.microsoft.com/download/dotnet/5.0)
-3. [ASP.NET Core 5.0](https://dotnet.microsoft.com/download/dotnet/5.0)
-4. [PowerShell Core 7.0](https://github.com/PowerShell/PowerShell)
-5. [Entity Framework Core 3.1](https://docs.microsoft.com/en-us/ef/core/)
-6. [Blazor aka Razor Components](https://dotnet.microsoft.com/apps/aspnet/web-apps/client)
-7. [Solidity](https://github.com/ethereum/solidity)
 
 ## Dependencies
 
