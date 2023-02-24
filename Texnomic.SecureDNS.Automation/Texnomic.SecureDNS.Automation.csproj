@@ -35,6 +35,6 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.PowerShell.SDK" Version="7.3.2" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
-		<PackageReference Include="System.Management.Automation" Version="7.3.2" />
+		<PackageReference Include="System.Management.Automation" Version="7.3.3" />
 	</ItemGroup>
 </Project>
