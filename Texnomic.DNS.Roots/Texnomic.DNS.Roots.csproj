@@ -35,6 +35,6 @@
 	<ItemGroup>
 		<PackageReference Include="HtmlAgilityPack" Version="1.11.46" />
 		<PackageReference Include="RestSharp" Version="108.0.3" />
-		<PackageReference Include="YamlDotNet" Version="13.0.0" />
+		<PackageReference Include="YamlDotNet" Version="13.0.1" />
 	</ItemGroup>
 </Project>
