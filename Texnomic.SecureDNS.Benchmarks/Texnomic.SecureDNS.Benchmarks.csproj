@@ -27,7 +27,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="BenchmarkDotNet" Version="0.13.5" />
-		<PackageReference Include="BinarySerializer" Version="8.6.3.2" />
+		<PackageReference Include="BinarySerializer" Version="8.6.4" />
 	</ItemGroup>
 
 	<ItemGroup>

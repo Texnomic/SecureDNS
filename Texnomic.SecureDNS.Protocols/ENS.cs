@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Nethereum.ENS;
+using Nethereum.Contracts.Services;
+using Nethereum.Contracts.Standards.ENS;
 using Nethereum.ENS.ENSRegistry.ContractDefinition;
 using Nethereum.Hex.HexConvertors.Extensions;
 using Nethereum.Web3;
@@ -15,6 +16,7 @@ using Texnomic.SecureDNS.Serialization;
 using OwnerFunction = Nethereum.ENS.ENSRegistry.ContractDefinition.OwnerFunction;
 using AvailableFunction =Texnomic.ENS.BaseRegistrar.ContractDefinition.AvailableFunction;
 using ENSOptions = Texnomic.SecureDNS.Protocols.Options.ENSOptions;
+using ENSRegistryService = Nethereum.ENS.ENSRegistryService;
 using NameExpiresFunction = Texnomic.ENS.BaseRegistrar.ContractDefinition.NameExpiresFunction;
 
 namespace Texnomic.SecureDNS.Protocols;
@@ -31,7 +33,7 @@ public class ENS : Protocol
     {
         Web3 = new Web3(ENSOptions.CurrentValue.Web3.ToString(), Logger);
         EnsUtil = new EnsUtil();
-        ENSService = new ENSService(Web3);
+        ENSService = new ENSService(new EthApiContractService(Web3.Client));
         ENSRegistryService = new ENSRegistryService(Web3, ENSService.EnsRegistryAddress);
         BaseRegistrarService = new BaseRegistrarService(Web3, "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85");
     }

@@ -26,15 +26,15 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.1" />
-		<PackageReference Include="MSTest.TestAdapter" Version="3.0.2" />
-		<PackageReference Include="MSTest.TestFramework" Version="3.0.2" />
-		<PackageReference Include="coverlet.collector" Version="3.2.0">
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.3" />
+		<PackageReference Include="MSTest.TestAdapter" Version="3.0.4" />
+		<PackageReference Include="MSTest.TestFramework" Version="3.0.4" />
+		<PackageReference Include="coverlet.collector" Version="6.0.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Nethereum.Accounts" Version="4.13.0" />
-		<PackageReference Include="Nethereum.ENS" Version="4.13.0" />
+		<PackageReference Include="Nethereum.Accounts" Version="4.14.0" />
+		<PackageReference Include="Nethereum.ENS" Version="4.14.0" />
 	</ItemGroup>
 
 	<ItemGroup>

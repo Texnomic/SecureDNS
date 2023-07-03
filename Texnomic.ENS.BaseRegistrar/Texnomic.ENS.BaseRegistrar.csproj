@@ -29,10 +29,10 @@
 		<DebugType>embedded</DebugType>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Nethereum.Contracts" Version="4.13.0" />
-		<PackageReference Include="Nethereum.RPC" Version="4.13.0" />
-		<PackageReference Include="Nethereum.Web3" Version="4.13.0" />
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+		<PackageReference Include="Nethereum.Contracts" Version="4.14.0" />
+		<PackageReference Include="Nethereum.RPC" Version="4.14.0" />
+		<PackageReference Include="Nethereum.Web3" Version="4.14.0" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 	</ItemGroup>
 	<ItemGroup>
 		<None Include="..\docs\Logo.png">

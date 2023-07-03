@@ -33,40 +33,40 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="AsyncEnumerator" Version="4.0.2" />
-		<PackageReference Include="Blazorise.Bootstrap" Version="1.2.0" />
-		<PackageReference Include="Blazorise.Icons.FontAwesome" Version="1.2.0" />
-		<PackageReference Include="Blazorise.Sidebar" Version="1.2.0" />
-		<PackageReference Include="ElectronNET.API" Version="13.5.1" />
+		<PackageReference Include="Blazorise.Bootstrap" Version="1.2.4" />
+		<PackageReference Include="Blazorise.Icons.FontAwesome" Version="1.2.4" />
+		<PackageReference Include="Blazorise.Sidebar" Version="1.2.4" />
+		<PackageReference Include="ElectronNET.API" Version="23.6.1" />
 		<PackageReference Include="FlexLabs.EntityFrameworkCore.Upsert" Version="7.0.0" />
-		<PackageReference Include="Hangfire" Version="1.7.33" />
+		<PackageReference Include="Hangfire" Version="1.8.3" />
 		<PackageReference Include="Hangfire.SQLite" Version="1.4.2" />
-		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="7.0.3" />
+		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="7.0.8" />
 		<PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.3" />
-		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="7.0.3" />
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.3" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.3">
+		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.8" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="7.0.8" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.8" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.8">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="7.0.3" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.3" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="7.0.8" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.8" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Design" Version="1.1.6" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
-		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.4" />
-		<PackageReference Include="morelinq" Version="3.3.2" />
-		<PackageReference Include="Serilog.AspNetCore" Version="6.1.0" />
+		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.7" />
+		<PackageReference Include="morelinq" Version="3.4.2" />
+		<PackageReference Include="Serilog.AspNetCore" Version="7.0.0" />
 		<PackageReference Include="Serilog.Enrichers.AspnetcoreHttpcontext" Version="1.1.0" />
 		<PackageReference Include="Serilog.Enrichers.Environment" Version="2.2.0" />
 		<PackageReference Include="Serilog.Enrichers.Memory" Version="1.0.4" />
 		<PackageReference Include="Serilog.Enrichers.Process" Version="2.0.2" />
 		<PackageReference Include="Serilog.Enrichers.Thread" Version="3.1.0" />
-		<PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0" />
+		<PackageReference Include="Serilog.Extensions.Logging" Version="7.0.0" />
 		<PackageReference Include="Serilog.Formatting.Compact" Version="1.1.0" />
-		<PackageReference Include="Serilog.Settings.Configuration" Version="3.4.0" />
+		<PackageReference Include="Serilog.Settings.Configuration" Version="7.0.0" />
 		<PackageReference Include="Serilog.Sinks.Seq" Version="5.2.2" />
-		<PackageReference Include="Syncfusion.Blazor" Version="20.4.0.50" />
-		<PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="7.18.4" />
+		<PackageReference Include="Syncfusion.Blazor" Version="22.1.36" />
+		<PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="7.22.3" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Texnomic.SecureDNS.Core\Texnomic.SecureDNS.Core.csproj" />
