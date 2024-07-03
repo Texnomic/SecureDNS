@@ -1,50 +1,18 @@
-﻿using System.Buffers.Binary;
-using System.Diagnostics;
-using System.Net.Sockets;
-using System.Runtime.InteropServices;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
-using PipelineNet.MiddlewareResolver;
+﻿namespace Texnomic.SecureDNS.Servers.Proxy;
 
-using Serilog;
-using Texnomic.SecureDNS.Abstractions.Enums;
-using Texnomic.SecureDNS.Core;
-using Texnomic.SecureDNS.Extensions;
-using Texnomic.SecureDNS.Serialization;
-using Texnomic.SecureDNS.Servers.Proxy.Options;
-using Texnomic.SecureDNS.Servers.Proxy.ResponsibilityChain;
-
-namespace Texnomic.SecureDNS.Servers.Proxy;
-
-public sealed class UDPServer2 : IHostedService, IDisposable
+public sealed class UDPServer2(
+    IOptionsMonitor<ProxyResponsibilityChainOptions> ProxyResponsibilityChainOptions,
+    IOptionsMonitor<ProxyServerOptions> ProxyServerOptions,
+    IMiddlewareResolver MiddlewareResolver,
+    ILogger Logger)
+    : IHostedService, IDisposable
 {
-    private readonly ILogger Logger;
-    private readonly List<Task> Threads;
-    private readonly IOptionsMonitor<ProxyServerOptions> Options;
-    private readonly IMiddlewareResolver MiddlewareResolver;
-    private readonly IOptionsMonitor<ProxyResponsibilityChainOptions> ProxyResponsibilityChainOptions;
-    private readonly UdpClient Server;
+    private readonly List<Task> Threads = [];
+    private readonly UdpClient Server = new();
 
     private CancellationToken CancellationToken;
 
-    private int Affinity;
-
-    public UDPServer2(IOptionsMonitor<ProxyResponsibilityChainOptions> ProxyResponsibilityChainOptions, IOptionsMonitor<ProxyServerOptions> ProxyServerOptions, IMiddlewareResolver MiddlewareResolver, ILogger Logger)
-    {
-        Options = ProxyServerOptions;
-
-        this.MiddlewareResolver = MiddlewareResolver;
-
-        this.ProxyResponsibilityChainOptions = ProxyResponsibilityChainOptions;
-
-        this.Logger = Logger;
-
-        Threads = new List<Task>();
-
-        Server = new UdpClient();
-
-        Affinity = 0;
-    }
+    private int Affinity = 0;
 
     public async Task StartAsync(CancellationToken Token)
     {
@@ -56,14 +24,14 @@ public sealed class UDPServer2 : IHostedService, IDisposable
             Server.Client.IOControl(-1744830452, new byte[4], null);
         }
 
-        Server.Client.Bind(Options.CurrentValue.IPEndPoint);
+        Server.Client.Bind(ProxyServerOptions.CurrentValue.IPEndPoint);
 
-        for (var I = 0; I < ProxyServerOptions.Threads; I++)
+        for (var I = 0; I < ProxyServerOptions.CurrentValue.Threads; I++)
         {
             Threads.Add(Task.Factory.StartNew(ResolveAsync, CancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default).Unwrap());
         }
 
-        Logger?.Information("UDP Server Started with {@Threads} Threads. Listening On {@IPEndPoint}", ProxyServerOptions.Threads, Options.CurrentValue.IPEndPoint.ToString());
+        Logger?.Information("UDP Server Started with {@Threads} Threads. Listening On {@IPEndPoint}", ProxyServerOptions.CurrentValue.Threads, ProxyServerOptions.CurrentValue.IPEndPoint.ToString());
 
         await Task.Yield();
     }
@@ -80,13 +48,13 @@ public sealed class UDPServer2 : IHostedService, IDisposable
     {
         var AffinityPointer = (0b00000001 << Affinity++);
             
-        var ProcessThread = Process.GetCurrentProcess().Threads[Thread.CurrentThread.ManagedThreadId];
+        var ProcessThread = Process.GetCurrentProcess().Threads[Environment.CurrentManagedThreadId];
 
         ProcessThread.ProcessorAffinity = (IntPtr) AffinityPointer;
 
         ProcessThread.PriorityLevel = ThreadPriorityLevel.Highest;
 
-        Logger?.Debug("UDP Server Started Thread {@Thread} with Affinity {@Affinity} & Priority {@Priority}.", Thread.CurrentThread.ManagedThreadId, AffinityPointer, ThreadPriorityLevel.Highest);
+        Logger?.Debug("UDP Server Started Thread {@Thread} with Affinity {@Affinity} & Priority {@Priority}.", Environment.CurrentManagedThreadId, AffinityPointer, ThreadPriorityLevel.Highest);
             
         var ProxyResponsibilityChain = new ProxyResponsibilityChain(ProxyResponsibilityChainOptions, MiddlewareResolver);
 

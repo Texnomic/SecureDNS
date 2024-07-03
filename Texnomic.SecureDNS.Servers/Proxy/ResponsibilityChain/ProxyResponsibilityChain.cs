@@ -1,9 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-using PipelineNet.ChainsOfResponsibility;
-using PipelineNet.MiddlewareResolver;
-using Texnomic.SecureDNS.Abstractions;
-using Texnomic.SecureDNS.Abstractions.Enums;
-using Texnomic.SecureDNS.Servers.Proxy.Options;
+﻿using PipelineNet.ChainsOfResponsibility;
 
 namespace Texnomic.SecureDNS.Servers.Proxy.ResponsibilityChain;
 

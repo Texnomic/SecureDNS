@@ -1,78 +1,33 @@
-﻿using System.Buffers.Binary;
-using System.Net.Sockets;
-using System.Threading.Tasks.Dataflow;
+﻿namespace Texnomic.SecureDNS.Servers.Proxy;
 
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
-
-using Nethereum.Util;
-
-using PipelineNet.MiddlewareResolver;
-
-using Serilog;
-
-using Texnomic.SecureDNS.Abstractions;
-using Texnomic.SecureDNS.Abstractions.Enums;
-using Texnomic.SecureDNS.Core;
-using Texnomic.SecureDNS.Extensions;
-using Texnomic.SecureDNS.Serialization;
-using Texnomic.SecureDNS.Servers.Proxy.Options;
-using Texnomic.SecureDNS.Servers.Proxy.ResponsibilityChain;
-
-namespace Texnomic.SecureDNS.Servers.Proxy;
-
-public sealed class TCPServer : IHostedService, IDisposable
+public sealed class TCPServer(
+    IOptionsMonitor<ProxyResponsibilityChainOptions> ProxyResponsibilityChainOptions,
+    IOptionsMonitor<ProxyServerOptions> ProxyServerOptions,
+    IMiddlewareResolver MiddlewareResolver,
+    ILogger Logger)
+    : IHostedService, IDisposable
 {
-    private readonly ILogger Logger;
-    private readonly List<Task> Workers;
-    private readonly IOptionsMonitor<ProxyServerOptions> Options;
-    private readonly IMiddlewareResolver MiddlewareResolver;
-    private readonly IOptionsMonitor<ProxyResponsibilityChainOptions> ProxyResponsibilityChainOptions;
-    private readonly BufferBlock<(IMessage, Socket)> IncomingQueue;
-    private readonly BufferBlock<(IMessage, Socket)> OutgoingQueue;
+    private readonly List<Task> Workers = [];
+    private readonly BufferBlock<(IMessage, Socket)> IncomingQueue = new();
+    private readonly BufferBlock<(IMessage, Socket)> OutgoingQueue = new();
+    private readonly TcpListener TcpListener = new(ProxyServerOptions.CurrentValue.IPEndPoint);
 
     private CancellationToken CancellationToken;
-
-    private TcpListener TcpListener;
-
-    public TCPServer(IOptionsMonitor<ProxyResponsibilityChainOptions> ProxyResponsibilityChainOptions,
-        IOptionsMonitor<ProxyServerOptions> ProxyServerOptions,
-        IMiddlewareResolver MiddlewareResolver,
-        ILogger Logger)
-    {
-        Options = ProxyServerOptions;
-
-        this.MiddlewareResolver = MiddlewareResolver;
-
-        this.ProxyResponsibilityChainOptions = ProxyResponsibilityChainOptions;
-
-        this.Logger = Logger;
-
-        Workers = new List<Task>();
-
-        IncomingQueue = new BufferBlock<(IMessage, Socket)>();
-
-        OutgoingQueue = new BufferBlock<(IMessage, Socket)>();
-    }
 
     public async Task StartAsync(CancellationToken Token)
     {
         CancellationToken = Token;
 
-        TcpListener = new TcpListener(Options.CurrentValue.IPEndPoint);
-
-        //TcpListener.Server.Bind(Options.CurrentValue.IPEndPoint);
-
         TcpListener.Start();
 
-        for (var I = 0; I < ProxyServerOptions.Threads; I++)
+        for (var I = 0; I < ProxyServerOptions.CurrentValue.Threads; I++)
         {
             Workers.Add(Task.Factory.StartNew(ReceiveAsync, CancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default).Unwrap());
             Workers.Add(Task.Factory.StartNew(ResolveAsync, CancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default).Unwrap());
             Workers.Add(Task.Factory.StartNew(SendAsync, CancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default).Unwrap());
         }
 
-        Logger?.Information("TCP Server Started with {@Threads} Threads. Listening On {@IPEndPoint}", ProxyServerOptions.Threads, Options.CurrentValue.IPEndPoint.ToString());
+        Logger?.Information("TCP Server Started with {@Threads} Threads. Listening On {@IPEndPoint}", ProxyServerOptions.CurrentValue.Threads, ProxyServerOptions.CurrentValue.IPEndPoint.ToString());
 
         await Task.Yield();
     }
@@ -135,12 +90,11 @@ public sealed class TCPServer : IHostedService, IDisposable
     {
         Thread.CurrentThread.Name = "Receiver";
 
-
         while (!CancellationToken.IsCancellationRequested)
         {
             try
             {
-                var ClientSocket = await TcpListener.AcceptSocketAsync();
+                var ClientSocket = await TcpListener.AcceptSocketAsync(CancellationToken);
 
                 var Prefix = new byte[2];
 
@@ -183,7 +137,7 @@ public sealed class TCPServer : IHostedService, IDisposable
         {
             try
             {
-                (Query, ClientSocket) = await IncomingQueue.ReceiveAsync(CancellationToken).WithCancellation(CancellationToken);
+                (Query, ClientSocket) = await IncomingQueue.ReceiveAsync(CancellationToken);
 
                 var Answer = await ResponsibilityChain.Execute(Query);
 
@@ -220,7 +174,7 @@ public sealed class TCPServer : IHostedService, IDisposable
         {
             try
             {
-                var (Answer, ClientSocket) = await OutgoingQueue.ReceiveAsync(CancellationToken).WithCancellation(CancellationToken);
+                var (Answer, ClientSocket) = await OutgoingQueue.ReceiveAsync(CancellationToken);
 
                 var Bytes = Serialize(Answer);
 
@@ -245,7 +199,7 @@ public sealed class TCPServer : IHostedService, IDisposable
         }
     }
 
-    private IMessage Handle(Exception Error, ushort ID, string Stage, ResponseCode Response)
+    private Message Handle(Exception Error, ushort ID, string Stage, ResponseCode Response)
     {
         Logger?.Error(Error, $"{@Error} Occurred While {Stage} Message.", Error);
 
@@ -257,7 +211,7 @@ public sealed class TCPServer : IHostedService, IDisposable
         };
     }
 
-    private IMessage Handle(Exception Error, byte[] Bytes, string Stage, ResponseCode Response)
+    private Message Handle(Exception Error, byte[] Bytes, string Stage, ResponseCode Response)
     {
         Logger?.Error(Error, $"{@Error} Occurred While {Stage} {@Bytes}.", Error, BitConverter.ToString(Bytes).Replace("-", ", 0x"));
 

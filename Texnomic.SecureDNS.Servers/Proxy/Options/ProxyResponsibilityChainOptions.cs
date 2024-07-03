@@ -1,5 +1,4 @@
 ﻿using PipelineNet.Middleware;
-using Texnomic.SecureDNS.Abstractions;
 
 namespace Texnomic.SecureDNS.Servers.Proxy.Options;
 

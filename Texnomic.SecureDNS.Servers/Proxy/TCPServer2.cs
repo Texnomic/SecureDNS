@@ -1,64 +1,27 @@
-﻿using System.Buffers.Binary;
-using System.Net.Sockets;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
-using PipelineNet.MiddlewareResolver;
+﻿namespace Texnomic.SecureDNS.Servers.Proxy;
 
-using Serilog;
-using Texnomic.SecureDNS.Abstractions.Enums;
-using Texnomic.SecureDNS.Core;
-using Texnomic.SecureDNS.Extensions;
-using Texnomic.SecureDNS.Serialization;
-using Texnomic.SecureDNS.Servers.Proxy.Options;
-using Texnomic.SecureDNS.Servers.Proxy.ResponsibilityChain;
-
-
-namespace Texnomic.SecureDNS.Servers.Proxy;
-
-public sealed class TCPServer2 : IHostedService, IDisposable
+public sealed class TCPServer2(IOptionsMonitor<ProxyResponsibilityChainOptions> ProxyResponsibilityChainOptions,
+    IOptionsMonitor<ProxyServerOptions> ProxyServerOptions,
+    IMiddlewareResolver MiddlewareResolver,
+    ILogger Logger) : IHostedService, IDisposable
 {
-    private readonly ILogger Logger;
-    private readonly List<Task> Threads;
-    private readonly IOptionsMonitor<ProxyServerOptions> Options;
-    private readonly IMiddlewareResolver MiddlewareResolver;
-    private readonly IOptionsMonitor<ProxyResponsibilityChainOptions> ProxyResponsibilityChainOptions;
-    private readonly TcpListener TcpListener;
+    private readonly List<Task> Threads = [];
+    private readonly TcpListener TcpListener = new(ProxyServerOptions.CurrentValue.IPEndPoint);
 
     private CancellationToken CancellationToken;
-
-
-    public TCPServer2(IOptionsMonitor<ProxyResponsibilityChainOptions> ProxyResponsibilityChainOptions,
-        IOptionsMonitor<ProxyServerOptions> ProxyServerOptions,
-        IMiddlewareResolver MiddlewareResolver,
-        ILogger Logger)
-    {
-        Options = ProxyServerOptions;
-
-        this.MiddlewareResolver = MiddlewareResolver;
-
-        this.ProxyResponsibilityChainOptions = ProxyResponsibilityChainOptions;
-
-        this.Logger = Logger;
-
-        Threads = new List<Task>();
-
-        TcpListener = new TcpListener(Options.CurrentValue.IPEndPoint);
-    }
 
     public async Task StartAsync(CancellationToken Token)
     {
         CancellationToken = Token;
 
-        //TcpListener.Server.Listen();
-
         TcpListener.Start();
 
-        for (var I = 0; I < ProxyServerOptions.Threads; I++)
+        for (var I = 0; I < ProxyServerOptions.CurrentValue.Threads; I++)
         {
             Threads.Add(Task.Factory.StartNew(ResolveAsync, CancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default).Unwrap());
         }
 
-        Logger?.Information("TCP Server Started with {@Threads} Threads. Listening On {@IPEndPoint}", ProxyServerOptions.Threads, Options.CurrentValue.IPEndPoint.ToString());
+        Logger?.Information("TCP Server Started with {@Threads} Threads. Listening On {@IPEndPoint}", ProxyServerOptions.CurrentValue.Threads, ProxyServerOptions.CurrentValue.IPEndPoint.ToString());
 
         await Task.Yield();
     }
@@ -92,7 +55,7 @@ public sealed class TCPServer2 : IHostedService, IDisposable
                 Prefix = new byte[2];
 
                 await Client.ReceiveAsync(Prefix, SocketFlags.None);
-                    
+
                 var Size = BinaryPrimitives.ReadUInt16BigEndian(Prefix);
 
                 Buffer = new byte[Size];
@@ -135,7 +98,7 @@ public sealed class TCPServer2 : IHostedService, IDisposable
 
                 var RawMessage = DnSerializer.Serialize(Message);
 
-                BinaryPrimitives.WriteUInt16BigEndian(Prefix, (ushort) RawMessage.Length);
+                BinaryPrimitives.WriteUInt16BigEndian(Prefix, (ushort)RawMessage.Length);
 
                 await Client.SendAsync(Prefix, SocketFlags.None);
 

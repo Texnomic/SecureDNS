@@ -1,62 +1,22 @@
-﻿using System.Net;
-using System.Net.Sockets;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks.Dataflow;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
-using Nethereum.Util;
-using PipelineNet.MiddlewareResolver;
-using Serilog;
-using Texnomic.SecureDNS.Abstractions;
-using Texnomic.SecureDNS.Abstractions.Enums;
-using Texnomic.SecureDNS.Core;
-using Texnomic.SecureDNS.Extensions;
-using Texnomic.SecureDNS.Serialization;
-using Texnomic.SecureDNS.Servers.Proxy.Options;
-using Texnomic.SecureDNS.Servers.Proxy.ResponsibilityChain;
+﻿namespace Texnomic.SecureDNS.Servers.Proxy;
 
-namespace Texnomic.SecureDNS.Servers.Proxy;
-
-public sealed class UDPServer : IHostedService, IDisposable
+public sealed class UDPServer(
+    IOptionsMonitor<ProxyResponsibilityChainOptions> ProxyResponsibilityChainOptions,
+    IOptionsMonitor<ProxyServerOptions> ProxyServerOptions,
+    IMiddlewareResolver MiddlewareResolver,
+    ILogger Logger)
+    : IHostedService, IDisposable
 {
-    private readonly ILogger Logger;
-    private readonly List<Task> Workers;
-    private readonly IOptionsMonitor<ProxyServerOptions> Options;
-    private readonly IMiddlewareResolver MiddlewareResolver;
-    private readonly IOptionsMonitor<ProxyResponsibilityChainOptions> ProxyResponsibilityChainOptions;
-    private readonly BufferBlock<(IMessage, IPEndPoint)> IncomingQueue;
-    private readonly BufferBlock<(IMessage, IPEndPoint)> OutgoingQueue;
-
+    private readonly List<Task> Workers = [];
+    private readonly BufferBlock<(IMessage, IPEndPoint)> IncomingQueue = new();
+    private readonly BufferBlock<(IMessage, IPEndPoint)> OutgoingQueue = new();
+    private readonly UdpClient UdpClient = new();
 
     private CancellationToken CancellationToken;
-
-    private UdpClient UdpClient;
-
-    public UDPServer(IOptionsMonitor<ProxyResponsibilityChainOptions> ProxyResponsibilityChainOptions,
-        IOptionsMonitor<ProxyServerOptions> ProxyServerOptions,
-        IMiddlewareResolver MiddlewareResolver,
-        ILogger Logger)
-    {
-        Options = ProxyServerOptions;
-
-        this.MiddlewareResolver = MiddlewareResolver;
-
-        this.ProxyResponsibilityChainOptions = ProxyResponsibilityChainOptions;
-
-        this.Logger = Logger;
-
-        Workers = new List<Task>();
-
-        IncomingQueue = new BufferBlock<(IMessage, IPEndPoint)>();
-
-        OutgoingQueue = new BufferBlock<(IMessage, IPEndPoint)>();
-    }
 
     public async Task StartAsync(CancellationToken Token)
     {
         CancellationToken = Token;
-
-        UdpClient = new UdpClient();
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
@@ -64,16 +24,16 @@ public sealed class UDPServer : IHostedService, IDisposable
             UdpClient.Client.IOControl(-1744830452, new byte[4], null);
         }
 
-        UdpClient.Client.Bind(Options.CurrentValue.IPEndPoint);
+        UdpClient.Client.Bind(ProxyServerOptions.CurrentValue.IPEndPoint);
 
-        for (var I = 0; I < ProxyServerOptions.Threads; I++)
+        for (var I = 0; I < ProxyServerOptions.CurrentValue.Threads; I++)
         {
             Workers.Add(Task.Factory.StartNew(ReceiveAsync, CancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default).Unwrap());
             Workers.Add(Task.Factory.StartNew(ResolveAsync, CancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default).Unwrap());
             Workers.Add(Task.Factory.StartNew(SendAsync, CancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default).Unwrap());
         }
 
-        Logger?.Information("UDP Server Started with {@Threads} Threads. Listening On {@IPEndPoint}", ProxyServerOptions.Threads, Options.CurrentValue.IPEndPoint.ToString());
+        Logger?.Information("UDP Server Started with {@Threads} Threads. Listening On {@IPEndPoint}", ProxyServerOptions.CurrentValue.Threads, ProxyServerOptions.CurrentValue.IPEndPoint.ToString());
 
         await Task.Yield();
     }
@@ -175,8 +135,7 @@ public sealed class UDPServer : IHostedService, IDisposable
         {
             try
             {
-                (Query, RemoteEndPoint) = await IncomingQueue.ReceiveAsync(CancellationToken)
-                    .WithCancellation(CancellationToken);
+                (Query, RemoteEndPoint) = await IncomingQueue.ReceiveAsync(CancellationToken);
 
                 var Answer = await ResponsibilityChain.Execute(Query);
 
@@ -213,8 +172,7 @@ public sealed class UDPServer : IHostedService, IDisposable
         {
             try
             {
-                var (Answer, RemoteEndPoint) = await OutgoingQueue.ReceiveAsync(CancellationToken)
-                    .WithCancellation(CancellationToken);
+                var (Answer, RemoteEndPoint) = await OutgoingQueue.ReceiveAsync(CancellationToken);
 
                 var Bytes = Serialize(Answer);
 
@@ -234,7 +192,7 @@ public sealed class UDPServer : IHostedService, IDisposable
         }
     }
 
-    private IMessage Handle(Exception Error, ushort ID, string Stage, ResponseCode Response)
+    private Message Handle(Exception Error, ushort ID, string Stage, ResponseCode Response)
     {
         Logger?.Error(Error, $"{@Error} Occurred While {Stage} Message.", Error);
 
@@ -246,7 +204,7 @@ public sealed class UDPServer : IHostedService, IDisposable
         };
     }
 
-    private IMessage Handle(Exception Error, byte[] Bytes, string Stage, ResponseCode Response)
+    private Message Handle(Exception Error, byte[] Bytes, string Stage, ResponseCode Response)
     {
         Logger?.Error(Error, $"{@Error} Occurred While {Stage} {@Bytes}.", Error, BitConverter.ToString(Bytes).Replace("-", ", 0x"));
 
