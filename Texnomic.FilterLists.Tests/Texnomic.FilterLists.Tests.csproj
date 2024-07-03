@@ -2,14 +2,14 @@
 
 	<PropertyGroup>
 		<IsPackable>false</IsPackable>
-		<TargetFramework>net7.0</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 
-		<Version>0.5.0-alpha</Version>
+		<Version>0.6.0-alpha</Version>
 		<Authors>Texnomic</Authors>
 		<Company>Texnomic</Company>
-		<Copyright>Texnomic, Copyrights © 2023</Copyright>
+		<Copyright>Texnomic, Copyrights © 2024</Copyright>
 
 		<RepositoryUrl>https://github.com/Texnomic/SecureDNS</RepositoryUrl>
 		<RepositoryType>Github</RepositoryType>
@@ -29,7 +29,7 @@
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.3" />
 		<PackageReference Include="MSTest.TestAdapter" Version="3.0.4" />
 		<PackageReference Include="MSTest.TestFramework" Version="3.0.4" />
-		<PackageReference Include="coverlet.collector" Version="6.0.0">
+		<PackageReference Include="coverlet.collector" Version="6.0.2">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>

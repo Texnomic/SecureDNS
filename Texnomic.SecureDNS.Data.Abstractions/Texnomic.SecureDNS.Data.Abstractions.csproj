@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net7.0</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 
-		<Version>0.5.0-alpha</Version>
+		<Version>0.6.0-alpha</Version>
 		<Authors>Texnomic</Authors>
 		<Company>Texnomic</Company>
-		<Copyright>Texnomic, Copyrights © 2023</Copyright>
+		<Copyright>Texnomic, Copyrights © 2024</Copyright>
 
 		<RepositoryUrl>https://github.com/Texnomic/SecureDNS</RepositoryUrl>
 		<RepositoryType>Github</RepositoryType>
@@ -33,6 +33,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.8" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.6" />
 	</ItemGroup>
 </Project>
