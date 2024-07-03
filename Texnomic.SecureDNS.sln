@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28902.138
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35013.160
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.SecureDNS", "Texnomic.SecureDNS\Texnomic.SecureDNS.csproj", "{8E7071ED-9877-4A23-A4DF-5C2362952317}"
 EndProject
@@ -38,8 +38,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.DNS.Roots", "Texno
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.DNS.Roots.Tests", "Texnomic.DNS.Roots.Tests\Texnomic.DNS.Roots.Tests.csproj", "{77507239-323C-45B5-AC7F-1ACBDBD0F61E}"
 EndProject
-Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "Texnomic.ENS.Infrastructure", "Texnomic.ENS.Infrastructure\Texnomic.ENS.Infrastructure.njsproj", "{74DA0A9A-FEA2-4367-B5E0-C6514DA8513D}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.ENS.Infrastructure.Tests", "Texnomic.ENS.Infrastructure.Tests\Texnomic.ENS.Infrastructure.Tests.csproj", "{2D2E6604-A43C-406A-AF2E-4D1C70136004}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.ENS.BaseRegistrar", "Texnomic.ENS.BaseRegistrar\Texnomic.ENS.BaseRegistrar.csproj", "{53C3B522-403C-4EB4-BE21-A772A0131691}"
@@ -67,6 +65,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Texnomic.SecureDNS.Servers", "Texnomic.SecureDNS.Servers\Texnomic.SecureDNS.Servers.csproj", "{FF242BFC-F980-419C-94CF-360954404284}"
 EndProject
 Project("{840C416C-B8F3-42BC-B0DD-F6BB14C9F8CB}") = "Texnomic.SecureDNS.Terminal.Installer", "Texnomic.SecureDNS.Terminal.Installer\Texnomic.SecureDNS.Terminal.Installer.aiproj", "{680F4F50-EB94-4EC4-8FE1-1F7B14F97639}"
+EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "Texnomic.ENS.Infrastructure", "Texnomic.ENS.Infrastructure\Texnomic.ENS.Infrastructure.esproj", "{17AE8E0C-F03B-40E5-8700-0E9CC32CF672}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -147,12 +147,6 @@ Global
 		{77507239-323C-45B5-AC7F-1ACBDBD0F61E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{77507239-323C-45B5-AC7F-1ACBDBD0F61E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{77507239-323C-45B5-AC7F-1ACBDBD0F61E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{74DA0A9A-FEA2-4367-B5E0-C6514DA8513D}.All|Any CPU.ActiveCfg = Release|Any CPU
-		{74DA0A9A-FEA2-4367-B5E0-C6514DA8513D}.All|Any CPU.Build.0 = Release|Any CPU
-		{74DA0A9A-FEA2-4367-B5E0-C6514DA8513D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{74DA0A9A-FEA2-4367-B5E0-C6514DA8513D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{74DA0A9A-FEA2-4367-B5E0-C6514DA8513D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{74DA0A9A-FEA2-4367-B5E0-C6514DA8513D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2D2E6604-A43C-406A-AF2E-4D1C70136004}.All|Any CPU.ActiveCfg = Release|Any CPU
 		{2D2E6604-A43C-406A-AF2E-4D1C70136004}.All|Any CPU.Build.0 = Release|Any CPU
 		{2D2E6604-A43C-406A-AF2E-4D1C70136004}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -237,6 +231,15 @@ Global
 		{680F4F50-EB94-4EC4-8FE1-1F7B14F97639}.Debug|Any CPU.Build.0 = Release
 		{680F4F50-EB94-4EC4-8FE1-1F7B14F97639}.Release|Any CPU.ActiveCfg = Release
 		{680F4F50-EB94-4EC4-8FE1-1F7B14F97639}.Release|Any CPU.Build.0 = Release
+		{17AE8E0C-F03B-40E5-8700-0E9CC32CF672}.All|Any CPU.ActiveCfg = Release|Any CPU
+		{17AE8E0C-F03B-40E5-8700-0E9CC32CF672}.All|Any CPU.Build.0 = Release|Any CPU
+		{17AE8E0C-F03B-40E5-8700-0E9CC32CF672}.All|Any CPU.Deploy.0 = Release|Any CPU
+		{17AE8E0C-F03B-40E5-8700-0E9CC32CF672}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17AE8E0C-F03B-40E5-8700-0E9CC32CF672}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17AE8E0C-F03B-40E5-8700-0E9CC32CF672}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{17AE8E0C-F03B-40E5-8700-0E9CC32CF672}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17AE8E0C-F03B-40E5-8700-0E9CC32CF672}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17AE8E0C-F03B-40E5-8700-0E9CC32CF672}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
