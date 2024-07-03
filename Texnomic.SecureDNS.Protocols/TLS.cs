@@ -1,12 +1,4 @@
-﻿using System.Buffers.Binary;
-using System.Net.Security;
-using System.Net.Sockets;
-using System.Security.Cryptography.X509Certificates;
-using Microsoft.Extensions.Options;
-using Texnomic.SecureDNS.Protocols.Options;
-
-
-namespace Texnomic.SecureDNS.Protocols;
+﻿namespace Texnomic.SecureDNS.Protocols;
 
 public class TLS : Protocol
 {

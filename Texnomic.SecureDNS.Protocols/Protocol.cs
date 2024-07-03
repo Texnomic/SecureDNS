@@ -1,8 +1,4 @@
-﻿using Texnomic.SecureDNS.Abstractions;
-using Texnomic.SecureDNS.Extensions;
-using Texnomic.SecureDNS.Serialization;
-
-namespace Texnomic.SecureDNS.Protocols;
+﻿namespace Texnomic.SecureDNS.Protocols;
 
 public abstract class Protocol : IProtocol
 {

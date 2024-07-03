@@ -1,8 +1,4 @@
-﻿using System.Net;
-using Texnomic.SecureDNS.Abstractions;
-
-
-namespace Texnomic.SecureDNS.Protocols.Options;
+﻿namespace Texnomic.SecureDNS.Protocols.Options;
 
 public class TLSOptions : IOptions
 {

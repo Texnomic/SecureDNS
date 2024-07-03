@@ -1,9 +1,4 @@
-﻿using System.Net;
-using System.Net.Http.Headers;
-
-using Microsoft.Extensions.Options;
-
-using Texnomic.SecureDNS.Protocols.Options;
+﻿using System.Net.Http.Headers;
 
 
 namespace Texnomic.SecureDNS.Protocols;

@@ -1,20 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Nethereum.Contracts.Services;
-using Nethereum.Contracts.Standards.ENS;
-using Nethereum.ENS.ENSRegistry.ContractDefinition;
-using Nethereum.Hex.HexConvertors.Extensions;
-using Nethereum.Web3;
-using Texnomic.ENS.BaseRegistrar;
-using Texnomic.SecureDNS.Abstractions;
-using Texnomic.SecureDNS.Abstractions.Enums;
-using Texnomic.SecureDNS.Core;
-using Texnomic.SecureDNS.Core.DataTypes;
-using Texnomic.SecureDNS.Core.Records;
-using Texnomic.SecureDNS.Serialization;
-
-using OwnerFunction = Nethereum.ENS.ENSRegistry.ContractDefinition.OwnerFunction;
-using AvailableFunction =Texnomic.ENS.BaseRegistrar.ContractDefinition.AvailableFunction;
+﻿using OwnerFunction = Nethereum.ENS.ENSRegistry.ContractDefinition.OwnerFunction;
+using AvailableFunction = Texnomic.ENS.BaseRegistrar.ContractDefinition.AvailableFunction;
 using ENSOptions = Texnomic.SecureDNS.Protocols.Options.ENSOptions;
 using ENSRegistryService = Nethereum.ENS.ENSRegistryService;
 using NameExpiresFunction = Texnomic.ENS.BaseRegistrar.ContractDefinition.NameExpiresFunction;
@@ -116,7 +101,7 @@ public class ENS : Protocol
 
     public override async ValueTask<byte[]> ResolveAsync(byte[] Query)
     {
-        var Request =  DnSerializer.Deserialize(Query);
+        var Request = DnSerializer.Deserialize(Query);
 
         var Response = await ResolveAsync(Request);
 
@@ -160,8 +145,8 @@ public class ENS : Protocol
             MessageType = MessageType.Response,
             ResponseCode = ResponseCode.NoError,
             Questions = Query.Questions,
-            Answers = new List<IAnswer>()
-            {
+            Answers =
+            [
                 new Answer()
                 {
                     Class = RecordClass.Internet,
@@ -200,19 +185,15 @@ public class ENS : Protocol
                     Domain = Query.Questions.First().Domain,
                     Length = DnSerializer.SizeOf(ExpiryDateTime),
                     Record = ExpiryDateTime
-                },
-            }
+                }
+            ]
         };
     }
 
     protected override void Dispose(bool Disposing)
     {
-        if (IsDisposed) return;
-
-        if (Disposing)
-        {
-
-        }
+        if (IsDisposed) 
+            return;
 
         IsDisposed = true;
     }

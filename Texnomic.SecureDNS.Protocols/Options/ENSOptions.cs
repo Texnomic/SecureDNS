@@ -1,6 +1,4 @@
-﻿using Texnomic.SecureDNS.Abstractions;
-
-namespace Texnomic.SecureDNS.Protocols.Options;
+﻿namespace Texnomic.SecureDNS.Protocols.Options;
 
 public class ENSOptions : IOptions
 {

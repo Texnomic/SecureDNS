@@ -1,28 +1,12 @@
-﻿using System.Buffers.Binary;
-using System.IO.Pipelines;
-using System.Net.Sockets;
-using Microsoft.Extensions.Options;
-using Texnomic.SecureDNS.Protocols.Options;
+﻿namespace Texnomic.SecureDNS.Protocols;
 
-
-namespace Texnomic.SecureDNS.Protocols;
-
-public class TCP : Protocol
+public class TCP(IOptionsMonitor<TCPOptions> TCPOptions) : Protocol
 {
-    private readonly IOptionsMonitor<TCPOptions> Options;
-
-    public TCP(IOptionsMonitor<TCPOptions> TCPOptions)
-    {
-        Options = TCPOptions;
-    }
-
     public override async ValueTask<byte[]> ResolveAsync(byte[] Query)
     {
-        using var Socket = new Socket(SocketType.Stream, ProtocolType.Tcp)
-        {
-            ReceiveTimeout = (int)Options.CurrentValue.Timeout.TotalMilliseconds,
-            SendTimeout = (int)Options.CurrentValue.Timeout.TotalMilliseconds
-        };
+        using var Socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
+        Socket.ReceiveTimeout = (int)TCPOptions.CurrentValue.Timeout.TotalMilliseconds;
+        Socket.SendTimeout = (int)TCPOptions.CurrentValue.Timeout.TotalMilliseconds;
 
         //await Socket.ConnectAsync(Options.CurrentValue.IPv4EndPoint);
 
@@ -44,7 +28,7 @@ public class TCP : Protocol
 
         //return Buffer;
 
-        await Socket.ConnectAsync(Options.CurrentValue.IPv4EndPoint);
+        await Socket.ConnectAsync(TCPOptions.CurrentValue.IPv4EndPoint);
 
         var Stream = new NetworkStream(Socket);
 
@@ -52,7 +36,7 @@ public class TCP : Protocol
 
         var Writer = PipeWriter.Create(Stream);
 
-        var CancellationTokenSource = new CancellationTokenSource(Options.CurrentValue.Timeout);
+        CancellationTokenSource = new CancellationTokenSource(TCPOptions.CurrentValue.Timeout);
 
         var Prefix = new byte[2];
 
@@ -70,7 +54,7 @@ public class TCP : Protocol
 
             if (Result.IsCompleted)
             {
-                var Size = BinaryPrimitives.ReadUInt16BigEndian(Result.Buffer.FirstSpan.Slice(0, 2));
+                var Size = BinaryPrimitives.ReadUInt16BigEndian(Result.Buffer.FirstSpan[..2]);
 
                 return Result.Buffer.FirstSpan.Slice(2, Size).ToArray();
             }
@@ -81,12 +65,8 @@ public class TCP : Protocol
 
     protected override void Dispose(bool Disposing)
     {
-        if (IsDisposed) return;
-
-        if (Disposing)
-        {
-
-        }
+        if (IsDisposed) 
+            return;
 
         IsDisposed = true;
     }

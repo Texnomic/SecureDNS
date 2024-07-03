@@ -1,21 +1,4 @@
-﻿using System.Buffers.Binary;
-using System.Net;
-using System.Net.Sockets;
-using System.Security.Cryptography;
-using System.Text;
-using Microsoft.Extensions.Options;
-
-using Texnomic.SecureDNS.Abstractions;
-using Texnomic.SecureDNS.Abstractions.Enums;
-using Texnomic.SecureDNS.Core;
-using Texnomic.SecureDNS.Core.DataTypes;
-using Texnomic.SecureDNS.Protocols.Options;
-using Texnomic.SecureDNS.Core.Records;
-using Texnomic.SecureDNS.Extensions;
-using Texnomic.SecureDNS.Serialization;
-using Texnomic.Sodium;
-
-using Random = Texnomic.Sodium.Random;
+﻿using Random = Texnomic.Sodium.Random;
 
 namespace Texnomic.SecureDNS.Protocols;
 
@@ -35,8 +18,6 @@ public sealed class DNSCrypt : Protocol
     private byte[] SecretKey;
 
     private byte[] SharedKey;
-
-    private bool IsInitialized;
 
     public DNSCrypt(IOptionsMonitor<DNSCryptOptions> DNSCryptOptions)
     {
@@ -62,24 +43,23 @@ public sealed class DNSCrypt : Protocol
             Truncated = false,
             CheckingDisabled = true,
             RecursionDesired = true,
-            Questions = new List<IQuestion>()
-            {
+            Questions =
+            [
                 new Question()
                 {
                     Type = RecordType.TXT,
                     Class = RecordClass.Internet,
                     Domain = Domain.FromString(Options.CurrentValue.DNSCryptStamp.ProviderName)
                 }
-            }
+            ]
         };
 
         var RawQuery = DnSerializer.Serialize(Query);
 
-        using var Socket = new Socket(SocketType.Dgram, ProtocolType.Udp)
-        {
-            ReceiveTimeout = (int)Options.CurrentValue.Timeout.TotalMilliseconds,
-            SendTimeout = (int)Options.CurrentValue.Timeout.TotalMilliseconds
-        };
+        using var Socket = new Socket(SocketType.Dgram, ProtocolType.Udp);
+
+        Socket.ReceiveTimeout = (int)Options.CurrentValue.Timeout.TotalMilliseconds;
+        Socket.SendTimeout = (int)Options.CurrentValue.Timeout.TotalMilliseconds;
 
         await Socket.ConnectAsync(IPEndPoint);
 
@@ -125,21 +105,26 @@ public sealed class DNSCrypt : Protocol
     {
         var Pad = Array.Empty<byte>();
 
-        if (QueryLength < 256)
+        switch (QueryLength)
         {
-            Pad = new byte[256 - QueryLength];
-        }
+            case < 256:
+                {
+                    Pad = new byte[256 - QueryLength];
 
-        if (QueryLength > 256)
-        {
-            var PaddingLength = 256 + 64;
+                    break;
+                }
+            case > 256:
+                {
+                    var PaddingLength = 256 + 64;
 
-            while (PaddingLength < QueryLength)
-            {
-                PaddingLength += 64;
-            }
+                    while (PaddingLength < QueryLength)
+                    {
+                        PaddingLength += 64;
+                    }
 
-            Pad = new byte[PaddingLength - QueryLength];
+                    Pad = new byte[PaddingLength - QueryLength];
+                    break;
+                }
         }
 
         Pad[0] = 0x80;
@@ -166,11 +151,10 @@ public sealed class DNSCrypt : Protocol
 
         var QueryPacket = ArrayExtensions.Concat(Certificate.ClientMagic, PublicKey, ClientNonce, EncryptedQuery);
 
-        using var Socket = new Socket(SocketType.Stream, ProtocolType.Tcp)
-        {
-            ReceiveTimeout = (int)Options.CurrentValue.Timeout.TotalMilliseconds,
-            SendTimeout = (int)Options.CurrentValue.Timeout.TotalMilliseconds
-        };
+        using var Socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
+
+        Socket.ReceiveTimeout = (int)Options.CurrentValue.Timeout.TotalMilliseconds;
+        Socket.SendTimeout = (int)Options.CurrentValue.Timeout.TotalMilliseconds;
 
         await Socket.ConnectAsync(IPEndPoint);
 
@@ -187,9 +171,9 @@ public sealed class DNSCrypt : Protocol
         var Size = BinaryPrimitives.ReadUInt16BigEndian(Prefix);
 
         var AnswerPacket = new byte[Size];
-            
+
         await Socket.ReliableReceiveAsync(AnswerPacket);
-            
+
         var ClientMagic = Encoding.ASCII.GetString(AnswerPacket[..8]);
 
         if (ClientMagic != "r6fnvWj8")
@@ -247,12 +231,8 @@ public sealed class DNSCrypt : Protocol
 
     protected override void Dispose(bool Disposing)
     {
-        if (IsDisposed) return;
-
-        if (Disposing)
-        {
-
-        }
+        if (IsDisposed) 
+            return;
 
         IsDisposed = true;
     }
