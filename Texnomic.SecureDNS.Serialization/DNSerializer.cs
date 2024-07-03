@@ -1,12 +1,4 @@
-﻿using System.Buffers.Binary;
-using Texnomic.SecureDNS.Core;
-using Texnomic.SecureDNS.Core.DataTypes;
-using Texnomic.SecureDNS.Abstractions;
-using Texnomic.SecureDNS.Abstractions.Enums;
-using Texnomic.SecureDNS.Core.Records;
-using Texnomic.SecureDNS.Extensions;
-
-namespace Texnomic.SecureDNS.Serialization;
+﻿namespace Texnomic.SecureDNS.Serialization;
 
 public static class DnSerializer
 {

@@ -1,9 +1,4 @@
-﻿using System.Text;
-using System.Buffers.Binary;
-using System.Net;
-using Texnomic.SecureDNS.Extensions;
-
-namespace Texnomic.SecureDNS.Serialization;
+﻿namespace Texnomic.SecureDNS.Serialization;
 
 public class DnStream
 {
