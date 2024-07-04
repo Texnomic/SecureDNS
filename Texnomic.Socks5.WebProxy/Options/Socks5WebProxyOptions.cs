@@ -1,7 +1,4 @@
-﻿using System.Net;
-using System.Net.Sockets;
-
-namespace Texnomic.Socks5.WebProxy.Options;
+﻿namespace Texnomic.Socks5.WebProxy.Options;
 
 public class Socks5WebProxyOptions
 {

@@ -1,26 +1,10 @@
-﻿using System.Net.Sockets;
-using System.Text;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
+﻿namespace Texnomic.Socks5.WebProxy;
 
-using Texnomic.Socks5.Options;
-using Texnomic.Socks5.WebProxy.Options;
-
-namespace Texnomic.Socks5.WebProxy;
-
-public class Socks5WebProxy : IHostedService, IDisposable
+public class Socks5WebProxy(IOptionsMonitor<Socks5WebProxyOptions> ProxyOptions, IOptionsMonitor<Socks5Options> Socks5Options) : IHostedService, IDisposable
 {
-    private readonly IOptionsMonitor<Socks5WebProxyOptions> ProxyOptions;
-    private readonly IOptionsMonitor<Socks5Options> Socks5Options;
+    private Task Thread;
     private Socket ServerSocket;
     private CancellationToken CancellationToken;
-
-    public Socks5WebProxy(IOptionsMonitor<Socks5WebProxyOptions> ProxyOptions, IOptionsMonitor<Socks5Options> Socks5Options)
-    {
-        this.ProxyOptions = ProxyOptions;
-        this.Socks5Options = Socks5Options;
-        ProxyOptions.OnChange(async (ChangedOptions) => await StartAsync(CancellationToken));
-    }
 
     public async Task StartAsync(CancellationToken Token)
     {
@@ -32,21 +16,19 @@ public class Socks5WebProxy : IHostedService, IDisposable
 
         ServerSocket.Listen(ProxyOptions.CurrentValue.BackLog);
 
-        _ = Task.Factory.StartNew(ReceiveAsync, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default).Unwrap();
-
-        await Task.Yield();
+        Thread = await Task.Factory.StartNew(ReceiveAsync, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
     }
 
     public async Task StopAsync(CancellationToken Token)
     {
-        await Task.Yield();
+        await Thread;
     }
 
     private async Task ReceiveAsync()
     {
         while (ServerSocket.IsBound && !CancellationToken.IsCancellationRequested)
         {
-            var ClientSocket = await ServerSocket.AcceptAsync();
+            var ClientSocket = await ServerSocket.AcceptAsync(CancellationToken);
 
             var Buffer = new byte[512];
 

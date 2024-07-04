@@ -1,35 +1,19 @@
-﻿using System.Net;
-using System.Net.Sockets;
-using Microsoft.Extensions.Options;
+﻿namespace Texnomic.Socks5;
 
-using Texnomic.SecureDNS.Extensions;
-using Texnomic.SecureDNS.Serialization;
-using Texnomic.Socks5.Enum;
-using Texnomic.Socks5.Options;
-
-namespace Texnomic.Socks5;
-
-public class Socks5
+public class Socks5(IOptionsMonitor<Socks5Options> Options)
 {
     private const byte SubNegotiationVersion = 0x01;
     private const byte SocksVersion = 0x05;
-    private readonly IOptionsMonitor<Socks5Options> Options;
     private Socket Socket;
     private bool Initialized;
 
-    public Socks5(IOptionsMonitor<Socks5Options> Options)
+    private async Task Initialize()
     {
-        this.Options = Options;
-        Options.OnChange(async (ChangedOptions) => await Initialize(ChangedOptions));
-    }
+        Socket = new Socket(Options.CurrentValue.SocketType, Options.CurrentValue.ProtocolType);
 
-    private async Task Initialize(Socks5Options Options)
-    {
-        Socket = new Socket(Options.SocketType, Options.ProtocolType);
-
-        Socket = Options.Authentication == Authentication.NoAuthentication
-            ? await Hello(Options.IPEndPoint)
-            : await Hello(Options.IPEndPoint, Options.Username, Options.Password);
+        Socket = Options.CurrentValue.Authentication == Authentication.NoAuthentication
+            ? await Hello(Options.CurrentValue.IPEndPoint)
+            : await Hello(Options.CurrentValue.IPEndPoint, Options.CurrentValue.Username, Options.CurrentValue.Password);
 
         Initialized = true;
     }
@@ -87,7 +71,7 @@ public class Socks5
 
     public async Task<Socket> Connect(string Domain, int Port)
     {
-        if (!Initialized) await Initialize(Options.CurrentValue);
+        if (!Initialized) await Initialize();
 
         var Message = CreateRequest(Command.Connect, Domain, Port);
 
@@ -118,7 +102,7 @@ public class Socks5
 
     public async Task<Socket> Connect(IPEndPoint IPEndPoint)
     {
-        if (!Initialized) await Initialize(Options.CurrentValue);
+        if (!Initialized) await Initialize();
 
         var Message = CreateRequest(Command.Connect, IPEndPoint);
 

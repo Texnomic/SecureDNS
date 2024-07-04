@@ -1,8 +1,4 @@
-﻿using System.Net;
-using System.Net.Sockets;
-using Texnomic.Socks5.Enum;
-
-namespace Texnomic.Socks5.Options;
+﻿namespace Texnomic.Socks5.Options;
 
 public class Socks5Options
 {
