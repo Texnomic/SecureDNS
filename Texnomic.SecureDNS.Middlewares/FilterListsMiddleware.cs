@@ -1,31 +1,14 @@
-﻿using System.Net;
-using Microsoft.Extensions.Options;
-using PipelineNet.Middleware;
-using Serilog;
-using Texnomic.FilterLists;
-using Texnomic.FilterLists.Enums;
-using Texnomic.FilterLists.Models;
-using Texnomic.SecureDNS.Abstractions;
-using Texnomic.SecureDNS.Abstractions.Enums;
-using Texnomic.SecureDNS.Core;
-using Texnomic.SecureDNS.Extensions;
-using Texnomic.SecureDNS.Middlewares.Options;
-
-namespace Texnomic.SecureDNS.Middlewares;
+﻿namespace Texnomic.SecureDNS.Middlewares;
 
 public class FilterListsMiddleware : IAsyncMiddleware<IMessage, IMessage>
 {
     private readonly ILogger Logger;
-    private readonly WebClient WebClient;
-    private readonly FastHashSet<string> Filter;
+    private readonly HttpClient HttpClient = new();
+    private readonly FastHashSet<string> Filter = [];
 
     public FilterListsMiddleware(IOptionsMonitor<FilterListsMiddlewareOptions> Options, ILogger Logger) : base()
     {
         this.Logger = Logger;
-
-        WebClient = new WebClient();
-
-        Filter = new FastHashSet<string>();
 
         Options.OnChange(OptionsOnChange);
 
@@ -71,25 +54,19 @@ public class FilterListsMiddleware : IAsyncMiddleware<IMessage, IMessage>
 
             var Lists = await GetFilterListsAsync(IDs);
 
-            Logger.Information("FilterLists Initialization Started with {@Count} Selected Lists.", $"{Lists.Count:n0}");
-
-            string File = null;
-            string[] Domains = null;
+            Logger.Information("FilterLists Initialization Started with {Count} Selected Lists.", $"{Lists.Count:N0}");
 
             foreach (var List in Lists)
             {
                 try
                 {
-                    File = await WebClient.DownloadStringTaskAsync(List.ViewUrl);
+                    var File = await HttpClient.GetStringAsync(List.ViewUrl);
 
-                    Domains = Parse(File);
+                    var Domains = Parse(File);
 
                     foreach (var Domain in Domains)
                     {
-                        if (!Filter.Contains(Domain))
-                        {
-                            Filter.Add(Domain);
-                        }
+                        Filter.Add(Domain);
                     }
 
                     Logger.Verbose("{@FilterList} Download Completed.", List);
@@ -101,10 +78,6 @@ public class FilterListsMiddleware : IAsyncMiddleware<IMessage, IMessage>
             }
 
             Filter.TrimExcess();
-
-            File = null;
-            Domains = null;
-            Lists = null;
 
             Logger.Information("FilterLists Initialization Completed with {@Count} Domains.", $"{Filter.Count:n0}");
         }
@@ -120,7 +93,7 @@ public class FilterListsMiddleware : IAsyncMiddleware<IMessage, IMessage>
 
         var Lists = await Client.GetListsAsync();
 
-        Lists = Lists.Where(List => List.Syntax == Syntax.Hosts || List.Syntax == Syntax.Domains)
+        Lists = Lists.Where(List => List.Syntax is Syntax.Hosts or Syntax.Domains)
             .Where(List => IDs.Contains(List.ID))           
             .ToList();
 

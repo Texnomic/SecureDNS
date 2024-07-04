@@ -1,15 +1,4 @@
-﻿using Serilog;
-using System.Net;
-using Microsoft.Extensions.Options;
-using PipelineNet.Middleware;
-using Texnomic.SecureDNS.Abstractions;
-using Texnomic.SecureDNS.Abstractions.Enums;
-using Texnomic.SecureDNS.Core;
-using Texnomic.SecureDNS.Core.DataTypes;
-using Texnomic.SecureDNS.Core.Records;
-using Texnomic.SecureDNS.Middlewares.Options;
-
-namespace Texnomic.SecureDNS.Middlewares;
+﻿namespace Texnomic.SecureDNS.Middlewares;
 
 public class HostTableMiddleware : IAsyncMiddleware<IMessage, IMessage>
 {
@@ -48,17 +37,17 @@ public class HostTableMiddleware : IAsyncMiddleware<IMessage, IMessage>
                     ID = Message.ID,
                     MessageType = MessageType.Response,
                     ResponseCode = ResponseCode.NoError,
-                    Questions = new List<IQuestion>()
-                    {
+                    Questions = 
+                    [
                         new Question()
                         {
                             Type = RecordType.A,
                             Class = RecordClass.Internet,
                             Domain = Domain.FromString(Message.Questions.First().Domain.Name)
                         }
-                    },
-                    Answers = new List<IAnswer>()
-                    {
+                    ],
+                    Answers = 
+                    [
                         new Answer()
                         {
                             Type = RecordType.A,
@@ -76,7 +65,7 @@ public class HostTableMiddleware : IAsyncMiddleware<IMessage, IMessage>
                                 Address = HostTable.GetValueOrDefault(Message.Questions.First().Domain.Name)
                             }
                         }
-                    }
+                    ]
                 };
             }
             else

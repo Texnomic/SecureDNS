@@ -1,22 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using PipelineNet.Middleware;
-using Texnomic.SecureDNS.Abstractions;
-using Texnomic.SecureDNS.Protocols.Options;
+﻿namespace Texnomic.SecureDNS.Middlewares;
 
-namespace Texnomic.SecureDNS.Middlewares;
-
-public class ENSMiddleware : IAsyncMiddleware<IMessage, IMessage>
+public class ENSMiddleware(IOptionsMonitor<ENSOptions> Options, ILogger Logger) : IAsyncMiddleware<IMessage, IMessage>
 {
-    private readonly ILogger Logger;
-    private readonly SecureDNS.Protocols.ENS ENS;
-
-    public ENSMiddleware(IOptionsMonitor<ENSOptions> Options, ILogger Logger) : base()
-    {
-        this.Logger = Logger;
-
-        ENS = new Protocols.ENS(Options, Logger);
-    }
+    private readonly Protocols.ENS ENS = new(Options);
 
     public async Task<IMessage> Run(IMessage Message, Func<IMessage, Task<IMessage>> Next)
     {
@@ -25,7 +11,7 @@ public class ENSMiddleware : IAsyncMiddleware<IMessage, IMessage>
 
         var Response = await ENS.ResolveAsync(Message);
 
-        Logger.LogInformation("Resolved ENS Query {@ID} For {@Domain}.", Message.ID, Message.Questions.First().Domain.Name);
+        Logger.Information("Resolved ENS Query {ID} For {Domain}.", Message.ID, Message.Questions.First().Domain.Name);
 
         return Response;
     }

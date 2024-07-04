@@ -14,9 +14,9 @@ public class ENS : Protocol
     private readonly ENSRegistryService ENSRegistryService;
     private readonly BaseRegistrarService BaseRegistrarService;
 
-    public ENS(IOptionsMonitor<ENSOptions> ENSOptions, ILogger Logger)
+    public ENS(IOptionsMonitor<ENSOptions> ENSOptions)
     {
-        Web3 = new Web3(ENSOptions.CurrentValue.Web3.ToString(), Logger);
+        Web3 = new Web3(ENSOptions.CurrentValue.Web3.ToString());
         EnsUtil = new EnsUtil();
         ENSService = new ENSService(new EthApiContractService(Web3.Client));
         ENSRegistryService = new ENSRegistryService(Web3, ENSService.EnsRegistryAddress);

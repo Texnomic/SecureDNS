@@ -1,10 +1,4 @@
-﻿using Serilog;
-using Microsoft.Extensions.Options;
-using PipelineNet.Middleware;
-using Texnomic.SecureDNS.Abstractions;
-using Texnomic.SecureDNS.Middlewares.Options;
-
-namespace Texnomic.SecureDNS.Middlewares;
+﻿namespace Texnomic.SecureDNS.Middlewares;
 
 public class MasterFileMiddleware : IAsyncMiddleware<IMessage, IMessage>
 {

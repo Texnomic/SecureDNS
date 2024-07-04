@@ -1,6 +1,4 @@
-﻿using Texnomic.SecureDNS.Abstractions;
-
-namespace Texnomic.SecureDNS.Middlewares.Options;
+﻿namespace Texnomic.SecureDNS.Middlewares.Options;
 
 public class MasterFileMiddlewareOptions
 {
