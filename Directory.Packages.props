@@ -1,0 +1,101 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Microsoft Extensions -->
+    <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.CommandLine" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting.Systemd" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting.WindowsServices" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Options" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.0" />
+    <!-- Microsoft ASP.NET Core -->
+    <PackageVersion Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.Identity" Version="2.3.1" />
+    <PackageVersion Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.Identity.UI" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="10.0.0" />
+    <!-- Microsoft Entity Framework Core -->
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Proxies" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.0" />
+    <!-- System Libraries -->
+    <PackageVersion Include="System.Management.Automation" Version="7.5.4" />
+    <PackageVersion Include="System.Text.Json" Version="10.0.0" />
+    <PackageVersion Include="System.Threading.Tasks.Dataflow" Version="10.0.0" />
+    <!-- Serilog -->
+    <PackageVersion Include="Serilog" Version="4.3.0" />
+    <PackageVersion Include="Serilog.AspNetCore" Version="10.0.0" />
+    <PackageVersion Include="Serilog.Enrichers.AspnetcoreHttpcontext" Version="1.1.0" />
+    <PackageVersion Include="Serilog.Enrichers.Environment" Version="3.0.1" />
+    <PackageVersion Include="Serilog.Enrichers.Memory" Version="1.0.4" />
+    <PackageVersion Include="Serilog.Enrichers.Process" Version="3.0.0" />
+    <PackageVersion Include="Serilog.Enrichers.Thread" Version="4.0.0" />
+    <PackageVersion Include="Serilog.Extensions.Hosting" Version="10.0.0" />
+    <PackageVersion Include="Serilog.Extensions.Logging" Version="10.0.0" />
+    <PackageVersion Include="Serilog.Formatting.Compact" Version="3.0.0" />
+    <PackageVersion Include="Serilog.Settings.Configuration" Version="10.0.0" />
+    <PackageVersion Include="Serilog.Sinks.Console" Version="6.1.1" />
+    <PackageVersion Include="Serilog.Sinks.ILogger" Version="1.0.3" />
+    <PackageVersion Include="Serilog.Sinks.Seq" Version="9.0.0" />
+    <!-- Common Logging -->
+    <PackageVersion Include="Common.Logging" Version="3.4.1" />
+    <PackageVersion Include="Common.Logging.Serilog" Version="5.1.0" />
+    <!-- Blazor & UI -->
+    <PackageVersion Include="Blazorise.Bootstrap" Version="1.8.7" />
+    <PackageVersion Include="Blazorise.Icons.FontAwesome" Version="1.8.7" />
+    <PackageVersion Include="Blazorise.Sidebar" Version="1.8.7" />
+    <PackageVersion Include="Syncfusion.Blazor" Version="31.2.16" />
+    <PackageVersion Include="Terminal.Gui" Version="1.19.0" />
+    <!-- Nethereum (Ethereum) -->
+    <PackageVersion Include="Nethereum.Accounts" Version="5.0.0" />
+    <PackageVersion Include="Nethereum.Contracts" Version="5.0.0" />
+    <PackageVersion Include="Nethereum.ENS" Version="5.0.0" />
+    <PackageVersion Include="Nethereum.RPC" Version="5.0.0" />
+    <PackageVersion Include="Nethereum.Web3" Version="5.0.0" />
+    <!-- Other Libraries -->
+    <PackageVersion Include="AsyncEnumerator" Version="4.0.2" />
+    <PackageVersion Include="BenchmarkDotNet" Version="0.15.8" />
+    <PackageVersion Include="BinarySerializer" Version="8.6.4.1" />
+    <PackageVersion Include="Colorful.Console" Version="1.2.15" />
+    <PackageVersion Include="Destructurama.Attributed" Version="5.1.0" />
+    <PackageVersion Include="ElectronNET.API" Version="23.6.2" />
+    <PackageVersion Include="FlexLabs.EntityFrameworkCore.Upsert" Version="10.0.0-beta1" />
+    <PackageVersion Include="Hangfire" Version="1.8.22" />
+    <PackageVersion Include="Hangfire.SQLite" Version="1.4.2" />
+    <PackageVersion Include="HtmlAgilityPack" Version="1.12.4" />
+    <PackageVersion Include="libsodium" Version="1.0.20.1" />
+    <PackageVersion Include="Microsoft.PowerShell.SDK" Version="7.5.4" />
+    <PackageVersion Include="morelinq" Version="4.4.0" />
+    <PackageVersion Include="Nerdbank.Streams" Version="2.13.16" />
+    <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageVersion Include="PipelineNet" Version="0.11.0" />
+    <PackageVersion Include="Polly" Version="8.6.5" />
+    <PackageVersion Include="Rebex.Elliptic.Curve25519" Version="1.2.2" />
+    <PackageVersion Include="Rebex.Elliptic.Ed25519" Version="1.2.2" />
+    <PackageVersion Include="RestSharp" Version="113.0.0" />
+    <PackageVersion Include="Sodium.Core" Version="1.4.0" />
+    <PackageVersion Include="Tmds.Systemd" Version="0.8.0" />
+    <PackageVersion Include="Tmds.Systemd.Logging" Version="0.8.0" />
+    <PackageVersion Include="YamlDotNet" Version="16.3.0" />
+    <PackageVersion Include="Z.EntityFramework.Extensions.EFCore" Version="10.105.0" />
+    <!-- Testing -->
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
+    <PackageVersion Include="Moq" Version="4.20.72" />
+    <PackageVersion Include="MSTest.TestAdapter" Version="4.0.2" />
+    <PackageVersion Include="MSTest.TestFramework" Version="4.0.2" />
+    <PackageVersion Include="coverlet.collector" Version="6.0.4" />
+  </ItemGroup>
+</Project>

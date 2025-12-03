@@ -1,166 +1,84 @@
 <Project Sdk="Microsoft.NET.Sdk">
-	<PropertyGroup>
-		<OutputType>Exe</OutputType>
-<<<<<<< HEAD
-		<TargetFramework>net6.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<LangVersion>8.0</LangVersion>
-		<Authors>Mohamed Samy</Authors>
-		<Company>Texnomic Ltd</Company>
-		<Product>Texnomic SecureDNS Terminal</Product>
-		<Copyright>Texnomic Ltd, Copyrights 2020</Copyright>
-		<AssemblyVersion>0.3.1.0</AssemblyVersion>
-		<FileVersion>0.3.0.0</FileVersion>
-		<RepositoryUrl>https://github.com/Texnomic/SecureDNS</RepositoryUrl>
-		<RepositoryType>Github</RepositoryType>
-		<ApplicationIcon>SecureDNS.ico</ApplicationIcon>
-		<Description>https://github.com/Texnomic/SecureDNS</Description>
-		<Version>0.4-alpha</Version>
-		<PackageIcon>SecureDNS.ico</PackageIcon>
-		<PackageIconUrl />
-		<PackageTags>Alpha</PackageTags>
-		<PackageId>Texnomic SecureDNS Terminal</PackageId>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageProjectUrl>https://github.com/Texnomic/SecureDNS</PackageProjectUrl>
-	</PropertyGroup>
-	<ItemGroup>
-		<None Remove="AppSettings.json" />
-		<None Remove="Fonts\Speed.flf" />
-	</ItemGroup>
-	<ItemGroup>
-		<EmbeddedResource Include="AppSettings.json">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-=======
-		<TargetFramework>net8.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+<PropertyGroup>
+<OutputType>Exe</OutputType>
+<ApplicationIcon>SecureDNS.ico</ApplicationIcon>
+</PropertyGroup>
 
-		<Version>0.6.0-alpha</Version>
-		<Authors>Texnomic</Authors>
-		<Company>Texnomic</Company>
-		<Copyright>Texnomic, Copyrights © 2024</Copyright>
+<ItemGroup>
+<None Remove="AppSettings.Development.json" />
+<None Remove="AppSettings.json" />
+<None Remove="AppSettings.Production.json" />
+<None Remove="Fonts\Speed.flf" />
+</ItemGroup>
 
-		<RepositoryUrl>https://github.com/Texnomic/SecureDNS</RepositoryUrl>
-		<RepositoryType>Github</RepositoryType>
+<ItemGroup>
+<Content Include="SecureDNS.ico" />
+</ItemGroup>
 
-		<PackageTags>Alpha</PackageTags>
-		<PackageId>$(ProjectName)</PackageId>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageProjectUrl>https://github.com/Texnomic/SecureDNS</PackageProjectUrl>
-		<PackageTags>dns sdns https udp tcp dnscrypt dou dot doh</PackageTags>
+<ItemGroup>
+<EmbeddedResource Include="AppSettings.Production.json">
+<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+</EmbeddedResource>
+<EmbeddedResource Include="AppSettings.Development.json">
+<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+</EmbeddedResource>
+<EmbeddedResource Include="AppSettings.json">
+<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+</EmbeddedResource>
+<EmbeddedResource Include="Fonts\Speed.flf" />
+</ItemGroup>
 
-		<Product>$(ProjectName)</Product>
-		<Description>$(ProjectName)</Description>
-		<ApplicationIcon>SecureDNS.ico</ApplicationIcon>
-	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-		<DebugType>embedded</DebugType>
-	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-		<DebugType>embedded</DebugType>
-	</PropertyGroup>
-	<ItemGroup>
-		<None Remove="AppSettings.Development.json" />
-		<None Remove="AppSettings.json" />
-		<None Remove="AppSettings.Production.json" />
-		<None Remove="Fonts\Speed.flf" />
-	</ItemGroup>
-	<ItemGroup>
-	  <Content Include="SecureDNS.ico" />
-	</ItemGroup>
-	<ItemGroup>
-		<EmbeddedResource Include="AppSettings.Production.json">
-			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
-		</EmbeddedResource>
-		<EmbeddedResource Include="AppSettings.Development.json">
-			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
-		</EmbeddedResource>
-		<EmbeddedResource Include="AppSettings.json">
-			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
->>>>>>> 80e159a06224c769a7805e12328fb284df6c8bc1
-		</EmbeddedResource>
-		<EmbeddedResource Include="Fonts\Speed.flf" />
-	</ItemGroup>
-	<ItemGroup>
-		<PackageReference Include="Colorful.Console" Version="1.2.15" />
-<<<<<<< HEAD
-		<PackageReference Include="Destructurama.Attributed" Version="3.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.1" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="6.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="6.0.1" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
-		<PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="6.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="6.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="6.0.0" />
-		<PackageReference Include="Serilog" Version="2.10.0" />
-		<PackageReference Include="Serilog.AspNetCore" Version="5.0.0" />
-		<PackageReference Include="Serilog.Enrichers.Thread" Version="3.1.0" />
-		<PackageReference Include="Serilog.Extensions.Hosting" Version="4.2.0" />
-		<PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0" />
-		<PackageReference Include="Serilog.Sinks.Console" Version="4.0.1" />
-		<PackageReference Include="Serilog.Sinks.Seq" Version="5.1.1" />
-		<PackageReference Include="Terminal.Gui" Version="1.4.0" />
-=======
-		<PackageReference Include="Destructurama.Attributed" Version="4.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="8.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="8.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="8.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="8.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2" />
-		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
-		<PackageReference Include="Serilog" Version="4.0.0" />
-		<PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
-		<PackageReference Include="Serilog.Enrichers.Thread" Version="4.0.0" />
-		<PackageReference Include="Serilog.Extensions.Hosting" Version="8.0.0" />
-		<PackageReference Include="Serilog.Extensions.Logging" Version="8.0.0" />
-		<PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
-		<PackageReference Include="Serilog.Sinks.Seq" Version="8.0.0" />
-		<PackageReference Include="Terminal.Gui" Version="1.17.0" />
->>>>>>> 80e159a06224c769a7805e12328fb284df6c8bc1
-		<PackageReference Include="Tmds.Systemd" Version="0.8.0" />
-		<PackageReference Include="Tmds.Systemd.Logging" Version="0.8.0" />
-	</ItemGroup>
-	<ItemGroup>
-		<ProjectReference Include="..\Texnomic.SecureDNS.Core\Texnomic.SecureDNS.Core.csproj" />
-		<ProjectReference Include="..\Texnomic.SecureDNS.Protocols\Texnomic.SecureDNS.Protocols.csproj" />
-		<ProjectReference Include="..\Texnomic.SecureDNS.Servers\Texnomic.SecureDNS.Servers.csproj" />
-	</ItemGroup>
-	<ItemGroup>
-		<Compile Update="Properties\Resources.Designer.cs">
-			<DesignTime>True</DesignTime>
-			<AutoGen>True</AutoGen>
-			<DependentUpon>Resources.resx</DependentUpon>
-		</Compile>
-	</ItemGroup>
-	<ItemGroup>
-		<EmbeddedResource Update="Properties\Resources.resx">
-			<Generator>ResXFileCodeGenerator</Generator>
-			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
-		</EmbeddedResource>
-	</ItemGroup>
-	<ItemGroup>
-		<None Include="SecureDNS.ico">
-			<Pack>True</Pack>
-			<PackagePath>
-			</PackagePath>
-		</None>
-	</ItemGroup>
-	<ItemGroup>
-		<Resource Include="AppSettings.json">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</Resource>
-	</ItemGroup>
-<<<<<<< HEAD
-	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="if $(ConfigurationName) == Release (..\Tools\signtool.exe sign /sha1 &quot;d4518c71443aebbc0429ec005774bc01176a2dbb&quot; /tr http://time.certum.pl /fd sha256 /v $(TargetPath))" />
-	</Target>
-=======
->>>>>>> 80e159a06224c769a7805e12328fb284df6c8bc1
+<ItemGroup>
+<PackageReference Include="Colorful.Console" />
+<PackageReference Include="Destructurama.Attributed" />
+<PackageReference Include="Microsoft.Extensions.Configuration" />
+<PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" />
+<PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" />
+<PackageReference Include="Microsoft.Extensions.Configuration.Json" />
+<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" />
+<PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+<PackageReference Include="Microsoft.Extensions.Hosting" />
+<PackageReference Include="Microsoft.Extensions.Hosting.Systemd" />
+<PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" />
+<PackageReference Include="Microsoft.Extensions.Options" />
+<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
+<PackageReference Include="Serilog" />
+<PackageReference Include="Serilog.AspNetCore" />
+<PackageReference Include="Serilog.Enrichers.Thread" />
+<PackageReference Include="Serilog.Extensions.Hosting" />
+<PackageReference Include="Serilog.Extensions.Logging" />
+<PackageReference Include="Serilog.Sinks.Console" />
+<PackageReference Include="Serilog.Sinks.Seq" />
+<PackageReference Include="Terminal.Gui" />
+<PackageReference Include="Tmds.Systemd" />
+<PackageReference Include="Tmds.Systemd.Logging" />
+</ItemGroup>
+
+<ItemGroup>
+<ProjectReference Include="..\Texnomic.SecureDNS.Core\Texnomic.SecureDNS.Core.csproj" />
+<ProjectReference Include="..\Texnomic.SecureDNS.Protocols\Texnomic.SecureDNS.Protocols.csproj" />
+<ProjectReference Include="..\Texnomic.SecureDNS.Servers\Texnomic.SecureDNS.Servers.csproj" />
+</ItemGroup>
+
+<ItemGroup>
+<Compile Update="Properties\Resources.Designer.cs">
+<DesignTime>True</DesignTime>
+<AutoGen>True</AutoGen>
+<DependentUpon>Resources.resx</DependentUpon>
+</Compile>
+</ItemGroup>
+
+<ItemGroup>
+<EmbeddedResource Update="Properties\Resources.resx">
+<Generator>ResXFileCodeGenerator</Generator>
+<LastGenOutput>Resources.Designer.cs</LastGenOutput>
+</EmbeddedResource>
+</ItemGroup>
+
+<ItemGroup>
+<Resource Include="AppSettings.json">
+<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+</Resource>
+</ItemGroup>
 </Project>
+

@@ -1,8 +1,4 @@
 ﻿using PipelineNet.Middleware;
-<<<<<<< HEAD
-using Texnomic.SecureDNS.Abstractions;
-=======
->>>>>>> 80e159a06224c769a7805e12328fb284df6c8bc1
 
 namespace Texnomic.SecureDNS.Servers.Proxy.Options;
 

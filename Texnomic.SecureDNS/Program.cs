@@ -23,8 +23,11 @@ public class Program
         return Host.CreateDefaultBuilder(Arguments)
             .ConfigureLogging(SetLogging)
             .ConfigureAppConfiguration(SetAppConfiguration)
+            .UseSerilog((hostContext, services, loggerConfiguration) =>
+            {
+                loggerConfiguration.ReadFrom.Configuration(JsonConfigurationProvider.BuildConfigurations());
+            })
             .ConfigureWebHostDefaults(SetWebHostDefaults);
-
     }
 
     private static void SetLogging(HostBuilderContext HostBuilderContext, ILoggingBuilder LoggingBuilder)
@@ -37,13 +40,7 @@ public class Program
     {
         WebHostBuilder.UseElectron(Arguments)
             .UseStartup<Startup>()
-            .UseConfiguration(JsonConfigurationProvider.BuildConfigurations())
-            .UseSerilog(ConfigureLogger, writeToProviders: true);
-    }
-
-    private static void ConfigureLogger(WebHostBuilderContext WebHostBuilderContext, LoggerConfiguration LoggerConfiguration)
-    {
-        LoggerConfiguration.ReadFrom.Configuration(JsonConfigurationProvider.BuildConfigurations());
+            .UseConfiguration(JsonConfigurationProvider.BuildConfigurations());
     }
 
     private static void SetAppConfiguration(HostBuilderContext HostBuilderContext, IConfigurationBuilder ConfigurationBuilder)

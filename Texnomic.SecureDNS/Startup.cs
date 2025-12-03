@@ -27,9 +27,9 @@ public class Startup
     public void ConfigureServices(IServiceCollection Services)
     {
         Services.AddSyncfusionBlazor();
-        Services.AddBlazorise(Options => { Options.ChangeTextOnKeyPress = true; });
-        Services.AddBootstrapProviders();
-        Services.AddFontAwesomeIcons();
+        Services.AddBlazorise()
+            .AddBootstrapProviders()
+            .AddFontAwesomeIcons();
         Services.AddJsonConfigurations();
         Services.AddLogging();
         Services.AddDatabase();
@@ -73,8 +73,6 @@ public class Startup
         App.UseHangfireServer();
         App.UseStaticFiles();
         App.UseRouting();
-        App.ApplicationServices.UseBootstrapProviders();
-        App.ApplicationServices.UseFontAwesomeIcons();
         App.UseAuthentication();
         App.UseAuthorization();
 

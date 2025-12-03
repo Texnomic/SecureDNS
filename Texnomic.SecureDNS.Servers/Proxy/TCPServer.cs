@@ -1,10 +1,4 @@
-<<<<<<< HEAD
-﻿using System.Buffers.Binary;
-using System.Net.Sockets;
-using System.Threading.Tasks.Dataflow;
-=======
-﻿namespace Texnomic.SecureDNS.Servers.Proxy;
->>>>>>> 80e159a06224c769a7805e12328fb284df6c8bc1
+namespace Texnomic.SecureDNS.Servers.Proxy;
 
 public sealed class TCPServer(
     IOptionsMonitor<ProxyResponsibilityChainOptions> ProxyResponsibilityChainOptions,

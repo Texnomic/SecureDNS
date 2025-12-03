@@ -19,12 +19,12 @@ public class BlacklistsBase : ComponentBase
     protected SfGrid<Blacklist> DefaultGrid;
 
 
-    public void ExcelExport()
+    public async Task ExcelExport()
     {
-        DefaultGrid.ExcelExport();
+        await DefaultGrid.ExportToExcelAsync();
     }
 
-    public void PdfExport()
+    public async Task PdfExport()
     {
         var ExportProperties = new PdfExportProperties();
         var Theme = new PdfTheme();
@@ -67,7 +67,7 @@ public class BlacklistsBase : ComponentBase
 
         ExportProperties.Theme = Theme;
 
-        DefaultGrid.PdfExport(ExportProperties);
+        await DefaultGrid.ExportToPdfAsync(ExportProperties);
     }
 
 

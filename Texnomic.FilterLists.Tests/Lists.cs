@@ -1,4 +1,3 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Texnomic.FilterLists.Models;
 
 namespace Texnomic.FilterLists.Tests;

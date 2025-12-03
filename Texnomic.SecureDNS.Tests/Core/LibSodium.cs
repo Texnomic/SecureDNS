@@ -1,6 +1,4 @@
 ﻿using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
 using Sodium;
 
 namespace Texnomic.SecureDNS.Tests.Core;

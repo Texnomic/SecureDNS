@@ -1,14 +1,4 @@
-<<<<<<< HEAD
-﻿using System.Buffers.Binary;
-using System.Diagnostics;
-using System.Net.Sockets;
-using System.Runtime.InteropServices;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
-using PipelineNet.MiddlewareResolver;
-=======
-﻿namespace Texnomic.SecureDNS.Servers.Proxy;
->>>>>>> 80e159a06224c769a7805e12328fb284df6c8bc1
+namespace Texnomic.SecureDNS.Servers.Proxy;
 
 public sealed class UDPServer2(
     IOptionsMonitor<ProxyResponsibilityChainOptions> ProxyResponsibilityChainOptions,

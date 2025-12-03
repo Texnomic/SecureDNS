@@ -1,7 +1,5 @@
 ﻿using System.Net;
 using Microsoft.Extensions.Options;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
 using Moq;
 using Texnomic.Socks5.Options;
 using Texnomic.Socks5.WebProxy;

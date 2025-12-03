@@ -1,7 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
 using Moq;
 
 using Texnomic.SecureDNS.Abstractions;

@@ -1,5 +1,4 @@
 using System.Net;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Texnomic.SecureDNS.Automation.Tests;
 

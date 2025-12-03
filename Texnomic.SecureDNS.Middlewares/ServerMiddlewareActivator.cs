@@ -2,8 +2,11 @@
 
 public class ServerMiddlewareActivator(IServiceProvider ServiceProvider) : IMiddlewareResolver
 {
-    public object Resolve(Type Type)
+    public MiddlewareResolverResult Resolve(Type Type)
     {
-        return ServiceProvider.GetService(Type);
+        return new MiddlewareResolverResult()
+        {
+            Middleware = ServiceProvider.GetService(Type)
+        };
     }
 }

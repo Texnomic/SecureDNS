@@ -1,0 +1,5 @@
+<Project>
+  <PropertyGroup>
+    <DefaultItemExcludes>$(DefaultItemExcludes);node_modules/**/*;artifacts/**/*;cache/**/*;typechain-types/**/*;coverage/**/*;dist/**/*;build/**/*</DefaultItemExcludes>
+  </PropertyGroup>
+</Project>

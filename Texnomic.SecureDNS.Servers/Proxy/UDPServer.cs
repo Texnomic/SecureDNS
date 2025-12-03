@@ -1,23 +1,4 @@
-<<<<<<< HEAD
-﻿using System.Net;
-using System.Net.Sockets;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks.Dataflow;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
-using Nethereum.Util;
-using PipelineNet.MiddlewareResolver;
-using Serilog;
-using Texnomic.SecureDNS.Abstractions;
-using Texnomic.SecureDNS.Abstractions.Enums;
-using Texnomic.SecureDNS.Core;
-using Texnomic.SecureDNS.Extensions;
-using Texnomic.SecureDNS.Serialization;
-using Texnomic.SecureDNS.Servers.Proxy.Options;
-using Texnomic.SecureDNS.Servers.Proxy.ResponsibilityChain;
-=======
-﻿namespace Texnomic.SecureDNS.Servers.Proxy;
->>>>>>> 80e159a06224c769a7805e12328fb284df6c8bc1
+namespace Texnomic.SecureDNS.Servers.Proxy;
 
 public sealed class UDPServer(
     IOptionsMonitor<ProxyResponsibilityChainOptions> ProxyResponsibilityChainOptions,

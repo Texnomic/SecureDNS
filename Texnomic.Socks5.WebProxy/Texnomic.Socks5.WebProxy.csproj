@@ -1,60 +1,21 @@
 <Project Sdk="Microsoft.NET.Sdk">
-	<PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+<PropertyGroup>
+</PropertyGroup>
 
-		<Version>0.6.0-alpha</Version>
-		<Authors>Texnomic</Authors>
-		<Company>Texnomic</Company>
-		<Copyright>Texnomic, Copyrights © 2024</Copyright>
+<ItemGroup>
+<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
+<PackageReference Include="morelinq" />
+</ItemGroup>
 
-		<RepositoryUrl>https://github.com/Texnomic/SecureDNS</RepositoryUrl>
-		<RepositoryType>Github</RepositoryType>
+<ItemGroup>
+<ProjectReference Include="..\Texnomic.Socks5\Texnomic.Socks5.csproj" />
+</ItemGroup>
 
-		<PackageIcon>SecureDNS.ico</PackageIcon>
-		<PackageTags>Alpha</PackageTags>
-		<PackageId>$(ProjectName)</PackageId>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageProjectUrl>https://github.com/Texnomic/SecureDNS</PackageProjectUrl>
-		<PackageTags>dns sdns https udp tcp dnscrypt dou dot doh</PackageTags>
-
-<<<<<<< HEAD
-  <ItemGroup>
-    <None Include="..\docs\Logo.png">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
-  </ItemGroup>
-
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="if $(ConfigurationName) == Release (..\Tools\signtool.exe sign /sha1 &quot;d4518c71443aebbc0429ec005774bc01176a2dbb&quot; /tr http://time.certum.pl /fd sha256 /v $(TargetPath))" />
-  </Target>
-
+<ItemGroup>
+<None Include="..\docs\Logo.png">
+<Pack>True</Pack>
+<PackagePath></PackagePath>
+</None>
+</ItemGroup>
 </Project>
-=======
-		<Product>$(ProjectName)</Product>
-		<Description>$(ProjectName)</Description>
-	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-		<DebugType>embedded</DebugType>
-	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-		<DebugType>embedded</DebugType>
-	</PropertyGroup>
-	<ItemGroup>
-		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
-		<PackageReference Include="morelinq" Version="4.2.0" />
-	</ItemGroup>
-	<ItemGroup>
-		<ProjectReference Include="..\Texnomic.Socks5\Texnomic.Socks5.csproj" />
-	</ItemGroup>
-	<ItemGroup>
-		<None Include="..\docs\Logo.png">
-			<Pack>True</Pack>
-			<PackagePath>
-			</PackagePath>
-		</None>
-	</ItemGroup>
-</Project>
->>>>>>> 80e159a06224c769a7805e12328fb284df6c8bc1
+

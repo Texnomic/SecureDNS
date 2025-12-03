@@ -1,8 +1,82 @@
-﻿<Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/0.5.89-alpha">
+﻿<Project>
   <PropertyGroup>
-    <!--Command to run on project build-->
-    <BuildCommand> </BuildCommand>
-    <!--Command to run on project clean-->
-    <CleanCommand> </CleanCommand>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Library</OutputType>
+    <IsPackable>false</IsPackable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- JavaScript/Node.js Project Settings -->
+    <StartupCommand>npm run node</StartupCommand>
+    <JavaScriptTestFramework>Mocha</JavaScriptTestFramework>
+    <BuildDependsOn></BuildDependsOn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Include ALL files in the project root -->
+    <None Include="*.*" Exclude="*.esproj;*.user;*.suo" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Include ALL TypeScript files -->
+    <None Include="**\*.ts" Exclude="node_modules\**;artifacts\**;cache\**;typechain-types\**;coverage\**;dist\**;build\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Include ALL JavaScript files -->
+    <None Include="**\*.js" Exclude="node_modules\**;artifacts\**;cache\**;typechain-types\**;coverage\**;dist\**;build\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Include ALL Solidity files -->
+    <None Include="**\*.sol" Exclude="node_modules\**;artifacts\**;cache\**;typechain-types\**;coverage\**;dist\**;build\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Include ALL JSON files -->
+    <None Include="**\*.json" Exclude="node_modules\**;artifacts\**;cache\**;typechain-types\**;coverage\**;dist\**;build\**;package-lock.json" />
+    <None Include="package-lock.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Include ALL Markdown files -->
+    <None Include="**\*.md" Exclude="node_modules\**;artifacts\**;cache\**;typechain-types\**;coverage\**;dist\**;build\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Include ALL YAML/YML files -->
+    <None Include="**\*.yml" Exclude="node_modules\**;artifacts\**;cache\**;typechain-types\**;coverage\**;dist\**;build\**" />
+    <None Include="**\*.yaml" Exclude="node_modules\**;artifacts\**;cache\**;typechain-types\**;coverage\**;dist\**;build\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Include ALL configuration files -->
+    <None Include=".eslintrc.*" />
+    <None Include=".prettierrc.*" />
+    <None Include=".solhint.*" />
+    <None Include=".gitignore" />
+    <None Include=".env*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Include text and license files -->
+    <None Include="**\*.txt" Exclude="node_modules\**;artifacts\**;cache\**;typechain-types\**;coverage\**;dist\**;build\**" />
+    <None Include="LICENSE*" />
+    <None Include="CHANGELOG*" />
+  </ItemGroup>
+
+  <Target Name="Build">
+    <Message Text="Checking npm dependencies..." Importance="high" />
+    <Exec Command="npm install" Condition="!Exists('node_modules')" WorkingDirectory="$(MSBuildProjectDirectory)" ContinueOnError="true" />
+    <Message Text="ENS Infrastructure project ready - $(MSBuildProjectDirectory)" Importance="high" />
+  </Target>
+
+  <Target Name="Clean">
+    <Message Text="Cleaning generated files..." Importance="high" />
+    <RemoveDir Directories="artifacts;cache;typechain-types;coverage;dist" Condition="Exists('artifacts') Or Exists('cache') Or Exists('typechain-types') Or Exists('coverage') Or Exists('dist')" />
+  </Target>
+
 </Project>

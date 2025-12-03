@@ -1,9 +1,4 @@
-<<<<<<< HEAD
-﻿using System.Net;
-using System.Text.Json.Serialization;
-=======
-﻿namespace Texnomic.SecureDNS.Servers.Proxy.Options;
->>>>>>> 80e159a06224c769a7805e12328fb284df6c8bc1
+namespace Texnomic.SecureDNS.Servers.Proxy.Options;
 
 public class ProxyServerOptions
 {

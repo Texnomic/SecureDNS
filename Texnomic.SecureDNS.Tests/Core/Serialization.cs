@@ -1,6 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-using Texnomic.SecureDNS.Serialization;
+﻿using Texnomic.SecureDNS.Serialization;
 
 namespace Texnomic.SecureDNS.Tests.Core;
 

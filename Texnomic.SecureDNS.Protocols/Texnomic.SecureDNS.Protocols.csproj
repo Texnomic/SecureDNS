@@ -1,47 +1,13 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-
-		<Version>0.6.0-alpha</Version>
-		<Authors>Texnomic</Authors>
-		<Company>Texnomic</Company>
-		<Copyright>Texnomic, Copyrights © 2024</Copyright>
-
-		<RepositoryUrl>https://github.com/Texnomic/SecureDNS</RepositoryUrl>
-		<RepositoryType>Github</RepositoryType>
-
 		<PackageIcon>Logo.png</PackageIcon>
-		<PackageTags>Alpha</PackageTags>
-		<PackageId>$(ProjectName)</PackageId>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageProjectUrl>https://github.com/Texnomic/SecureDNS</PackageProjectUrl>
-		<PackageTags>dns sdns https udp tcp dnscrypt dou dot doh</PackageTags>
+	</PropertyGroup>
 
-		<Product>$(ProjectName)</Product>
-		<Description>$(ProjectName)</Description>
-	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-		<DebugType>embedded</DebugType>
-	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-		<DebugType>embedded</DebugType>
-	</PropertyGroup>
 	<ItemGroup>
-<<<<<<< HEAD
-	  <Compile Remove="DataTypes\**" />
-	  <EmbeddedResource Remove="DataTypes\**" />
-	  <None Remove="DataTypes\**" />
+		<PackageReference Include="Microsoft.Extensions.Options" />
+		<PackageReference Include="Nethereum.ENS" />
 	</ItemGroup>
-	<ItemGroup>
-		<PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
-		<PackageReference Include="Nethereum.ENS" Version="4.2.0" />
-=======
-		<PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2" />
-		<PackageReference Include="Nethereum.ENS" Version="4.21.2" />
->>>>>>> 80e159a06224c769a7805e12328fb284df6c8bc1
-	</ItemGroup>
+
 	<ItemGroup>
 		<ProjectReference Include="..\Texnomic.SecureDNS.Abstractions\Texnomic.SecureDNS.Abstractions.csproj" />
 		<ProjectReference Include="..\Texnomic.SecureDNS.Core\Texnomic.SecureDNS.Core.csproj" />
@@ -49,17 +15,12 @@
 		<ProjectReference Include="..\Texnomic.SecureDNS.Serialization\Texnomic.SecureDNS.Serialization.csproj" />
 		<ProjectReference Include="..\Texnomic.Sodium\Texnomic.Sodium.csproj" />
 	</ItemGroup>
+
 	<ItemGroup>
 		<None Include="..\docs\Logo.png">
 			<Pack>True</Pack>
-			<PackagePath>
-			</PackagePath>
+			<PackagePath></PackagePath>
 		</None>
 	</ItemGroup>
-<<<<<<< HEAD
-	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="if $(ConfigurationName) == Release (..\Tools\signtool.exe sign /sha1 &quot;d4518c71443aebbc0429ec005774bc01176a2dbb&quot; /tr http://time.certum.pl /fd sha256 /v $(TargetPath))" />
-	</Target>
-=======
->>>>>>> 80e159a06224c769a7805e12328fb284df6c8bc1
 </Project>
+
