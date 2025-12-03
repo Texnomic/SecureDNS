@@ -1246,4 +1246,61 @@ public static class DnSerializer
     }
 
     #endregion
+
+    #region EdnsClientSubnet
+
+    private static EdnsClientSubnet GetEdnsClientSubnet(in DnStream Stream)
+    {
+        var Family = Stream.ReadUShort().AsEnum<AddressFamily>();
+        var SourcePrefixLength = Stream.ReadByte();
+        var ScopePrefixLength = Stream.ReadByte();
+        
+        var AddressBytesLength = (SourcePrefixLength + 7) / 8;
+        var AddressBytes = AddressBytesLength > 0 ? Stream.ReadBytes(AddressBytesLength).ToArray() : Array.Empty<byte>();
+
+        var FullAddressLength = Family == AddressFamily.IPv6 ? 16 : 4;
+        var FullAddressBytes = new byte[FullAddressLength];
+        Array.Copy(AddressBytes, FullAddressBytes, Math.Min(AddressBytes.Length, FullAddressLength));
+
+        return new EdnsClientSubnet()
+        {
+            Family = Family,
+            SourcePrefixLength = SourcePrefixLength,
+            ScopePrefixLength = ScopePrefixLength,
+            Address = new IPAddress(FullAddressBytes)
+        };
+    }
+
+    private static void Set(in DnStream Stream, in EdnsClientSubnet EdnsClientSubnet)
+    {
+        Stream.WriteUShort((ushort)EdnsClientSubnet.Family);
+        Stream.WriteByte(EdnsClientSubnet.SourcePrefixLength);
+        Stream.WriteByte(EdnsClientSubnet.ScopePrefixLength);
+
+        var AddressBytes = EdnsClientSubnet.Address.GetAddressBytes();
+        var SignificantBytes = (EdnsClientSubnet.SourcePrefixLength + 7) / 8;
+
+        if (SignificantBytes > 0)
+        {
+            var SubnetBytes = new byte[SignificantBytes];
+            Array.Copy(AddressBytes, SubnetBytes, Math.Min(SignificantBytes, AddressBytes.Length));
+
+            var BitsInLastByte = EdnsClientSubnet.SourcePrefixLength % 8;
+            if (BitsInLastByte != 0 && SignificantBytes > 0)
+            {
+                var Mask = (byte)(0xFF << (8 - BitsInLastByte));
+                SubnetBytes[SignificantBytes - 1] &= Mask;
+            }
+
+            Stream.WriteBytes(SubnetBytes);
+        }
+    }
+
+    private static ushort SizeOf(in EdnsClientSubnet EdnsClientSubnet)
+    {
+        var SignificantBytes = (EdnsClientSubnet.SourcePrefixLength + 7) / 8;
+        return (ushort)(4 + SignificantBytes);
+    }
+
+    #endregion
 }
