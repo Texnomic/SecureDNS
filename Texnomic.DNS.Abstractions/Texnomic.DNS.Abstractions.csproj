@@ -1,9 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-<PropertyGroup>
-<PackageIcon>SecureDNS.ico</PackageIcon>
-</PropertyGroup>
-
-<ItemGroup>
-<PackageReference Include="BinarySerializer" Version="8.6.4.1" />
-</ItemGroup>
-</Project>
