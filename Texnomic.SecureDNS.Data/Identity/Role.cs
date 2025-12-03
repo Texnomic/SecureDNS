@@ -1,15 +1,13 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using System;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Texnomic.SecureDNS.Data.Identity
+namespace Texnomic.SecureDNS.Data.Identity;
+
+[Table("Roles")]
+public class Role : IdentityRole<Guid>
 {
-    [Table("Roles")]
-    public class Role : IdentityRole<Guid>
+    public Role()
     {
-        public Role()
-        {
-            Id = Guid.NewGuid();
-        }
+        Id = Guid.NewGuid();
     }
 }

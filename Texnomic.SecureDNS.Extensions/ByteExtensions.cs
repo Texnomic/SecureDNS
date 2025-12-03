@@ -1,65 +1,62 @@
-﻿using System;
+﻿namespace Texnomic.SecureDNS.Extensions;
 
-namespace Texnomic.SecureDNS.Extensions
+public static class ByteExtensions
 {
-    public static class ByteExtensions
+    public static byte GetBits(this byte Byte, byte Index, byte Length)
     {
-        public static byte GetBits(this byte Byte, byte Index, byte Length)
+        if (Index > 7) throw new ArgumentOutOfRangeException(nameof(Index));
+
+        if (Length > 8) throw new ArgumentOutOfRangeException(nameof(Length));
+
+        var Shift = 8 - (Index + Length);
+
+        var Mask = (byte)(0b11111111 >> Index >> Shift << Shift);
+
+        return (byte)((Byte & Mask) >> Shift);
+    }
+
+    public static byte SetBits(this byte Byte, byte Index, byte Length, byte Value)
+    {
+        Value = (byte)(Value << (8 - (Index + Length)));
+
+        for (var I = Index; I <= Index + Length - 1; I++)
         {
-            if (Index > 7) throw new ArgumentOutOfRangeException(nameof(Index));
+            var Bit = Value.GetBit(I);
 
-            if (Length > 8) throw new ArgumentOutOfRangeException(nameof(Length));
-
-            var Shift = 8 - (Index + Length);
-
-            var Mask = (byte)(0b11111111 >> Index >> Shift << Shift);
-
-            return (byte)((Byte & Mask) >> Shift);
+            Byte = Byte.SetBit(I, Bit);
         }
 
-        public static byte SetBits(this byte Byte, byte Index, byte Length, byte Value)
-        {
-            Value = (byte)(Value << (8 - (Index + Length)));
+        return Byte;
+    }
 
-            for (var I = Index; I <= Index + Length - 1; I++)
-            {
-                var Bit = Value.GetBit(I);
+    public static byte GetBit(this byte Byte, byte Index)
+    {
+        return Byte.GetBits(Index, 1);
+    }
 
-                Byte = Byte.SetBit(I, Bit);
-            }
+    public static byte SetBit(this byte Byte, byte Index, byte Value)
+    {
+        if (Value > 1) throw new ArgumentOutOfRangeException(nameof(Value));
 
-            return Byte;
-        }
+        var Mask = (byte)(0b10000000 >> Index);
 
-        public static byte GetBit(this byte Byte, byte Index)
-        {
-            return Byte.GetBits(Index, 1);
-        }
+        Byte = (byte)(Value == 1 ? Byte | Mask : Byte & (byte)~Mask);
 
-        public static byte SetBit(this byte Byte, byte Index, byte Value)
-        {
-            if (Value > 1) throw new ArgumentOutOfRangeException(nameof(Value));
+        return Byte;
+    }
 
-            var Mask = (byte)(0b10000000 >> Index);
+    public static byte AsByte(this bool Bool)
+    {
+        return Convert.ToByte(Bool);
+    }
 
-            Byte = (byte)(Value == 1 ? Byte | Mask : Byte & (byte)~Mask);
+    public static bool AsBool(this byte Byte)
+    {
+        return Convert.ToBoolean(Byte);
+    }
 
-            return Byte;
-        }
-
-        public static byte AsByte(this bool Bool)
-        {
-            return Convert.ToByte(Bool);
-        }
-
-        public static bool AsBool(this byte Byte)
-        {
-            return Convert.ToBoolean(Byte);
-        }
-
-        public static TEnum AsEnum<TEnum>(this byte Byte) where TEnum : Enum
-        {
-            return (TEnum)(object)Byte;
-        }
+    public static TEnum AsEnum<TEnum>(this byte Byte) where TEnum : Enum
+    {
+        return (TEnum)(object)Byte;
     }
 }

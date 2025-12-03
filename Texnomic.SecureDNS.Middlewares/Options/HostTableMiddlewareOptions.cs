@@ -1,14 +1,11 @@
-﻿using System.Collections.Generic;
+﻿namespace Texnomic.SecureDNS.Middlewares.Options;
 
-namespace Texnomic.SecureDNS.Middlewares.Options
+public class HostTableMiddlewareOptions
 {
-    public class HostTableMiddlewareOptions
+    public Dictionary<string, string> HostTable { get; set; } = new Dictionary<string, string>()
     {
-        public Dictionary<string, string> HostTable { get; set; } = new Dictionary<string, string>()
-        {
-            { "dns.google", "8.8.8.8" }
-        };
+        { "dns.google", "8.8.8.8" }
+    };
 
-        public int TimeToLive { get; set; } = 30;
-    }
+    public int TimeToLive { get; set; } = 30;
 }

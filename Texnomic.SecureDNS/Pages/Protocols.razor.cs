@@ -1,18 +1,14 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Components;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.AspNetCore.Components;
 
-namespace Texnomic.SecureDNS.Pages
+namespace Texnomic.SecureDNS.Pages;
+
+public class ProtocolsBase : ComponentBase
 {
-    public class ProtocolsBase : ComponentBase
-    {
-        [Inject]
-        protected IEnumerable<IHostedService> HostedServices { get; set; }
+    [Inject]
+    protected IEnumerable<IHostedService> HostedServices { get; set; }
 
-        protected override Task OnInitializedAsync()
-        {
-            return base.OnInitializedAsync();
-        }
+    protected override Task OnInitializedAsync()
+    {
+        return base.OnInitializedAsync();
     }
 }

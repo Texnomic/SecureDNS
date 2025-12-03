@@ -1,14 +1,13 @@
-﻿namespace Texnomic.Socks5.Enum
+﻿namespace Texnomic.Socks5.Enum;
+
+internal enum Reply: byte
 {
-    internal enum Reply: byte
-    {
-        Succeeded = 0,
-        Failure = 1,
-        NotAllowed = 2,
-        NetworkUnreachable = 3,
-        HostUnreachable = 4,
-        ConnectionRefused = 5,
-        TTLExpired = 6,
-        CommandNotSupported = 8
-    }
+    Succeeded = 0,
+    Failure = 1,
+    NotAllowed = 2,
+    NetworkUnreachable = 3,
+    HostUnreachable = 4,
+    ConnectionRefused = 5,
+    TTLExpired = 6,
+    CommandNotSupported = 8
 }

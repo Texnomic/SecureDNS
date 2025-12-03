@@ -1,13 +1,12 @@
 using Nethereum.ABI.FunctionEncoding.Attributes;
 
-namespace Texnomic.ENS.PublicResolver.ContractDefinition
-{
-    public class NameOutputDto : NameOutputDtoBase { }
+namespace Texnomic.ENS.PublicResolver.ContractDefinition;
 
-    [FunctionOutput]
-    public class NameOutputDtoBase : IFunctionOutputDTO 
-    {
-        [Parameter("string", "", 1)]
-        public virtual string ReturnValue1 { get; set; }
-    }
+public class NameOutputDto : NameOutputDtoBase { }
+
+[FunctionOutput]
+public class NameOutputDtoBase : IFunctionOutputDTO 
+{
+    [Parameter("string", "", 1)]
+    public virtual string ReturnValue1 { get; set; }
 }

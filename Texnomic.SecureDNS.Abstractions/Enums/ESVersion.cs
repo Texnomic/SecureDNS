@@ -1,8 +1,7 @@
-﻿namespace Texnomic.SecureDNS.Abstractions.Enums
+﻿namespace Texnomic.SecureDNS.Abstractions.Enums;
+
+public enum ESVersion : ushort
 {
-    public enum ESVersion : ushort
-    {
-        X25519_XSalsa20Poly1305 = 1,
-        X25519_XChacha20Poly1305 = 2
-    }
+    X25519_XSalsa20Poly1305 = 1,
+    X25519_XChacha20Poly1305 = 2
 }

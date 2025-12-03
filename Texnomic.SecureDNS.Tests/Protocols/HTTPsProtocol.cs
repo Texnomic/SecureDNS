@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -15,73 +11,72 @@ using Texnomic.SecureDNS.Core.DataTypes;
 using Texnomic.SecureDNS.Protocols;
 using Texnomic.SecureDNS.Protocols.Options;
 
-namespace Texnomic.SecureDNS.Tests.Protocols
+namespace Texnomic.SecureDNS.Tests.Protocols;
+
+[TestClass]
+public class HTTPsProtocol
 {
-    [TestClass]
-    public class HTTPsProtocol
+    private IProtocol Resolver;
+    private IMessage RequestMessage;
+    private IMessage ResponseMessage;
+
+
+    [TestInitialize]
+    public void Initialize()
     {
-        private IProtocol Resolver;
-        private IMessage RequestMessage;
-        private IMessage ResponseMessage;
-
-
-        [TestInitialize]
-        public void Initialize()
+        var HTTPsOptions = new HTTPsOptions()
         {
-            var HTTPsOptions = new HTTPsOptions()
-            {
-                Uri = new Uri("https://cloudflare-dns.com")
-            };
+            Uri = new Uri("https://cloudflare-dns.com")
+        };
 
-            var TLSOptionsMonitor = Mock.Of<IOptionsMonitor<HTTPsOptions>>(Options => Options.CurrentValue == HTTPsOptions);
+        var TLSOptionsMonitor = Mock.Of<IOptionsMonitor<HTTPsOptions>>(Options => Options.CurrentValue == HTTPsOptions);
 
-            Resolver = new HTTPs(TLSOptionsMonitor);
+        Resolver = new HTTPs(TLSOptionsMonitor);
 
-            RequestMessage = new Message()
-            {
-                ID = (ushort) new Random().Next(),
-                RecursionDesired = true
-            };
-        }
-
-        [TestMethod]
-        [TestProperty("rdweb.wvd.microsoft.com", "A")]
-        [TestProperty("facebook.com", "A")]
-        public async Task ResolveAsync()
+        RequestMessage = new Message()
         {
-            var Type = GetType();
+            ID = (ushort) new Random().Next(),
+            RecursionDesired = true
+        };
+    }
 
-            var Method = Type.GetMethod(nameof(ResolveAsync));
+    [TestMethod]
+    [TestProperty("rdweb.wvd.microsoft.com", "A")]
+    [TestProperty("facebook.com", "A")]
+    public async Task ResolveAsync()
+    {
+        var Type = GetType();
 
-            var Attributes = Method?.GetCustomAttributes(typeof(TestPropertyAttribute), false);
+        var Method = Type.GetMethod(nameof(ResolveAsync));
 
-            if (Attributes == null) throw new TestCanceledException();
+        var Attributes = Method?.GetCustomAttributes(typeof(TestPropertyAttribute), false);
 
-            foreach (var Attribute in Attributes)
+        if (Attributes == null) throw new TestCanceledException();
+
+        foreach (var Attribute in Attributes)
+        {
+            var TestAttribute = (TestPropertyAttribute)Attribute;
+
+            var TestDomain = TestAttribute.Name;
+
+            var TestRecord = Enum.Parse<RecordType>(TestAttribute.Value);
+
+            RequestMessage.Questions = new List<IQuestion>()
             {
-                var TestAttribute = (TestPropertyAttribute)Attribute;
-
-                var TestDomain = TestAttribute.Name;
-
-                var TestRecord = Enum.Parse<RecordType>(TestAttribute.Value);
-
-                RequestMessage.Questions = new List<IQuestion>()
+                new Question()
                 {
-                    new Question()
-                    {
-                        Domain = Domain.FromString(TestDomain),
-                        Class = RecordClass.Internet,
-                        Type = TestRecord
-                    }
-                };
+                    Domain = Domain.FromString(TestDomain),
+                    Class = RecordClass.Internet,
+                    Type = TestRecord
+                }
+            };
 
-                ResponseMessage = await Resolver.ResolveAsync(RequestMessage);
+            ResponseMessage = await Resolver.ResolveAsync(RequestMessage);
 
-                Assert.AreEqual(RequestMessage.ID, ResponseMessage.ID);
-                Assert.IsNotNull(ResponseMessage.Questions);
-                Assert.IsNotNull(ResponseMessage.Answers);
-                //Assert.IsInstanceOfType(ResponseMessage.Answers.Last().Record, typeof(SecureDNS.Core.Records.A));
-            }
+            Assert.AreEqual(RequestMessage.ID, ResponseMessage.ID);
+            Assert.IsNotNull(ResponseMessage.Questions);
+            Assert.IsNotNull(ResponseMessage.Answers);
+            //Assert.IsInstanceOfType(ResponseMessage.Answers.Last().Record, typeof(SecureDNS.Core.Records.A));
         }
     }
 }

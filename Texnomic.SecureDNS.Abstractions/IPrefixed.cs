@@ -1,8 +1,7 @@
-﻿namespace Texnomic.SecureDNS.Abstractions
+﻿namespace Texnomic.SecureDNS.Abstractions;
+
+public interface IPrefixed<T>
 {
-    public interface IPrefixed<T>
-    {
-        byte Length { get; set; }
-        T Value { get; set; }
-    }
+    byte Length { get; set; }
+    T Value { get; set; }
 }

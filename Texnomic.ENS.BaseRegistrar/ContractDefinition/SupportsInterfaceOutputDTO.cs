@@ -1,4 +1,3 @@
-﻿namespace Texnomic.ENS.BaseRegistrar.ContractDefinition
-{
-    public partial class SupportsInterfaceOutputDto : SupportsInterfaceOutputDtoBase { }
-}
+﻿namespace Texnomic.ENS.BaseRegistrar.ContractDefinition;
+
+public partial class SupportsInterfaceOutputDto : SupportsInterfaceOutputDtoBase { }

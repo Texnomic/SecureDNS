@@ -1,16 +1,14 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
 using Texnomic.SecureDNS.Data.Abstractions.Identity;
 
-namespace Texnomic.SecureDNS.Data.Identity
+namespace Texnomic.SecureDNS.Data.Identity;
+
+[Table("Users")]
+public class User : IdentityUser<Guid>, IUser
 {
-    [Table("Users")]
-    public class User : IdentityUser<Guid>, IUser
+    public User()
     {
-        public User()
-        {
-            Id = Guid.NewGuid();
-        }
+        Id = Guid.NewGuid();
     }
 }

@@ -1,4 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
+<<<<<<< HEAD
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <PackageTags>dns sdns https udp tcp dnscrypt dou dot doh</PackageTags>
@@ -24,4 +25,42 @@
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="if $(ConfigurationName) == Release (..\Tools\signtool.exe sign /sha1 &quot;d4518c71443aebbc0429ec005774bc01176a2dbb&quot; /tr http://time.certum.pl /fd sha256 /v $(TargetPath))" />
   </Target>
+=======
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+
+		<Version>0.6.0-alpha</Version>
+		<Authors>Texnomic</Authors>
+		<Company>Texnomic</Company>
+		<Copyright>Texnomic, Copyrights © 2024</Copyright>
+
+		<RepositoryUrl>https://github.com/Texnomic/SecureDNS</RepositoryUrl>
+		<RepositoryType>Github</RepositoryType>
+
+		<PackageIcon>Logo.png</PackageIcon>
+		<PackageTags>Alpha</PackageTags>
+		<PackageId>$(ProjectName)</PackageId>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageProjectUrl>https://github.com/Texnomic/SecureDNS</PackageProjectUrl>
+		<PackageTags>dns sdns https udp tcp dnscrypt dou dot doh</PackageTags>
+
+		<Product>$(ProjectName)</Product>
+		<Description>$(ProjectName)</Description>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<DebugType>embedded</DebugType>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<DebugType>embedded</DebugType>
+	</PropertyGroup>
+	<ItemGroup>
+		<None Include="..\docs\Logo.png">
+			<Pack>True</Pack>
+			<PackagePath>
+			</PackagePath>
+		</None>
+	</ItemGroup>
+>>>>>>> 80e159a06224c769a7805e12328fb284df6c8bc1
 </Project>

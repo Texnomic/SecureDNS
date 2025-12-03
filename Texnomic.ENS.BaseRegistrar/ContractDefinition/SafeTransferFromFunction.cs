@@ -1,4 +1,3 @@
-﻿namespace Texnomic.ENS.BaseRegistrar.ContractDefinition
-{
-    public partial class SafeTransferFromFunction : SafeTransferFromFunctionBase { }
-}
+﻿namespace Texnomic.ENS.BaseRegistrar.ContractDefinition;
+
+public partial class SafeTransferFromFunction : SafeTransferFromFunctionBase { }

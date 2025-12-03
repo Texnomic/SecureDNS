@@ -1,4 +1,3 @@
-﻿namespace Texnomic.ENS.BaseRegistrar.ContractDefinition
-{
-    public partial class MigrationLockPeriodOutputDto : MigrationLockPeriodOutputDtoBase { }
-}
+﻿namespace Texnomic.ENS.BaseRegistrar.ContractDefinition;
+
+public partial class MigrationLockPeriodOutputDto : MigrationLockPeriodOutputDtoBase { }

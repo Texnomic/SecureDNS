@@ -1,8 +1,7 @@
-﻿namespace Texnomic.SecureDNS.Abstractions.Enums
+﻿namespace Texnomic.SecureDNS.Abstractions.Enums;
+
+public enum AuthoritativeAnswer : byte
 {
-    public enum AuthoritativeAnswer : byte
-    {
-        Cache = 0,
-        Authoritative = 1,
-    }
+    Cache = 0,
+    Authoritative = 1,
 }

@@ -1,11 +1,10 @@
-﻿namespace Texnomic.SecureDNS.Terminal.Enums
+﻿namespace Texnomic.SecureDNS.Terminal.Enums;
+
+public enum Protocol
 {
-    public enum Protocol
-    {
-        DNSCrypt,
-        HTTPs,
-        TLS,
-        TCP,
-        UDP
-    }
+    DNSCrypt,
+    HTTPs,
+    TLS,
+    TCP,
+    UDP
 }

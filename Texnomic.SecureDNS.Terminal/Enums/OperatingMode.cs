@@ -1,10 +1,9 @@
 ﻿
-namespace Texnomic.SecureDNS.Terminal.Enums
+namespace Texnomic.SecureDNS.Terminal.Enums;
+
+public enum Mode
 {
-    public enum Mode
-    {
-        CLI,
-        GUI,
-        Daemon
-    }
+    CLI,
+    GUI,
+    Daemon
 }

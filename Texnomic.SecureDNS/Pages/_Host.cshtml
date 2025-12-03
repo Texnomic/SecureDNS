@@ -1,5 +1,5 @@
 ﻿@page "/"
-@namespace Texnomic.SecureDNS.Pages
+@namespace Texnomic.SecureDNS.Pages ;
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 <!DOCTYPE html>
@@ -56,9 +56,9 @@
     <script src="/lib/materialize-stepper/dist/js/mstepper.min.js"></script>
 </head>
 <body>
-    <app>
-        @(await Html.RenderComponentAsync<App>(RenderMode.ServerPrerendered))
-    </app>
-    <script src="_framework/blazor.server.js"></script>
+<app>
+    @(await Html.RenderComponentAsync<App>(RenderMode.ServerPrerendered))
+</app>
+<script src="_framework/blazor.server.js"></script>
 </body>
 </html>

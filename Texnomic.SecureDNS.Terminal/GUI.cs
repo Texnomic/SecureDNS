@@ -1,12 +1,8 @@
-﻿using System;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Diagnostics;
 using System.Net.NetworkInformation;
-using System.Threading.Tasks;
 using Terminal.Gui;
 using Texnomic.SecureDNS.Terminal.Options;
 using Microsoft.Extensions.Hosting;
-using System.Threading;
 using Microsoft.Extensions.Options;
 using Texnomic.SecureDNS.Servers.Proxy;
 using Texnomic.SecureDNS.Servers.Proxy.Options;
@@ -15,255 +11,254 @@ using Console = Colorful.Console;
 using Timer = System.Timers.Timer;
 
 
-namespace Texnomic.SecureDNS.Terminal
+namespace Texnomic.SecureDNS.Terminal;
+
+public class GUI : IHostedService, IDisposable
 {
-    public class GUI : IHostedService, IDisposable
+    private readonly IOptionsMonitor<TerminalOptions> Options;
+
+    private readonly IOptionsMonitor<ProxyServerOptions> ServerOptions;
+
+    private readonly UDPServer2 UDPServer;
+
+    private readonly TCPServer2 TCPServer;
+
+    private readonly Timer StatusTimer;
+
+    private readonly CancellationTokenSource CancellationTokenSource;
+
+    public GUI(IOptionsMonitor<TerminalOptions> TerminalOptions, IOptionsMonitor<ProxyServerOptions> ProxyServerOptions, UDPServer2 UDPServer, TCPServer2 TCPServer)
     {
-        private readonly IOptionsMonitor<TerminalOptions> Options;
+        Console.ReplaceAllColorsWithDefaults();
 
-        private readonly IOptionsMonitor<ProxyServerOptions> ServerOptions;
+        Options = TerminalOptions;
 
-        private readonly UDPServer2 UDPServer;
+        ServerOptions = ProxyServerOptions;
 
-        private readonly TCPServer2 TCPServer;
+        this.UDPServer = UDPServer;
 
-        private readonly Timer StatusTimer;
+        this.TCPServer = TCPServer;
 
-        private readonly CancellationTokenSource CancellationTokenSource;
+        StatusTimer = new Timer(1000);
 
-        public GUI(IOptionsMonitor<TerminalOptions> TerminalOptions, IOptionsMonitor<ProxyServerOptions> ProxyServerOptions, UDPServer2 UDPServer, TCPServer2 TCPServer)
+        CancellationTokenSource = new CancellationTokenSource();
+    }
+
+    private static readonly ColorScheme SuccessColorScheme = new ColorScheme()
+    {
+        Normal = Attribute.Make(Color.Black, Color.Green),
+        Focus = Attribute.Make(Color.Black, Color.Green)
+    };
+
+    private static readonly ColorScheme FailureColorScheme = new ColorScheme()
+    {
+        Normal = Attribute.Make(Color.White, Color.Red),
+        Focus = Attribute.Make(Color.White, Color.Red)
+    };
+
+    private void Draw()
+    {
+        var Window = new Window("Management", 1)
         {
-            Console.ReplaceAllColorsWithDefaults();
-
-            Options = TerminalOptions;
-
-            ServerOptions = ProxyServerOptions;
-
-            this.UDPServer = UDPServer;
-
-            this.TCPServer = TCPServer;
-
-            StatusTimer = new Timer(1000);
-
-            CancellationTokenSource = new CancellationTokenSource();
-        }
-
-        private static readonly ColorScheme SuccessColorScheme = new ColorScheme()
-        {
-            Normal = Attribute.Make(Color.Black, Color.Green),
-            Focus = Attribute.Make(Color.Black, Color.Green)
+            X = 0,
+            Y = 1,
+            Width = Dim.Fill(),
+            Height = Dim.Fill()
         };
 
-        private static readonly ColorScheme FailureColorScheme = new ColorScheme()
+        Application.Top.Add(Window);
+
+
+        var ServerBindingLabel = new Label("Server Binding: ")
         {
-            Normal = Attribute.Make(Color.White, Color.Red),
-            Focus = Attribute.Make(Color.White, Color.Red)
+            X = 3,
+            Y = 2,
         };
 
-        private void Draw()
+        var ServerBindingText = new TextField(ServerOptions.CurrentValue.IPEndPoint.ToString())
         {
-            var Window = new Window("Management", 1)
+            X = Pos.Right(ServerBindingLabel) + 2,
+            Y = Pos.Top(ServerBindingLabel),
+            Width = 30
+        };
+
+        var StartButton = new Button("Start Server", true)
+        {
+            X = Pos.AnchorEnd(37),
+            Y = Pos.AnchorEnd(1),
+        };
+
+        StartButton.Clicked += () => StartServerAsync().RunSynchronously();
+
+        var StopButton = new Button("Stop Server")
+        {
+            X = Pos.AnchorEnd(16),
+            Y = Pos.AnchorEnd(1),
+        };
+
+        StopButton.Clicked += () => StopServerAsync().RunSynchronously();
+
+        var MenuBar = new MenuBar(new[]
+        {
+            new MenuBarItem ("SecureDNS", new  []
             {
-                X = 0,
-                Y = 1,
-                Width = Dim.Fill(),
-                Height = Dim.Fill()
-            };
+                new MenuItem ("Start", "Server", StartServerAsync().RunSynchronously),
 
-            Application.Top.Add(Window);
+                new MenuItem ("Stop", "Server", StopServerAsync().RunSynchronously),
 
+                new MenuItem ("Quit", "System", () => Application.RequestStop()),
+            }),
 
-            var ServerBindingLabel = new Label("Server Binding: ")
+            //new MenuBarItem ("Seq", new  []
+            //{
+            //    new MenuItem ("Browse", "", () => Browse(SeqEndPointText.Text.ToString())),
+            //}),
+
+            new MenuBarItem("About", new[]
             {
-                X = 3,
-                Y = 2,
-            };
+                new MenuItem("Browse", "GitHub", () => Browse("https://github.com/Texnomic/SecureDNS")),
+            })
+        });
 
-            var ServerBindingText = new TextField(ServerOptions.CurrentValue.IPEndPoint.ToString())
-            {
-                X = Pos.Right(ServerBindingLabel) + 2,
-                Y = Pos.Top(ServerBindingLabel),
-                Width = 30
-            };
-
-            var StartButton = new Button("Start Server", true)
-            {
-                X = Pos.AnchorEnd(37),
-                Y = Pos.AnchorEnd(1),
-            };
-
-            StartButton.Clicked += () => StartServerAsync().RunSynchronously();
-
-            var StopButton = new Button("Stop Server")
-            {
-                X = Pos.AnchorEnd(16),
-                Y = Pos.AnchorEnd(1),
-            };
-
-            StopButton.Clicked += () => StopServerAsync().RunSynchronously();
-
-            var MenuBar = new MenuBar(new[]
-            {
-                new MenuBarItem ("SecureDNS", new  []
-                {
-                    new MenuItem ("Start", "Server", StartServerAsync().RunSynchronously),
-
-                    new MenuItem ("Stop", "Server", StopServerAsync().RunSynchronously),
-
-                    new MenuItem ("Quit", "System", () => Application.RequestStop()),
-                }),
-
-                //new MenuBarItem ("Seq", new  []
-                //{
-                //    new MenuItem ("Browse", "", () => Browse(SeqEndPointText.Text.ToString())),
-                //}),
-
-                new MenuBarItem("About", new[]
-                {
-                    new MenuItem("Browse", "GitHub", () => Browse("https://github.com/Texnomic/SecureDNS")),
-                })
-            });
-
-            Application.Top.Add(MenuBar);
+        Application.Top.Add(MenuBar);
 
 
-            var StatusListView = new ListView()
-            {
-                X = Pos.Left(ServerBindingLabel),
-                Y = Pos.Top(ServerBindingLabel) + 5,
-                Width = 40,
-                Height = 15,
-            };
+        var StatusListView = new ListView()
+        {
+            X = Pos.Left(ServerBindingLabel),
+            Y = Pos.Top(ServerBindingLabel) + 5,
+            Width = 40,
+            Height = 15,
+        };
 
-            //StatusTimer.Elapsed += (Sender, Args) => StatusListView.SetSource(UDPServer.Status().Distinct().ToList());
+        //StatusTimer.Elapsed += (Sender, Args) => StatusListView.SetSource(UDPServer.Status().Distinct().ToList());
 
-            //StatusTimer.Elapsed += (Sender, Args) => StatusListView.SetSource(TCPServer.Status().Distinct().ToList());
+        //StatusTimer.Elapsed += (Sender, Args) => StatusListView.SetSource(TCPServer.Status().Distinct().ToList());
 
-            Window.Add(ServerBindingLabel,
-                ServerBindingText,
-                StartButton,
-                StopButton,
-                StatusListView,
-                StatusListView);
+        Window.Add(ServerBindingLabel,
+            ServerBindingText,
+            StartButton,
+            StopButton,
+            StatusListView,
+            StatusListView);
 
             
-        }
+    }
 
-        public async Task StartAsync(CancellationToken CancellationToken)
+    public async Task StartAsync(CancellationToken CancellationToken)
+    {
+        Application.Init();
+
+        Draw();
+
+        StatusTimer.Start();
+
+        Application.Run();
+
+        await Task.Yield();
+    }
+
+    public async Task StopAsync(CancellationToken CancellationToken)
+    {
+        StatusTimer.Stop();
+
+        CancellationTokenSource.Cancel();
+
+        await UDPServer.StopAsync(CancellationTokenSource.Token).ConfigureAwait(false);
+
+        await TCPServer.StopAsync(CancellationTokenSource.Token).ConfigureAwait(false);
+
+        Application.RequestStop();
+    }
+
+
+    public async Task StartServerAsync()
+    {
+        try
         {
-            Application.Init();
+            var Available = CheckPort(ServerOptions.CurrentValue.IPEndPoint.Port);
 
-            Draw();
+            if (Available)
+            {
+                await UDPServer.StartAsync(CancellationTokenSource.Token).ConfigureAwait(false);
 
-            StatusTimer.Start();
+                await TCPServer.StartAsync(CancellationTokenSource.Token).ConfigureAwait(false);
 
-            Application.Run();
-
-            await Task.Yield();
+                MessageBox.Query(40, 7, "Information", "Server Started.", "OK");
+            }
+            else
+            {
+                MessageBox.ErrorQuery(80, 7, "Error", $"Port {ServerOptions.CurrentValue.IPEndPoint.Port} Already Used.", "OK");
+            }
         }
-
-        public async Task StopAsync(CancellationToken CancellationToken)
+        catch (Exception Error)
         {
-            StatusTimer.Stop();
+            MessageBox.ErrorQuery(80, 7, "Error", Error.Message, "OK");
+        }
+    }
 
+    public async Task StopServerAsync()
+    {
+        try
+        {
             CancellationTokenSource.Cancel();
 
             await UDPServer.StopAsync(CancellationTokenSource.Token).ConfigureAwait(false);
 
             await TCPServer.StopAsync(CancellationTokenSource.Token).ConfigureAwait(false);
 
-            Application.RequestStop();
+            MessageBox.Query(40, 7, "Information", "Server Stopped.", "OK");
         }
-
-
-        public async Task StartServerAsync()
+        catch (Exception Error)
         {
-            try
-            {
-                var Available = CheckPort(ServerOptions.CurrentValue.IPEndPoint.Port);
-
-                if (Available)
-                {
-                    await UDPServer.StartAsync(CancellationTokenSource.Token).ConfigureAwait(false);
-
-                    await TCPServer.StartAsync(CancellationTokenSource.Token).ConfigureAwait(false);
-
-                    MessageBox.Query(40, 7, "Information", "Server Started.", "OK");
-                }
-                else
-                {
-                    MessageBox.ErrorQuery(80, 7, "Error", $"Port {ServerOptions.CurrentValue.IPEndPoint.Port} Already Used.", "OK");
-                }
-            }
-            catch (Exception Error)
-            {
-                MessageBox.ErrorQuery(80, 7, "Error", Error.Message, "OK");
-            }
+            MessageBox.ErrorQuery(80, 7, "Error", Error.Message, "OK");
         }
+    }
 
-        public async Task StopServerAsync()
+    private static void Browse(string Url)
+    {
+        var Ps = new ProcessStartInfo(Url)
         {
-            try
-            {
-                CancellationTokenSource.Cancel();
+            UseShellExecute = true,
+            Verb = "open"
+        };
 
-                await UDPServer.StopAsync(CancellationTokenSource.Token).ConfigureAwait(false);
+        Process.Start(Ps);
+    }
 
-                await TCPServer.StopAsync(CancellationTokenSource.Token).ConfigureAwait(false);
+    private static bool CheckPort(int Port)
+    {
+        return IPGlobalProperties.GetIPGlobalProperties()
+            .GetActiveUdpListeners()
+            .All(Connection => Connection.Port != Port);
+    }
 
-                MessageBox.Query(40, 7, "Information", "Server Stopped.", "OK");
-            }
-            catch (Exception Error)
-            {
-                MessageBox.ErrorQuery(80, 7, "Error", Error.Message, "OK");
-            }
-        }
 
-        private static void Browse(string Url)
+    private bool IsDisposed;
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool Disposing)
+    {
+        if (IsDisposed) return;
+
+        if (Disposing)
         {
-            var Ps = new ProcessStartInfo(Url)
-            {
-                UseShellExecute = true,
-                Verb = "open"
-            };
-
-            Process.Start(Ps);
+            CancellationTokenSource.Dispose();
+            UDPServer.Dispose();
+            TCPServer.Dispose();
+            StatusTimer.Dispose();
         }
 
-        private static bool CheckPort(int Port)
-        {
-            return IPGlobalProperties.GetIPGlobalProperties()
-                                     .GetActiveUdpListeners()
-                                     .All(Connection => Connection.Port != Port);
-        }
+        IsDisposed = true;
+    }
 
-
-        private bool IsDisposed;
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool Disposing)
-        {
-            if (IsDisposed) return;
-
-            if (Disposing)
-            {
-                CancellationTokenSource.Dispose();
-                UDPServer.Dispose();
-                TCPServer.Dispose();
-                StatusTimer.Dispose();
-            }
-
-            IsDisposed = true;
-        }
-
-        ~GUI()
-        {
-            Dispose(false);
-        }
+    ~GUI()
+    {
+        Dispose(false);
     }
 }

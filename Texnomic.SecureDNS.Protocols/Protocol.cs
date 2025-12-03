@@ -1,65 +1,56 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
+﻿namespace Texnomic.SecureDNS.Protocols;
 
-using Texnomic.SecureDNS.Abstractions;
-using Texnomic.SecureDNS.Extensions;
-using Texnomic.SecureDNS.Serialization;
-
-namespace Texnomic.SecureDNS.Protocols
+public abstract class Protocol : IProtocol
 {
-    public abstract class Protocol : IProtocol
+    protected bool IsInitialized;
+
+    protected CancellationTokenSource CancellationTokenSource;
+
+    protected virtual void OptionsOnChange(IOptions Options)
     {
-        protected bool IsInitialized;
+        throw new NotImplementedException();
+    }
 
-        protected CancellationTokenSource CancellationTokenSource;
+    protected virtual ValueTask InitializeAsync()
+    {
+        throw new NotImplementedException();
+    }
 
-        protected virtual void OptionsOnChange(IOptions Options)
-        {
-            throw new NotImplementedException();
-        }
+    public byte[] Resolve(byte[] Query)
+    {
+        return Async.RunSync(() => ResolveAsync(Query).AsTask());
+    }
 
-        protected virtual ValueTask InitializeAsync()
-        {
-            throw new NotImplementedException();
-        }
+    public IMessage Resolve(IMessage Query)
+    {
+        return Async.RunSync(() => ResolveAsync(Query).AsTask());
+    }
 
-        public byte[] Resolve(byte[] Query)
-        {
-            return Async.RunSync(() => ResolveAsync(Query).AsTask());
-        }
+    public abstract ValueTask<byte[]> ResolveAsync(byte[] Query);
 
-        public IMessage Resolve(IMessage Query)
-        {
-            return Async.RunSync(() => ResolveAsync(Query).AsTask());
-        }
+    public virtual async ValueTask<IMessage> ResolveAsync(IMessage Query)
+    {
+        var SerializedQuery = DnSerializer.Serialize(Query);
 
-        public abstract ValueTask<byte[]> ResolveAsync(byte[] Query);
+        var SerializedAnswer = await ResolveAsync(SerializedQuery);
 
-        public virtual async ValueTask<IMessage> ResolveAsync(IMessage Query)
-        {
-            var SerializedQuery = DnSerializer.Serialize(Query);
+        var AnswerMessage = DnSerializer.Deserialize(SerializedAnswer);
 
-            var SerializedAnswer = await ResolveAsync(SerializedQuery);
+        return AnswerMessage;
+    }
 
-            var AnswerMessage = DnSerializer.Deserialize(SerializedAnswer);
+    protected bool IsDisposed;
 
-            return AnswerMessage;
-        }
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
 
-        protected bool IsDisposed;
+    protected abstract void Dispose(bool Disposing);
 
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected abstract void Dispose(bool Disposing);
-
-        ~Protocol()
-        {
-            Dispose(false);
-        }
+    ~Protocol()
+    {
+        Dispose(false);
     }
 }

@@ -1,6 +1,5 @@
-﻿namespace Texnomic.SecureDNS.Abstractions
+﻿namespace Texnomic.SecureDNS.Abstractions;
+
+public interface IStamp
 {
-    public interface IStamp
-    {
-    }
 }

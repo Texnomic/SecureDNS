@@ -1,8 +1,7 @@
-﻿namespace Texnomic.SecureDNS.Abstractions.Enums
+﻿namespace Texnomic.SecureDNS.Abstractions.Enums;
+
+public enum MessageType : byte
 {
-    public enum MessageType : byte
-    {
-        Query = 0,
-        Response = 1
-    }
+    Query = 0,
+    Response = 1
 }

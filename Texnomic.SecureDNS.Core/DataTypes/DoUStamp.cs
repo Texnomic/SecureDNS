@@ -1,20 +1,19 @@
 ﻿using Texnomic.SecureDNS.Abstractions;
 
-namespace Texnomic.SecureDNS.Core.DataTypes
+namespace Texnomic.SecureDNS.Core.DataTypes;
+
+/// <summary>
+/// <see cref="https://github.com/DNSCrypt/dnscrypt-proxy/wiki/stamps#plain-dns-stamps"/>
+/// </summary>
+public class DoUStamp : IStamp
 {
-    /// <summary>
-    /// <see cref="https://github.com/DNSCrypt/dnscrypt-proxy/wiki/stamps#plain-dns-stamps"/>
-    /// </summary>
-    public class DoUStamp : IStamp
-    {
-        public bool DnsSec { get; set; }
+    public bool DnsSec { get; set; }
 
-        public bool NoLog { get; set; }
+    public bool NoLog { get; set; }
 
-        public bool NoFilter { get; set; }
+    public bool NoFilter { get; set; }
 
-        public byte[] Flags { get; set; }
+    public byte[] Flags { get; set; }
 
-        public string Address { get; set; }
-    }
+    public string Address { get; set; }
 }

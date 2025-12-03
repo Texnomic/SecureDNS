@@ -1,372 +1,364 @@
-﻿using System;
-using System.Text;
-using System.Buffers.Binary;
-using System.Collections.Generic;
-using System.Net;
-using Texnomic.SecureDNS.Extensions;
+﻿namespace Texnomic.SecureDNS.Serialization;
 
-namespace Texnomic.SecureDNS.Serialization
+public class DnStream
 {
-    public class DnStream
+    private readonly Memory<byte> Raw;
+
+    private int ByteIndex;
+
+    private int BitIndex;
+
+    public ushort BytePosition => (ushort)ByteIndex;
+
+    public ushort BitPosition => (ushort)BitIndex;
+
+    public ushort Length => (ushort)Raw.Length;
+
+    public DnStream(ushort Length)
     {
-        private readonly Memory<byte> Raw;
+        Raw = new byte[Length];
 
-        private int ByteIndex;
+        (ByteIndex, BitIndex) = (0, 0);
+    }
 
-        private int BitIndex;
+    public DnStream(in byte[] Raw)
+    {
+        this.Raw = Raw;
 
-        public ushort BytePosition => (ushort)ByteIndex;
+        (ByteIndex, BitIndex) = (0, 0);
+    }
 
-        public ushort BitPosition => (ushort)BitIndex;
+    public void Seek(ushort Bytes, byte Bits = 0)
+    {
+        (ByteIndex, BitIndex) = (Bytes, Bits);
+    }
 
-        public ushort Length => (ushort)Raw.Length;
+    public int Find(ReadOnlySpan<byte> Bytes)
+    {
+        return Raw.Span.SequenceCompareTo(Bytes);
+    }
 
-        public DnStream(ushort Length)
+
+    private Span<byte> ReadSpan(ushort Length)
+    {
+        return Raw.Slice(ByteIndex, Length).Span;
+    }
+
+    private Span<byte> ReadSpanToEnd()
+    {
+        return Raw.Slice(ByteIndex).Span;
+    }
+
+    private Span<byte> ReadSpan(int Length)
+    {
+        return Raw.Slice(ByteIndex, Length).Span;
+    }
+
+    public byte ReadBits(byte Length)
+    {
+        var Byte = Raw.Span[ByteIndex].GetBits((byte)BitIndex, Length);
+
+        BitIndex += Length;
+
+        if (BitIndex > 7)
         {
-            Raw = new byte[Length];
-
-            (ByteIndex, BitIndex) = (0, 0);
-        }
-
-        public DnStream(in byte[] Raw)
-        {
-            this.Raw = Raw;
-
-            (ByteIndex, BitIndex) = (0, 0);
-        }
-
-        public void Seek(ushort Bytes, byte Bits = 0)
-        {
-            (ByteIndex, BitIndex) = (Bytes, Bits);
-        }
-
-        public int Find(ReadOnlySpan<byte> Bytes)
-        {
-            return Raw.Span.SequenceCompareTo(Bytes);
-        }
-
-
-        private Span<byte> ReadSpan(ushort Length)
-        {
-            return Raw.Slice(ByteIndex, Length).Span;
-        }
-
-        private Span<byte> ReadSpanToEnd()
-        {
-            return Raw.Slice(ByteIndex).Span;
-        }
-
-        private Span<byte> ReadSpan(int Length)
-        {
-            return Raw.Slice(ByteIndex, Length).Span;
-        }
-
-        public byte ReadBits(byte Length)
-        {
-            var Byte = Raw.Span[ByteIndex].GetBits((byte)BitIndex, Length);
-
-            BitIndex += Length;
-
-            if (BitIndex > 7)
-            {
-                ByteIndex++;
-                BitIndex = 0;
-            }
-
-            return Byte;
-        }
-
-        public void WriteBits(byte Length, byte Value)
-        {
-            Raw.Span[ByteIndex] = Raw.Span[ByteIndex].SetBits((byte)BitIndex, Length, Value);
-
-            BitIndex += Length;
-
-            if (BitIndex > 7)
-            {
-                ByteIndex++;
-                BitIndex = 0;
-            }
-        }
-
-        public byte ReadBit()
-        {
-            var Byte = Raw.Span[ByteIndex].GetBit((byte)BitIndex);
-
-            BitIndex++;
-
-            if (BitIndex > 7)
-            {
-                ByteIndex++;
-                BitIndex = 0;
-            }
-
-            return Byte;
-        }
-
-        public void WriteBit(byte Value)
-        {
-            Raw.Span[ByteIndex] = Raw.Span[ByteIndex].SetBit((byte)BitIndex, Value);
-
-            BitIndex++;
-
-            if (BitIndex > 7)
-            {
-                ByteIndex++;
-                BitIndex = 0;
-            }
-        }
-
-        public byte ReadByte()
-        {
-            var Byte = Raw.Span[ByteIndex];
-            
-            ByteIndex += 1;
-
-            return Byte;
-        }
-
-        public void WriteByte(byte Value)
-        {
-            Raw.Span[ByteIndex] = Value;
-
             ByteIndex++;
+            BitIndex = 0;
         }
 
-        public ReadOnlySpan<byte> ReadBytes(ushort Length)
+        return Byte;
+    }
+
+    public void WriteBits(byte Length, byte Value)
+    {
+        Raw.Span[ByteIndex] = Raw.Span[ByteIndex].SetBits((byte)BitIndex, Length, Value);
+
+        BitIndex += Length;
+
+        if (BitIndex > 7)
         {
-            var Bytes = ReadSpan(Length);
-
-            ByteIndex += Length;
-
-            return Bytes;
+            ByteIndex++;
+            BitIndex = 0;
         }
+    }
 
-        public ReadOnlySpan<byte> ReadPrefixedBytes()
+    public byte ReadBit()
+    {
+        var Byte = Raw.Span[ByteIndex].GetBit((byte)BitIndex);
+
+        BitIndex++;
+
+        if (BitIndex > 7)
         {
-            var Length = ReadByte();
-
-            return ReadBytes(Length);
+            ByteIndex++;
+            BitIndex = 0;
         }
 
-        public byte[][] ReadListPrefixedBytes()
+        return Byte;
+    }
+
+    public void WriteBit(byte Value)
+    {
+        Raw.Span[ByteIndex] = Raw.Span[ByteIndex].SetBit((byte)BitIndex, Value);
+
+        BitIndex++;
+
+        if (BitIndex > 7)
         {
-            var Count = ReadByte();
-
-            var List = new List<byte[]>(Count);
-
-            for (var i = 0; i < Count; i++)
-            {
-                List.Add(ReadPrefixedBytes().ToArray());
-            }
-
-            return List.ToArray();
+            ByteIndex++;
+            BitIndex = 0;
         }
+    }
 
-        public ReadOnlySpan<byte> ReadBytesToEnd()
+    public byte ReadByte()
+    {
+        var Byte = Raw.Span[ByteIndex];
+            
+        ByteIndex += 1;
+
+        return Byte;
+    }
+
+    public void WriteByte(byte Value)
+    {
+        Raw.Span[ByteIndex] = Value;
+
+        ByteIndex++;
+    }
+
+    public ReadOnlySpan<byte> ReadBytes(ushort Length)
+    {
+        var Bytes = ReadSpan(Length);
+
+        ByteIndex += Length;
+
+        return Bytes;
+    }
+
+    public ReadOnlySpan<byte> ReadPrefixedBytes()
+    {
+        var Length = ReadByte();
+
+        return ReadBytes(Length);
+    }
+
+    public byte[][] ReadListPrefixedBytes()
+    {
+        var Count = ReadByte();
+
+        var List = new List<byte[]>(Count);
+
+        for (var i = 0; i < Count; i++)
         {
-            var Bytes = ReadSpanToEnd();
-
-            ByteIndex = Raw.Length - 1;
-
-            return Bytes;
+            List.Add(ReadPrefixedBytes().ToArray());
         }
 
-        public void WriteBytes(Span<byte> Bytes)
+        return List.ToArray();
+    }
+
+    public ReadOnlySpan<byte> ReadBytesToEnd()
+    {
+        var Bytes = ReadSpanToEnd();
+
+        ByteIndex = Raw.Length - 1;
+
+        return Bytes;
+    }
+
+    public void WriteBytes(Span<byte> Bytes)
+    {
+        Bytes.CopyTo(ReadSpan(Bytes.Length));
+
+        ByteIndex += Bytes.Length;
+    }
+
+    public void WritePrefixedBytes(Span<byte> Bytes)
+    {
+        WriteByte((byte)Bytes.Length);
+
+        WriteBytes(Bytes);
+    }
+
+    public void WriteListPrefixedBytes(byte[][] Value)
+    {
+        WriteByte((byte)Value.Length);
+
+        foreach (var Array in Value)
         {
-            Bytes.CopyTo(ReadSpan(Bytes.Length));
-
-            ByteIndex += Bytes.Length;
+            WritePrefixedBytes(Array);
         }
+    }
 
-        public void WritePrefixedBytes(Span<byte> Bytes)
-        {
-            WriteByte((byte)Bytes.Length);
+    public void WriteBytes(ReadOnlySpan<byte> Bytes)
+    {
+        Bytes.CopyTo(ReadSpan(Bytes.Length));
 
-            WriteBytes(Bytes);
-        }
+        ByteIndex += Bytes.Length;
+    }
 
-        public void WriteListPrefixedBytes(byte[][] Value)
-        {
-            WriteByte((byte)Value.Length);
+    public short ReadShort()
+    {
+        return BinaryPrimitives.ReadInt16BigEndian(ReadBytes(2));
+    }
 
-            foreach (var Array in Value)
-            {
-                WritePrefixedBytes(Array);
-            }
-        }
+    public void WriteShort(short Value)
+    {
+        BinaryPrimitives.WriteInt16BigEndian(ReadSpan(2), Value);
 
-        public void WriteBytes(ReadOnlySpan<byte> Bytes)
-        {
-            Bytes.CopyTo(ReadSpan(Bytes.Length));
+        ByteIndex += 2;
+    }
 
-            ByteIndex += Bytes.Length;
-        }
+    public ushort ReadUShort()
+    {
+        return BinaryPrimitives.ReadUInt16BigEndian(ReadBytes(2));
+    }
 
-        public short ReadShort()
-        {
-            return BinaryPrimitives.ReadInt16BigEndian(ReadBytes(2));
-        }
+    public void WriteUShort(ushort Value)
+    {
+        BinaryPrimitives.WriteUInt16BigEndian(ReadSpan(2), Value);
 
-        public void WriteShort(short Value)
-        {
-            BinaryPrimitives.WriteInt16BigEndian(ReadSpan(2), Value);
+        ByteIndex += 2;
+    }
 
-            ByteIndex += 2;
-        }
+    public int ReadInt32()
+    {
+        return BinaryPrimitives.ReadInt32BigEndian(ReadBytes(4));
+    }
 
-        public ushort ReadUShort()
-        {
-            return BinaryPrimitives.ReadUInt16BigEndian(ReadBytes(2));
-        }
+    public void WriteInt32(int Value)
+    {
+        BinaryPrimitives.WriteInt32BigEndian(ReadSpan(4), Value);
 
-        public void WriteUShort(ushort Value)
-        {
-            BinaryPrimitives.WriteUInt16BigEndian(ReadSpan(2), Value);
+        ByteIndex += 4;
+    }
 
-            ByteIndex += 2;
-        }
+    public uint ReadUInt32()
+    {
+        return BinaryPrimitives.ReadUInt32BigEndian(ReadBytes(4));
+    }
 
-        public int ReadInt32()
-        {
-            return BinaryPrimitives.ReadInt32BigEndian(ReadBytes(4));
-        }
+    public void WriteUInt32(uint Value)
+    {
+        BinaryPrimitives.WriteUInt32BigEndian(ReadSpan(4), Value);
 
-        public void WriteInt32(int Value)
-        {
-            BinaryPrimitives.WriteInt32BigEndian(ReadSpan(4), Value);
+        ByteIndex += 4;
+    }
 
-            ByteIndex += 4;
-        }
+    public long ReadLong()
+    {
+        return BinaryPrimitives.ReadInt64BigEndian(ReadBytes(8));
+    }
 
-        public uint ReadUInt32()
-        {
-            return BinaryPrimitives.ReadUInt32BigEndian(ReadBytes(4));
-        }
+    public void WriteLong(long Value)
+    {
+        BinaryPrimitives.WriteInt64BigEndian(ReadSpan(8), Value);
 
-        public void WriteUInt32(uint Value)
-        {
-            BinaryPrimitives.WriteUInt32BigEndian(ReadSpan(4), Value);
+        ByteIndex += 8;
+    }
 
-            ByteIndex += 4;
-        }
+    public ulong ReadULong()
+    {
+        return BinaryPrimitives.ReadUInt64BigEndian(ReadBytes(8));
+    }
 
-        public long ReadLong()
-        {
-            return BinaryPrimitives.ReadInt64BigEndian(ReadBytes(8));
-        }
+    public void WriteULong(ulong Value)
+    {
+        BinaryPrimitives.WriteUInt64BigEndian(ReadSpan(8), Value);
 
-        public void WriteLong(long Value)
-        {
-            BinaryPrimitives.WriteInt64BigEndian(ReadSpan(8), Value);
+        ByteIndex += 8;
+    }
 
-            ByteIndex += 8;
-        }
+    public string ReadString(ushort Length)
+    {
+        return Encoding.ASCII.GetString(ReadBytes(Length));
+    }
 
-        public ulong ReadULong()
-        {
-            return BinaryPrimitives.ReadUInt64BigEndian(ReadBytes(8));
-        }
+    public string ReadPrefixedString()
+    {
+        var Length = ReadByte();
 
-        public void WriteULong(ulong Value)
-        {
-            BinaryPrimitives.WriteUInt64BigEndian(ReadSpan(8), Value);
+        return ReadString(Length);
+    }
 
-            ByteIndex += 8;
-        }
+    public ReadOnlySpan<char> ReadStringSpan(ushort Length)
+    {
+        return ReadString(Length).AsSpan();
+    }
 
-        public string ReadString(ushort Length)
-        {
-            return Encoding.ASCII.GetString(ReadBytes(Length));
-        }
+    public ReadOnlyMemory<char> ReadStringMemory(ushort Length)
+    {
+        return ReadString(Length).AsMemory();
+    }
 
-        public string ReadPrefixedString()
-        {
-            var Length = ReadByte();
+    public void WriteString(string Value)
+    {
+        var Bytes = Encoding.ASCII.GetBytes(Value);
 
-            return ReadString(Length);
-        }
+        Bytes.CopyTo(ReadSpan(Bytes.Length));
 
-        public ReadOnlySpan<char> ReadStringSpan(ushort Length)
-        {
-            return ReadString(Length).AsSpan();
-        }
+        ByteIndex += Bytes.Length;
+    }
 
-        public ReadOnlyMemory<char> ReadStringMemory(ushort Length)
-        {
-            return ReadString(Length).AsMemory();
-        }
+    public void WritePrefixedString(string Value)
+    {
+        WriteByte((byte)Value.Length);
 
-        public void WriteString(string Value)
-        {
-            var Bytes = Encoding.ASCII.GetBytes(Value);
+        WriteString(Value);
+    }
 
-            Bytes.CopyTo(ReadSpan(Bytes.Length));
+    public TimeSpan ReadTimeSpan()
+    {
+        var Seconds = ReadInt32();
 
-            ByteIndex += Bytes.Length;
-        }
+        return new TimeSpan(0, 0, Seconds);
+    }
 
-        public void WritePrefixedString(string Value)
-        {
-            WriteByte((byte)Value.Length);
+    public void WriteTimeSpan(TimeSpan TimeSpan)
+    {
+        WriteUInt32((uint)TimeSpan.TotalSeconds);
+    }
 
-            WriteString(Value);
-        }
+    public IPAddress ReadIPv4Address()
+    {
+        return new IPAddress(ReadBytes(4));
+    }
 
-        public TimeSpan ReadTimeSpan()
-        {
-            var Seconds = ReadInt32();
+    public void WriteIPv4Address(IPAddress IPAddress)
+    {
+        WriteBytes(IPAddress.GetAddressBytes());
+    }
 
-            return new TimeSpan(0, 0, Seconds);
-        }
+    public IPAddress ReadIPv6Address()
+    {
+        return new IPAddress(ReadBytes(16));
+    }
 
-        public void WriteTimeSpan(TimeSpan TimeSpan)
-        {
-            WriteUInt32((uint)TimeSpan.TotalSeconds);
-        }
+    public void WriteIPv6Address(IPAddress IPAddress)
+    {
+        WriteBytes(IPAddress.GetAddressBytes());
+    }
 
-        public IPAddress ReadIPv4Address()
-        {
-            return new IPAddress(ReadBytes(4));
-        }
+    public DateTime ReadEpoch()
+    {
+        var Seconds = ReadUInt32();
 
-        public void WriteIPv4Address(IPAddress IPAddress)
-        {
-            WriteBytes(IPAddress.GetAddressBytes());
-        }
+        return new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddSeconds(Seconds);
+    }
 
-        public IPAddress ReadIPv6Address()
-        {
-            return new IPAddress(ReadBytes(16));
-        }
+    public void WriteEpoch(DateTime DateTime)
+    {
+        var Seconds = DateTime.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
 
-        public void WriteIPv6Address(IPAddress IPAddress)
-        {
-            WriteBytes(IPAddress.GetAddressBytes());
-        }
+        WriteUInt32((uint)Seconds);
+    }
 
-        public DateTime ReadEpoch()
-        {
-            var Seconds = ReadUInt32();
+    public byte[] ToArray()
+    {
+        return Raw.ToArray();
+    }
 
-            return new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddSeconds(Seconds);
-        }
-
-        public void WriteEpoch(DateTime DateTime)
-        {
-            var Seconds = DateTime.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
-
-            WriteUInt32((uint)Seconds);
-        }
-
-        public byte[] ToArray()
-        {
-            return Raw.ToArray();
-        }
-
-        public ReadOnlySpan<byte> ToSpan()
-        {
-            return Raw.Span;
-        }
+    public ReadOnlySpan<byte> ToSpan()
+    {
+        return Raw.Span;
     }
 }

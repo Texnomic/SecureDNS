@@ -5,7 +5,7 @@
 [![Slack](https://img.shields.io/static/v1?logo=Slack&label=Slack&message=Channel&color=73BA25&logoColor=4A154B)](https://join.slack.com/t/texnomicsecuredns/shared_invite/zt-h110u1u8-5VwSZsQSHL13s62xAZjI2Q)
 [![Facebook](https://img.shields.io/static/v1?logo=Facebook&label=Facebook&message=Page&color=73BA25&logoColor=1877FF2)](https://www.facebook.com/Texnomic-Secure-DNS-114240320331170)
 
-Building a Secure, Modern, Cross-Platform & Cross-Architecture DNS Server Using .NET 6.0.
+Building a Secure, Modern, Cross-Platform & Cross-Architecture DNS Server Using .NET 8.0.
 
 SecureDNS Project aims to implements all *secure* DNS Protocols regardless of being standardized or widely adopted; while maintaining backward compatibility with *unsecure* DNS-Over-UDP Protocol via Reverse Proxy.
 
@@ -20,10 +20,9 @@ SecureDNS Project is implemented using modern [Clean-Architecture](https://www.a
 5. [Platforms](#Platforms)
 6. [Architecture](#Architecture)
 7. [Launch](#Launch)
-8. [Technology](#Technology)
-9. [Dependencies](#Dependencies)
-10. [Donations](#Donations)
-11. [Supported-By](#Supported-By)
+8. [Dependencies](#Dependencies)
+9. [Donations](#Donations)
+10. [Supported-By](#Supported-By)
 
 ## Releases
 
@@ -98,16 +97,6 @@ The Project offically launched within my talk for [Cairo Security Camp](https://
 
 >This talk will cover the DNS protocol since its inception in 1986 and taking a deep-dive into the inherit lack of security at its core design and how all modern operating systems using insecure standards, Then we will explain alternative secure implementation like DNS Over TLS and DNS Over HTTP/S. Then we will shift-gears to developing an all-new modern DNS Server Reference-Implementation with a myriad of possibilities for retaking control like Black/Sink-holing, Threat Hunting/Intelligence and way more! Finally, we will launch a GitHub-based Open-Source Project containing DNS Server Reference-Implementation for the First-Time & Exclusively in Cairo Security Camp!
 
-## Technology
-
-1. [C# 8.0](https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-8)
-2. [.NET 5.0](https://dotnet.microsoft.com/download/dotnet/5.0)
-3. [ASP.NET Core 5.0](https://dotnet.microsoft.com/download/dotnet/5.0)
-4. [PowerShell Core 7.0](https://github.com/PowerShell/PowerShell)
-5. [Entity Framework Core 3.1](https://docs.microsoft.com/en-us/ef/core/)
-6. [Blazor aka Razor Components](https://dotnet.microsoft.com/apps/aspnet/web-apps/client)
-7. [Solidity](https://github.com/ethereum/solidity)
-
 ## Dependencies
 
 1. [HangFire](https://www.hangfire.io/)
@@ -131,8 +120,6 @@ The Project offically launched within my talk for [Cairo Security Camp](https://
 ## Donations
 
 * [![PayPal](https://img.shields.io/static/v1?logo=PayPal&label=PayPal&message=https://www.paypal.me/texnomic&color=blue)](https://www.paypal.me/texnomic)
-* ![Bitcoin](https://img.shields.io/static/v1?logo=Bitcoin&label=BTC&message=13wMqy8yg9yhJAAP2AXu8A2De1ptAYh6s4&color=orange)
-* ![Ethereum](https://img.shields.io/static/v1?logo=Ethereum&label=Ethereum&message=0xfE171b1C5C5584b65ec58a6FA2009f6ECeE812D7&color=black&logoColor=black)
 
 ## Supported-By
 

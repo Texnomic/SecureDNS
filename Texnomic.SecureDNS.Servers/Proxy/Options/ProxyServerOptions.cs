@@ -1,17 +1,18 @@
+<<<<<<< HEAD
 ﻿using System.Net;
 using System.Text.Json.Serialization;
+=======
+﻿namespace Texnomic.SecureDNS.Servers.Proxy.Options;
+>>>>>>> 80e159a06224c769a7805e12328fb284df6c8bc1
 
-namespace Texnomic.SecureDNS.Servers.Proxy.Options
+public class ProxyServerOptions
 {
-    public class ProxyServerOptions
-    {
-        public string Address { get; set; } = "127.0.0.1";
+    public string Address { get; set; } = "127.0.0.1";
 
-        public int Port { get; set; } = 53;
+    public int Port { get; set; } = 53;
 
-        [JsonIgnore]
-        public IPEndPoint IPEndPoint => new IPEndPoint(IPAddress.Parse(Address), Port);
+    [JsonIgnore]
+    public IPEndPoint IPEndPoint => new(IPAddress.Parse(Address), Port);
 
-        public static int Threads { get; set; } = Environment.ProcessorCount;
-    }
+    public int Threads { get; set; } = Environment.ProcessorCount;
 }

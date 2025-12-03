@@ -1,17 +1,40 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-
     <IsPackable>false</IsPackable>
+	  <TargetFramework>net8.0</TargetFramework>
+	  <ImplicitUsings>enable</ImplicitUsings>
+	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 
-    <LangVersion>8.0</LangVersion>
+	  <Version>0.6.0-alpha</Version>
+	  <Authors>Texnomic</Authors>
+	  <Company>Texnomic</Company>
+	  <Copyright>Texnomic, Copyrights © 2024</Copyright>
+
+	  <RepositoryUrl>https://github.com/Texnomic/SecureDNS</RepositoryUrl>
+	  <RepositoryType>Github</RepositoryType>
+
+	  <PackageIcon>SecureDNS.ico</PackageIcon>
+	  <PackageTags>Alpha</PackageTags>
+	  <PackageId>$(ProjectName)</PackageId>
+	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
+	  <PackageProjectUrl>https://github.com/Texnomic/SecureDNS</PackageProjectUrl>
+	  <PackageTags>dns sdns https udp tcp dnscrypt dou dot doh</PackageTags>
+
+	  <Product>$(ProjectName)</Product>
+	  <Description>$(ProjectName)</Description>
   </PropertyGroup>
 
   <ItemGroup>
+<<<<<<< HEAD
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
     <PackageReference Include="MSTest.TestAdapter" Version="2.2.8" />
     <PackageReference Include="MSTest.TestFramework" Version="2.2.8" />
+=======
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="3.4.3" />
+    <PackageReference Include="MSTest.TestFramework" Version="3.4.3" />
+>>>>>>> 80e159a06224c769a7805e12328fb284df6c8bc1
   </ItemGroup>
 
   <ItemGroup>

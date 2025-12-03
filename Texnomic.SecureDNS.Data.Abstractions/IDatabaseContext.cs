@@ -1,7 +1,6 @@
-﻿namespace Texnomic.SecureDNS.Data.Abstractions
+﻿namespace Texnomic.SecureDNS.Data.Abstractions;
+
+public interface IDatabaseContext
 {
-    public interface IDatabaseContext
-    {
-        //DbSet<IUser> Users { get; set; }
-    }
+    //DbSet<IUser> Users { get; set; }
 }

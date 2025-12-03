@@ -1,8 +1,7 @@
-﻿namespace Texnomic.SecureDNS.Abstractions.Enums
+﻿namespace Texnomic.SecureDNS.Abstractions.Enums;
+
+public enum Endianness : byte
 {
-    public enum Endianness : byte
-    {
-        Big,
-        Little
-    }
+    Big,
+    Little
 }
