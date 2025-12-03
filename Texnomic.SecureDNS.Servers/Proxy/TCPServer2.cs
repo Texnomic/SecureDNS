@@ -1,10 +1,5 @@
-﻿using System;
-using System.Buffers.Binary;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Buffers.Binary;
 using System.Net.Sockets;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using PipelineNet.MiddlewareResolver;
@@ -12,12 +7,9 @@ using PipelineNet.MiddlewareResolver;
 using Serilog;
 using Texnomic.SecureDNS.Abstractions.Enums;
 using Texnomic.SecureDNS.Core;
-using Texnomic.SecureDNS.Extensions;
 using Texnomic.SecureDNS.Serialization;
 using Texnomic.SecureDNS.Servers.Proxy.Options;
 using Texnomic.SecureDNS.Servers.Proxy.ResponsibilityChain;
-using Process = System.Diagnostics.Process;
-using ThreadPriorityLevel = System.Diagnostics.ThreadPriorityLevel;
 
 
 namespace Texnomic.SecureDNS.Servers.Proxy
@@ -33,7 +25,6 @@ namespace Texnomic.SecureDNS.Servers.Proxy
 
         private CancellationToken CancellationToken;
 
-        private int Affinity;
 
         public TCPServer2(IOptionsMonitor<ProxyResponsibilityChainOptions> ProxyResponsibilityChainOptions,
             IOptionsMonitor<ProxyServerOptions> ProxyServerOptions,
@@ -51,8 +42,6 @@ namespace Texnomic.SecureDNS.Servers.Proxy
             Threads = new List<Task>();
 
             TcpListener = new TcpListener(Options.CurrentValue.IPEndPoint);
-
-            Affinity = 0;
         }
 
         public async Task StartAsync(CancellationToken Token)
@@ -83,16 +72,6 @@ namespace Texnomic.SecureDNS.Servers.Proxy
 
         private async Task ResolveAsync()
         {
-            var AffinityPointer = (0b00000001 << Affinity++);
-
-            var ProcessThread = Process.GetCurrentProcess().Threads[Thread.CurrentThread.ManagedThreadId];
-
-            ProcessThread.ProcessorAffinity = (IntPtr)AffinityPointer;
-
-            ProcessThread.PriorityLevel = ThreadPriorityLevel.Highest;
-
-            Logger?.Debug("TCP Server Started Thread {@Thread} with Affinity {@Affinity} & Priority {@Priority}.", Thread.CurrentThread.ManagedThreadId, AffinityPointer, ThreadPriorityLevel.Highest);
-
             var ProxyResponsibilityChain = new ProxyResponsibilityChain(ProxyResponsibilityChainOptions, MiddlewareResolver);
 
             while (!CancellationToken.IsCancellationRequested)
@@ -105,7 +84,7 @@ namespace Texnomic.SecureDNS.Servers.Proxy
 
                 try
                 {
-                    Client = await TcpListener.AcceptSocketAsync().WithCancellation(CancellationToken);
+                    Client = await TcpListener.AcceptSocketAsync(CancellationToken);
 
                     Prefix = new byte[2];
 
@@ -130,7 +109,7 @@ namespace Texnomic.SecureDNS.Servers.Proxy
                     await Client.SendAsync(RawAnswer, SocketFlags.None);
 
                     Logger?.Information("Resolved Query {@QueryID} To {@RemoteEndPoint} with {@ResponseCode} For {@Domain}.",
-                                    Query.ID, Client.RemoteEndPoint.ToString(), Answer?.ResponseCode, Answer?.Questions.FirstOrDefault()?.Domain.Name);
+                                    Query.ID, Client.RemoteEndPoint?.ToString(), Answer?.ResponseCode, Answer?.Questions.FirstOrDefault()?.Domain.Name);
 
                     Logger?.Debug("Resolved {@Answer} For {@RemoteEndPoint}", Answer, Client.RemoteEndPoint);
                 }
@@ -146,7 +125,7 @@ namespace Texnomic.SecureDNS.Servers.Proxy
                 {
                     var Message = new Message()
                     {
-                        ID = BinaryPrimitives.ReadUInt16BigEndian(Buffer[2..2]),
+                        ID = BinaryPrimitives.ReadUInt16BigEndian(Buffer.AsSpan()[2..2]),
                         MessageType = MessageType.Response,
                         ResponseCode = ResponseCode.ServerFailure,
                     };

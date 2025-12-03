@@ -40,11 +40,11 @@ namespace Texnomic.SecureDNS.Terminal
 
         private static string Stage;
 
-        private static string ApplicationData;
+        private static string ApplicationData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
 
-        private static string AppSettingsFile;
+        private static string AppSettingsFile = "AppSettings.json";
 
-        private static string AppSettingsStageFile;
+        private static string AppSettingsPath;
 
         private static IConfigurationRoot Configurations;
 
@@ -53,41 +53,31 @@ namespace Texnomic.SecureDNS.Terminal
 
         public static async Task Main(string[] Arguments)
         {
-            Splash();
-
-            Stage = Environment.GetEnvironmentVariable("SecureDNS_Enviroment") ?? "Production";
-
-            ApplicationData = Stage == "Production" ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "Texnomic", "SecureDNS - Terminal Edition") : Environment.CurrentDirectory;
-
-            if(!Directory.Exists(ApplicationData)) Directory.CreateDirectory(ApplicationData);
-
-            AppSettingsFile = Path.Combine(ApplicationData, "AppSettings.json");
-
-            AppSettingsStageFile = Path.Combine(ApplicationData, $"AppSettings.{Stage}.json");
-
-            Console.WriteLine(AppSettingsFile);
-
-            if (!File.Exists(AppSettingsFile))
+            try
             {
-                await File.WriteAllBytesAsync(Path.Combine(ApplicationData, AppSettingsFile), ReadResource(AppSettingsFile));
-                await File.WriteAllBytesAsync(Path.Combine(ApplicationData, "AppSettings.Production.json"), ReadResource("AppSettings.Production.json"));
-                await File.WriteAllBytesAsync(Path.Combine(ApplicationData, "AppSettings.Development.json"), ReadResource("AppSettings.Development.json"));
+                Splash();
+
+                Configurations = await BuildConfig();
+
+                BuildHost();
+
+                Log.Information($"Environment: {Stage}");
+
+                Log.Information($"Settings: {AppSettingsPath}");
+
+                await HostBuilder.Build().RunAsync();
+
+            }
+            catch (Exception Error)
+            {
+                Log.Fatal(Error, Error.Message);
+            }
+            finally
+            {
+                Log.CloseAndFlush();
             }
 
-            Configurations = new ConfigurationBuilder()
-            .SetBasePath(ApplicationData)
-            .AddJsonFile(AppSettingsFile, false, true)
-            .AddJsonFile(AppSettingsStageFile, true, true)
-            .AddUserSecrets<Program>(true, true)
-            .AddEnvironmentVariables()
-            .Build();
-
-
-            Options = Configurations.GetSection("Terminal Options").Get<TerminalOptions>();
-
-            BuildHost();
-
-            await HostBuilder.RunConsoleAsync();
+            Console.ReadLine();
         }
 
         private static byte[] ReadResource(string Name)
@@ -103,7 +93,7 @@ namespace Texnomic.SecureDNS.Terminal
 
             var Buffer = new byte[Stream.Length];
 
-            Stream.Read(Buffer);
+            Stream?.Read(Buffer);
 
             return Buffer;
 
@@ -117,7 +107,7 @@ namespace Texnomic.SecureDNS.Terminal
                 .ConfigureLogging(ConfigureLogging)
                 .UseSerilog(ConfigureLogger, writeToProviders: true);
 
-            var Options = Configurations.GetSection("Terminal Options").Get<TerminalOptions>();
+            Options = Configurations.GetSection("Terminal Options").Get<TerminalOptions>();
 
             if (Options.Mode != Mode.Daemon) return;
 
@@ -300,6 +290,30 @@ namespace Texnomic.SecureDNS.Terminal
 
             return Result;
 
+        }
+
+        private static async ValueTask<IConfigurationRoot>  BuildConfig()
+        {
+            Stage = Environment.GetEnvironmentVariable("SecureDNS_Enviroment") ?? "Production";
+
+            ApplicationData = Stage == "Production" ? Path.Combine(ApplicationData, "Texnomic", "SecureDNS - Terminal Edition") : Environment.CurrentDirectory;
+
+            if (Directory.Exists(ApplicationData) == false) Directory.CreateDirectory(ApplicationData);
+
+            AppSettingsPath = Path.Combine(ApplicationData, "AppSettings.json");
+
+
+            if (File.Exists(AppSettingsPath) == false)
+            {
+                await File.WriteAllBytesAsync(AppSettingsPath, ReadResource(AppSettingsFile));
+            }
+
+            return new ConfigurationBuilder()
+                    .SetBasePath(ApplicationData)
+                    .AddJsonFile(AppSettingsPath, false, true)
+                    .AddUserSecrets<Program>(true, true)
+                    .AddEnvironmentVariables()
+                    .Build();
         }
     }
 }

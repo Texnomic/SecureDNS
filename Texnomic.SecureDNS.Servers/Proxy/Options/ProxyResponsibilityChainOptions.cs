@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using PipelineNet.Middleware;
+﻿using PipelineNet.Middleware;
 using Texnomic.SecureDNS.Abstractions;
 
 namespace Texnomic.SecureDNS.Servers.Proxy.Options
