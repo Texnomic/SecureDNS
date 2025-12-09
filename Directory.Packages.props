@@ -57,7 +57,7 @@
     <PackageVersion Include="Blazorise.Bootstrap" Version="1.8.7" />
     <PackageVersion Include="Blazorise.Icons.FontAwesome" Version="1.8.7" />
     <PackageVersion Include="Blazorise.Sidebar" Version="1.8.7" />
-    <PackageVersion Include="Syncfusion.Blazor" Version="31.2.16" />
+    <PackageVersion Include="Syncfusion.Blazor" Version="31.2.18" />
     <PackageVersion Include="Terminal.Gui" Version="1.19.0" />
     <!-- Nethereum (Ethereum) -->
     <PackageVersion Include="Nethereum.Accounts" Version="5.0.0" />
