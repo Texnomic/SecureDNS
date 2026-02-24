@@ -70,7 +70,7 @@
     <PackageVersion Include="BenchmarkDotNet" Version="0.15.8" />
     <PackageVersion Include="BinarySerializer" Version="8.6.4.1" />
     <PackageVersion Include="Colorful.Console" Version="1.2.15" />
-    <PackageVersion Include="Destructurama.Attributed" Version="5.1.0" />
+    <PackageVersion Include="Destructurama.Attributed" Version="5.2.0" />
     <PackageVersion Include="ElectronNET.API" Version="23.6.2" />
     <PackageVersion Include="FlexLabs.EntityFrameworkCore.Upsert" Version="10.0.0-beta1" />
     <PackageVersion Include="Hangfire" Version="1.8.22" />
