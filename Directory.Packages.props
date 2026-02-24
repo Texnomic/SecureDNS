@@ -85,7 +85,7 @@
     <PackageVersion Include="Polly" Version="8.6.5" />
     <PackageVersion Include="Rebex.Elliptic.Curve25519" Version="1.2.2" />
     <PackageVersion Include="Rebex.Elliptic.Ed25519" Version="1.2.2" />
-    <PackageVersion Include="RestSharp" Version="113.0.0" />
+    <PackageVersion Include="RestSharp" Version="113.1.0" />
     <PackageVersion Include="Sodium.Core" Version="1.4.0" />
     <PackageVersion Include="Tmds.Systemd" Version="0.8.0" />
     <PackageVersion Include="Tmds.Systemd.Logging" Version="0.8.0" />
