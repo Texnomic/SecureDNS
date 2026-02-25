@@ -36,7 +36,7 @@
     <PackageVersion Include="System.Text.Json" Version="10.0.0" />
     <PackageVersion Include="System.Threading.Tasks.Dataflow" Version="10.0.0" />
     <!-- Serilog -->
-    <PackageVersion Include="Serilog" Version="4.3.0" />
+    <PackageVersion Include="Serilog" Version="4.3.1" />
     <PackageVersion Include="Serilog.AspNetCore" Version="10.0.0" />
     <PackageVersion Include="Serilog.Enrichers.AspnetcoreHttpcontext" Version="1.1.0" />
     <PackageVersion Include="Serilog.Enrichers.Environment" Version="3.0.1" />
