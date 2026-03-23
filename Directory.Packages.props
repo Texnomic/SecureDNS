@@ -61,9 +61,9 @@
     <PackageVersion Include="Terminal.Gui" Version="1.19.0" />
     <!-- Nethereum (Ethereum) -->
     <PackageVersion Include="Nethereum.Accounts" Version="5.0.0" />
-    <PackageVersion Include="Nethereum.Contracts" Version="5.0.0" />
+    <PackageVersion Include="Nethereum.Contracts" Version="6.0.4" />
     <PackageVersion Include="Nethereum.ENS" Version="5.0.0" />
-    <PackageVersion Include="Nethereum.RPC" Version="5.0.0" />
+    <PackageVersion Include="Nethereum.RPC" Version="6.0.4" />
     <PackageVersion Include="Nethereum.Web3" Version="5.0.0" />
     <!-- Other Libraries -->
     <PackageVersion Include="AsyncEnumerator" Version="4.0.2" />
