@@ -68,7 +68,7 @@
     <!-- Other Libraries -->
     <PackageVersion Include="AsyncEnumerator" Version="4.0.2" />
     <PackageVersion Include="BenchmarkDotNet" Version="0.15.8" />
-    <PackageVersion Include="BinarySerializer" Version="8.6.4.1" />
+    <PackageVersion Include="BinarySerializer" Version="10.1.0" />
     <PackageVersion Include="Colorful.Console" Version="1.2.15" />
     <PackageVersion Include="Destructurama.Attributed" Version="5.1.0" />
     <PackageVersion Include="ElectronNET.API" Version="23.6.2" />
